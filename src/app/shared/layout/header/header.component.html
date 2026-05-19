@@ -1,0 +1,43 @@
+<mat-toolbar>
+  <div routerLink="/" class="logo-wrapper">
+    <img src="assets/Logo no background.svg" alt="RaidOps Logo" class="logo" />
+    <span>RaidOps</span>
+    @if (!isProd) {
+      <span class="env-badge">Dev</span>
+    }
+  </div>
+
+  <span class="spacer"></span>
+
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <app-discord-icon [type]="iconType" />
+  </button>
+
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item [matMenuTriggerFor]="langMenu">
+      <mat-icon>language</mat-icon>
+      <span>{{ 'header.language' | transloco }}</span>
+    </button>
+    <mat-divider />
+    @if (isAuthenticated()) {
+      <button mat-menu-item (click)="onLogoutClick()">
+        <mat-icon>logout</mat-icon>
+        <span>{{ 'header.logout' | transloco }}</span>
+      </button>
+    } @else {
+      <button mat-menu-item (click)="onLoginClick()">
+        <mat-icon>login</mat-icon>
+        <span>{{ 'header.login' | transloco }}</span>
+      </button>
+    }
+  </mat-menu>
+
+  <mat-menu #langMenu="matMenu">
+    @for (lang of availableLangs; track lang) {
+      <button mat-menu-item (click)="setLang(lang)">
+        <mat-icon>{{ lang === activeLang ? 'check' : '' }}</mat-icon>
+        {{ langLabels[lang] ?? lang.toUpperCase() }}
+      </button>
+    }
+  </mat-menu>
+</mat-toolbar>

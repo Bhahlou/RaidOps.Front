@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"i:\\\\repos\\\\RaidOps.Front\\\\src\" -File)",
+      "Bash(Select-Object Name)",
+      "PowerShell($basePath = \"i:\\\\repos\\\\RaidOps.Front\\\\src\\\\app\"; Get-ChildItem -Path $basePath -Recurse -Directory | Sort-Object FullName | ForEach-Object { $rel = $_.FullName -replace [regex]::Escape\\($basePath\\), \"\"; Write-Output \\(\".\" + $rel\\) })",
+      "PowerShell($basePath = \"i:\\\\repos\\\\RaidOps.Front\\\\src\\\\app\"; Get-ChildItem -Path $basePath -Recurse -File | Where-Object { $_.Directory.FullName -ne $basePath } | Sort-Object Directory, Name | ForEach-Object { $rel = $_.FullName -replace [regex]::Escape\\($basePath\\), \"\"; Write-Output $rel })",
+      "PowerShell(@\\(\"core\\\\interceptors\", \"core\\\\models\", \"core\\\\services\", \"features\\\\guilds\\\\components\", \"shared\\\\directives\"\\) | ForEach-Object { $dir = \"i:\\\\repos\\\\RaidOps.Front\\\\src\\\\app\\\\$_\"; $files = Get-ChildItem -Path $dir -File -ErrorAction SilentlyContinue; if \\($files\\) { Write-Output \"=== $_ ===\"; $files | ForEach-Object { Write-Output $_.Name } } })"
+    ]
+  }
+}

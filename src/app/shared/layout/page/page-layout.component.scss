@@ -1,0 +1,4 @@
+.page-content {
+  height: calc(100vh - var(--navbar-height));
+  overflow: auto;
+}

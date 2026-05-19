@@ -1,0 +1,45 @@
+.guild-layout {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text-primary);
+      background: var(--color-bg-tertiary);
+    }
+
+    &.active {
+      color: var(--color-accent);
+      background: var(--color-bg-elevated);
+    }
+  }
+
+  .separator {
+    height: 1px;
+    background: var(--color-border);
+    margin: 8px 0;
+  }
+}
+
+.guild-content {
+  flex: 1;
+  overflow: auto;
+}

@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './raidops-theme' as raidops-theme;
+
+html {
+  font-family: 'Roboto', sans-serif;
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: raidops-theme.$primary-palette,
+        tertiary: raidops-theme.$tertiary-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  @media (prefers-contrast: more) {
+    @include raidops-theme.high-contrast-overrides(color-scheme);
+  }
+}
+
+// ── Reset & base ─────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: #0f1117;
+  color: #e2e2e5;
+}
+
+.mat-toolbar {
+  z-index: 2;
+  position: relative !important;
+  box-shadow: var(--mat-sys-primary) 0px 1px 0px 0px;
+
+  --mat-toolbar-standard-height: var(--header-bar-height);
+}
+
+:root {
+  @include mat.toolbar-overrides(
+    (
+      container-text-color: var(--mat-sys-primary),
+      container-background-color: var(--mat-sys-surface),
+    )
+  );
+}

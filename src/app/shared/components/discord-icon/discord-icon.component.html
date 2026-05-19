@@ -1,0 +1,8 @@
+<div class="avatar-wrapper">
+  @if (!url) {
+    <mat-icon>account_circle</mat-icon>
+  }
+  @if (url) {
+    <img [src]="url" [alt]="'Discord icon'" />
+  }
+</div>
