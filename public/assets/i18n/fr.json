@@ -4,6 +4,13 @@
     "logout": "Déconnexion",
     "language": "Langue"
   },
+  "sidenav": {
+    "account": {
+      "characters": "Personnages",
+      "equipment": "Équipement"
+    },
+    "guilds": "Mes guildes"
+  },
   "noGuild": {
     "noServer": {
       "title": "Aucune guilde éligible",

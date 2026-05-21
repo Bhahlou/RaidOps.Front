@@ -1,0 +1,123 @@
+// ── Host ─────────────────────────────────────────────────────────────────────
+
+:host {
+  display: contents;
+}
+
+// ── Sidenav rail ─────────────────────────────────────────────────────────────
+
+.sidenav {
+  width: var(--sidebar-rail-width);
+  flex-shrink: 0;
+  background: var(--mat-sys-surface-container-low);
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.is-expanded {
+    width: var(--sidebar-width);
+  }
+}
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 56px;
+  // Centers the 36px avatar in 64px rail: (64 - 36) / 2 = 14px
+  padding: 0 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  transition: background 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+}
+
+.section-avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  app-discord-icon {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.section-name {
+  flex: 1;
+  text-align: left;
+  font-weight: 500;
+}
+
+.section-chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: color-mix(in srgb, var(--mat-sys-on-surface-variant) 55%, transparent);
+}
+
+// ── Nav items ─────────────────────────────────────────────────────────────────
+
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  // Centers the 24px icon in 64px rail: (64 - 24) / 2 = 20px
+  padding: 0 20px;
+  text-decoration: none;
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &.active-link {
+    color: var(--mat-sys-primary);
+    background: var(--mat-sys-surface-container-high);
+  }
+}
+
+.item-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  font-size: 24px;
+}
+
+// ── Labels (hidden in rail, visible when expanded) ────────────────────────────
+
+.sidenav-label {
+  opacity: 0;
+  transition: opacity 150ms ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidenav.is-expanded .sidenav-label {
+  opacity: 1;
+  transition-delay: 150ms;
+}
+
+// ── Section separator ────────────────────────────────────────────────────────
+
+.section-separator {
+  height: 1px;
+  margin: 4px 12px;
+  background: var(--mat-sys-outline-variant);
+  flex-shrink: 0;
+}

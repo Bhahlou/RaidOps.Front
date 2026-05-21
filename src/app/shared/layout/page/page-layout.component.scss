@@ -1,4 +1,9 @@
-.page-content {
+.page-container {
+  display: flex;
   height: calc(100vh - var(--navbar-height));
+}
+
+.page-content {
+  flex: 1;
   overflow: auto;
 }

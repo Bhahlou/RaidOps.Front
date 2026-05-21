@@ -5,6 +5,7 @@ import { NoGuildComponent } from './features/no-guild/no-guild.component';
 import { CharactersComponent } from './features/characters/characters.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { RegisterComponent } from './features/guilds/pages/register/register.component';
+import { GearPlannerComponent } from './features/gear-planner/gear-planner.component';
 import { AuthCallbackComponent } from './core/components/auth-callback.component';
 import { GuildCalendarComponent } from './features/guilds/pages/calendar/guild-calendar.component';
 import { GuildDashboardComponent } from './features/guilds/pages/dashboard/guild-dashboard.component';
@@ -32,6 +33,7 @@ export const routes: Routes = [
         children: [
           { path: 'no-guild', component: NoGuildComponent },
           { path: 'characters', component: CharactersComponent },
+          { path: 'gear-planner', component: GearPlannerComponent },
           { path: 'settings', component: SettingsComponent },
           {
             path: 'guild-register/:id',

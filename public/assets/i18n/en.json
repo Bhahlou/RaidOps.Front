@@ -4,6 +4,13 @@
     "logout": "Logout",
     "language": "Language"
   },
+  "sidenav": {
+    "account": {
+      "characters": "Characters",
+      "equipment": "Gear planner"
+    },
+    "guilds": "My guilds"
+  },
   "noGuild": {
     "noServer": {
       "title": "No eligible guild",

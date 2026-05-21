@@ -4,6 +4,7 @@
 html {
   font-family: 'Roboto', sans-serif;
   color-scheme: light dark;
+
   @include mat.theme(
     (
       color: (
@@ -14,6 +15,9 @@ html {
       density: 0,
     )
   );
+
+  // Apply dark gaming palette overrides on top of the generated theme
+  @include raidops-theme.dark-overrides;
 
   @media (prefers-contrast: more) {
     @include raidops-theme.high-contrast-overrides(color-scheme);
@@ -32,23 +36,98 @@ html {
 html,
 body {
   height: 100%;
-  background-color: #0f1117;
-  color: #e2e2e5;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .mat-toolbar {
   z-index: 2;
   position: relative !important;
-  box-shadow: var(--mat-sys-primary) 0px 1px 0px 0px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 
-  --mat-toolbar-standard-height: var(--header-bar-height);
+  --mat-toolbar-standard-height: var(--navbar-height);
 }
 
 :root {
+  // ── Layout ──────────────────────────────────────────────────────────────────
+  --navbar-height: 56px;
+  --sidebar-width: 240px;
+  --sidebar-rail-width: 64px;
+
+  // No remaining custom color variables — all colors use --mat-sys-* tokens.
+
   @include mat.toolbar-overrides(
     (
       container-text-color: var(--mat-sys-primary),
-      container-background-color: var(--mat-sys-surface),
+      container-background-color: var(--mat-sys-surface-container-high),
     )
   );
+}
+
+// ── Animated ambient background ───────────────────────────────────────────────
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+body::before {
+  width: 900px;
+  height: 700px;
+  top: -80px;
+  right: -80px;
+  // #ffb954 — primary amber (M3 dark tone 80)
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 185, 84, 0.38) 0%,
+    transparent 65%
+  );
+  filter: blur(45px);
+  animation: blob-drift-1 30s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 800px;
+  height: 800px;
+  bottom: -80px;
+  left: -80px;
+  // #c1cf61 — tertiary lime (M3 dark tone 80)
+  background: radial-gradient(
+    ellipse at center,
+    rgba(193, 207, 97, 0.28) 0%,
+    transparent 65%
+  );
+  filter: blur(55px);
+  animation: blob-drift-2 38s ease-in-out infinite alternate;
+}
+
+@keyframes blob-drift-1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  30%  { transform: translate(-180px, 140px) scale(1.12); }
+  65%  { transform: translate(120px, -100px) scale(0.9); }
+  100% { transform: translate(-80px, 160px) scale(1.06); }
+}
+
+@keyframes blob-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  35%  { transform: translate(160px, -130px) scale(1.1); }
+  70%  { transform: translate(-140px, 90px) scale(0.88); }
+  100% { transform: translate(100px, -160px) scale(1.14); }
+}
+
+// Make app-root sit above the blobs
+app-root {
+  position: relative;
+  z-index: 1;
 }

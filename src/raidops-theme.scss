@@ -136,6 +136,33 @@ $_rest: (
 $primary-palette: map.merge(map.get($_palettes, primary), $_rest);
 $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
+// ── Dark gaming theme overrides ───────────────────────────────────────────────
+// Overrides Material sys tokens to match the RaidOps dark blue-gray palette.
+// Call inside the html {} selector in styles.scss after @include mat.theme().
+@mixin dark-overrides {
+  @include mat.theme-overrides(
+    (
+      // Surface / background layers
+      surface: #0f1117,
+      surface-container-lowest: #0b0d12,
+      surface-container-low: #16181f,
+      surface-container: #1e2028,
+      surface-container-high: #252830,
+      surface-container-highest: #2e3040,
+      surface-dim: #0b0d12,
+      surface-bright: #2e3040,
+
+      // Text
+      on-surface: #e2e2e5,
+      on-surface-variant: #9b9baf,
+
+      // Borders
+      outline-variant: #2e3040,
+      outline: #3e4050
+    )
+  );
+}
+
 @function _high-contrast-value($light, $dark, $theme-type) {
   @if ($theme-type == light) {
     @return $light;

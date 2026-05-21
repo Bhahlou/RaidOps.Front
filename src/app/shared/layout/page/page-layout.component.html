@@ -1,5 +1,12 @@
 <app-header />
 <app-loading-bar />
-<div class="page-content">
-  <router-outlet />
+
+<div class="page-container">
+  @if (isAuthenticated()) {
+    <app-sidenav />
+  }
+
+  <main class="page-content">
+    <router-outlet />
+  </main>
 </div>
