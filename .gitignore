@@ -1,5 +1,9 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Local dev certificates (mkcert)
+localhost.pem
+localhost-key.pem
+
 # Compiled output
 /dist
 /tmp
@@ -19,6 +23,7 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+.claude/*
 
 # Visual Studio Code
 .vscode/*
