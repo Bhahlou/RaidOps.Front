@@ -34,6 +34,11 @@ export const routes: Routes = [
           { path: 'characters', component: CharactersComponent },
           { path: 'settings', component: SettingsComponent },
           {
+            path: 'guild-register/:id',
+            component: RegisterComponent,
+            canActivate: [discordAdminGuard],
+          },
+          {
             path: '',
             canActivate: [eligibleGuildGuard],
             children: [
@@ -50,11 +55,6 @@ export const routes: Routes = [
                   { path: 'loot', component: GuildLootComponent },
                   { path: 'settings', component: GuildSettingsComponent },
                 ],
-              },
-              {
-                path: 'register/:id',
-                component: RegisterComponent,
-                canActivate: [discordAdminGuard],
               },
             ],
           },

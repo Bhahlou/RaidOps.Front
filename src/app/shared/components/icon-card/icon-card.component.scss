@@ -1,0 +1,25 @@
+mat-card-header {
+  margin-bottom: 8px;
+  text-align: left;
+
+  mat-card-subtitle {
+    margin-top: 6px;
+  }
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.card-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--color-accent);
+  opacity: 0.7;
+}

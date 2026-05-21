@@ -3,5 +3,17 @@
     "login": "Login",
     "logout": "Logout",
     "language": "Language"
+  },
+  "noGuild": {
+    "noServer": {
+      "title": "No eligible guild",
+      "description": "None of your guilds is currently registered for RaidOps. RaidOps requires you to be an <strong>administrator</strong> of a Discord server to register one yourself.<br />Join or create a Discord server, then come back here."
+    },
+    "register": {
+      "title": "No guild registered",
+      "description": "None of your guilds is currently registered for RaidOps. Being administrator of the following servers, you can register one yourself to start using RaidOps",
+      "serverColumn": "Guild",
+      "action": "Register"
+    }
   }
 }

@@ -3,5 +3,17 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "language": "Langue"
+  },
+  "noGuild": {
+    "noServer": {
+      "title": "Aucune guilde éligible",
+      "description": "Aucune de tes guildes n'est actuellement enregistrée dans RaidOps. RaidOps nécessite que tu sois <strong>administrateur</strong> d'un serveur Discord pour pouvoir l'enregistrer.<br />Rejoins ou crée un serveur Discord, puis reviens ici."
+    },
+    "register": {
+      "title": "Aucune guilde enregistrée",
+      "description": "Aucune de tes guildes n'est actuellement enregistrée dans RaidOps. Etant administrateur des serveurs suivants, tu peux en enregistrer un toi même pour commencer à utiliser RaidOps.",
+      "serverColumn": "Guilde",
+      "action": "Enregistrer"
+    }
   }
 }
