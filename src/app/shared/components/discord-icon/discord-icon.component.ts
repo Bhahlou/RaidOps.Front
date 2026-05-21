@@ -10,7 +10,7 @@ import { DiscordIconType } from '../../models/discord-icon-type.enum';
 })
 export class DiscordIconComponent {
   id = input<string>();
-  hash = input<string>();
+  hash = input<string | null>();
   type = input.required<DiscordIconType>();
 
   get url() {
@@ -25,7 +25,7 @@ export class DiscordIconComponent {
       }
     }
 
-    const index = Number(BigInt(this.id()!) % 6n);
+    const index = Number((BigInt(this.id()!) >> 22n) % 6n);
     return `${baseUrl}/embed/avatars/${index}.png`;
   }
 }

@@ -25,7 +25,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
-      { path: 'auth/callback', component: AuthCallbackComponent },
+      { path: 'authcallback', component: AuthCallbackComponent },
       {
         path: '',
         canActivate: [authGuard],

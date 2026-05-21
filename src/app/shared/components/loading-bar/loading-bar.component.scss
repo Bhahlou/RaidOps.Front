@@ -1,0 +1,9 @@
+:host {
+  position: fixed;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: block;
+  pointer-events: none;
+}
