@@ -24,3 +24,27 @@
 .spacer {
   flex: 1 1 auto;
 }
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+
+  &:has(.user-name) {
+    padding-left: 12px;
+  }
+  border-radius: 28px;
+  transition: background 150ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .user-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+}

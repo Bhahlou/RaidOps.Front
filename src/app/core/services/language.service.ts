@@ -7,14 +7,14 @@ type Lang = (typeof AVAILABLE_LANGS)[number];
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-  private transloco = inject(TranslocoService);
+  readonly #transloco = inject(TranslocoService);
 
   constructor() {
-    this.transloco.setActiveLang(this.resolveInitialLang());
+    this.#transloco.setActiveLang(this.#resolveInitialLang());
   }
 
   get activeLang(): Lang {
-    return this.transloco.getActiveLang() as Lang;
+    return this.#transloco.getActiveLang() as Lang;
   }
 
   get availableLangs(): readonly string[] {
@@ -24,10 +24,10 @@ export class LanguageService {
   setLang(lang: string): void {
     if (!AVAILABLE_LANGS.includes(lang as Lang)) return;
     localStorage.setItem(STORAGE_KEY, lang);
-    this.transloco.setActiveLang(lang);
+    this.#transloco.setActiveLang(lang);
   }
 
-  private resolveInitialLang(): Lang {
+  #resolveInitialLang(): Lang {
     const saved = localStorage.getItem(STORAGE_KEY) as Lang | null;
     if (saved && AVAILABLE_LANGS.includes(saved)) return saved;
 
