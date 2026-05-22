@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { HomeComponent } from './features/home/home.component';
-import { NoGuildComponent } from './features/no-guild/no-guild.component';
 import { CharactersComponent } from './features/characters/characters.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { RegisterComponent } from './features/guilds/pages/register/register.component';
@@ -18,6 +17,7 @@ import { eligibleGuildGuard } from './features/guilds/guards/eligible-guild-guar
 import { guildAccessGuard } from './features/guilds/guards/guild-access-guard';
 import { GuildLayoutComponent } from './features/guilds/layout/guild-layout.component';
 import { PageLayoutComponent } from './shared/layout/page/page-layout.component';
+import { NoGuildComponent } from './features/guilds/pages/no-guild/no-guild.component';
 
 export const routes: Routes = [
   {

@@ -1,1 +1,24 @@
-<p>register works!</p>
+<div class="register-container">
+  @if (guild(); as guild) {
+    <app-icon-card
+      icon="smart_toy"
+      [title]="'register.title' | transloco"
+    >
+      <div class="guild-preview">
+        <div class="guild-icon">
+          <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" />
+        </div>
+        <span class="guild-name">{{ guild.name }}</span>
+      </div>
+
+      <p class="description" [innerHTML]="'register.description' | transloco"></p>
+
+      <div class="action">
+        <button mat-flat-button color="primary" (click)="initiateRegistration()">
+          <mat-icon>add_circle</mat-icon>
+          {{ 'register.cta' | transloco }}
+        </button>
+      </div>
+    </app-icon-card>
+  }
+</div>

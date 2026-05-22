@@ -1,0 +1,47 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 64px 24px;
+
+  app-icon-card {
+    width: 100%;
+    max-width: 560px;
+  }
+}
+
+// ── Guild preview ─────────────────────────────────────────────────────────────
+
+.guild-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 8px;
+}
+
+.guild-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.guild-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+.description {
+  color: var(--color-text-secondary);
+  margin: 16px 0 24px;
+  line-height: 1.6;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+}
