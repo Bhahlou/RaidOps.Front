@@ -5,12 +5,16 @@
     [isBnetLinked]="isBnetLinked()"
     [bnetAccount]="bnetAccount() ?? null"
     (linkBnet)="linkBnet($event)"
+    (openImport)="openImportDialog()"
   />
 
   <app-character-list-content
     [isBnetLoading]="isBnetLoading()"
     [isBnetLinked]="isBnetLinked()"
+    [isCharactersLoading]="isCharactersLoading()"
+    [characters]="characters()"
     (linkBnet)="linkBnet($event)"
+    (openImport)="openImportDialog()"
   />
 
 </div>

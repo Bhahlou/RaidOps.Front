@@ -60,6 +60,22 @@
       "emptyTitle": "Aucun personnage",
       "empty": "Importe tes personnages depuis Battle.net pour commencer.",
       "importButton": "Importer les personnages"
+    },
+    "import": {
+      "titleBranch": "Importer des personnages — Choisir une branche",
+      "titleCharacters": "Importer des personnages — {{ branch }}",
+      "branchDesc": "Sélectionne la branche de jeu depuis laquelle tu veux importer tes personnages.",
+      "charactersDesc": "Sélectionne les personnages à importer. Les personnages déjà importés sont affichés mais ne peuvent pas être resélectionnés.",
+      "alreadyImported": "Déjà importé",
+      "allImported": "Tous tes personnages sur cette branche ont déjà été importés.",
+      "fetchError": "Impossible de charger les personnages. Réessaie.",
+      "back": "Retour",
+      "cancel": "Annuler",
+      "importButton": "Importer ({{ count }})",
+      "searchPlaceholder": "Rechercher par nom…",
+      "noResults": "Aucun personnage ne correspond à ta recherche.",
+      "importSuccess": "Personnages importés avec succès !",
+      "importError": "Une erreur est survenue pendant l'import. Réessaie."
     }
   }
 }

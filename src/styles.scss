@@ -28,6 +28,13 @@ html {
     )
   );
 
+  @include mat.dialog-overrides(
+    (
+      container-color: var(--mat-sys-surface-container-high),
+      container-shape: 16px,
+    )
+  );
+
   @media (prefers-contrast: more) {
     @include raidops-theme.high-contrast-overrides(color-scheme);
   }
@@ -147,6 +154,13 @@ body::after {
 app-root {
   position: relative;
   z-index: 1;
+}
+
+// ── Dialog ────────────────────────────────────────────────────────────────────
+// Border + elevation — not available as Material tokens, applied globally.
+.mat-mdc-dialog-surface {
+  border: 1px solid var(--mat-sys-outline-variant) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.72) !important;
 }
 
 // ── Snackbar variants ──────────────────────────────────────────────────────────

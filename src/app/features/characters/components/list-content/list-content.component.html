@@ -1,10 +1,7 @@
 <div class="page-content">
 
-  @if (isBnetLoading()) {
-    <div class="empty-state">
-      <mat-spinner [diameter]="36" />
-    </div>
-
+  @if (isBnetLoading() || (isBnetLinked() && isCharactersLoading())) {
+    <!-- progress bar handles loading feedback -->
   } @else if (!isBnetLinked()) {
     <div class="empty-state">
       <mat-icon class="empty-icon">videogame_asset</mat-icon>
@@ -15,15 +12,22 @@
       </app-bnet-link-button>
     </div>
 
-  } @else {
+  } @else if (characters().length === 0) {
     <div class="empty-state">
       <mat-icon class="empty-icon">manage_accounts</mat-icon>
       <p class="empty-title">{{ 'characters.list.emptyTitle' | transloco }}</p>
       <p class="empty-desc">{{ 'characters.list.empty' | transloco }}</p>
-      <button mat-stroked-button>
+      <button mat-stroked-button (click)="openImport.emit()">
         <mat-icon>download</mat-icon>
         {{ 'characters.list.importButton' | transloco }}
       </button>
+    </div>
+
+  } @else {
+    <div class="char-grid">
+      @for (char of characters(); track char.id) {
+        <app-character-card [character]="char" />
+      }
     </div>
   }
 

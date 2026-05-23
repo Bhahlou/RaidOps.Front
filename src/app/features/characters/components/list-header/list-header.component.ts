@@ -23,6 +23,7 @@ export class ListHeaderComponent {
   readonly bnetAccount = input<BnetAccount | null>(null);
 
   readonly linkBnet = output<string>();
+  readonly openImport = output<void>();
 
   readonly regionFlags = REGION_FLAGS;
 }

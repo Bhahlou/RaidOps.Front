@@ -5,7 +5,7 @@
     @if (!isBnetLoading()) {
       @if (isBnetLinked()) {
         <!-- BNet linked → import button (action) + battletag chip (info, far right) -->
-        <button mat-flat-button>
+        <button mat-flat-button (click)="openImport.emit()">
           <mat-icon>download</mat-icon>
           {{ 'characters.list.importButton' | transloco }}
         </button>

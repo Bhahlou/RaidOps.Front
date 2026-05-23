@@ -60,6 +60,22 @@
       "emptyTitle": "No characters yet",
       "empty": "Import your characters from Battle.net to get started.",
       "importButton": "Import characters"
+    },
+    "import": {
+      "titleBranch": "Import characters — Select a branch",
+      "titleCharacters": "Import characters — {{ branch }}",
+      "branchDesc": "Select the game branch you want to import characters from.",
+      "charactersDesc": "Select the characters you want to import. Already imported characters are shown but cannot be re-selected.",
+      "alreadyImported": "Already imported",
+      "allImported": "All your characters on this branch have already been imported.",
+      "fetchError": "Failed to load characters. Please try again.",
+      "back": "Back",
+      "cancel": "Cancel",
+      "importButton": "Import ({{ count }})",
+      "searchPlaceholder": "Search by name…",
+      "noResults": "No characters match your search.",
+      "importSuccess": "Characters imported successfully!",
+      "importError": "An error occurred during import. Please try again."
     }
   }
 }
