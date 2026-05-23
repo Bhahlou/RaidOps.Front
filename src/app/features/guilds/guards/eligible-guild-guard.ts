@@ -3,19 +3,20 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthStore } from '../../../core/stores/auth.store';
 
 /**
- * Protects guild routes that require at least one registered guild.
+ * Protects the /guilds route.
  *
- * - If the user belongs to at least one registered guild → allow.
- * - Otherwise → redirects to /no-guild so the user can register one.
+ * Allows access when the user has at least one registered guild
+ * OR is admin of at least one unregistered guild (so they can register it).
+ * Otherwise redirects to /no-guild.
  */
 export const eligibleGuildGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  const user = authStore.user();
-  if (user && user.guilds.some((g) => g.isRegistered)) {
-    return true;
-  }
+  const guilds = authStore.user()?.guilds ?? [];
+  const hasEligibleGuild =
+    guilds.some(g => g.isRegistered) ||
+    guilds.some(g => g.isAdmin && !g.isRegistered);
 
-  return router.createUrlTree(['/no-guild']);
+  return hasEligibleGuild ? true : router.createUrlTree(['/no-guild']);
 };

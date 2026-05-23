@@ -11,6 +11,24 @@
     },
     "guilds": "Mes guildes"
   },
+  "guildList": {
+    "column": "Guilde",
+    "registered": {
+      "title": "Mes guildes enregistrées",
+      "subtitle": "Sélectionne une guilde pour accéder à son tableau de bord.",
+      "action": "Accéder"
+    },
+    "admin": {
+      "title": "Mes guildes non enregistrées",
+      "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
+      "action": "Enregistrer"
+    }
+  },
+  "register": {
+    "title": "Enregistrer une guilde",
+    "description": "Pour enregistrer ta guilde sur RaidOps, tu dois inviter le bot RaidOps à rejoindre ton serveur discord. En cliquant sur le bouton ci-dessous, tu seras redirigé vers Discord pour autoriser l'invitation. L'enregistrement sera automatiquement finalisé une fois le bot invité.",
+    "cta": "Inviter le bot et enregistrer"
+  },
   "noGuild": {
     "noServer": {
       "title": "Aucune guilde éligible",

@@ -11,6 +11,24 @@
     },
     "guilds": "My guilds"
   },
+  "guildList": {
+    "column": "Guild",
+    "registered": {
+      "title": "My registered guilds",
+      "subtitle": "Select a guild to access its dahsboard.",
+      "action": "Enter"
+    },
+    "admin": {
+      "title": "My unregistered guilds",
+      "subtitle": "The following guilds are unregistered, but you are administator of them. You can register them to start using RaidOps.",
+      "action": "Register"
+    }
+  },
+  "register": {
+    "title": "Register a guild",
+    "description": "To activate RaidOps on this server, the bot needs to join your Discord server. By clicking the button below, you will be redirected to Discord to authorise the invitation. Registration will be completed automatically once the bot has been invited.",
+    "cta": "Invite the bot and register"
+  },
   "noGuild": {
     "noServer": {
       "title": "No eligible guild",

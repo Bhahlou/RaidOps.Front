@@ -1,0 +1,37 @@
+.guild-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 64px 24px;
+
+  app-icon-card {
+    width: 100%;
+    max-width: 560px;
+  }
+}
+
+// ── Guild table ───────────────────────────────────────────────────────────────
+
+.guild-table {
+  width: 100%;
+  background: transparent;
+
+  .mat-column-icon {
+    width: 52px;
+    padding-right: 0;
+  }
+
+  .mat-column-action {
+    width: 140px;
+  }
+}
+
+.guild-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.action-cell {
+  text-align: right;
+}

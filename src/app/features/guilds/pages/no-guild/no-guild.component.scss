@@ -1,0 +1,11 @@
+.no-guild-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 64px 24px;
+
+  app-icon-card {
+    width: 100%;
+    max-width: 560px;
+  }
+}
