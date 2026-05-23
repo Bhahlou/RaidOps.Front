@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { CharacterService } from '../services/character.service';
 import { BnetAccount } from '../models/bnet-account.model';
+import { CharacterDto } from '../models/character.model';
 
 /**
  * Signal store for character-related state.
@@ -34,6 +35,31 @@ export class CharacterStore {
     this.#bnetAccount.set(undefined); // reset to loading state before every call
     return this.#characterService.getBnetAccount().pipe(
       tap((account) => this.#bnetAccount.set(account)),
+    );
+  }
+
+  // ── Characters ────────────────────────────────────────────────────────────
+
+  /** `undefined` = not yet fetched / loading; `[]` = loaded, none imported yet. */
+  readonly #characters = signal<CharacterDto[] | undefined>(undefined);
+
+  /** Read-only view of the characters list. */
+  readonly characters = this.#characters.asReadonly();
+
+  /** True while characters are being fetched. */
+  readonly isCharactersLoading = computed(() => this.#characters() === undefined);
+
+  /** The current character list, defaulting to `[]` while loading. */
+  readonly characterList = computed(() => this.#characters() ?? []);
+
+  /**
+   * Fetches the user's imported characters and updates the store.
+   * Call this after confirming BNet is linked.
+   */
+  loadCharacters(): Observable<CharacterDto[]> {
+    this.#characters.set(undefined); // reset to loading state
+    return this.#characterService.getCharacters().pipe(
+      tap((chars) => this.#characters.set(chars)),
     );
   }
 }
