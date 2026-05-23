@@ -20,7 +20,7 @@
     },
     "admin": {
       "title": "Mes guildes non enregistrées",
-      "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
+      "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en es administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
       "action": "Enregistrer"
     }
   },
@@ -39,6 +39,27 @@
       "description": "Aucune de tes guildes n'est actuellement enregistrée dans RaidOps. Etant administrateur des serveurs suivants, tu peux en enregistrer un toi même pour commencer à utiliser RaidOps.",
       "serverColumn": "Guilde",
       "action": "Enregistrer"
+    }
+  },
+  "errors": {
+    "network": "Erreur réseau. Vérifie ta connexion.",
+    "server": "Erreur serveur. Réessaie dans quelques instants."
+  },
+  "characters": {
+    "bnet": {
+      "linkButton": "Lier Battle.net",
+      "notLinkedTitle": "Lier ton compte Battle.net",
+      "notLinkedDescription": "Lie ton compte Battle.net pour importer tes personnages.",
+      "linkedSuccess": "Compte Battle.net lié avec succès !",
+      "linkError": "Une erreur est survenue lors de la liaison de ton compte Battle.net. Réessaie.",
+      "linkErrorSession": "Session expirée. Réessaie de lier ton compte Battle.net.",
+      "linkErrorBnet": "Battle.net est inaccessible pour le moment. Réessaie plus tard."
+    },
+    "list": {
+      "title": "Personnages",
+      "emptyTitle": "Aucun personnage",
+      "empty": "Importe tes personnages depuis Battle.net pour commencer.",
+      "importButton": "Importer les personnages"
     }
   }
 }

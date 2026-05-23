@@ -1,0 +1,16 @@
+<div class="characters-page">
+
+  <app-character-list-header
+    [isBnetLoading]="isBnetLoading()"
+    [isBnetLinked]="isBnetLinked()"
+    [bnetAccount]="bnetAccount() ?? null"
+    (linkBnet)="linkBnet($event)"
+  />
+
+  <app-character-list-content
+    [isBnetLoading]="isBnetLoading()"
+    [isBnetLinked]="isBnetLinked()"
+    (linkBnet)="linkBnet($event)"
+  />
+
+</div>

@@ -1,0 +1,30 @@
+<div class="page-content">
+
+  @if (isBnetLoading()) {
+    <div class="empty-state">
+      <mat-spinner [diameter]="36" />
+    </div>
+
+  } @else if (!isBnetLinked()) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">videogame_asset</mat-icon>
+      <p class="empty-title">{{ 'characters.bnet.notLinkedTitle' | transloco }}</p>
+      <p class="empty-desc">{{ 'characters.bnet.notLinkedDescription' | transloco }}</p>
+      <app-bnet-link-button variant="large" (regionSelected)="linkBnet.emit($event)">
+        {{ 'characters.bnet.linkButton' | transloco }}
+      </app-bnet-link-button>
+    </div>
+
+  } @else {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">manage_accounts</mat-icon>
+      <p class="empty-title">{{ 'characters.list.emptyTitle' | transloco }}</p>
+      <p class="empty-desc">{{ 'characters.list.empty' | transloco }}</p>
+      <button mat-stroked-button>
+        <mat-icon>download</mat-icon>
+        {{ 'characters.list.importButton' | transloco }}
+      </button>
+    </div>
+  }
+
+</div>

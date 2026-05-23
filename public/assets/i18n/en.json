@@ -40,5 +40,26 @@
       "serverColumn": "Guild",
       "action": "Register"
     }
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "server": "Server error. Please try again later."
+  },
+  "characters": {
+    "bnet": {
+      "linkButton": "Link Battle.net",
+      "notLinkedTitle": "Link your Battle.net account",
+      "notLinkedDescription": "Link your Battle.net account to import your World of Warcraft characters.",
+      "linkedSuccess": "Battle.net account linked successfully!",
+      "linkError": "An error occurred while linking your Battle.net account. Please try again.",
+      "linkErrorSession": "Session expired. Please try linking your Battle.net account again.",
+      "linkErrorBnet": "Battle.net is currently unavailable. Please try again later."
+    },
+    "list": {
+      "title": "Characters",
+      "emptyTitle": "No characters yet",
+      "empty": "Import your characters from Battle.net to get started.",
+      "importButton": "Import characters"
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { HomeComponent } from './features/home/home.component';
-import { CharactersComponent } from './features/characters/characters.component';
+import { CharacterListComponent } from './features/characters/pages/list/list.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { RegisterComponent } from './features/guilds/pages/register/register.component';
 import { GearPlannerComponent } from './features/gear-planner/gear-planner.component';
@@ -32,7 +32,7 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
           { path: 'no-guild', component: NoGuildComponent },
-          { path: 'characters', component: CharactersComponent },
+          { path: 'characters', component: CharacterListComponent },
           { path: 'gear-planner', component: GearPlannerComponent },
           { path: 'settings', component: SettingsComponent },
           {
