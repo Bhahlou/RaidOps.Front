@@ -1,0 +1,23 @@
+<article class="card">
+
+  <app-wow-class-icon
+    [classId]="character().classId"
+    [className]="character().className"
+    [size]="36" />
+
+  <div class="card-info">
+    <span class="char-name" [style.color]="character().classColor">{{ character().name }}</span>
+    <span class="char-meta">
+      {{ character().realmName }}
+      @if (character().itemLevel) {
+        · {{ character().itemLevel }}&thinsp;ilvl
+      }
+    </span>
+  </div>
+
+  <div class="card-aside">
+    <app-wow-faction-icon [faction]="character().faction" [size]="18" />
+    <span class="char-level">{{ character().level }}</span>
+  </div>
+
+</article>
