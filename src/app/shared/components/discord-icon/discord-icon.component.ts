@@ -9,13 +9,11 @@ import { DiscordIconType } from '../../models/discord-icon-type.enum';
   styleUrl: './discord-icon.component.scss',
 })
 export class DiscordIconComponent {
-  id = input<string>();
+  id = input.required<string>();
   hash = input<string | null>();
   type = input.required<DiscordIconType>();
 
   get url() {
-    if (!this.id()) return null;
-
     const baseUrl = 'https://cdn.discordapp.com';
     if (this.hash()) {
       if (this.type() === DiscordIconType.User) {
@@ -25,7 +23,7 @@ export class DiscordIconComponent {
       }
     }
 
-    const index = Number((BigInt(this.id()!) >> 22n) % 6n);
+    const index = Number((BigInt(this.id()) >> 22n) % 6n);
     return `${baseUrl}/embed/avatars/${index}.png`;
   }
 }

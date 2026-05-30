@@ -30,6 +30,6 @@ export class AuthService {
 
   /** Redirects the browser to the Discord OAuth2 sign-up flow. */
   signup(): void {
-    window.location.href = `${this.#api}/api/v1/discordAuth/signup`;
+    globalThis.location.href = `${this.#api}/api/v1/discordAuth/signup`;
   }
 }

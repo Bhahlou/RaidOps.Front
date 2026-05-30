@@ -25,7 +25,7 @@ export class RegisterComponent implements OnInit {
 
   /** The guild being registered, resolved from the authenticated user's guild list. */
   readonly guild = computed<UserGuild | null>(
-    () => this.#authStore.user()?.guilds.find(g => g.id === this.#guildId) ?? null,
+    () => this.#authStore.user()?.guilds.find((g) => g.id === this.#guildId) ?? null,
   );
 
   readonly DiscordIconType = DiscordIconType;
@@ -42,6 +42,6 @@ export class RegisterComponent implements OnInit {
   initiateRegistration(): void {
     const guild = this.guild();
     if (!guild) return;
-    window.location.href = `${environment.apiUrl}/api/v1/guilds/register/initiate?guildId=${guild.id}`;
+    globalThis.location.href = `${environment.apiUrl}/api/v1/guilds/register/initiate?guildId=${guild.id}`;
   }
 }
