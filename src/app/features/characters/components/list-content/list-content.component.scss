@@ -1,53 +1,47 @@
-// ── Content area ──────────────────────────────────────────────────────────────
-
 .page-content {
   flex: 1;
   overflow: auto;
   display: flex;
   flex-direction: column;
-}
 
-// ── Character grid ────────────────────────────────────────────────────────────
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 24px;
+    text-align: center;
 
-.char-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
-  padding: 20px 24px;
-  align-content: start;
-}
+    .icon {
+      font-size: 56px;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 4px;
+    }
 
-// ── Empty / loading states ────────────────────────────────────────────────────
+    .title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--mat-sys-on-surface);
+      margin: 0;
+    }
 
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 48px 24px;
-  text-align: center;
-}
+    .desc {
+      font-size: 0.875rem;
+      color: var(--mat-sys-on-surface-variant);
+      margin: 0 0 8px;
+      max-width: 680px;
+      line-height: 1.5;
+    }
+  }
 
-.empty-icon {
-  font-size: 56px;
-  width: 56px;
-  height: 56px;
-  margin-bottom: 4px;
-}
-
-.empty-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--mat-sys-on-surface);
-  margin: 0;
-}
-
-.empty-desc {
-  font-size: 0.875rem;
-  color: var(--mat-sys-on-surface-variant);
-  margin: 0 0 8px;
-  max-width: 380px;
-  line-height: 1.5;
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    padding: 20px 24px;
+    align-content: start;
+  }
 }
