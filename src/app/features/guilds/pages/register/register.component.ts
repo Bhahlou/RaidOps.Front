@@ -42,6 +42,6 @@ export class RegisterComponent implements OnInit {
   initiateRegistration(): void {
     const guild = this.guild();
     if (!guild) return;
-    globalThis.location.href = `${environment.apiUrl}/api/v1/guilds/register/initiate?guildId=${guild.id}`;
+    globalThis.location.href = `${environment.apiUrl}/guilds/register/initiate?guildId=${guild.id}`;
   }
 }
