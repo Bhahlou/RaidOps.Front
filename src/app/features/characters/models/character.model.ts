@@ -1,3 +1,5 @@
+import { CharacterSpec } from './character-spec.model';
+
 /** A WoW character imported into RaidOps. */
 export interface Character {
   id: number;
@@ -8,8 +10,12 @@ export interface Character {
   raceId: number;
   raceName: string;
   faction: string;
+  branchName: string;
   realmName: string;
   realmSlug: string;
   level: number;
   itemLevel: number | null;
+  avatarUrl: string | null;
+  guildName: string | null;
+  specs: CharacterSpec[];
 }
