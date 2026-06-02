@@ -3,11 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CharacterStore } from '../../stores/character.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { LoadingStore } from '../../../../core/stores/loading.store';
-import { environment } from '../../../../../environments/environment';
 import { ListHeaderComponent } from '../../components/list-header/list-header.component';
 import { ListContentComponent } from '../../components/list-content/list-content.component';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
+import {
+  SyncBnetDialogComponent,
+  SyncBnetDialogData,
+} from '../../components/sync-bnet-dialog/sync-bnet-dialog.component';
 
 /** Shell page for the characters list. Handles routing concerns and delegates UI to sub-components. */
 @Component({
@@ -20,10 +22,8 @@ import { ImportDialogComponent } from '../../components/import-dialog/import-dia
 export class CharacterListComponent implements OnInit {
   readonly #store = inject(CharacterStore);
   readonly #snackbar = inject(SnackbarService);
-  readonly #loadingStore = inject(LoadingStore);
   readonly #route = inject(ActivatedRoute);
   readonly #dialog = inject(MatDialog);
-  readonly #api = environment.apiUrl;
 
   readonly isBnetLoading = this.#store.isBnetLoading;
   readonly isBnetLinked = this.#store.isBnetLinked;
@@ -39,17 +39,21 @@ export class CharacterListComponent implements OnInit {
   }
 
   /**
-   * Navigates the browser to the BNet OAuth initiation endpoint for the given region.
-   * Manually increments the loading store because this is a browser-level redirect,
-   * not an HttpClient call — the loading interceptor won't see it.
-   * No matching decrement needed: the page reloads entirely after the OAuth flow.
+   * Triggered by the "Lier BNet" region picker in the header/content.
+   * Opens the sync dialog with the selected region for first-time account linking.
    */
   linkBnet(region: string): void {
-    this.#loadingStore.increment();
-    window.location.href = `${this.#api}/api/v1/bnet/link/initiate?region=${region}`;
+    this.#openSyncDialog(region);
   }
 
-  /** Opens the two-step character import dialog. */
+  /** Opens the sync dialog using the region from the already-linked BNet account. */
+  openSyncDialog(): void {
+    const region = this.bnetAccount()?.region;
+    if (!region) return;
+    this.#openSyncDialog(region);
+  }
+
+  /** Opens the character activation dialog (select synced chars to use in RaidOps). */
   openImportDialog(): void {
     const dialogRef = this.#dialog.open(ImportDialogComponent, {
       width: '680px',
@@ -57,39 +61,54 @@ export class CharacterListComponent implements OnInit {
       maxHeight: '85vh',
     });
 
-    dialogRef.afterClosed().subscribe((result?: { imported: number; error?: boolean }) => {
-      if (!result) return;
-      if (result.error) {
-        this.#snackbar.error('characters.import.importError');
-      } else if (result.imported > 0) {
-        this.#snackbar.success('characters.import.importSuccess');
-        this.#store.loadCharacters().subscribe();
-      }
+    dialogRef
+      .afterClosed()
+      .subscribe((result?: { activated: number; error?: boolean; openSync?: boolean }) => {
+        if (!result) return;
+        if (result.openSync) {
+          this.openSyncDialog();
+          return;
+        }
+        if (result.error) {
+          this.#snackbar.error('characters.import.importError');
+        } else if (result.activated > 0) {
+          this.#snackbar.success('characters.import.importSuccess');
+          this.#store.loadCharacters().subscribe();
+        }
+      });
+  }
+
+  #openSyncDialog(region: string): void {
+    const dialogRef = this.#dialog.open(SyncBnetDialogComponent, {
+      width: '680px',
+      maxWidth: '95vw',
+      data: { region } satisfies SyncBnetDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { synced: boolean }) => {
+      if (!result?.synced) return;
+      this.#snackbar.success('characters.bnet.syncSuccess');
+      this.#store.loadBnetAccount().subscribe((account) => {
+        if (account) this.#store.loadCharacters().subscribe();
+      });
     });
   }
 
-  /** Handles query params set by the BNet OAuth callback redirect. */
+  /** Handles error query params set by the BNet OAuth callback in edge cases. */
   #handleOAuthCallback(): void {
-    const params = this.#route.snapshot.queryParamMap;
-
-    if (params.get('bnet_linked') === 'true') {
-      setTimeout(() => this.#snackbar.success('characters.bnet.linkedSuccess'), 400);
-      return;
-    }
-
-    const error = params.get('error');
+    const error = this.#route.snapshot.queryParamMap.get('error');
     if (error) {
       setTimeout(() => this.#snackbar.error(this.#bnetErrorKey(error)), 200);
     }
   }
 
-  /** Maps a BNet OAuth error code to its i18n key. */
   #bnetErrorKey(error: string): string {
     switch (error) {
-      case 'invalid_state':
-      case 'state_mismatch':
+      case 'InvalidState':
+      case 'StateMismatch':
+      case 'Unauthorized':
         return 'characters.bnet.linkErrorSession';
-      case 'bnet_api_error':
+      case 'BnetApiError':
         return 'characters.bnet.linkErrorBnet';
       default:
         return 'characters.bnet.linkError';

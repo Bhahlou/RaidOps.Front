@@ -1,138 +1,140 @@
-<h2 mat-dialog-title>
-  @if (step() === 'branches') {
-    {{ 'characters.import.titleBranch' | transloco }}
-  } @else {
-    {{ 'characters.import.titleCharacters' | transloco : { branch: selectedBranch()?.name } }}
-  }
-</h2>
+<h2 mat-dialog-title>{{ 'characters.import.title' | transloco }}</h2>
 
 <mat-dialog-content>
 
-  <!-- Loading / Error states -->
   @if (loadState() === 'loading') {
     <div class="dialog-state">
       <mat-spinner [diameter]="36" />
     </div>
+
   } @else if (loadState() === 'error') {
     <div class="dialog-state dialog-state--error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ 'characters.import.fetchError' | transloco }}</p>
     </div>
 
-  <!-- Step 1 — Branch selection -->
-  } @else if (step() === 'branches') {
-    <p class="step-desc">{{ 'characters.import.branchDesc' | transloco }}</p>
-    <div class="branch-grid">
-      @for (branch of branches(); track branch.id) {
-        <button
-          [class]="'branch-card branch-card--' + branch.currentExpansionShortCode.toLowerCase()"
-          (click)="selectBranch(branch)">
-          <div class="branch-card__bg" aria-hidden="true"></div>
-          <div class="branch-card__content">
-            <span class="branch-name">{{ branch.name }}</span>
-            <span class="branch-expansion">{{ branch.currentExpansionShortCode }}</span>
-          </div>
-          <mat-icon class="branch-card__arrow">arrow_forward</mat-icon>
-        </button>
-      }
+  } @else if (characters().length === 0) {
+    <div class="dialog-state">
+      <mat-icon>sync_alt</mat-icon>
+      <p>{{ 'characters.import.noSyncedChars' | transloco }}</p>
     </div>
 
-  <!-- Step 2 — Character selection -->
+  } @else if (allAlreadyActive()) {
+    <div class="dialog-state">
+      <mat-icon>check_circle_outline</mat-icon>
+      <p>{{ 'characters.import.allActive' | transloco }}</p>
+    </div>
+
   } @else {
-    @if (allCharactersAlreadyImported()) {
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput #searchInput
+        [placeholder]="'characters.import.searchPlaceholder' | transloco"
+        [value]="searchQuery()"
+        (input)="searchQuery.set(searchInput.value)" />
+      @if (searchQuery()) {
+        <button matSuffix mat-icon-button (click)="searchQuery.set(''); searchInput.value = ''">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    @if (filteredBranchGroups().length === 0) {
       <div class="dialog-state">
-        <mat-icon>check_circle_outline</mat-icon>
-        <p>{{ 'characters.import.allImported' | transloco }}</p>
+        <mat-icon>manage_search</mat-icon>
+        <p>{{ 'characters.import.noResults' | transloco }}</p>
       </div>
     } @else {
+      <!-- Level 1: Branch -->
+      <mat-accordion multi>
+        @for (branch of filteredBranchGroups(); track branch.branchName) {
+          <mat-expansion-panel
+            [expanded]="isBranchExpanded(branch.branchName)"
+            (opened)="toggleBranchPanel(branch.branchName, true)"
+            (closed)="toggleBranchPanel(branch.branchName, false)">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="branch-header">
+                <span class="branch-label">{{ branch.branchName }}</span>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
 
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput #searchInput
-          [placeholder]="'characters.import.searchPlaceholder' | transloco"
-          [value]="searchQuery()"
-          (input)="searchQuery.set(searchInput.value)" />
-        @if (searchQuery()) {
-          <button matSuffix mat-icon-button (click)="searchQuery.set(''); searchInput.value = ''">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </mat-form-field>
+            <!-- Level 2: Realm -->
+            <mat-accordion multi class="realm-accordion">
+              @for (realm of branch.realms; track realm.realmName) {
+                <mat-expansion-panel
+                  [expanded]="isRealmExpanded(branch.branchName, realm.realmName)"
+                  (opened)="toggleRealmPanel(branch.branchName, realm.realmName, true)"
+                  (closed)="toggleRealmPanel(branch.branchName, realm.realmName, false)">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title class="realm-header">
+                      <mat-checkbox
+                        [checked]="isRealmAllSelected(realm)"
+                        [indeterminate]="isRealmIndeterminate(realm)"
+                        (change)="toggleAllInRealm(realm)"
+                        (click)="$event.stopPropagation()">
+                      </mat-checkbox>
+                      <span>{{ realm.realmName }}</span>
+                      <span class="realm-count">{{ realm.characters.length }}</span>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
 
-      @if (filteredRealmGroups().length === 0) {
-        <div class="dialog-state">
-          <mat-icon>manage_search</mat-icon>
-          <p>{{ 'characters.import.noResults' | transloco }}</p>
-        </div>
-      } @else {
-        <mat-accordion multi>
-          @for (group of filteredRealmGroups(); track group.realmSlug) {
-            <mat-expansion-panel [expanded]="true">
-              <mat-expansion-panel-header>
-                <mat-panel-title class="realm-header">
-                  <mat-checkbox
-                    [checked]="isGroupAllSelected(group)"
-                    [indeterminate]="isGroupIndeterminate(group)"
-                    (change)="toggleAll(group)"
-                    (click)="$event.stopPropagation()">
-                  </mat-checkbox>
-                  <span>{{ group.realmName }}</span>
-                  <span class="realm-count">{{ group.characters.length }}</span>
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-
-              <div class="char-list">
-                @for (char of group.characters; track char.bnetCharacterId) {
-                  <div
-                    class="char-row"
-                    [class.char-row--imported]="char.alreadyImported"
-                    (click)="toggleCharacter(char)">
-                    <mat-checkbox
-                      [checked]="isSelected(char.bnetCharacterId)"
-                      [disabled]="char.alreadyImported"
-                      (click)="$event.stopPropagation()"
-                      (change)="toggleCharacter(char)">
-                    </mat-checkbox>
-                    <app-wow-class-icon
-                      [classId]="char.classId"
-                      [className]="char.className" />
-                    <span class="char-name" [style.color]="classColor(char.classId)">{{ char.name }}</span>
-                    <span class="char-level">{{ char.level }}</span>
-                    <app-wow-faction-icon [faction]="char.faction" />
-                    @if (char.alreadyImported) {
-                      <span class="already-imported-badge">{{ 'characters.import.alreadyImported' | transloco }}</span>
+                  <div class="char-list">
+                    @for (char of realm.characters; track char.id) {
+                      <div
+                        class="char-row"
+                        [class.char-row--imported]="char.isActive"
+                        (click)="toggleCharacter(char)">
+                        <mat-checkbox
+                          [checked]="isSelected(char.id)"
+                          [disabled]="char.isActive"
+                          (click)="$event.stopPropagation()"
+                          (change)="toggleCharacter(char)">
+                        </mat-checkbox>
+                        <app-wow-class-icon [classId]="char.classId" [className]="char.className" />
+                        <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
+                        <span class="char-level">{{ char.level }}</span>
+                        <app-wow-faction-icon [faction]="char.faction" />
+                        @if (char.isActive) {
+                          <span class="already-imported-badge">{{ 'characters.import.alreadyActive' | transloco }}</span>
+                        }
+                      </div>
                     }
                   </div>
-                }
-              </div>
-            </mat-expansion-panel>
-          }
-        </mat-accordion>
-      }
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
+
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
     }
   }
 
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  @if (step() === 'characters' && loadState() === 'idle') {
-    <button mat-button (click)="goBack()" [disabled]="isImporting()">
-      {{ 'characters.import.back' | transloco }}
+<mat-dialog-actions>
+  <div class="actions-left">
+    <button mat-stroked-button (click)="openSync()" [disabled]="isActivating()">
+      <mat-icon>sync</mat-icon>
+      {{ 'characters.bnet.syncButton' | transloco }}
     </button>
-  }
-  <button mat-button mat-dialog-close [disabled]="isImporting()">
-    {{ 'characters.import.cancel' | transloco }}
-  </button>
-  @if (step() === 'characters' && loadState() === 'idle' && !allCharactersAlreadyImported()) {
-    <button
-      mat-flat-button
-      [disabled]="selectedCount() === 0 || isImporting()"
-      (click)="import()">
-      @if (isImporting()) {
-        <mat-spinner [diameter]="16" />
-      } @else {
-        {{ 'characters.import.importButton' | transloco : { count: selectedCount() } }}
-      }
+    <span class="sync-hint">{{ 'characters.import.syncHint' | transloco }}</span>
+  </div>
+  <div class="actions-right">
+    <button mat-button mat-dialog-close [disabled]="isActivating()">
+      {{ 'characters.import.cancel' | transloco }}
     </button>
-  }
+    @if (loadState() === 'idle' && !allAlreadyActive() && characters().length > 0) {
+      <button
+        mat-flat-button
+        [disabled]="selectedCount() === 0 || isActivating()"
+        (click)="activate()">
+        @if (isActivating()) {
+          <mat-spinner [diameter]="16" />
+        } @else {
+          {{ 'characters.import.importButton' | transloco : { count: selectedCount() } }}
+        }
+      </button>
+    }
+  </div>
 </mat-dialog-actions>

@@ -193,7 +193,36 @@
   opacity: 0.8;
 }
 
-// ── Step 2 — Expansion panels ────────────────────────────────────────────────
+// ── Actions bar ──────────────────────────────────────────────────────────────
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 24px;
+}
+
+.actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sync-hint {
+  font-size: 11px;
+  color: var(--mat-sys-on-surface-variant);
+  max-width: 200px;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+// ── Accordion panels ─────────────────────────────────────────────────────────
 
 // Differentiate realm header from character rows without ::ng-deep on global tokens.
 :host ::ng-deep {
@@ -226,7 +255,21 @@
   }
 }
 
-// ── Step 2 — Character list ───────────────────────────────────────────────────
+// ── Branch + Realm headers ────────────────────────────────────────────────────
+
+.branch-header {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface);
+}
+
+.branch-label {
+  letter-spacing: 0.02em;
+}
+
+.realm-accordion {
+  margin: 4px 0;
+}
 
 .realm-header {
   display: flex;

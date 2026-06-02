@@ -48,34 +48,43 @@
   "characters": {
     "bnet": {
       "linkButton": "Lier Battle.net",
-      "notLinkedTitle": "Lier ton compte Battle.net",
-      "notLinkedDescription": "Lie ton compte Battle.net pour importer tes personnages.",
+      "notLinkedTitle": "Lie ton compte Battle.net",
+      "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement.",
       "linkedSuccess": "Compte Battle.net lié avec succès !",
       "linkError": "Une erreur est survenue lors de la liaison de ton compte Battle.net. Réessaie.",
       "linkErrorSession": "Session expirée. Réessaie de lier ton compte Battle.net.",
-      "linkErrorBnet": "Battle.net est inaccessible pour le moment. Réessaie plus tard."
+      "linkErrorBnet": "Battle.net est inaccessible pour le moment. Réessaie plus tard.",
+      "popupBlocked": "Autorise les popups pour importer tes personnages.",
+      "syncButton": "Synchroniser BNet",
+      "syncSuccess": "Personnages synchronisés avec succès !"
     },
     "list": {
       "title": "Personnages",
-      "emptyTitle": "Aucun personnage",
-      "empty": "Importe tes personnages depuis Battle.net pour commencer.",
+      "emptyTitle": "Aucun personnage importé",
+      "empty": "RaidOps connait maintenant tes personnages, mais tu n'en as encore importé aucun. Clique sur le bouton ci-dessous pour importer tes personnages depuis Battle.net.",
       "importButton": "Importer les personnages"
     },
     "import": {
-      "titleBranch": "Importer des personnages — Choisir une branche",
-      "titleCharacters": "Importer des personnages — {{ branch }}",
-      "branchDesc": "Sélectionne la branche de jeu depuis laquelle tu veux importer tes personnages.",
-      "charactersDesc": "Sélectionne les personnages à importer. Les personnages déjà importés sont affichés mais ne peuvent pas être resélectionnés.",
-      "alreadyImported": "Déjà importé",
-      "allImported": "Tous tes personnages sur cette branche ont déjà été importés.",
+      "title": "Importer des personnages",
+      "alreadyActive": "Déjà importé",
+      "allActive": "Tous tes personnages synchronisés sont déjà importés.",
+      "noSyncedChars": "Aucun personnage synchronisé. Utilise « Synchroniser BNet » d'abord.",
+      "syncHint": "Des personnages manquants ? Synchronise ton compte BNet.",
       "fetchError": "Impossible de charger les personnages. Réessaie.",
-      "back": "Retour",
       "cancel": "Annuler",
       "importButton": "Importer ({{ count }})",
       "searchPlaceholder": "Rechercher par nom…",
       "noResults": "Aucun personnage ne correspond à ta recherche.",
       "importSuccess": "Personnages importés avec succès !",
       "importError": "Une erreur est survenue pendant l'import. Réessaie."
+    },
+    "sync": {
+      "title": "Synchroniser les personnages",
+      "branchDesc": "Sélectionne la branche de jeu à synchroniser.",
+      "authenticating": "Connexion à Battle.net…",
+      "syncing": "Synchronisation en cours…",
+      "error": "Une erreur est survenue. Réessaie.",
+      "retry": "Réessayer"
     }
   }
 }

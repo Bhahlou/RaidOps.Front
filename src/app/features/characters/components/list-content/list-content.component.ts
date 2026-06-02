@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BnetLinkButtonComponent } from '../../../../shared/components/bnet-link-button/bnet-link-button.component';
 import { CharacterCardComponent } from '../character-card/character-card.component';
-import { CharacterDto } from '../../models/character.model';
+import { Character } from '../../models/character.model';
 
 /**
  * Content area for the characters list page.
@@ -27,7 +27,7 @@ export class ListContentComponent {
   readonly isBnetLoading = input.required<boolean>();
   readonly isBnetLinked = input.required<boolean>();
   readonly isCharactersLoading = input.required<boolean>();
-  readonly characters = input.required<CharacterDto[]>();
+  readonly characters = input.required<Character[]>();
 
   readonly linkBnet = output<string>();
   readonly openImport = output<void>();

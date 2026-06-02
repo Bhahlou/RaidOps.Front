@@ -1,5 +1,4 @@
-/** A WoW character imported into RaidOps. */
-export interface Character {
+export interface SyncedCharacter {
   id: number;
   name: string;
   classId: number;
@@ -8,8 +7,8 @@ export interface Character {
   raceId: number;
   raceName: string;
   faction: string;
+  branchName: string;
   realmName: string;
-  realmSlug: string;
   level: number;
-  itemLevel: number | null;
+  isActive: boolean;
 }

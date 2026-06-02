@@ -2,7 +2,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { CharacterService } from '../services/character.service';
 import { BnetAccount } from '../models/bnet-account.model';
-import { CharacterDto } from '../models/character.model';
+import { Character } from '../models/character.model';
+import { BnetService } from '../../../shared/services/bnet.service';
 
 /**
  * Signal store for character-related state.
@@ -15,6 +16,7 @@ import { CharacterDto } from '../models/character.model';
 @Injectable({ providedIn: 'root' })
 export class CharacterStore {
   readonly #characterService = inject(CharacterService);
+  readonly #bnetService = inject(BnetService);
 
   readonly #bnetAccount = signal<BnetAccount | null | undefined>(undefined);
 
@@ -33,15 +35,15 @@ export class CharacterStore {
    */
   loadBnetAccount(): Observable<BnetAccount | null> {
     this.#bnetAccount.set(undefined); // reset to loading state before every call
-    return this.#characterService.getBnetAccount().pipe(
-      tap((account) => this.#bnetAccount.set(account)),
-    );
+    return this.#bnetService
+      .getBnetAccount()
+      .pipe(tap((account) => this.#bnetAccount.set(account)));
   }
 
   // ── Characters ────────────────────────────────────────────────────────────
 
   /** `undefined` = not yet fetched / loading; `[]` = loaded, none imported yet. */
-  readonly #characters = signal<CharacterDto[] | undefined>(undefined);
+  readonly #characters = signal<Character[] | undefined>(undefined);
 
   /** Read-only view of the characters list. */
   readonly characters = this.#characters.asReadonly();
@@ -56,10 +58,8 @@ export class CharacterStore {
    * Fetches the user's imported characters and updates the store.
    * Call this after confirming BNet is linked.
    */
-  loadCharacters(): Observable<CharacterDto[]> {
+  loadCharacters(): Observable<Character[]> {
     this.#characters.set(undefined); // reset to loading state
-    return this.#characterService.getCharacters().pipe(
-      tap((chars) => this.#characters.set(chars)),
-    );
+    return this.#characterService.getCharacters().pipe(tap((chars) => this.#characters.set(chars)));
   }
 }

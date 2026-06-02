@@ -6,6 +6,7 @@ import { SettingsComponent } from './features/settings/settings.component';
 import { RegisterComponent } from './features/guilds/pages/register/register.component';
 import { GearPlannerComponent } from './features/gear-planner/gear-planner.component';
 import { AuthCallbackComponent } from './core/components/auth-callback.component';
+import { BnetCallbackComponent } from './core/components/bnet-callback.component';
 import { GuildCalendarComponent } from './features/guilds/pages/calendar/guild-calendar.component';
 import { GuildDashboardComponent } from './features/guilds/pages/dashboard/guild-dashboard.component';
 import { GuildListComponent } from './features/guilds/pages/list/guild-list.component';
@@ -27,6 +28,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       { path: 'authcallback', component: AuthCallbackComponent },
+      { path: 'bnet-callback', component: BnetCallbackComponent },
       {
         path: '',
         canActivate: [authGuard],
