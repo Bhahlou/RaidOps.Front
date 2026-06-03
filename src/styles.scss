@@ -163,6 +163,18 @@ app-root {
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.72) !important;
 }
 
+// ── Mat menu — danger item ─────────────────────────────────────────────────────
+// mat-menu renders in a CDK overlay portal outside component scope.
+.menu-item--danger {
+  &.mat-mdc-menu-item {
+    color: var(--mat-sys-error);
+
+    .mat-icon {
+      color: var(--mat-sys-error);
+    }
+  }
+}
+
 // ── Snackbar variants ──────────────────────────────────────────────────────────
 // Background + text colors are set via mat.snack-bar-overrides() in html {}.
 // Only border decorations live here — panelClass drives success/error/info variants.

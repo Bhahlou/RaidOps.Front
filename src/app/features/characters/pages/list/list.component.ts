@@ -6,6 +6,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ListHeaderComponent } from '../../components/list-header/list-header.component';
 import { ListContentComponent } from '../../components/list-content/list-content.component';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
+import { ConfirmDeactivateDialogComponent } from '../../components/confirm-deactivate-dialog/confirm-deactivate-dialog.component';
 import {
   SyncBnetDialogComponent,
   SyncBnetDialogData,
@@ -53,10 +54,31 @@ export class CharacterListComponent implements OnInit {
     this.#openSyncDialog(region);
   }
 
+  deactivateCharacter(id: number): void {
+    const dialogRef = this.#dialog.open(ConfirmDeactivateDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.#store.deactivateCharacter(id).subscribe({
+        error: () => this.#snackbar.error('characters.card.deactivateError'),
+      });
+    });
+  }
+
+  resyncCharacter(id: number): void {
+    this.#store.resyncCharacter(id).subscribe({
+      next: () => this.#snackbar.success('characters.card.resyncSuccess'),
+      error: () => this.#snackbar.error('characters.card.resyncError'),
+    });
+  }
+
   /** Opens the character activation dialog (select synced chars to use in RaidOps). */
   openImportDialog(): void {
     const dialogRef = this.#dialog.open(ImportDialogComponent, {
-      width: '680px',
+      width: '800px',
       maxWidth: '95vw',
       maxHeight: '85vh',
     });

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { HomeComponent } from './features/home/home.component';
 import { CharacterListComponent } from './features/characters/pages/list/list.component';
+import { CharacterDetailComponent } from './features/characters/pages/detail/character-detail.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { RegisterComponent } from './features/guilds/pages/register/register.component';
 import { GearPlannerComponent } from './features/gear-planner/gear-planner.component';
@@ -35,6 +36,7 @@ export const routes: Routes = [
         children: [
           { path: 'no-guild', component: NoGuildComponent },
           { path: 'characters', component: CharacterListComponent },
+          { path: 'characters/:branch/:realm/:name', component: CharacterDetailComponent },
           { path: 'gear-planner', component: GearPlannerComponent },
           { path: 'settings', component: SettingsComponent },
           {

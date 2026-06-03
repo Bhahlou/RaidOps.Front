@@ -85,6 +85,19 @@
       "syncing": "Synchronisation en cours…",
       "error": "Une erreur est survenue. Réessaie.",
       "retry": "Réessayer"
+    },
+    "card": {
+      "resync": "Resynchroniser depuis BNet",
+      "deactivate": "Désactiver de RaidOps",
+      "resyncSuccess": "Personnage resynchronisé !",
+      "resyncError": "Erreur lors de la resynchronisation. Réessaie.",
+      "deactivateError": "Erreur lors de la désactivation. Réessaie.",
+      "deactivateConfirm": {
+        "title": "Désactiver le personnage ?",
+        "body": "Ce personnage ne sera plus accessible dans RaidOps. Ses données restent intactes — si tu l'importes à nouveau, son historique sera récupéré.",
+        "cancel": "Annuler",
+        "confirm": "Désactiver"
+      }
     }
   }
 }

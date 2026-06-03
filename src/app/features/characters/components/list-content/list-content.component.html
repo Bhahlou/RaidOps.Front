@@ -31,7 +31,11 @@
               <h3 class="realm-header">{{ realm.realmName }}</h3>
               <div class="char-grid">
                 @for (char of realm.characters; track char.id) {
-                  <app-character-card [character]="char" />
+                  <app-character-card
+                    [character]="char"
+                    (resync)="resyncCharacter.emit(char.id)"
+                    (deactivate)="deactivateCharacter.emit(char.id)"
+                  />
                 }
               </div>
             </div>

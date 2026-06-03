@@ -1,4 +1,4 @@
-<article class="card">
+<article class="card" [routerLink]="charRoute()">
   <div class="card-avatar">
     @if (character().avatarUrl) {
       <img
@@ -17,7 +17,10 @@
   </div>
 
   <div class="card-body">
-    <span class="char-name" [style.color]="character().classColor">{{ character().name }}</span>
+    <div class="char-name-row">
+      <span class="char-name" [style.color]="character().classColor">{{ character().name }}</span>
+      <app-wow-faction-icon [faction]="character().faction" [size]="16" />
+    </div>
 
     <span class="char-meta">
       @if (character().guildName) {
@@ -42,8 +45,26 @@
     }
   </div>
 
-  <div class="card-aside">
-    <app-wow-faction-icon [faction]="character().faction" [size]="18" />
+  <div class="card-right">
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="cardMenu"
+      (click)="$event.stopPropagation()"
+    >
+      <mat-icon>more_vert</mat-icon>
+    </button>
+
     <span class="char-level">{{ character().level }}</span>
   </div>
 </article>
+
+<mat-menu #cardMenu="matMenu">
+  <button mat-menu-item (click)="resync.emit()">
+    <mat-icon>sync</mat-icon>
+    <span>{{ 'characters.card.resync' | transloco }}</span>
+  </button>
+  <button mat-menu-item class="menu-item--danger" (click)="deactivate.emit()">
+    <mat-icon>person_remove</mat-icon>
+    <span>{{ 'characters.card.deactivate' | transloco }}</span>
+  </button>
+</mat-menu>

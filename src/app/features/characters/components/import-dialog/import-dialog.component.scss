@@ -218,7 +218,9 @@ mat-dialog-actions {
   font-size: 11px;
   color: var(--mat-sys-on-surface-variant);
   max-width: 200px;
-  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   opacity: 0.8;
 }
 

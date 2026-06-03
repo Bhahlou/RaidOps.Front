@@ -85,6 +85,19 @@
       "syncing": "Syncing characters…",
       "error": "An error occurred. Please try again.",
       "retry": "Retry"
+    },
+    "card": {
+      "resync": "Resync from Battle.net",
+      "deactivate": "Deactivate from RaidOps",
+      "resyncSuccess": "Character resynced!",
+      "resyncError": "Resync failed. Please try again.",
+      "deactivateError": "Deactivation failed. Please try again.",
+      "deactivateConfirm": {
+        "title": "Deactivate character?",
+        "body": "This character will no longer be manageable in RaidOps. Your data is safe — re-importing the character will restore its full history.",
+        "cancel": "Cancel",
+        "confirm": "Deactivate"
+      }
     }
   }
 }

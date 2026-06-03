@@ -62,4 +62,24 @@ export class CharacterStore {
     this.#characters.set(undefined); // reset to loading state
     return this.#characterService.getCharacters().pipe(tap((chars) => this.#characters.set(chars)));
   }
+
+  /** Sets the character as inactive in RaidOps and removes it from the local list. */
+  deactivateCharacter(characterId: number): Observable<{ message: string }> {
+    return this.#characterService.deactivateCharacter(characterId).pipe(
+      tap(() => {
+        this.#characters.update((chars) => (chars ? chars.filter((c) => c.id !== characterId) : chars));
+      }),
+    );
+  }
+
+  /** Re-fetches the character's BNet data and updates it in the local list. */
+  resyncCharacter(characterId: number): Observable<Character> {
+    return this.#characterService.resyncCharacter(characterId).pipe(
+      tap((updated) => {
+        this.#characters.update((chars) =>
+          chars ? chars.map((c) => (c.id === characterId ? updated : c)) : chars,
+        );
+      }),
+    );
+  }
 }

@@ -91,7 +91,13 @@
       "deactivate": "Von RaidOps deaktivieren",
       "resyncSuccess": "Charakter neu synchronisiert!",
       "resyncError": "Fehler bei der Neusynchronisierung. Bitte versuche es erneut.",
-      "deactivateError": "Fehler bei der Deaktivierung. Bitte versuche es erneut."
+      "deactivateError": "Fehler bei der Deaktivierung. Bitte versuche es erneut.",
+      "deactivateConfirm": {
+        "title": "Charakter deaktivieren?",
+        "body": "Dieser Charakter wird in RaidOps nicht mehr verwaltbar sein. Deine Daten bleiben erhalten — wenn du den Charakter erneut importierst, wird sein Verlauf wiederhergestellt.",
+        "cancel": "Abbrechen",
+        "confirm": "Deaktivieren"
+      }
     }
   }
 }

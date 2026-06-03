@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { Character } from '../models/character.model';
 import { SyncedCharacter } from '../models/synced-character.model';
 
+
 /**
  * Thin HTTP layer for character-related endpoints.
  * Holds no state — use CharacterStore for state management.
@@ -39,5 +40,15 @@ export class CharacterService {
     return this.#http.post<{ message: string }>(`${this.#api}/activate`, {
       characterIds,
     });
+  }
+
+  /** Sets IsActiveInRaidOps = false for the given character. Does not delete any related data. */
+  deactivateCharacter(characterId: number): Observable<{ message: string }> {
+    return this.#http.post<{ message: string }>(`${this.#api}/${characterId}/deactivate`, {});
+  }
+
+  /** Re-fetches the character's data from the BNet API and returns the updated character. */
+  resyncCharacter(characterId: number): Observable<Character> {
+    return this.#http.post<Character>(`${this.#api}/${characterId}/resync`, {});
   }
 }
