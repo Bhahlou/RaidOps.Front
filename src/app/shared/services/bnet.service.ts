@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { BnetAccount } from '../../features/characters/models/bnet-account.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BnetService {
