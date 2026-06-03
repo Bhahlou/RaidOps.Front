@@ -5,40 +5,42 @@
   (mouseleave)="isExpanded.set(false)"
 >
   <!-- Section : Mon compte -->
-  <div class="section">
-    <button class="section-header" (click)="isExpanded() && toggleAccount()">
-      <div class="section-avatar">
-        <app-discord-icon
-          [type]="iconType"
-          [hash]="user()?.avatarHash"
-          [id]="user()?.discordId"
-        />
-      </div>
-      <span class="sidenav-label section-name">{{ user()?.name }}</span>
-      @if (isExpanded()) {
-        <mat-icon class="section-chevron">
-          {{ isAccountOpen() ? 'expand_less' : 'expand_more' }}
-        </mat-icon>
+  @if (isAuthenticated()) {
+    <div class="section">
+      <button class="section-header" (click)="isExpanded() && toggleAccount()">
+        <div class="section-avatar">
+          <app-discord-icon
+            [type]="iconType"
+            [hash]="user()?.avatarHash"
+            [id]="user()?.discordId!"
+          />
+        </div>
+        <span class="sidenav-label section-name">{{ user()?.name }}</span>
+        @if (isExpanded()) {
+          <mat-icon class="section-chevron">
+            {{ isAccountOpen() ? 'expand_less' : 'expand_more' }}
+          </mat-icon>
+        }
+      </button>
+
+      @if (isAccountOpen()) {
+        <a class="sidenav-item" routerLink="/characters" routerLinkActive="active-link">
+          <mat-icon class="item-icon">people</mat-icon>
+          <span class="sidenav-label">{{ 'sidenav.account.characters' | transloco }}</span>
+        </a>
+        <a class="sidenav-item" routerLink="/gear-planner" routerLinkActive="active-link">
+          <mat-icon class="item-icon">shield</mat-icon>
+          <span class="sidenav-label">{{ 'sidenav.account.equipment' | transloco }}</span>
+        </a>
+        <a class="sidenav-item" routerLink="/guilds" [class.active-link]="isGuildsActive()">
+          <mat-icon class="item-icon">groups</mat-icon>
+          <span class="sidenav-label">{{ 'sidenav.guilds' | transloco }}</span>
+        </a>
       }
-    </button>
+    </div>
 
-    @if (isAccountOpen()) {
-      <a class="sidenav-item" routerLink="/characters" routerLinkActive="active-link">
-        <mat-icon class="item-icon">people</mat-icon>
-        <span class="sidenav-label">{{ 'sidenav.account.characters' | transloco }}</span>
-      </a>
-      <a class="sidenav-item" routerLink="/gear-planner" routerLinkActive="active-link">
-        <mat-icon class="item-icon">shield</mat-icon>
-        <span class="sidenav-label">{{ 'sidenav.account.equipment' | transloco }}</span>
-      </a>
-      <a class="sidenav-item" routerLink="/guilds" [class.active-link]="isGuildsActive()">
-        <mat-icon class="item-icon">groups</mat-icon>
-        <span class="sidenav-label">{{ 'sidenav.guilds' | transloco }}</span>
-      </a>
-    }
-  </div>
+    <div class="section-separator"></div>
 
-  <div class="section-separator"></div>
-
-  <!-- Section : Guildes enregistrées (à venir) -->
+    <!-- Section : Guildes enregistrées (à venir) -->
+  }
 </nav>

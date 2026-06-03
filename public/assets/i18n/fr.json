@@ -20,7 +20,7 @@
     },
     "admin": {
       "title": "Mes guildes non enregistrées",
-      "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
+      "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en es administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
       "action": "Enregistrer"
     }
   },
@@ -39,6 +39,65 @@
       "description": "Aucune de tes guildes n'est actuellement enregistrée dans RaidOps. Etant administrateur des serveurs suivants, tu peux en enregistrer un toi même pour commencer à utiliser RaidOps.",
       "serverColumn": "Guilde",
       "action": "Enregistrer"
+    }
+  },
+  "errors": {
+    "network": "Erreur réseau. Vérifie ta connexion.",
+    "server": "Erreur serveur. Réessaie dans quelques instants."
+  },
+  "characters": {
+    "bnet": {
+      "linkButton": "Lier Battle.net",
+      "notLinkedTitle": "Lie ton compte Battle.net",
+      "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement.",
+      "linkedSuccess": "Compte Battle.net lié avec succès !",
+      "linkError": "Une erreur est survenue lors de la liaison de ton compte Battle.net. Réessaie.",
+      "linkErrorSession": "Session expirée. Réessaie de lier ton compte Battle.net.",
+      "linkErrorBnet": "Battle.net est inaccessible pour le moment. Réessaie plus tard.",
+      "popupBlocked": "Autorise les popups pour importer tes personnages.",
+      "syncButton": "Synchroniser BNet",
+      "syncSuccess": "Personnages synchronisés avec succès !"
+    },
+    "list": {
+      "title": "Personnages",
+      "emptyTitle": "Aucun personnage importé",
+      "empty": "RaidOps connait maintenant tes personnages, mais tu n'en as encore importé aucun. Clique sur le bouton ci-dessous pour importer tes personnages depuis Battle.net.",
+      "importButton": "Importer les personnages"
+    },
+    "import": {
+      "title": "Importer des personnages",
+      "alreadyActive": "Déjà importé",
+      "allActive": "Tous tes personnages synchronisés sont déjà importés.",
+      "noSyncedChars": "Aucun personnage synchronisé. Utilise « Synchroniser BNet » d'abord.",
+      "syncHint": "Des personnages manquants ? Synchronise ton compte BNet.",
+      "fetchError": "Impossible de charger les personnages. Réessaie.",
+      "cancel": "Annuler",
+      "importButton": "Importer ({{ count }})",
+      "searchPlaceholder": "Rechercher par nom…",
+      "noResults": "Aucun personnage ne correspond à ta recherche.",
+      "importSuccess": "Personnages importés avec succès !",
+      "importError": "Une erreur est survenue pendant l'import. Réessaie."
+    },
+    "sync": {
+      "title": "Synchroniser les personnages",
+      "branchDesc": "Sélectionne la branche de jeu à synchroniser.",
+      "authenticating": "Connexion à Battle.net…",
+      "syncing": "Synchronisation en cours…",
+      "error": "Une erreur est survenue. Réessaie.",
+      "retry": "Réessayer"
+    },
+    "card": {
+      "resync": "Resynchroniser depuis BNet",
+      "deactivate": "Désactiver de RaidOps",
+      "resyncSuccess": "Personnage resynchronisé !",
+      "resyncError": "Erreur lors de la resynchronisation. Réessaie.",
+      "deactivateError": "Erreur lors de la désactivation. Réessaie.",
+      "deactivateConfirm": {
+        "title": "Désactiver le personnage ?",
+        "body": "Ce personnage ne sera plus accessible dans RaidOps. Ses données restent intactes — si tu l'importes à nouveau, son historique sera récupéré.",
+        "cancel": "Annuler",
+        "confirm": "Désactiver"
+      }
     }
   }
 }

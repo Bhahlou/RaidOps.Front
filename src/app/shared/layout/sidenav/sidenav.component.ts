@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
@@ -10,13 +10,7 @@ import { DiscordIconType } from '../../models/discord-icon-type.enum';
 
 @Component({
   selector: 'app-sidenav',
-  imports: [
-    RouterLink,
-    RouterLinkActive,
-    MatIconModule,
-    TranslocoPipe,
-    DiscordIconComponent,
-  ],
+  imports: [RouterLink, RouterLinkActive, MatIconModule, TranslocoPipe, DiscordIconComponent],
   templateUrl: './sidenav.component.html',
   styleUrl: './sidenav.component.scss',
 })
@@ -29,6 +23,7 @@ export class SidenavComponent {
 
   readonly isExpanded = signal(false);
   readonly isAccountOpen = signal(true);
+  readonly isAuthenticated = computed(() => this.#authStore.isAuthenticated());
 
   /** True when the current route belongs to the guilds area (/guilds or /no-guild). */
   readonly isGuildsActive = toSignal(

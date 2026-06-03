@@ -1,0 +1,11 @@
+:host {
+  display: contents; // the <img> participates directly in the parent's layout
+}
+
+img {
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: block;
+  flex-shrink: 0;
+}

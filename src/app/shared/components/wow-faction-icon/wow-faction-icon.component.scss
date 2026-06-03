@@ -1,0 +1,10 @@
+:host {
+  display: contents; // the <img> participates directly in the parent's layout
+}
+
+img {
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}

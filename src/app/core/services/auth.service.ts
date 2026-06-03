@@ -15,21 +15,21 @@ export class AuthService {
 
   /** Fetches the authenticated user's profile. Requires a valid access_token cookie. */
   getMe(): Observable<User> {
-    return this.#http.get<User>(`${this.#api}/api/v1/user/me`);
+    return this.#http.get<User>(`${this.#api}/user/me`);
   }
 
   /** Exchanges the refresh_token cookie for a new access/refresh token pair. */
   refresh(): Observable<void> {
-    return this.#http.post<void>(`${this.#api}/api/v1/discordAuth/refresh`, {});
+    return this.#http.post<void>(`${this.#api}/discordAuth/refresh`, {});
   }
 
   /** Clears the access_token and refresh_token cookies server-side. */
   logout(): Observable<void> {
-    return this.#http.post<void>(`${this.#api}/api/v1/discordAuth/logout`, {});
+    return this.#http.post<void>(`${this.#api}/discordAuth/logout`, {});
   }
 
   /** Redirects the browser to the Discord OAuth2 sign-up flow. */
   signup(): void {
-    window.location.href = `${this.#api}/api/v1/discordAuth/signup`;
+    globalThis.location.href = `${this.#api}/discordAuth/signup`;
   }
 }

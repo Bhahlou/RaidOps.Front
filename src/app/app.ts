@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styles: [],
 })
 export class App {
   constructor() {

@@ -16,7 +16,11 @@
       <span class="user-name">{{ user()?.name }}</span>
     }
     <button mat-icon-button>
-      <app-discord-icon [type]="iconType" [id]="user()?.discordId" [hash]="user()?.avatarHash" />
+      @if (user()?.discordId) {
+        <app-discord-icon [type]="iconType" [id]="user()?.discordId!" [hash]="user()?.avatarHash" />
+      } @else {
+        <mat-icon>account_circle</mat-icon>
+      }
     </button>
   </div>
 

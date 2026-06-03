@@ -1,0 +1,47 @@
+<div class="page-content">
+  @if (isBnetLoading() || (isBnetLinked() && isCharactersLoading())) {
+    <!-- progress bar handles loading feedback -->
+  } @else if (!isBnetLinked()) {
+    <div class="empty-state">
+      <mat-icon class="icon">videogame_asset</mat-icon>
+      <p class="title">{{ 'characters.bnet.notLinkedTitle' | transloco }}</p>
+      <p class="desc">{{ 'characters.bnet.notLinkedDescription' | transloco }}</p>
+      <app-bnet-link-button variant="large" (regionSelected)="linkBnet.emit($event)">
+        {{ 'characters.bnet.linkButton' | transloco }}
+      </app-bnet-link-button>
+    </div>
+  } @else if (characters().length === 0) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">manage_accounts</mat-icon>
+      <p class="empty-title">{{ 'characters.list.emptyTitle' | transloco }}</p>
+      <p class="empty-desc">{{ 'characters.list.empty' | transloco }}</p>
+      <button mat-flat-button (click)="openImport.emit()">
+        <mat-icon>download</mat-icon>
+        {{ 'characters.list.importButton' | transloco }}
+      </button>
+    </div>
+  } @else {
+    <div class="char-sections">
+      @for (branch of branchGroups(); track branch.branchName) {
+        <section class="branch-section">
+          <h2 class="branch-header">{{ branch.branchName }}</h2>
+
+          @for (realm of branch.realms; track realm.realmName) {
+            <div class="realm-group">
+              <h3 class="realm-header">{{ realm.realmName }}</h3>
+              <div class="char-grid">
+                @for (char of realm.characters; track char.id) {
+                  <app-character-card
+                    [character]="char"
+                    (resync)="resyncCharacter.emit(char.id)"
+                    (deactivate)="deactivateCharacter.emit(char.id)"
+                  />
+                }
+              </div>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

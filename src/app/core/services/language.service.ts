@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 
 const STORAGE_KEY = 'lang';
-const AVAILABLE_LANGS = ['fr', 'en'] as const;
+const AVAILABLE_LANGS = ['fr', 'en', 'de'] as const;
 type Lang = (typeof AVAILABLE_LANGS)[number];
 
 @Injectable({ providedIn: 'root' })

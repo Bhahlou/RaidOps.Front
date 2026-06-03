@@ -40,5 +40,64 @@
       "serverColumn": "Guild",
       "action": "Register"
     }
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "server": "Server error. Please try again later."
+  },
+  "characters": {
+    "bnet": {
+      "linkButton": "Link Battle.net",
+      "notLinkedTitle": "Link your Battle.net account",
+      "notLinkedDescription": "To ensure that each character created in RaidOps belongs to its rightful owner, we synchronize characters with Battle.net accounts. By linking your Battle.net account, you can easily import and sync your characters.",
+      "linkedSuccess": "Battle.net account linked successfully!",
+      "linkError": "An error occurred while linking your Battle.net account. Please try again.",
+      "linkErrorSession": "Session expired. Please try linking your Battle.net account again.",
+      "linkErrorBnet": "Battle.net is currently unavailable. Please try again later.",
+      "popupBlocked": "Allow popups to import your characters.",
+      "syncButton": "Sync Battle.net",
+      "syncSuccess": "Characters synced successfully!"
+    },
+    "list": {
+      "title": "Characters",
+      "emptyTitle": "No characters yet",
+      "empty": "RaidOps now knows your characters, but you haven't imported any yet. Click the button below to import your characters from Battle.net.",
+      "importButton": "Import characters"
+    },
+    "import": {
+      "title": "Import characters",
+      "alreadyActive": "Already imported",
+      "allActive": "All your synced characters are already imported.",
+      "noSyncedChars": "No synced characters. Use \"Sync Battle.net\" first.",
+      "syncHint": "Missing characters? Sync your Battle.net account.",
+      "fetchError": "Failed to load characters. Please try again.",
+      "cancel": "Cancel",
+      "importButton": "Import ({{ count }})",
+      "searchPlaceholder": "Search by name…",
+      "noResults": "No characters match your search.",
+      "importSuccess": "Characters imported successfully!",
+      "importError": "An error occurred during import. Please try again."
+    },
+    "sync": {
+      "title": "Sync characters",
+      "branchDesc": "Select the game branch to sync.",
+      "authenticating": "Connecting to Battle.net…",
+      "syncing": "Syncing characters…",
+      "error": "An error occurred. Please try again.",
+      "retry": "Retry"
+    },
+    "card": {
+      "resync": "Resync from Battle.net",
+      "deactivate": "Deactivate from RaidOps",
+      "resyncSuccess": "Character resynced!",
+      "resyncError": "Resync failed. Please try again.",
+      "deactivateError": "Deactivation failed. Please try again.",
+      "deactivateConfirm": {
+        "title": "Deactivate character?",
+        "body": "This character will no longer be manageable in RaidOps. Your data is safe — re-importing the character will restore its full history.",
+        "cancel": "Cancel",
+        "confirm": "Deactivate"
+      }
+    }
   }
 }

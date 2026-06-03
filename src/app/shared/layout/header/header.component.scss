@@ -47,4 +47,13 @@
     font-weight: 500;
     color: var(--mat-sys-on-surface);
   }
+
+  .mat-icon {
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    color: var(--mat-sys-primary);
+  }
 }

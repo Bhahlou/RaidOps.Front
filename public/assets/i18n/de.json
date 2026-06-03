@@ -1,0 +1,103 @@
+{
+  "header": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "language": "Sprache"
+  },
+  "sidenav": {
+    "account": {
+      "characters": "Charaktere",
+      "equipment": "Ausrüstungsplaner"
+    },
+    "guilds": "Meine Gilden"
+  },
+  "guildList": {
+    "column": "Gilde",
+    "registered": {
+      "title": "Meine registrierten Gilden",
+      "subtitle": "Wähle eine Gilde aus, um auf ihr Dashboard zuzugreifen.",
+      "action": "Betreten"
+    },
+    "admin": {
+      "title": "Meine nicht registrierten Gilden",
+      "subtitle": "Die folgenden Gilden sind nicht in RaidOps registriert, aber du bist deren Administrator. Du kannst sie registrieren, um RaidOps zu nutzen.",
+      "action": "Registrieren"
+    }
+  },
+  "register": {
+    "title": "Gilde registrieren",
+    "description": "Um RaidOps auf diesem Server zu aktivieren, muss der Bot deinem Discord-Server beitreten. Indem du auf die Schaltfläche unten klickst, wirst du zu Discord weitergeleitet, um die Einladung zu autorisieren. Die Registrierung wird automatisch abgeschlossen, sobald der Bot eingeladen wurde.",
+    "cta": "Bot einladen und registrieren"
+  },
+  "noGuild": {
+    "noServer": {
+      "title": "Keine berechtigte Gilde",
+      "description": "Keine deiner Gilden ist derzeit in RaidOps registriert. RaidOps erfordert, dass du <strong>Administrator</strong> eines Discord-Servers bist, um eine selbst zu registrieren.<br />Tritt einem Discord-Server bei oder erstelle einen, und komm dann zurück."
+    },
+    "register": {
+      "title": "Keine Gilde registriert",
+      "description": "Keine deiner Gilden ist derzeit in RaidOps registriert. Da du Administrator der folgenden Server bist, kannst du einen selbst registrieren, um RaidOps zu nutzen.",
+      "serverColumn": "Gilde",
+      "action": "Registrieren"
+    }
+  },
+  "errors": {
+    "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
+    "server": "Serverfehler. Bitte versuche es später erneut."
+  },
+  "characters": {
+    "bnet": {
+      "linkButton": "Battle.net verknüpfen",
+      "notLinkedTitle": "Verknüpfe dein Battle.net-Konto",
+      "notLinkedDescription": "Um sicherzustellen, dass jeder in RaidOps erstellte Charakter seinem rechtmäßigen Besitzer gehört, synchronisieren wir Charaktere mit Battle.net-Konten. Durch das Verknüpfen deines Battle.net-Kontos kannst du deine Charaktere einfach importieren und synchronisieren.",
+      "linkedSuccess": "Battle.net-Konto erfolgreich verknüpft!",
+      "linkError": "Beim Verknüpfen deines Battle.net-Kontos ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      "linkErrorSession": "Sitzung abgelaufen. Bitte versuche erneut, dein Battle.net-Konto zu verknüpfen.",
+      "linkErrorBnet": "Battle.net ist derzeit nicht verfügbar. Bitte versuche es später erneut.",
+      "popupBlocked": "Erlaube Popups, um deine Charaktere zu importieren.",
+      "syncButton": "BNet synchronisieren",
+      "syncSuccess": "Charaktere erfolgreich synchronisiert!"
+    },
+    "list": {
+      "title": "Charaktere",
+      "emptyTitle": "Noch keine Charaktere",
+      "empty": "RaidOps kennt nun deine Charaktere, aber du hast noch keinen importiert. Klicke auf die Schaltfläche unten, um deine Charaktere von Battle.net zu importieren.",
+      "importButton": "Charaktere importieren"
+    },
+    "import": {
+      "title": "Charaktere importieren",
+      "alreadyActive": "Bereits importiert",
+      "allActive": "Alle deine synchronisierten Charaktere sind bereits importiert.",
+      "noSyncedChars": "Keine synchronisierten Charaktere. Benutze zuerst «Battle.net synchronisieren».",
+      "syncHint": "Chars fehlen? BNet synchronisieren.",
+      "fetchError": "Charaktere konnten nicht geladen werden. Bitte versuche es erneut.",
+      "cancel": "Abbrechen",
+      "importButton": "Importieren ({{ count }})",
+      "searchPlaceholder": "Nach Name suchen…",
+      "noResults": "Keine Charaktere entsprechen deiner Suche.",
+      "importSuccess": "Charaktere erfolgreich importiert!",
+      "importError": "Beim Import ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    },
+    "sync": {
+      "title": "Charaktere synchronisieren",
+      "branchDesc": "Wähle den Spielzweig zum Synchronisieren aus.",
+      "authenticating": "Verbindung zu Battle.net…",
+      "syncing": "Charaktere werden synchronisiert…",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+      "retry": "Erneut versuchen"
+    },
+    "card": {
+      "resync": "Von Battle.net neu synchronisieren",
+      "deactivate": "Von RaidOps deaktivieren",
+      "resyncSuccess": "Charakter neu synchronisiert!",
+      "resyncError": "Fehler bei der Neusynchronisierung. Bitte versuche es erneut.",
+      "deactivateError": "Fehler bei der Deaktivierung. Bitte versuche es erneut.",
+      "deactivateConfirm": {
+        "title": "Charakter deaktivieren?",
+        "body": "Dieser Charakter wird in RaidOps nicht mehr verwaltbar sein. Deine Daten bleiben erhalten — wenn du den Charakter erneut importierst, wird sein Verlauf wiederhergestellt.",
+        "cancel": "Abbrechen",
+        "confirm": "Deaktivieren"
+      }
+    }
+  }
+}

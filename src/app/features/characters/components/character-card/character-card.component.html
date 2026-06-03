@@ -1,0 +1,70 @@
+<article class="card" [routerLink]="charRoute()">
+  <div class="card-avatar">
+    @if (character().avatarUrl) {
+      <img
+        class="avatar-img"
+        [src]="character().avatarUrl"
+        [alt]="character().name"
+        loading="lazy"
+      />
+    } @else {
+      <app-wow-class-icon
+        [classId]="character().classId"
+        [className]="character().className"
+        [size]="44"
+      />
+    }
+  </div>
+
+  <div class="card-body">
+    <div class="char-name-row">
+      <span class="char-name" [style.color]="character().classColor">{{ character().name }}</span>
+      <app-wow-faction-icon [faction]="character().faction" [size]="16" />
+    </div>
+
+    <span class="char-meta">
+      @if (character().guildName) {
+        &lt;{{ character().guildName }}&gt;
+      } @else {
+        {{ character().className }}
+      }
+    </span>
+
+    @if (character().specs.length > 0) {
+      <div class="char-specs">
+        @for (spec of character().specs; track spec.specId) {
+          <div class="spec" [class.spec--main]="spec.isMain" [title]="spec.name">
+            @if (spec.iconUrl) {
+              <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
+            } @else {
+              <span class="spec-name">{{ spec.name }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card-right">
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="cardMenu"
+      (click)="$event.stopPropagation()"
+    >
+      <mat-icon>more_vert</mat-icon>
+    </button>
+
+    <span class="char-level">{{ character().level }}</span>
+  </div>
+</article>
+
+<mat-menu #cardMenu="matMenu">
+  <button mat-menu-item (click)="resync.emit()">
+    <mat-icon>sync</mat-icon>
+    <span>{{ 'characters.card.resync' | transloco }}</span>
+  </button>
+  <button mat-menu-item class="menu-item--danger" (click)="deactivate.emit()">
+    <mat-icon>person_remove</mat-icon>
+    <span>{{ 'characters.card.deactivate' | transloco }}</span>
+  </button>
+</mat-menu>

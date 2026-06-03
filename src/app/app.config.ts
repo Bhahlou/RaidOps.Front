@@ -7,15 +7,16 @@ import { routes } from './app.routes';
 import { TranslocoHttpLoader } from './core/services/transloco-http-loader';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { snackbarInterceptor } from './core/interceptors/snackbar.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([snackbarInterceptor, loadingInterceptor, authInterceptor])),
     provideTransloco({
       config: {
-        availableLangs: ['fr', 'en'],
+        availableLangs: ['fr', 'en', 'de'],
         defaultLang: 'fr',
         fallbackLang: 'fr',
         reRenderOnLangChange: true,

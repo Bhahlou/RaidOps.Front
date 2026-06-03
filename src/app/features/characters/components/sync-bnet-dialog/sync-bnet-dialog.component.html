@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>{{ 'characters.sync.title' | transloco }}</h2>
+
+<mat-dialog-content>
+
+  @if (isLoadingBranches() || step() === 'authenticating' || step() === 'syncing') {
+    <div class="dialog-state">
+      <mat-spinner [diameter]="36" />
+      <p>{{ (step() === 'syncing' ? 'characters.sync.syncing' : 'characters.sync.authenticating') | transloco }}</p>
+    </div>
+
+  } @else if (step() === 'error') {
+    <div class="dialog-state dialog-state--error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ 'characters.sync.error' | transloco }}</p>
+    </div>
+
+  } @else {
+    <p class="step-desc">{{ 'characters.sync.branchDesc' | transloco }}</p>
+    <div class="branch-grid">
+      @for (branch of branches(); track branch.id) {
+        <button
+          [class]="'branch-card branch-card--' + branch.currentExpansionShortCode.toLowerCase()"
+          (click)="selectBranch(branch)">
+          <div class="branch-card__bg" aria-hidden="true"></div>
+          <div class="branch-card__content">
+            <span class="branch-name">{{ branch.name }}</span>
+            <span class="branch-expansion">{{ branch.currentExpansionShortCode }}</span>
+          </div>
+          <mat-icon class="branch-card__arrow">arrow_forward</mat-icon>
+        </button>
+      }
+    </div>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (step() === 'error') {
+    <button mat-button (click)="retry()">{{ 'characters.sync.retry' | transloco }}</button>
+  }
+  <button mat-button mat-dialog-close>{{ 'characters.import.cancel' | transloco }}</button>
+</mat-dialog-actions>
