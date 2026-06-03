@@ -41,9 +41,9 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
   readonly isLoadingBranches = signal(true);
 
   #selectedBranchId: number | null = null;
-  #iframe: HTMLIFrameElement | null = null;
+  #popup: Window | null = null;
   #messageHandler: ((e: MessageEvent) => void) | null = null;
-  #fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+  #popupPollTimer: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     this.#wowBranchesService.getAll().subscribe({
@@ -67,7 +67,7 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
     this.step.set('authenticating');
 
     const url = `${this.#api}/bnet/link/initiate?region=${this.#data.region}`;
-    this.#openIframe(url);
+    this.#openPopup(url);
   }
 
   retry(): void {
@@ -75,14 +75,8 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
     this.#selectedBranchId = null;
   }
 
-  #openIframe(url: string): void {
+  #openPopup(url: string): void {
     this.#cleanup();
-
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText =
-      'position:absolute;width:1px;height:1px;left:-9999px;top:-9999px;border:0;';
-    document.body.appendChild(iframe);
-    this.#iframe = iframe;
 
     const handler = (event: MessageEvent) => {
       if (event.origin !== window.location.origin || event.data?.type !== 'bnet_oauth') return;
@@ -99,12 +93,14 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
     this.#messageHandler = handler;
     window.addEventListener('message', handler);
 
-    this.#fallbackTimer = setTimeout(() => {
-      this.#cleanup();
-      this.step.set('error');
-    }, 15000);
+    this.#popup = window.open(url, 'bnet_oauth', 'width=520,height=680,menubar=no,toolbar=no,location=yes');
 
-    iframe.src = url;
+    this.#popupPollTimer = setInterval(() => {
+      if (this.#popup?.closed) {
+        this.#cleanup();
+        this.step.set('error');
+      }
+    }, 500);
   }
 
   #syncCharacters(): void {
@@ -122,13 +118,13 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
       window.removeEventListener('message', this.#messageHandler);
       this.#messageHandler = null;
     }
-    if (this.#iframe && document.body.contains(this.#iframe)) {
-      document.body.removeChild(this.#iframe);
-      this.#iframe = null;
+    if (this.#popupPollTimer !== null) {
+      clearInterval(this.#popupPollTimer);
+      this.#popupPollTimer = null;
     }
-    if (this.#fallbackTimer !== null) {
-      clearTimeout(this.#fallbackTimer);
-      this.#fallbackTimer = null;
+    if (this.#popup && !this.#popup.closed) {
+      this.#popup.close();
+      this.#popup = null;
     }
   }
 }
