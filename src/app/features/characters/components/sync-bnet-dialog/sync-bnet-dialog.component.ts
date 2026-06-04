@@ -79,7 +79,7 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
     this.#cleanup();
 
     const handler = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin || event.data?.type !== 'bnet_oauth') return;
+      if (event.origin !== globalThis.location.origin || event.data?.type !== 'bnet_oauth') return;
       this.#cleanup();
 
       if (event.data.error) {
@@ -91,14 +91,25 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
     };
 
     this.#messageHandler = handler;
-    window.addEventListener('message', handler);
+    globalThis.addEventListener('message', handler);
 
-    this.#popup = window.open(url, 'bnet_oauth', 'width=520,height=680,menubar=no,toolbar=no,location=yes');
+    this.#popup = globalThis.open(
+      url,
+      'bnet_oauth',
+      'width=520,height=680,menubar=no,toolbar=no,location=yes',
+    );
 
     this.#popupPollTimer = setInterval(() => {
       if (this.#popup?.closed) {
-        this.#cleanup();
-        this.step.set('error');
+        clearInterval(this.#popupPollTimer!);
+        this.#popupPollTimer = null;
+        // Defer to let any pending postMessage be processed first
+        setTimeout(() => {
+          if (this.step() === 'authenticating') {
+            this.#cleanup();
+            this.step.set('error');
+          }
+        }, 200);
       }
     }, 500);
   }
@@ -115,7 +126,7 @@ export class SyncBnetDialogComponent implements OnInit, OnDestroy {
 
   #cleanup(): void {
     if (this.#messageHandler) {
-      window.removeEventListener('message', this.#messageHandler);
+      globalThis.removeEventListener('message', this.#messageHandler);
       this.#messageHandler = null;
     }
     if (this.#popupPollTimer !== null) {
