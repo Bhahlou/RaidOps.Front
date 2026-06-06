@@ -1,30 +1,125 @@
-name: Build & Push to GHCR
+name: Deploy
 
 on:
+  # Each code merge to master refreshes the :acceptance image (ready for the acceptance env).
   push:
-    branches:
-      - master
+    branches: [master]
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - '.release-please-manifest.json'
+      - 'package.json'
+  # A published release (= Release PR merged) deploys to production.
+  release:
+    types: [published]
 
 jobs:
-  build:
+  # ── Acceptance : every code merge to master ───────────────────────────────
+  acceptance:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
 
       - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+      - name: Build & push :acceptance
         run: |
           IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}
-          docker build -t $IMAGE_NAME:latest .
+          docker build -t $IMAGE_NAME:acceptance .
+          docker push $IMAGE_NAME:acceptance
 
-      - name: Push Docker image
+      - name: Notify Discord (acceptance)
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_ACCEPTANCE_WEBHOOK_URL }}
+          FULL_REPO: ${{ github.repository }}
+          SHORT_REPO: ${{ github.event.repository.name }}
+          AUTHOR: ${{ github.actor }}
+          MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_URL: ${{ github.event.head_commit.url }}
+        run: |
+          # First line of the squash commit = the conventional PR title
+          DESC=$(echo "$MESSAGE" | head -n 1)
+          # Extract the PR number from the squash title "(#NN)" → link to the PR
+          # (fall back to the commit URL for a direct push without a PR)
+          PR_NUMBER=$(echo "$DESC" | grep -oE '#[0-9]+' | tail -1 | tr -d '#')
+          if [ -n "$PR_NUMBER" ]; then
+            LINK="https://github.com/$FULL_REPO/pull/$PR_NUMBER"
+          else
+            LINK="$COMMIT_URL"
+          fi
+          curl -s -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "$SHORT_REPO — $AUTHOR pushed an acceptance update" \
+              --arg desc "$DESC" \
+              --arg url "$LINK" \
+              '{
+                embeds: [{
+                  title: $title,
+                  description: $desc,
+                  url: $url,
+                  color: 3447003,
+                  footer: { text: "Rolling out to acceptance…" }
+                }]
+              }')"
+
+  # ── Production : on published release ──────────────────────────────────────
+  prod:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout released tag
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Log in to GHCR
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push :latest + version tag
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
         run: |
           IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$VERSION .
           docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:$VERSION
+
+      - name: Notify Discord (production)
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_PROD_WEBHOOK_URL }}
+          SHORT_REPO: ${{ github.event.repository.name }}
+          TAG: ${{ github.event.release.tag_name }}
+          AUTHOR: ${{ github.actor }}
+          BODY: ${{ github.event.release.body }}
+          URL: ${{ github.event.release.html_url }}
+        run: |
+          # release-please already generated a markdown changelog with clickable links
+          DESC=$(echo "$BODY" | head -c 4000)
+          curl -s -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "🚀 $SHORT_REPO — $AUTHOR pushed release $TAG" \
+              --arg desc "$DESC" \
+              --arg url "$URL" \
+              '{
+                embeds: [{
+                  title: $title,
+                  description: $desc,
+                  url: $url,
+                  color: 16750848,
+                  footer: { text: "Rolling out to production…" }
+                }]
+              }')"
