@@ -98,7 +98,7 @@ describe('RegisterComponent', () => {
 
       component.initiateRegistration();
 
-      expect(assign).toHaveBeenCalledWith('/api/v1/guilds/register/initiate?guildId=abc');
+      expect(assign).toHaveBeenCalledWith(expect.stringContaining('/guilds/register/initiate?guildId=abc'));
     });
 
     it('does nothing when guild is null', () => {

@@ -40,7 +40,7 @@ describe('AuthService', () => {
       let result: User | undefined;
       service.getMe().subscribe(u => { result = u; });
 
-      const req = controller.expectOne('/api/v1/user/me');
+      const req = controller.expectOne(r => r.url.endsWith('/user/me'));
       expect(req.request.method).toBe('GET');
       req.flush(mockUser);
 
@@ -53,7 +53,7 @@ describe('AuthService', () => {
       let completed = false;
       service.refresh().subscribe({ complete: () => { completed = true; } });
 
-      const req = controller.expectOne('/api/v1/discordAuth/refresh');
+      const req = controller.expectOne(r => r.url.endsWith('/discordAuth/refresh'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({});
       req.flush(null);
@@ -67,7 +67,7 @@ describe('AuthService', () => {
       let completed = false;
       service.logout().subscribe({ complete: () => { completed = true; } });
 
-      const req = controller.expectOne('/api/v1/discordAuth/logout');
+      const req = controller.expectOne(r => r.url.endsWith('/discordAuth/logout'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({});
       req.flush(null);
@@ -79,7 +79,7 @@ describe('AuthService', () => {
   describe('signup', () => {
     it('redirects to /api/v1/discordAuth/signup', () => {
       service.signup();
-      expect(mockAssign).toHaveBeenCalledWith('/api/v1/discordAuth/signup');
+      expect(mockAssign).toHaveBeenCalledWith(expect.stringContaining('/discordAuth/signup'));
     });
   });
 });

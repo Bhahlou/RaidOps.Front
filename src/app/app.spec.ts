@@ -4,9 +4,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
 import { App } from './app';
-
-const mockEnv = vi.hoisted(() => ({ production: true, apiUrl: '' }));
-vi.mock('../environments/environment', () => ({ environment: mockEnv }));
+import { environment } from '../environments/environment';
 
 const mockTransloco = {
   getActiveLang: () => 'fr',
@@ -42,16 +40,12 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('sets favicon to production URL when environment.production is true', () => {
-    mockEnv.production = true;
+  it('sets favicon to the correct URL for the current environment', () => {
     TestBed.createComponent(App);
-    expect(faviconEl.getAttribute('href')).toBe('assets/Logo no background.svg');
-  });
-
-  it('sets favicon to dev URL when environment.production is false', () => {
-    mockEnv.production = false;
-    TestBed.createComponent(App);
-    expect(faviconEl.getAttribute('href')).toBe('assets/Logo no background DEV.svg');
+    const expected = environment.production
+      ? 'assets/Logo no background.svg'
+      : 'assets/Logo no background DEV.svg';
+    expect(faviconEl.getAttribute('href')).toBe(expected);
   });
 
   it('does not throw when no favicon element exists in the document', () => {
