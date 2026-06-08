@@ -1,0 +1,42 @@
+name: Tests & SonarCloud
+
+on:
+  push:
+    branches:
+      - master
+    # A PR release merge changes only those files (0 code) → no re-run on master
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - '.release-please-manifest.json'
+      - 'package.json'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-analyze:
+    name: Run tests and Sonar Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        env:
+          CI: true
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
