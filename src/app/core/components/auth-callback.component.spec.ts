@@ -1,22 +1,47 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { type Observable, of, throwError } from 'rxjs';
 
 import { AuthCallbackComponent } from './auth-callback.component';
+import { AuthStore } from '../stores/auth.store';
 
 describe('AuthCallbackComponent', () => {
-  let component: AuthCallbackComponent;
   let fixture: ComponentFixture<AuthCallbackComponent>;
+  let navigate: ReturnType<typeof vi.fn>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  const setup = (loadUser: () => Observable<unknown>) => {
+    navigate = vi.fn().mockResolvedValue(true);
+
+    TestBed.configureTestingModule({
       imports: [AuthCallbackComponent],
-    }).compileComponents();
+      providers: [
+        { provide: AuthStore, useValue: { loadUser } },
+        { provide: Router, useValue: { navigate } },
+      ],
+    });
 
     fixture = TestBed.createComponent(AuthCallbackComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
+  };
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    setup(() => of(undefined));
+    fixture.detectChanges();
+    expect(fixture.componentInstance).toBeTruthy();
+  });
+
+  it('navigates to /guilds on successful loadUser', () => {
+    setup(() => of(undefined));
+
+    fixture.detectChanges();
+
+    expect(navigate).toHaveBeenCalledWith(['/guilds']);
+  });
+
+  it('navigates to /home when loadUser fails', () => {
+    setup(() => throwError(() => new Error('auth failed')));
+
+    fixture.detectChanges();
+
+    expect(navigate).toHaveBeenCalledWith(['/home']);
   });
 });

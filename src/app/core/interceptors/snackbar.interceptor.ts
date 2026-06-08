@@ -27,15 +27,13 @@ export const snackbarInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   return next(req).pipe(
-    catchError((err: unknown) => {
-      if (err instanceof HttpErrorResponse) {
-        if (err.status === 0) {
-          snackbar.error('errors.network');
-        } else if (err.status >= 500) {
-          snackbar.error('errors.server');
-        }
-        // 4xx (incl. 401) → let the caller handle
+    catchError((err: HttpErrorResponse) => {
+      if (err.status === 0) {
+        snackbar.error('errors.network');
+      } else if (err.status >= 500) {
+        snackbar.error('errors.server');
       }
+      // 4xx (incl. 401) → let the caller handle
       return throwError(() => err);
     }),
   );

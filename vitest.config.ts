@@ -9,7 +9,11 @@ export default defineConfig({
     setupFiles: ['src/test-setup.ts'],
     include: ['src/**/*.spec.ts'],
     reporters: ['default'],
-    server: { deps: { inline: [/^@angular/] } },
+    server: {
+      deps: {
+        inline: [/^@angular/],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text-summary'],

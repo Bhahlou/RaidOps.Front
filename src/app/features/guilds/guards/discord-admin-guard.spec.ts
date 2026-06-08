@@ -1,17 +1,83 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, convertToParamMap, provideRouter, Router, UrlTree } from '@angular/router';
+import { signal } from '@angular/core';
 
 import { discordAdminGuard } from './discord-admin-guard';
+import { AuthStore } from '../../../core/stores/auth.store';
+import { User } from '../../../core/models/user.model';
+
+const makeRoute = (id: string | null): ActivatedRouteSnapshot =>
+  ({ paramMap: convertToParamMap(id ? { id } : {}) }) as unknown as ActivatedRouteSnapshot;
+
+const makeUser = (guilds: User['guilds']): User => ({
+  discordId: '123',
+  name: 'Test',
+  avatarHash: null,
+  guilds,
+});
 
 describe('discordAdminGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) =>
-    TestBed.runInInjectionContext(() => discordAdminGuard(...guardParameters));
+  const executeGuard: CanActivateFn = (...args) =>
+    TestBed.runInInjectionContext(() => discordAdminGuard(...args));
+
+  let userSignal: ReturnType<typeof signal<User | null>>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    userSignal = signal<User | null>(null);
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthStore,
+          useValue: { user: userSignal.asReadonly() },
+        },
+      ],
+    });
   });
 
-  it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+  it('returns true when user is admin of the guild matching the route param', () => {
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isAdmin: true }]));
+
+    expect(executeGuard(makeRoute('g1'), {} as any)).toBe(true);
+  });
+
+  it('redirects to /no-guild when user is not admin of the guild', () => {
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isAdmin: false }]));
+    const router = TestBed.inject(Router);
+
+    const result = executeGuard(makeRoute('g1'), {} as any);
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(router.serializeUrl(result as UrlTree)).toBe('/no-guild');
+  });
+
+  it('redirects to /no-guild when guild id does not match any user guild', () => {
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isAdmin: true }]));
+    const router = TestBed.inject(Router);
+
+    const result = executeGuard(makeRoute('other-id'), {} as any);
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(router.serializeUrl(result as UrlTree)).toBe('/no-guild');
+  });
+
+  it('redirects to /no-guild when route has no id param', () => {
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isAdmin: true }]));
+    const router = TestBed.inject(Router);
+
+    const result = executeGuard(makeRoute(null), {} as any);
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(router.serializeUrl(result as UrlTree)).toBe('/no-guild');
+  });
+
+  it('redirects to /no-guild when user is null', () => {
+    const router = TestBed.inject(Router);
+
+    const result = executeGuard(makeRoute('g1'), {} as any);
+
+    expect(result).toBeInstanceOf(UrlTree);
+    expect(router.serializeUrl(result as UrlTree)).toBe('/no-guild');
   });
 });

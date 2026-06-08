@@ -8,6 +8,7 @@ import { UserGuild } from '../../../../core/models/user-guild.model';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -20,6 +21,7 @@ export class RegisterComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #authStore = inject(AuthStore);
+  readonly #location = inject(LOCATION);
 
   readonly #guildId = this.#route.snapshot.paramMap.get('id');
 
@@ -42,6 +44,6 @@ export class RegisterComponent implements OnInit {
   initiateRegistration(): void {
     const guild = this.guild();
     if (!guild) return;
-    globalThis.location.href = `${environment.apiUrl}/guilds/register/initiate?guildId=${guild.id}`;
+    this.#location.assign(`${environment.apiUrl}/guilds/register/initiate?guildId=${guild.id}`);
   }
 }
