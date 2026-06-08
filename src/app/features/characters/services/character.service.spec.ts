@@ -1,0 +1,132 @@
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+
+import { CharacterService } from './character.service';
+import { Character } from '../models/character.model';
+import { SyncedCharacter } from '../models/synced-character.model';
+
+const makeChar = (id = 1): Character => ({
+  id,
+  name: `Char${id}`,
+  classId: 1,
+  className: 'Warrior',
+  classColor: '#C69B3A',
+  raceId: 1,
+  raceName: 'Human',
+  faction: 'ALLIANCE',
+  branchName: 'Retail',
+  realmName: 'Silvermoon',
+  realmSlug: 'silvermoon',
+  level: 80,
+  itemLevel: 620,
+  avatarUrl: null,
+  guildName: null,
+  specs: [],
+});
+
+describe('CharacterService', () => {
+  let service: CharacterService;
+  let controller: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    service = TestBed.inject(CharacterService);
+    controller = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => controller.verify());
+
+  describe('getCharacters', () => {
+    it('sends GET /characters and returns the list', () => {
+      let result: Character[] | undefined;
+      service.getCharacters().subscribe(c => { result = c; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters'));
+      expect(req.request.method).toBe('GET');
+      req.flush([makeChar(1)]);
+
+      expect(result).toEqual([makeChar(1)]);
+    });
+  });
+
+  describe('getSyncedCharacters', () => {
+    it('sends GET /characters/synced and returns the list', () => {
+      const synced: SyncedCharacter[] = [
+        {
+          id: 1, name: 'Char1', classId: 1, className: 'Warrior', classColor: '#C69B3A',
+          raceId: 1, raceName: 'Human', faction: 'ALLIANCE', branchName: 'Retail',
+          realmName: 'Silvermoon', level: 80, isActive: true,
+        },
+      ];
+
+      let result: SyncedCharacter[] | undefined;
+      service.getSyncedCharacters().subscribe(c => { result = c; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/synced'));
+      expect(req.request.method).toBe('GET');
+      req.flush(synced);
+
+      expect(result).toEqual(synced);
+    });
+  });
+
+  describe('syncCharacters', () => {
+    it('sends POST /characters/sync with branchId', () => {
+      let result: { message: string } | undefined;
+      service.syncCharacters(2).subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/sync'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ branchId: 2 });
+      req.flush({ message: 'ok' });
+
+      expect(result).toEqual({ message: 'ok' });
+    });
+  });
+
+  describe('activateCharacters', () => {
+    it('sends POST /characters/activate with characterIds', () => {
+      let result: { message: string } | undefined;
+      service.activateCharacters([1, 2, 3]).subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/activate'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ characterIds: [1, 2, 3] });
+      req.flush({ message: 'ok' });
+
+      expect(result).toEqual({ message: 'ok' });
+    });
+  });
+
+  describe('deactivateCharacter', () => {
+    it('sends POST /characters/:id/deactivate with empty body', () => {
+      let result: { message: string } | undefined;
+      service.deactivateCharacter(42).subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/42/deactivate'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      req.flush({ message: 'ok' });
+
+      expect(result).toEqual({ message: 'ok' });
+    });
+  });
+
+  describe('resyncCharacter', () => {
+    it('sends POST /characters/:id/resync and returns the updated character', () => {
+      const updated = makeChar(42);
+      let result: Character | undefined;
+      service.resyncCharacter(42).subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/42/resync'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      req.flush(updated);
+
+      expect(result).toEqual(updated);
+    });
+  });
+});

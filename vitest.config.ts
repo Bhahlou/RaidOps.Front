@@ -18,6 +18,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['lcov', 'text-summary'],
       reportsDirectory: 'coverage',
+      all: true,
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.spec.ts',
@@ -25,6 +26,8 @@ export default defineConfig({
         'src/main.ts',
         'src/environments/**',
         'src/**/*.model.ts',
+        'src/**/*.routes.ts',
+        'src/app/app.config.ts',
       ],
     },
   },
