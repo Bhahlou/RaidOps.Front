@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { type Observable, of, throwError } from 'rxjs';
 
 import { AuthCallbackComponent } from './auth-callback.component';
 import { AuthStore } from '../stores/auth.store';
@@ -9,7 +9,7 @@ describe('AuthCallbackComponent', () => {
   let fixture: ComponentFixture<AuthCallbackComponent>;
   let navigate: ReturnType<typeof vi.fn>;
 
-  const setup = (loadUser: () => ReturnType<typeof of>) => {
+  const setup = (loadUser: () => Observable<unknown>) => {
     navigate = vi.fn().mockResolvedValue(true);
 
     TestBed.configureTestingModule({
