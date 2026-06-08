@@ -1,9 +1,10 @@
 .page-container {
-  display: flex;
+  position: relative;
   height: calc(100vh - var(--navbar-height));
 }
 
 .page-content {
-  flex: 1;
+  height: 100%;
   overflow: auto;
+  margin-left: var(--sidebar-rail-width);
 }

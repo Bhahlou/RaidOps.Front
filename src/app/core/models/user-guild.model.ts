@@ -3,5 +3,6 @@ export interface UserGuild {
   name: string;
   iconHash: string | null;
   isRegistered: boolean;
+  isConfigured: boolean;
   isAdmin: boolean;
 }

@@ -9,7 +9,15 @@
       "characters": "Personnages",
       "equipment": "Équipement"
     },
-    "guilds": "Mes guildes"
+    "guilds": "Mes guildes",
+    "guild": {
+      "dashboard": "Tableau de bord",
+      "calendar": "Calendrier",
+      "roster": "Roster",
+      "loot": "Loot",
+      "settings": "Paramètres",
+      "switch": "Changer de guilde"
+    }
   },
   "guildList": {
     "column": "Guilde",
@@ -21,13 +29,43 @@
     "admin": {
       "title": "Mes guildes non enregistrées",
       "subtitle": "Les guildes suivantes ne sont pas enregistrées dans RaidOps, mais tu en es administrateur . Tu peux les enregistrer pour commencer à utiliser RaidOps.",
-      "action": "Enregistrer"
+      "action": "Enregistrer",
+      "actionComplete": "Compléter"
     }
   },
   "register": {
     "title": "Enregistrer une guilde",
+    "steps": {
+      "invite": "Inviter le bot",
+      "settings": "Réglages"
+    },
     "description": "Pour enregistrer ta guilde sur RaidOps, tu dois inviter le bot RaidOps à rejoindre ton serveur discord. En cliquant sur le bouton ci-dessous, tu seras redirigé vers Discord pour autoriser l'invitation. L'enregistrement sera automatiquement finalisé une fois le bot invité.",
     "cta": "Inviter le bot et enregistrer"
+  },
+  "guildSettings": {
+    "pageTitle": "Paramètres de la guilde",
+    "pageSubtitle": "Configure le fuseau horaire et les règles d'accès au roster.",
+    "timezone": {
+      "label": "Fuseau horaire",
+      "placeholder": "ex. Europe/Paris",
+      "required": "Le fuseau horaire est requis."
+    },
+    "rosterMode": {
+      "label": "Accès au roster",
+      "open": "Ouvert à tous",
+      "discordRoleOnly": "Rôle Discord requis",
+      "hintOpen": "N'importe quel membre authentifié peut rejoindre le roster.",
+      "hintRole": "Les membres ayant ce rôle ou un rôle plus élevé dans la hiérarchie Discord peuvent rejoindre le roster."
+    },
+    "roles": {
+      "label": "Seuil d'accès au roster",
+      "loading": "Chargement des rôles…",
+      "empty": "Aucun rôle assignable trouvé sur ce serveur.",
+      "hint": "Clique sur un rôle pour définir le seuil minimum. Ce rôle et tous les rôles au-dessus donnent accès au roster.",
+      "threshold": "Seuil",
+      "excluded": "Rôles exclus"
+    },
+    "save": "Enregistrer les réglages"
   },
   "noGuild": {
     "noServer": {

@@ -33,18 +33,23 @@ export class GuildListComponent implements OnInit {
       this.loading.set(false);
       if (this.registeredGuilds().length === 1 && this.adminGuilds().length === 0) {
         this.#router.navigate(['/guilds', this.registeredGuilds()[0].id, 'dashboard']);
+      } else if (this.registeredGuilds().length === 0 && this.adminGuilds().length === 1 && !this.adminGuilds()[0].isRegistered) {
+        this.#router.navigate(['/guild-register', this.adminGuilds()[0].id]);
       }
     });
   }
 
-  /** Registered guilds the user can access. */
+  /** Fully configured guilds the user can access. */
   readonly registeredGuilds = computed<UserGuild[]>(
-    () => this.#authStore.user()?.guilds.filter((g) => g.isRegistered) ?? [],
+    () => this.#authStore.user()?.guilds.filter((g) => g.isRegistered && g.isConfigured) ?? [],
   );
 
-  /** Guilds where the user is admin but RaidOps is not yet registered. */
+  /** Guilds where the bot is invited but settings are incomplete, or not yet registered at all. */
   readonly adminGuilds = computed<UserGuild[]>(
-    () => this.#authStore.user()?.guilds.filter((g) => g.isAdmin && !g.isRegistered) ?? [],
+    () =>
+      this.#authStore.user()?.guilds.filter(
+        (g) => g.isAdmin && (!g.isRegistered || !g.isConfigured),
+      ) ?? [],
   );
 
   readonly DiscordIconType = DiscordIconType;

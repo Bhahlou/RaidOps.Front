@@ -1,9 +1,14 @@
 <div class="register-container">
-  @if (guild(); as guild) {
-    <app-icon-card
-      icon="smart_toy"
-      [title]="'register.title' | transloco"
-    >
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (guild(); as guild) {
+
+    <app-icon-card icon="smart_toy" [title]="'register.title' | transloco">
+
+      <!-- Guild preview -->
       <div class="guild-preview">
         <div class="guild-icon">
           <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" />
@@ -11,14 +16,35 @@
         <span class="guild-name">{{ guild.name }}</span>
       </div>
 
-      <p class="description" [innerHTML]="'register.description' | transloco"></p>
+      <!-- Stepper -->
+      <mat-stepper [selectedIndex]="stepIndex()" linear class="register-stepper">
 
-      <div class="action">
-        <button mat-flat-button color="primary" (click)="initiateRegistration()">
-          <mat-icon>add_circle</mat-icon>
-          {{ 'register.cta' | transloco }}
-        </button>
-      </div>
+        <!-- Step 1 — Invite bot -->
+        <mat-step
+          [label]="'register.steps.invite' | transloco"
+          [completed]="guild.isRegistered"
+        >
+          <p class="description" [innerHTML]="'register.description' | transloco"></p>
+          <div class="action">
+            <button mat-flat-button color="primary" (click)="initiateRegistration()">
+              <mat-icon>add_circle</mat-icon>
+              {{ 'register.cta' | transloco }}
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- Step 2 — Settings -->
+        <mat-step [label]="'register.steps.settings' | transloco">
+          <app-guild-settings-form
+            [guildId]="guild.id"
+            (saved)="onSettingsSaved()"
+          />
+        </mat-step>
+
+      </mat-stepper>
+
     </app-icon-card>
+
   }
+
 </div>

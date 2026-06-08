@@ -5,12 +5,31 @@ import { Subject } from 'rxjs';
 
 import { SidenavComponent } from './sidenav.component';
 import { AuthStore } from '../../../core/stores/auth.store';
+import { User } from '../../../core/models/user.model';
+import { UserGuild } from '../../../core/models/user-guild.model';
+
+const makeGuild = (overrides: Partial<UserGuild>): UserGuild => ({
+  id: 'g1',
+  name: 'Guild',
+  iconHash: null,
+  isRegistered: false,
+  isConfigured: false,
+  isAdmin: false,
+  ...overrides,
+});
+
+const makeUser = (guilds: UserGuild[]): User => ({
+  discordId: '123',
+  name: 'TestUser',
+  avatarHash: null,
+  guilds,
+});
 
 describe('SidenavComponent', () => {
   let routerEvents$: Subject<unknown>;
   let mockRouter: { events: ReturnType<typeof routerEvents$.asObservable>; url: string };
 
-  const setup = (url = '/home', authenticated = false) => {
+  const setup = (url = '/home', authenticated = false, user: User | null = null) => {
     routerEvents$ = new Subject();
     mockRouter = { events: routerEvents$.asObservable(), url };
 
@@ -19,7 +38,7 @@ describe('SidenavComponent', () => {
       providers: [
         {
           provide: AuthStore,
-          useValue: { user: signal(null), isAuthenticated: computed(() => authenticated) },
+          useValue: { user: signal(user), isAuthenticated: computed(() => authenticated) },
         },
         { provide: Router, useValue: mockRouter },
       ],
@@ -55,6 +74,26 @@ describe('SidenavComponent', () => {
     expect(setup('/home', false).isAuthenticated()).toBe(false);
   });
 
+  // ── registeredGuilds ──────────────────────────────────────────────────────
+
+  describe('registeredGuilds', () => {
+    it('returns only guilds that are both registered and configured', () => {
+      const user = makeUser([
+        makeGuild({ id: 'g1', isRegistered: true,  isConfigured: true  }),
+        makeGuild({ id: 'g2', isRegistered: true,  isConfigured: false }),
+        makeGuild({ id: 'g3', isRegistered: false, isConfigured: true  }),
+        makeGuild({ id: 'g4', isRegistered: false, isConfigured: false }),
+      ]);
+      const component = setup('/home', false, user);
+
+      expect(component.registeredGuilds().map(g => g.id)).toEqual(['g1']);
+    });
+
+    it('returns empty array when user is null', () => {
+      expect(setup().registeredGuilds()).toEqual([]);
+    });
+  });
+
   // ── toggleAccount ─────────────────────────────────────────────────────────
 
   it('toggleAccount flips isAccountOpen', () => {
@@ -65,6 +104,35 @@ describe('SidenavComponent', () => {
 
     component.toggleAccount();
     expect(component.isAccountOpen()).toBe(true);
+  });
+
+  // ── toggleGuild ───────────────────────────────────────────────────────────
+
+  describe('toggleGuild', () => {
+    it('adds a guild id when not already open', () => {
+      const component = setup();
+      component.toggleGuild('g1');
+
+      expect(component.openGuildIds().has('g1')).toBe(true);
+    });
+
+    it('removes a guild id when already open (toggle off)', () => {
+      const component = setup();
+      component.toggleGuild('g1');
+      component.toggleGuild('g1');
+
+      expect(component.openGuildIds().has('g1')).toBe(false);
+    });
+
+    it('manages multiple guild ids independently', () => {
+      const component = setup();
+      component.toggleGuild('g1');
+      component.toggleGuild('g2');
+      component.toggleGuild('g1');
+
+      expect(component.openGuildIds().has('g1')).toBe(false);
+      expect(component.openGuildIds().has('g2')).toBe(true);
+    });
   });
 
   // ── isGuildsActive ────────────────────────────────────────────────────────
@@ -97,5 +165,22 @@ describe('SidenavComponent', () => {
     routerEvents$.next(new NavigationEnd(1, '/home', '/home'));
 
     expect(component.isGuildsActive()).toBe(false);
+  });
+
+  // ── auto-open guild section ───────────────────────────────────────────────
+
+  describe('auto-open effect', () => {
+    it('opens the guild section on initial guild route', () => {
+      const component = setup('/guilds/g1/dashboard');
+
+      expect(component.openGuildIds().has('g1')).toBe(true);
+    });
+
+    it('does not add anything when not on a guild route', () => {
+      const component = setup('/home');
+
+      expect(component.openGuildIds().size).toBe(0);
+    });
+
   });
 });

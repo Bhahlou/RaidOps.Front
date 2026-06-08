@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
 
 import { RegisterComponent } from './register.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
@@ -8,12 +9,14 @@ import { LOCATION } from '../../../../core/tokens/location.token';
 import { UserGuild } from '../../../../core/models/user-guild.model';
 import { User } from '../../../../core/models/user.model';
 
-const makeGuild = (id: string): UserGuild => ({
+const makeGuild = (id: string, overrides?: Partial<UserGuild>): UserGuild => ({
   id,
   name: `Guild ${id}`,
   iconHash: null,
   isRegistered: false,
+  isConfigured: false,
   isAdmin: true,
+  ...overrides,
 });
 
 const makeUser = (guilds: UserGuild[]): User => ({
@@ -29,16 +32,22 @@ describe('RegisterComponent', () => {
   let navigate: ReturnType<typeof vi.fn>;
   let assign: ReturnType<typeof vi.fn>;
 
-  const setup = (guildId: string | null, guilds: UserGuild[] = []) => {
+  const setup = (
+    guildId: string | null,
+    guilds: UserGuild[] = [],
+    loadUserFn?: () => Observable<unknown>,
+  ) => {
     navigate = vi.fn().mockResolvedValue(true);
     assign = vi.fn();
 
-    const userSignal = signal<User | null>(guilds.length ? makeUser(guilds) : null);
+    const initialUser = guilds.length ? makeUser(guilds) : null;
+    const userSignal = signal<User | null>(initialUser);
+    const loadUser = loadUserFn ?? (() => of(initialUser));
 
     TestBed.configureTestingModule({
       imports: [RegisterComponent],
       providers: [
-        { provide: AuthStore, useValue: { user: userSignal.asReadonly() } },
+        { provide: AuthStore, useValue: { user: userSignal.asReadonly(), loadUser } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => guildId } } } },
         { provide: Router, useValue: { navigate } },
         { provide: LOCATION, useValue: { assign } },
@@ -74,6 +83,22 @@ describe('RegisterComponent', () => {
     });
   });
 
+  // ── stepIndex computed ────────────────────────────────────────────────────
+
+  describe('stepIndex', () => {
+    it('is 0 when the guild is not yet registered', () => {
+      setup('abc', [makeGuild('abc', { isRegistered: false })]);
+
+      expect(component.stepIndex()).toBe(0);
+    });
+
+    it('is 1 when the guild is registered', () => {
+      setup('abc', [makeGuild('abc', { isRegistered: true })]);
+
+      expect(component.stepIndex()).toBe(1);
+    });
+  });
+
   // ── ngOnInit ──────────────────────────────────────────────────────────────
 
   describe('ngOnInit', () => {
@@ -83,10 +108,23 @@ describe('RegisterComponent', () => {
       expect(navigate).toHaveBeenCalledWith(['/no-guild']);
     });
 
-    it('does not redirect when guild is found', () => {
+    it('redirects to dashboard when guild is already configured', () => {
+      setup('abc', [makeGuild('abc', { isRegistered: true, isConfigured: true })]);
+
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc', 'dashboard']);
+    });
+
+    it('does not redirect when guild is found but not yet configured', () => {
       setup('abc', [makeGuild('abc')]);
 
       expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('redirects to /no-guild and clears loading on loadUser error', () => {
+      setup('abc', [makeGuild('abc')], () => throwError(() => new Error('auth failed')));
+
+      expect(navigate).toHaveBeenCalledWith(['/no-guild']);
+      expect(component.loading()).toBe(false);
     });
   });
 
@@ -100,13 +138,17 @@ describe('RegisterComponent', () => {
 
       expect(assign).toHaveBeenCalledWith(expect.stringContaining('/guilds/register/initiate?guildId=abc'));
     });
+  });
 
-    it('does nothing when guild is null', () => {
-      setup(null);
+  // ── onSettingsSaved ───────────────────────────────────────────────────────
 
-      component.initiateRegistration();
+  describe('onSettingsSaved', () => {
+    it('navigates to the guild dashboard', () => {
+      setup('abc', [makeGuild('abc')]);
 
-      expect(assign).not.toHaveBeenCalled();
+      component.onSettingsSaved();
+
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc', 'dashboard']);
     });
   });
 });

@@ -1,0 +1,113 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="settings-form">
+
+  <!-- Timezone -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'guildSettings.timezone.label' | transloco }}</mat-label>
+    <input
+      matInput
+      formControlName="timezone"
+      [matAutocomplete]="tzAuto"
+      [placeholder]="'guildSettings.timezone.placeholder' | transloco"
+    />
+    <mat-autocomplete #tzAuto autoActiveFirstOption [displayWith]="displayTimezone">
+      @for (tz of filteredTimezones(); track tz.id) {
+        <mat-option [value]="tz.id">{{ tz.label }}</mat-option>
+      }
+    </mat-autocomplete>
+    @if (form.controls.timezone.hasError('required')) {
+      <mat-error>{{ 'guildSettings.timezone.required' | transloco }}</mat-error>
+    }
+  </mat-form-field>
+
+  <!-- Roster mode -->
+  <div class="field-group">
+    <p class="field-label">{{ 'guildSettings.rosterMode.label' | transloco }}</p>
+    <mat-button-toggle-group formControlName="rosterMode" class="roster-toggle">
+      <mat-button-toggle [value]="RosterMode.Open">
+        <mat-icon>public</mat-icon>
+        {{ 'guildSettings.rosterMode.open' | transloco }}
+      </mat-button-toggle>
+      <mat-button-toggle [value]="RosterMode.DiscordRoleOnly">
+        <mat-icon>shield</mat-icon>
+        {{ 'guildSettings.rosterMode.discordRoleOnly' | transloco }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+    <p class="field-hint">
+      {{ (isDiscordRoleMode() ? 'guildSettings.rosterMode.hintRole' : 'guildSettings.rosterMode.hintOpen') | transloco }}
+    </p>
+  </div>
+
+  <!-- Role threshold (only when DiscordRoleOnly) -->
+  @if (isDiscordRoleMode()) {
+    <div class="field-group roles-section">
+      <p class="field-label">{{ 'guildSettings.roles.label' | transloco }}</p>
+
+      @if (rolesLoading()) {
+        <div class="roles-loading">
+          <mat-spinner diameter="24" />
+          <span>{{ 'guildSettings.roles.loading' | transloco }}</span>
+        </div>
+      } @else if (sortedRoles().length > 0) {
+        <p class="field-hint">{{ 'guildSettings.roles.hint' | transloco }}</p>
+
+        <div class="roles-list-wrapper">
+        <div class="roles-list">
+          @for (role of sortedRoles(); track role.id; let last = $last) {
+            <button
+              type="button"
+              class="role-row"
+              [class.is-included]="isRoleIncluded(role)"
+              [class.is-threshold]="isThreshold(role)"
+              [class.is-excluded]="isRoleExcluded(role)"
+              [style.--role-color]="roleColor(role)"
+              (click)="selectThreshold(role.id)"
+            >
+              <span class="role-row-indicator">
+                @if (isRoleIncluded(role)) {
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                } @else if (roleIconUrl(role); as iconUrl) {
+                  <img class="role-icon" [src]="iconUrl" [alt]="" />
+                } @else if (roleColor(role); as color) {
+                  <span class="role-dot" [style.background]="color"></span>
+                } @else {
+                  <span class="role-dot-empty"></span>
+                }
+              </span>
+              <span class="role-row-name">{{ role.name }}</span>
+              @if (isThreshold(role)) {
+                <span class="threshold-badge">{{ 'guildSettings.roles.threshold' | transloco }}</span>
+              }
+            </button>
+
+            @if (isThreshold(role) && !last) {
+              <div class="threshold-divider">
+                <span class="threshold-divider-label">{{ 'guildSettings.roles.excluded' | transloco }}</span>
+              </div>
+            }
+          }
+        </div>
+        </div>
+      } @else {
+        <p class="field-hint">{{ 'guildSettings.roles.empty' | transloco }}</p>
+      }
+    </div>
+  }
+
+  <!-- Submit -->
+  <div class="form-actions">
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="form.invalid || submitting()"
+    >
+      @if (submitting()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        <mat-icon>check_circle</mat-icon>
+      }
+      {{ 'guildSettings.save' | transloco }}
+    </button>
+  </div>
+
+</form>
