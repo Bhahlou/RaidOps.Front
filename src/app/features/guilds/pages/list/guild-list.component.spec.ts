@@ -32,7 +32,7 @@ describe('GuildListComponent', () => {
 
   const setup = (guilds: UserGuild[] | null = []) => {
     navigate = vi.fn().mockResolvedValue(true);
-    const initialUser = guilds !== null ? user(guilds) : null;
+    const initialUser = guilds === null ? null : user(guilds);
     userSignal = signal<User | null>(initialUser);
 
     TestBed.configureTestingModule({
