@@ -6,7 +6,7 @@
 
   app-icon-card {
     width: 100%;
-    max-width: 560px;
+    max-width: 640px;
   }
 }
 
@@ -33,7 +33,14 @@
   color: var(--color-text-primary);
 }
 
-// ── Content ───────────────────────────────────────────────────────────────────
+// ── Stepper ───────────────────────────────────────────────────────────────────
+
+.register-stepper {
+  margin-top: 16px;
+  background: transparent;
+}
+
+// ── Step content ──────────────────────────────────────────────────────────────
 
 .description {
   color: var(--color-text-secondary);
@@ -44,4 +51,14 @@
 .action {
   display: flex;
   justify-content: flex-end;
+  margin-top: 8px;
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px;
 }

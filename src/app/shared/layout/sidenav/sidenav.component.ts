@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
@@ -19,26 +19,57 @@ export class SidenavComponent {
   readonly #router = inject(Router);
 
   readonly user = this.#authStore.user;
-  readonly iconType = DiscordIconType.User;
+  readonly iconTypeUser = DiscordIconType.User;
+  readonly iconTypeGuild = DiscordIconType.Guild;
 
   readonly isExpanded = signal(false);
   readonly isAccountOpen = signal(true);
   readonly isAuthenticated = computed(() => this.#authStore.isAuthenticated());
 
-  /** True when the current route belongs to the guilds area (/guilds or /no-guild). */
-  readonly isGuildsActive = toSignal(
+  readonly #routeUrl = toSignal(
     this.#router.events.pipe(
       filter((e) => e instanceof NavigationEnd),
       startWith(null),
-      map(() => {
-        const url = this.#router.url;
-        return url.startsWith('/guilds') || url.startsWith('/no-guild');
-      }),
+      map(() => this.#router.url),
     ),
-    { initialValue: false },
+    { initialValue: this.#router.url },
   );
+
+  readonly isGuildsActive = computed(() => {
+    const url = this.#routeUrl();
+    return url.startsWith('/guilds') || url.startsWith('/no-guild');
+  });
+
+  readonly #currentGuildId = computed(() => {
+    const match = this.#routeUrl().match(/^\/guilds\/([^/]+)/);
+    return match ? match[1] : null;
+  });
+
+  /** Guilds fully registered and configured — shown in the sidenav. */
+  readonly registeredGuilds = computed(
+    () => this.user()?.guilds.filter((g) => g.isRegistered && g.isConfigured) ?? [],
+  );
+
+  /** IDs of guild sections currently open (multiple allowed). */
+  readonly openGuildIds = signal<Set<string>>(new Set());
+
+  constructor() {
+    // Auto-open the guild section when navigating into a guild route.
+    effect(() => {
+      const id = this.#currentGuildId();
+      if (id) this.openGuildIds.update((s) => new Set([...s, id]));
+    });
+  }
 
   toggleAccount(): void {
     this.isAccountOpen.update((v) => !v);
+  }
+
+  toggleGuild(id: string): void {
+    this.openGuildIds.update((s) => {
+      const next = new Set(s);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }
 }

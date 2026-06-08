@@ -65,7 +65,7 @@
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let guild" class="action-cell">
               <a mat-stroked-button [routerLink]="['/guild-register', guild.id]">
-                {{ 'guildList.admin.action' | transloco }}
+                {{ (guild.isRegistered ? 'guildList.admin.actionComplete' : 'guildList.admin.action') | transloco }}
               </a>
             </td>
           </ng-container>

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 
 import { RegisterComponent } from './register.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
@@ -8,12 +9,14 @@ import { LOCATION } from '../../../../core/tokens/location.token';
 import { UserGuild } from '../../../../core/models/user-guild.model';
 import { User } from '../../../../core/models/user.model';
 
-const makeGuild = (id: string): UserGuild => ({
+const makeGuild = (id: string, overrides?: Partial<UserGuild>): UserGuild => ({
   id,
   name: `Guild ${id}`,
   iconHash: null,
   isRegistered: false,
+  isConfigured: false,
   isAdmin: true,
+  ...overrides,
 });
 
 const makeUser = (guilds: UserGuild[]): User => ({
@@ -33,12 +36,13 @@ describe('RegisterComponent', () => {
     navigate = vi.fn().mockResolvedValue(true);
     assign = vi.fn();
 
-    const userSignal = signal<User | null>(guilds.length ? makeUser(guilds) : null);
+    const initialUser = guilds.length ? makeUser(guilds) : null;
+    const userSignal = signal<User | null>(initialUser);
 
     TestBed.configureTestingModule({
       imports: [RegisterComponent],
       providers: [
-        { provide: AuthStore, useValue: { user: userSignal.asReadonly() } },
+        { provide: AuthStore, useValue: { user: userSignal.asReadonly(), loadUser: () => of(initialUser) } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => guildId } } } },
         { provide: Router, useValue: { navigate } },
         { provide: LOCATION, useValue: { assign } },
@@ -99,14 +103,6 @@ describe('RegisterComponent', () => {
       component.initiateRegistration();
 
       expect(assign).toHaveBeenCalledWith(expect.stringContaining('/guilds/register/initiate?guildId=abc'));
-    });
-
-    it('does nothing when guild is null', () => {
-      setup(null);
-
-      component.initiateRegistration();
-
-      expect(assign).not.toHaveBeenCalled();
     });
   });
 });

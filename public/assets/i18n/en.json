@@ -9,7 +9,15 @@
       "characters": "Characters",
       "equipment": "Gear planner"
     },
-    "guilds": "My guilds"
+    "guilds": "My guilds",
+    "guild": {
+      "dashboard": "Dashboard",
+      "calendar": "Calendar",
+      "roster": "Roster",
+      "loot": "Loot",
+      "settings": "Settings",
+      "switch": "Switch guild"
+    }
   },
   "guildList": {
     "column": "Guild",
@@ -21,13 +29,43 @@
     "admin": {
       "title": "My unregistered guilds",
       "subtitle": "The following guilds are unregistered, but you are administator of them. You can register them to start using RaidOps.",
-      "action": "Register"
+      "action": "Register",
+      "actionComplete": "Complete"
     }
   },
   "register": {
     "title": "Register a guild",
+    "steps": {
+      "invite": "Invite bot",
+      "settings": "Settings"
+    },
     "description": "To activate RaidOps on this server, the bot needs to join your Discord server. By clicking the button below, you will be redirected to Discord to authorise the invitation. Registration will be completed automatically once the bot has been invited.",
     "cta": "Invite the bot and register"
+  },
+  "guildSettings": {
+    "pageTitle": "Guild settings",
+    "pageSubtitle": "Configure the timezone and roster access rules.",
+    "timezone": {
+      "label": "Timezone",
+      "placeholder": "e.g. Europe/Paris",
+      "required": "Timezone is required."
+    },
+    "rosterMode": {
+      "label": "Roster access",
+      "open": "Open to all",
+      "discordRoleOnly": "Discord role required",
+      "hintOpen": "Any authenticated member can join the roster.",
+      "hintRole": "Members with the required role or any higher role in the Discord hierarchy can join the roster."
+    },
+    "roles": {
+      "label": "Roster access threshold",
+      "loading": "Loading roles…",
+      "empty": "No assignable roles found on this server.",
+      "hint": "Click a role to set the minimum threshold. That role and all roles above it will have access to the roster.",
+      "threshold": "Threshold",
+      "excluded": "Excluded roles"
+    },
+    "save": "Save settings"
   },
   "noGuild": {
     "noServer": {

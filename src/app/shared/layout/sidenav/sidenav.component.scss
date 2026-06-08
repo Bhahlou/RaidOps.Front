@@ -1,14 +1,18 @@
 // ── Host ─────────────────────────────────────────────────────────────────────
 
 :host {
-  display: contents;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 100;
 }
 
 // ── Sidenav rail ─────────────────────────────────────────────────────────────
 
 .sidenav {
   width: var(--sidebar-rail-width);
-  flex-shrink: 0;
+  height: 100%;
   background: var(--mat-sys-surface-container-low);
   border-right: 1px solid var(--mat-sys-outline-variant);
   overflow: hidden;
@@ -16,10 +20,11 @@
 
   &.is-expanded {
     width: var(--sidebar-width);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
   }
 }
 
-// ── Section ───────────────────────────────────────────────────────────────────
+// ── Section header (account & guild toggles) ──────────────────────────────────
 
 .section-header {
   display: flex;
@@ -51,6 +56,12 @@
     width: 100%;
     height: 100%;
   }
+}
+
+// Guild icons are square-rounded; user avatars stay circular (discord-icon handles that).
+.guild-avatar {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .section-name {

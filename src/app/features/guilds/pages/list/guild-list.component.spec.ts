@@ -13,6 +13,7 @@ const guild = (overrides: Partial<UserGuild>): UserGuild => ({
   name: 'Guild',
   iconHash: null,
   isRegistered: false,
+  isConfigured: false,
   isAdmin: false,
   ...overrides,
 });
@@ -44,8 +45,7 @@ describe('GuildListComponent', () => {
         },
         { provide: Router, useValue: { navigate } },
       ],
-    })
-    .overrideComponent(GuildListComponent, { set: { template: '', imports: [] } });
+    }).overrideComponent(GuildListComponent, { set: { template: '', imports: [] } });
 
     fixture = TestBed.createComponent(GuildListComponent);
     component = fixture.componentInstance;
@@ -56,12 +56,12 @@ describe('GuildListComponent', () => {
   describe('registeredGuilds', () => {
     it('returns only registered guilds', () => {
       setup([
-        guild({ id: 'g1', isRegistered: true }),
+        guild({ id: 'g1', isRegistered: true, isConfigured: true }),
         guild({ id: 'g2', isRegistered: false }),
       ]);
       fixture.detectChanges();
 
-      expect(component.registeredGuilds().map(g => g.id)).toEqual(['g1']);
+      expect(component.registeredGuilds().map((g) => g.id)).toEqual(['g1']);
     });
 
     it('returns empty array when user has no registered guilds', () => {
@@ -83,12 +83,12 @@ describe('GuildListComponent', () => {
     it('returns guilds where user is admin and guild is not registered', () => {
       setup([
         guild({ id: 'g1', isAdmin: true, isRegistered: false }),
-        guild({ id: 'g2', isAdmin: true, isRegistered: true }),
+        guild({ id: 'g2', isAdmin: true, isRegistered: true, isConfigured: true }),
         guild({ id: 'g3', isAdmin: false, isRegistered: false }),
       ]);
       fixture.detectChanges();
 
-      expect(component.adminGuilds().map(g => g.id)).toEqual(['g1']);
+      expect(component.adminGuilds().map((g) => g.id)).toEqual(['g1']);
     });
 
     it('returns empty array when user is null', () => {
@@ -111,7 +111,7 @@ describe('GuildListComponent', () => {
     });
 
     it('auto-navigates to dashboard when exactly one registered guild and no admin guilds', () => {
-      setup([guild({ id: 'g1', isRegistered: true })]);
+      setup([guild({ id: 'g1', isRegistered: true, isConfigured: true })]);
       fixture.detectChanges();
 
       expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1', 'dashboard']);
@@ -119,8 +119,8 @@ describe('GuildListComponent', () => {
 
     it('does not auto-navigate when there are multiple registered guilds', () => {
       setup([
-        guild({ id: 'g1', isRegistered: true }),
-        guild({ id: 'g2', isRegistered: true }),
+        guild({ id: 'g1', isRegistered: true, isConfigured: true }),
+        guild({ id: 'g2', isRegistered: true, isConfigured: true }),
       ]);
       fixture.detectChanges();
 
@@ -129,9 +129,23 @@ describe('GuildListComponent', () => {
 
     it('does not auto-navigate when there is one registered guild but also admin guilds', () => {
       setup([
-        guild({ id: 'g1', isRegistered: true }),
+        guild({ id: 'g1', isRegistered: true, isConfigured: true }),
         guild({ id: 'g2', isAdmin: true, isRegistered: false }),
       ]);
+      fixture.detectChanges();
+
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('auto-navigates to /guild-register when one unregistered admin guild and no registered guilds', () => {
+      setup([guild({ id: 'g1', isAdmin: true, isRegistered: false })]);
+      fixture.detectChanges();
+
+      expect(navigate).toHaveBeenCalledWith(['/guild-register', 'g1']);
+    });
+
+    it('does not auto-navigate to /guild-register when the admin guild is registered but not yet configured', () => {
+      setup([guild({ id: 'g1', isAdmin: true, isRegistered: true, isConfigured: false })]);
       fixture.detectChanges();
 
       expect(navigate).not.toHaveBeenCalled();
