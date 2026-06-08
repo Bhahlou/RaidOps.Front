@@ -162,7 +162,7 @@ export class GuildSettingsFormComponent implements OnInit {
   }
 
   roleColor(role: DiscordRole): string | null {
-    return role.color !== 0 ? '#' + role.color.toString(16).padStart(6, '0') : null;
+    return role.color === 0 ? null : '#' + role.color.toString(16).padStart(6, '0');
   }
 
   roleIconUrl(role: DiscordRole): string | null {
