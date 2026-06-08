@@ -14,5 +14,18 @@ export default defineConfig({
         inline: [/^@angular/],
       },
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['lcov', 'text-summary'],
+      reportsDirectory: 'coverage',
+      include: ['src/**/*.ts'],
+      exclude: [
+        'src/**/*.spec.ts',
+        'src/test-setup.ts',
+        'src/main.ts',
+        'src/environments/**',
+        'src/**/*.model.ts',
+      ],
+    },
   },
 });
