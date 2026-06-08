@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 /**
  * Lightweight relay page opened inside the BNet OAuth popup.
- * Reads the callback query params, posts the result to the parent window, then closes.
+ * Reads the callback query params, posts the result to the parent globalThis, then closes.
  */
 @Component({
   selector: 'app-bnet-callback',
@@ -21,13 +21,13 @@ export class BnetCallbackComponent implements OnInit {
         ? { type: 'bnet_oauth' }
         : { type: 'bnet_oauth', error: params.get('error') ?? 'unknown' };
 
-    if (window.opener) {
+    if (globalThis.opener) {
       // Opened as a popup
-      window.opener.postMessage(message, window.location.origin);
-      window.close();
-    } else if (window.parent !== window) {
+      globalThis.opener.postMessage(message, globalThis.location.origin);
+      globalThis.close();
+    } else if (globalThis.parent !== globalThis.self) {
       // Loaded in a hidden iframe
-      window.parent.postMessage(message, window.location.origin);
+      globalThis.parent.postMessage(message, globalThis.location.origin);
     }
   }
 }

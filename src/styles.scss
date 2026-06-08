@@ -1,8 +1,13 @@
 @use '@angular/material' as mat;
 @use './raidops-theme' as raidops-theme;
+@import '@fontsource/inter/300.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
 
 html {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif;
   color-scheme: light dark;
 
   @include mat.theme(
@@ -12,7 +17,7 @@ html {
         tertiary: raidops-theme.$tertiary-palette,
         theme-type: dark,
       ),
-      typography: Roboto,
+      typography: Inter,
       density: 0,
     )
   );
@@ -61,6 +66,8 @@ app-root {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .mat-toolbar {
@@ -149,12 +156,6 @@ body::after {
   100% {
     transform: translate(100px, -160px) scale(1.14);
   }
-}
-
-// Make app-root sit above the blobs
-app-root {
-  position: relative;
-  z-index: 1;
 }
 
 // ── Dialog ────────────────────────────────────────────────────────────────────

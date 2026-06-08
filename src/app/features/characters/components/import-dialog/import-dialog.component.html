@@ -71,7 +71,8 @@
                         [checked]="isRealmAllSelected(realm)"
                         [indeterminate]="isRealmIndeterminate(realm)"
                         (change)="toggleAllInRealm(realm)"
-                        (click)="$event.stopPropagation()">
+                        (click)="$event.stopPropagation()"
+                        (keydown)="$event.stopPropagation()">
                       </mat-checkbox>
                       <span>{{ realm.realmName }}</span>
                       <span class="realm-count">{{ realm.characters.length }}</span>
@@ -83,11 +84,15 @@
                       <div
                         class="char-row"
                         [class.char-row--imported]="char.isActive"
-                        (click)="toggleCharacter(char)">
+                        role="button"
+                        tabindex="0"
+                        (click)="toggleCharacter(char)"
+                        (keydown.enter)="toggleCharacter(char)">
                         <mat-checkbox
                           [checked]="isSelected(char.id)"
                           [disabled]="char.isActive"
                           (click)="$event.stopPropagation()"
+                          (keydown)="$event.stopPropagation()"
                           (change)="toggleCharacter(char)">
                         </mat-checkbox>
                         <app-wow-class-icon [classId]="char.classId" [className]="char.className" />
