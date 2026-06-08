@@ -1,21 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+
 import { PageLayoutComponent } from './page-layout.component';
+import { AuthStore } from '../../../core/stores/auth.store';
 
 describe('PageLayoutComponent', () => {
-  let component: PageLayoutComponent;
-  let fixture: ComponentFixture<PageLayoutComponent>;
+  const setup = (authenticated: boolean) => {
+    const isAuthenticated = signal(authenticated);
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       imports: [PageLayoutComponent],
-    }).compileComponents();
+      providers: [
+        { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly() } },
+      ],
+    })
+    .overrideComponent(PageLayoutComponent, { set: { template: '', imports: [] } });
 
-    fixture = TestBed.createComponent(PageLayoutComponent);
-    component = fixture.componentInstance;
+    const fixture = TestBed.createComponent(PageLayoutComponent);
     fixture.detectChanges();
-  });
+    return fixture.componentInstance;
+  };
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(setup(false)).toBeTruthy();
+  });
+
+  it('isAuthenticated is true when store reports authenticated', () => {
+    expect(setup(true).isAuthenticated()).toBe(true);
+  });
+
+  it('isAuthenticated is false when store reports not authenticated', () => {
+    expect(setup(false).isAuthenticated()).toBe(false);
   });
 });
