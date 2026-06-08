@@ -41,7 +41,7 @@ export class SidenavComponent {
   });
 
   readonly #currentGuildId = computed(() => {
-    const match = this.#routeUrl().match(/^\/guilds\/([^/]+)/);
+    const match = /^\/guilds\/([^/]+)/.exec(this.#routeUrl());
     return match ? match[1] : null;
   });
 
