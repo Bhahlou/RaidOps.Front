@@ -1,0 +1,284 @@
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { signal } from '@angular/core';
+import { of } from 'rxjs';
+
+import { CharacterListComponent } from './list.component';
+import { CharacterStore } from '../../stores/character.store';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { BnetAccount } from '../../models/bnet-account.model';
+import { Character } from '../../models/character.model';
+
+const mockAccount: BnetAccount = {
+  bnetId: '1',
+  battleTag: 'Test#0001',
+  region: 'eu',
+  tokenExpiry: '2026-01-01T00:00:00Z',
+};
+
+const mockChar: Character = {
+  id: 1, name: 'Char', classId: 1, className: 'Warrior', classColor: '#C69B3A',
+  raceId: 1, raceName: 'Human', faction: 'ALLIANCE', branchName: 'Retail',
+  realmName: 'Silvermoon', realmSlug: 'silvermoon', level: 80, itemLevel: null,
+  avatarUrl: null, guildName: null, specs: [],
+};
+
+describe('CharacterListComponent', () => {
+  let component: CharacterListComponent;
+  let storeMock: {
+    isBnetLoading: ReturnType<typeof signal<boolean>>;
+    isBnetLinked: ReturnType<typeof signal<boolean>>;
+    bnetAccount: ReturnType<typeof signal<BnetAccount | null | undefined>>;
+    isCharactersLoading: ReturnType<typeof signal<boolean>>;
+    characterList: ReturnType<typeof signal<Character[]>>;
+    loadBnetAccount: ReturnType<typeof vi.fn>;
+    loadCharacters: ReturnType<typeof vi.fn>;
+    deactivateCharacter: ReturnType<typeof vi.fn>;
+    resyncCharacter: ReturnType<typeof vi.fn>;
+  };
+  let snackbarMock: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
+  let dialogMock: { open: ReturnType<typeof vi.fn> };
+  let routeGet: ReturnType<typeof vi.fn>;
+
+  const setup = (errorParam: string | null = null, accountToEmit: BnetAccount | null = mockAccount) => {
+    routeGet = vi.fn().mockReturnValue(errorParam);
+
+    storeMock = {
+      isBnetLoading: signal(false),
+      isBnetLinked: signal(true),
+      bnetAccount: signal(accountToEmit),
+      isCharactersLoading: signal(false),
+      characterList: signal([]),
+      loadBnetAccount: vi.fn().mockReturnValue(of(accountToEmit)),
+      loadCharacters: vi.fn().mockReturnValue(of([])),
+      deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
+      resyncCharacter: vi.fn().mockReturnValue(of(mockChar)),
+    };
+    snackbarMock = { success: vi.fn(), error: vi.fn() };
+    dialogMock = {
+      open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }),
+    };
+
+    TestBed.configureTestingModule({
+      imports: [CharacterListComponent],
+      providers: [
+        { provide: CharacterStore, useValue: storeMock },
+        { provide: SnackbarService, useValue: snackbarMock },
+        { provide: MatDialog, useValue: dialogMock },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: routeGet } } } },
+      ],
+    });
+    TestBed.overrideComponent(CharacterListComponent, { set: { template: '', imports: [] } });
+    component = TestBed.createComponent(CharacterListComponent).componentInstance;
+  };
+
+  describe('ngOnInit', () => {
+    it('loads bnet account on init', () => {
+      setup();
+      component.ngOnInit();
+      expect(storeMock.loadBnetAccount).toHaveBeenCalled();
+    });
+
+    it('loads characters when account is linked', () => {
+      setup(null, mockAccount);
+      component.ngOnInit();
+      expect(storeMock.loadCharacters).toHaveBeenCalled();
+    });
+
+    it('does not load characters when account is null', () => {
+      setup(null, null);
+      component.ngOnInit();
+      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+    });
+
+    it('shows a BNet error snackbar when error query param is present', () => {
+      vi.useFakeTimers();
+      setup('BnetApiError');
+      component.ngOnInit();
+
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorBnet');
+      vi.useRealTimers();
+    });
+
+    it('shows session error snackbar for InvalidState', () => {
+      vi.useFakeTimers();
+      setup('InvalidState');
+      component.ngOnInit();
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
+      vi.useRealTimers();
+    });
+
+    it('shows session error snackbar for StateMismatch', () => {
+      vi.useFakeTimers();
+      setup('StateMismatch');
+      component.ngOnInit();
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
+      vi.useRealTimers();
+    });
+
+    it('shows session error snackbar for Unauthorized', () => {
+      vi.useFakeTimers();
+      setup('Unauthorized');
+      component.ngOnInit();
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
+      vi.useRealTimers();
+    });
+
+    it('shows generic error snackbar for unknown error codes', () => {
+      vi.useFakeTimers();
+      setup('SomethingElse');
+      component.ngOnInit();
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkError');
+      vi.useRealTimers();
+    });
+
+    it('shows no snackbar when error param is absent', () => {
+      vi.useFakeTimers();
+      setup(null);
+      component.ngOnInit();
+      vi.advanceTimersByTime(200);
+      expect(snackbarMock.error).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+  });
+
+  describe('resyncCharacter', () => {
+    it('calls store.resyncCharacter and shows success snackbar', () => {
+      setup();
+      component.resyncCharacter(1);
+      expect(storeMock.resyncCharacter).toHaveBeenCalledWith(1);
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.card.resyncSuccess');
+    });
+  });
+
+  describe('deactivateCharacter', () => {
+    it('opens the confirmation dialog', () => {
+      setup();
+      component.deactivateCharacter(1);
+      expect(dialogMock.open).toHaveBeenCalled();
+    });
+
+    it('calls store.deactivateCharacter when user confirms', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      component.deactivateCharacter(1);
+      expect(storeMock.deactivateCharacter).toHaveBeenCalledWith(1);
+    });
+
+    it('does not call store.deactivateCharacter when user cancels', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(false)) });
+      component.deactivateCharacter(1);
+      expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('openImportDialog', () => {
+    it('opens the import dialog', () => {
+      setup();
+      component.openImportDialog();
+      expect(dialogMock.open).toHaveBeenCalled();
+    });
+
+    it('reloads characters when result.activated is positive', () => {
+      setup();
+      dialogMock.open.mockReturnValue({
+        afterClosed: vi.fn().mockReturnValue(of({ activated: 2 })),
+      });
+      component.openImportDialog();
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.import.importSuccess');
+      expect(storeMock.loadCharacters).toHaveBeenCalled();
+    });
+
+    it('shows error snackbar when result.error is true', () => {
+      setup();
+      dialogMock.open.mockReturnValue({
+        afterClosed: vi.fn().mockReturnValue(of({ error: true, activated: 0 })),
+      });
+      component.openImportDialog();
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.import.importError');
+    });
+
+    it('opens sync dialog when result.openSync is true', () => {
+      setup();
+      // First open returns openSync result; second open (sync dialog) returns undefined
+      dialogMock.open
+        .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ openSync: true })) })
+        .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      component.openImportDialog();
+      // Sync dialog was opened as a follow-up
+      expect(dialogMock.open).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('linkBnet', () => {
+    it('opens the sync dialog with the given region', () => {
+      setup();
+      component.linkBnet('eu');
+      expect(dialogMock.open).toHaveBeenCalled();
+    });
+  });
+
+  describe('openSyncDialog', () => {
+    it('does nothing when no BNet account is linked (region is undefined)', () => {
+      setup(null, null);
+      storeMock.bnetAccount.set(null);
+      component.openSyncDialog();
+      expect(dialogMock.open).not.toHaveBeenCalled();
+    });
+
+    it('opens the sync dialog when account is linked', () => {
+      setup();
+      storeMock.bnetAccount.set(mockAccount);
+      component.openSyncDialog();
+      expect(dialogMock.open).toHaveBeenCalled();
+    });
+  });
+
+  describe('sync dialog result handling', () => {
+    it('does nothing when dialog closes without a result', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      component.linkBnet('eu');
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+      expect(storeMock.loadBnetAccount).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when dialog closes with synced=false', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: false })) });
+      component.linkBnet('eu');
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+    });
+
+    it('shows syncSuccess snackbar and reloads account when synced=true', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
+      component.linkBnet('eu');
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.syncSuccess');
+      expect(storeMock.loadBnetAccount).toHaveBeenCalled();
+    });
+
+    it('loads characters after sync when account is still linked', () => {
+      setup(null, mockAccount);
+      storeMock.loadBnetAccount.mockReturnValue(of(mockAccount));
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
+      component.linkBnet('eu');
+      expect(storeMock.loadCharacters).toHaveBeenCalled();
+    });
+
+    it('does not load characters after sync when account is null', () => {
+      setup(null, null);
+      storeMock.loadBnetAccount.mockReturnValue(of(null));
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
+      component.linkBnet('eu');
+      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+    });
+  });
+});
