@@ -1,0 +1,148 @@
+import { TestBed } from '@angular/core/testing';
+import { of, Subject, throwError } from 'rxjs';
+
+import { AuthStore } from './auth.store';
+import { AuthService } from '../services/auth.service';
+import { User } from '../models/user.model';
+
+const SESSION_KEY = 'raidops_user';
+
+const mockUser: User = {
+  discordId: '123',
+  name: 'TestUser',
+  avatarHash: null,
+  guilds: [],
+};
+
+describe('AuthStore', () => {
+  let getMe: ReturnType<typeof vi.fn>;
+  let refresh: ReturnType<typeof vi.fn>;
+  let logout: ReturnType<typeof vi.fn>;
+
+  const setup = () => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AuthService, useValue: { getMe, refresh, logout } },
+      ],
+    });
+    return TestBed.inject(AuthStore);
+  };
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    getMe = vi.fn().mockReturnValue(of(mockUser));
+    refresh = vi.fn().mockReturnValue(of(undefined));
+    logout = vi.fn().mockReturnValue(of(undefined));
+  });
+
+  // ── Constructor ───────────────────────────────────────────────────────────
+
+  describe('constructor', () => {
+    it('starts with user=null when sessionStorage is empty', () => {
+      const store = setup();
+      expect(store.user()).toBeNull();
+      expect(store.isAuthenticated()).toBe(false);
+    });
+
+    it('restores user from sessionStorage when valid JSON is stored', () => {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockUser));
+
+      const store = setup();
+
+      expect(store.user()).toEqual(mockUser);
+      expect(store.isAuthenticated()).toBe(true);
+    });
+
+    it('clears sessionStorage when stored value is not valid JSON', () => {
+      sessionStorage.setItem(SESSION_KEY, 'not-json{{{');
+
+      const store = setup();
+
+      expect(store.user()).toBeNull();
+      expect(sessionStorage.getItem(SESSION_KEY)).toBeNull();
+    });
+  });
+
+  // ── loadUser ──────────────────────────────────────────────────────────────
+
+  describe('loadUser', () => {
+    it('updates the user signal and persists to sessionStorage on success', () => {
+      const store = setup();
+
+      store.loadUser().subscribe();
+
+      expect(store.user()).toEqual(mockUser);
+      expect(JSON.parse(sessionStorage.getItem(SESSION_KEY)!)).toEqual(mockUser);
+    });
+
+    it('propagates errors without updating state', () => {
+      getMe.mockReturnValue(throwError(() => new Error('network')));
+      const store = setup();
+
+      let caught = false;
+      store.loadUser().subscribe({ error: () => { caught = true; } });
+
+      expect(caught).toBe(true);
+      expect(store.user()).toBeNull();
+    });
+  });
+
+  // ── refresh ───────────────────────────────────────────────────────────────
+
+  describe('refresh', () => {
+    it('calls AuthService.refresh and completes', () => {
+      const store = setup();
+      let completed = false;
+
+      store.refresh().subscribe({ complete: () => { completed = true; } });
+
+      expect(refresh).toHaveBeenCalledOnce();
+      expect(completed).toBe(true);
+    });
+
+    it('deduplicates concurrent calls — returns the same observable', () => {
+      const subject = new Subject<void>();
+      refresh.mockReturnValue(subject.asObservable());
+      const store = setup();
+
+      const first = store.refresh();
+      const second = store.refresh();
+
+      expect(first).toBe(second);
+      expect(refresh).toHaveBeenCalledOnce();
+    });
+
+    it('resets the cached observable after success so the next call hits the server again', () => {
+      const store = setup();
+
+      store.refresh().subscribe();
+      store.refresh().subscribe();
+
+      expect(refresh).toHaveBeenCalledTimes(2);
+    });
+
+    it('resets the cached observable after an error', () => {
+      refresh.mockReturnValue(throwError(() => new Error('fail')));
+      const store = setup();
+
+      store.refresh().subscribe({ error: () => {} });
+      store.refresh().subscribe({ error: () => {} });
+
+      expect(refresh).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // ── logout ────────────────────────────────────────────────────────────────
+
+  describe('logout', () => {
+    it('clears the user signal and sessionStorage on success', () => {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockUser));
+      const store = setup();
+
+      store.logout().subscribe();
+
+      expect(store.user()).toBeNull();
+      expect(sessionStorage.getItem(SESSION_KEY)).toBeNull();
+    });
+  });
+});

@@ -32,6 +32,6 @@ export class LanguageService {
     if (saved && AVAILABLE_LANGS.includes(saved)) return saved;
 
     const browser = navigator.language.slice(0, 2) as Lang;
-    return AVAILABLE_LANGS.includes(browser) ? browser : 'fr';
+    return AVAILABLE_LANGS.includes(browser) ? browser : 'en';
   }
 }

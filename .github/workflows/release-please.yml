@@ -1,0 +1,23 @@
+name: Release Please
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          # PAT (not GITHUB_TOKEN): a bot-created PR/release with GITHUB_TOKEN does NOT
+          # trigger other workflows (GitHub loop protection). The PAT makes:
+          #   - the Release PR trigger tests.yml (fast scan → required checks green)
+          #   - the published release trigger deploy.yml (prod deploy)
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}

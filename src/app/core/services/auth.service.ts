@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
+import { LOCATION } from '../tokens/location.token';
 
 /**
  * Thin HTTP layer for auth-related endpoints.
@@ -11,6 +12,7 @@ import { User } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   readonly #http = inject(HttpClient);
+  readonly #location = inject(LOCATION);
   readonly #api = environment.apiUrl;
 
   /** Fetches the authenticated user's profile. Requires a valid access_token cookie. */
@@ -30,6 +32,6 @@ export class AuthService {
 
   /** Redirects the browser to the Discord OAuth2 sign-up flow. */
   signup(): void {
-    globalThis.location.href = `${this.#api}/discordAuth/signup`;
+    this.#location.assign(`${this.#api}/discordAuth/signup`);
   }
 }
