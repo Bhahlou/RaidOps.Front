@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copier les manifests d'abord pour profiter du cache Docker (layer npm install)
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
