@@ -1,9 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed } from '@angular/core';
 import { UnderConstructionComponent } from '../../../../shared/components/under-construction/under-construction.component';
-import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
-import { AuthStore } from '../../../../core/stores/auth.store';
-import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { injectGuildContext } from '../../inject-guild-context';
 
 @Component({
   selector: 'app-guild-dashboard',
@@ -12,20 +10,11 @@ import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enu
   styleUrl: './guild-dashboard.component.scss',
 })
 export class GuildDashboardComponent {
-  readonly #authStore = inject(AuthStore);
+  readonly #guildContext = injectGuildContext();
 
-  readonly guildId = inject(ActivatedRoute).parent!.snapshot.paramMap.get('id')!;
+  readonly guildId = this.#guildContext.guildId;
 
-  readonly breadcrumbs = computed((): BreadcrumbItem[] => {
-    const guild = this.#authStore.user()?.guilds.find(g => g.id === this.guildId);
-    return [
-      {
-        label: guild?.name ?? '…',
-        discordIcon: guild
-          ? { id: guild.id, hash: guild.iconHash, type: DiscordIconType.Guild }
-          : undefined,
-      },
-      { i18nKey: 'sidenav.guild.dashboard' },
-    ];
-  });
+  readonly breadcrumbs = computed(() =>
+    this.#guildContext.breadcrumbs('sidenav.guild.dashboard', false)
+  );
 }

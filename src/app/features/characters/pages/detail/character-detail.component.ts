@@ -1,9 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
 import { WowFactionIconComponent } from '../../../../shared/components/wow-faction-icon/wow-faction-icon.component';
-import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
+import {
+  PageHeaderComponent,
+  BreadcrumbItem,
+} from '../../../../shared/components/page-header/page-header.component';
 import { CharacterStore } from '../../stores/character.store';
 import { CharacterGuildsComponent } from '../../components/character-guilds/character-guilds.component';
 import { CharacterGearComponent } from '../../components/character-gear/character-gear.component';
@@ -27,7 +30,7 @@ import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enu
   templateUrl: './character-detail.component.html',
   styleUrl: './character-detail.component.scss',
 })
-export class CharacterDetailComponent {
+export class CharacterDetailComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #characterStore = inject(CharacterStore);
