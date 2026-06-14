@@ -1,1 +1,7 @@
-<app-under-construction />
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" />
+  <div class="roster-layout">
+    <app-guild-roster-list class="col-main" [guildId]="guildId()" />
+    <app-guild-my-characters class="col-side" [guildId]="guildId()" />
+  </div>
+</div>

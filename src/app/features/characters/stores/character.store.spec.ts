@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { CharacterStore } from './character.store';
 import { CharacterService } from '../services/character.service';
 import { BnetService } from '../../../shared/services/bnet.service';
+import { GuildMembershipStore } from '../../guilds/stores/guild-membership.store';
 import { Character } from '../models/character.model';
 import { BnetAccount } from '../models/bnet-account.model';
 
@@ -41,6 +42,7 @@ describe('CharacterStore', () => {
     resyncCharacter: ReturnType<typeof vi.fn>;
   };
   let bnetService: { getBnetAccount: ReturnType<typeof vi.fn> };
+  let evictCharacter: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     charService = {
@@ -49,12 +51,14 @@ describe('CharacterStore', () => {
       resyncCharacter: vi.fn(),
     };
     bnetService = { getBnetAccount: vi.fn() };
+    evictCharacter = vi.fn();
 
     TestBed.configureTestingModule({
       providers: [
         CharacterStore,
         { provide: CharacterService, useValue: charService },
         { provide: BnetService, useValue: bnetService },
+        { provide: GuildMembershipStore, useValue: { evictCharacter } },
       ],
     });
 
@@ -129,6 +133,20 @@ describe('CharacterStore', () => {
 
       expect(store.characterList()).toEqual([makeChar(1), makeChar(3)]);
     });
+
+    it('leaves the characters signal as undefined when list has not been loaded yet', () => {
+      charService.deactivateCharacter.mockReturnValue(of({ message: 'ok' }));
+      store.deactivateCharacter(1).subscribe();
+
+      expect(store.characters()).toBeUndefined();
+    });
+
+    it('calls evictCharacter on the membership store with the character id', () => {
+      charService.deactivateCharacter.mockReturnValue(of({ message: 'ok' }));
+      store.deactivateCharacter(42).subscribe();
+
+      expect(evictCharacter).toHaveBeenCalledWith(42);
+    });
   });
 
   describe('resyncCharacter', () => {
@@ -141,6 +159,14 @@ describe('CharacterStore', () => {
       store.resyncCharacter(1).subscribe();
 
       expect(store.characterList()).toEqual([updated, makeChar(2)]);
+    });
+
+    it('leaves the characters signal as undefined when list has not been loaded yet', () => {
+      const updated: Character = { ...makeChar(1), name: 'UpdatedName' };
+      charService.resyncCharacter.mockReturnValue(of(updated));
+      store.resyncCharacter(1).subscribe();
+
+      expect(store.characters()).toBeUndefined();
     });
   });
 });

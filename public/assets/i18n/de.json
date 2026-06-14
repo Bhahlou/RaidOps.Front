@@ -41,6 +41,65 @@
       "action": "Registrieren"
     }
   },
+  "characterDetail": {
+    "guilds": {
+      "title": "Meine Gilden",
+      "empty": "Dieser Charakter gehört noch keiner Gilde an.",
+      "leave": "Gilde verlassen",
+      "joinButton": "Einer Gilde beitreten",
+      "noEligible": "Keine Gilde für diesen Charakter verfügbar.",
+      "join": "Beitreten"
+    }
+  },
+  "roster": {
+    "title": "Roster",
+    "addCharacter": "Charakter hinzufügen",
+    "addPanel": {
+      "title": "Meine verfügbaren Charaktere",
+      "empty": "Alle deine Charaktere sind bereits in dieser Gilde.",
+      "join": "Beitreten"
+    },
+    "myCharacters": "Meine Charaktere in dieser Gilde",
+    "empty": "Du hast noch keine Charaktere in dieser Gilde.",
+    "leave": "Gilde verlassen"
+  },
+  "home": {
+    "title": "Verwalte deine Gilde.",
+    "titleAccent": "Beherrsche Azeroth.",
+    "tagline": "Roster, Raids, Loot, Kalender — alles an einem Ort, verbunden mit Discord.",
+    "cta": "Loslegen",
+    "badge1": "Ein Tool. Keine 18 Tabs mehr.",
+    "badge2": "Keine Installation",
+    "badge3": "Discord-verbunden",
+    "features": {
+      "heading": "Alles, was du für ernsthaftes Raiden brauchst.",
+      "subheading": "Ein Tool um deine Gilde zu organisieren, zu koordinieren und voranzubringen.",
+      "roster": {
+        "title": "Roster & Charaktere",
+        "desc": "Verwalte, wer was spielt. Behalte Klasse, Rolle und Itemlevel jedes Mitglieds im Blick."
+      },
+      "calendar": {
+        "title": "Raid-Kalender",
+        "desc": "Plane Events, verwalte Anmeldungen und halte die ganze Gilde auf dem Laufenden."
+      },
+      "loot": {
+        "title": "Loot-Verwaltung",
+        "desc": "Verteile Loot fair mit einer vollständigen Vergabehistorie pro Charakter."
+      },
+      "permissions": {
+        "title": "Berechtigungen & Rollen",
+        "desc": "Ordne Discord-Rollen feingranularen Berechtigungen zu. Jeder Offizier sieht genau das, was er soll."
+      },
+      "bot": {
+        "title": "Integrierter Discord-Bot",
+        "desc": "Event-Benachrichtigungen, Anwesenheitsbestätigungen und Loot-Meldungen direkt in deinen Channels."
+      },
+      "stats": {
+        "title": "Gildenstatistiken",
+        "desc": "Verfolge Fortschritt, Raid-Performance und Mitgliederentwicklung über alle Tiers."
+      }
+    }
+  },
   "errors": {
     "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
     "server": "Serverfehler. Bitte versuche es später erneut."

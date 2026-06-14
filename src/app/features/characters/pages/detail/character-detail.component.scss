@@ -1,1 +1,51 @@
+.character-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
 
+.page-card {
+  margin: 24px;
+}
+
+.char-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 8px;
+}
+
+.char-avatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.char-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.char-name-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.char-guild {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}

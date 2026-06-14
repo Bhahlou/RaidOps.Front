@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { CharacterListComponent } from './list.component';
 import { CharacterStore } from '../../stores/character.store';
@@ -155,6 +155,13 @@ describe('CharacterListComponent', () => {
       expect(storeMock.resyncCharacter).toHaveBeenCalledWith(1);
       expect(snackbarMock.success).toHaveBeenCalledWith('characters.card.resyncSuccess');
     });
+
+    it('shows error snackbar when store call fails', () => {
+      setup();
+      storeMock.resyncCharacter.mockReturnValue(throwError(() => new Error('fail')));
+      component.resyncCharacter(1);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.card.resyncError');
+    });
   });
 
   describe('deactivateCharacter', () => {
@@ -176,6 +183,14 @@ describe('CharacterListComponent', () => {
       dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(false)) });
       component.deactivateCharacter(1);
       expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
+    });
+
+    it('shows error snackbar when store call fails after confirmation', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      storeMock.deactivateCharacter.mockReturnValue(throwError(() => new Error('fail')));
+      component.deactivateCharacter(1);
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.card.deactivateError');
     });
   });
 

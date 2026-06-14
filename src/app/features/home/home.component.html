@@ -1,1 +1,58 @@
-<app-under-construction />
+<div class="home-layout">
+  <div class="hero">
+    <h1 class="hero__title">
+      <span class="hero__title-line">{{ 'home.title' | transloco }}</span>
+      <span class="hero__title-line hero__title-accent">{{ 'home.titleAccent' | transloco }}</span>
+    </h1>
+
+    <p class="hero__tagline">{{ 'home.tagline' | transloco }}</p>
+
+    <button mat-flat-button class="hero__btn-cta" routerLink="/get-started">
+      {{ 'home.cta' | transloco }}
+      <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+    </button>
+
+    <div class="hero__badges">
+      <span class="badge">
+        <mat-icon>check_circle</mat-icon>
+        {{ 'home.badge1' | transloco }}
+      </span>
+      <span class="hero__badges-sep">·</span>
+      <span class="badge">
+        <mat-icon>check_circle</mat-icon>
+        {{ 'home.badge2' | transloco }}
+      </span>
+      <span class="hero__badges-sep">·</span>
+      <span class="badge">
+        <mat-icon>check_circle</mat-icon>
+        {{ 'home.badge3' | transloco }}
+      </span>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="features__grid">
+      @for (feature of features; track feature.key) {
+        <div class="feature-card">
+          <div class="feature-card__icon-wrap">
+            @if (feature.svg) {
+              <svg class="feature-card__svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path [attr.d]="feature.svg" fill="currentColor" />
+              </svg>
+            } @else {
+              <mat-icon>{{ feature.icon }}</mat-icon>
+            }
+          </div>
+          <div class="feature-card__body">
+            <h3 class="feature-card__title">
+              {{ 'home.features.' + feature.key + '.title' | transloco }}
+            </h3>
+            <p class="feature-card__desc">
+              {{ 'home.features.' + feature.key + '.desc' | transloco }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

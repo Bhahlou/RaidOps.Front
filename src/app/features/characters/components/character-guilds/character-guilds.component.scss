@@ -1,0 +1,71 @@
+::ng-deep .guilds-card .mat-mdc-card-header {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-btn {
+  color: var(--color-text-muted);
+
+  &:hover, &.active { color: var(--color-accent); }
+}
+
+.membership-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.membership-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.guild-name {
+  flex: 1;
+  font-weight: 500;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover { text-decoration: underline; }
+}
+
+.rank-select {
+  width: 82px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-select-trigger {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+  }
+}
+
+.leave-btn {
+  color: var(--color-text-muted);
+
+  &:hover { color: #f44336; }
+}
+
+.eligible-panel {
+  &.with-divider {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+}
+
+.empty-hint {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}

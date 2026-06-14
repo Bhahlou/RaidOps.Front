@@ -1,0 +1,24 @@
+import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { DiscordIconComponent } from '../discord-icon/discord-icon.component';
+import { DiscordIconType } from '../../models/discord-icon-type.enum';
+
+export interface BreadcrumbItem {
+  label?: string;
+  i18nKey?: string;
+  link?: string[] | null;
+  discordIcon?: { id: string; hash: string | null; type: DiscordIconType };
+}
+
+@Component({
+  selector: 'app-page-header',
+  standalone: true,
+  imports: [RouterLink, MatIcon, TranslocoPipe, DiscordIconComponent],
+  templateUrl: './page-header.component.html',
+  styleUrl: './page-header.component.scss',
+})
+export class PageHeaderComponent {
+  readonly items = input.required<BreadcrumbItem[]>();
+}

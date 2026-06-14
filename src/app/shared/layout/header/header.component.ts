@@ -3,7 +3,6 @@ import { Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordIconComponent } from '../../components/discord-icon/discord-icon.component';
 import { LangSelectorComponent } from '../../components/lang-selector/lang-selector.component';
@@ -20,7 +19,6 @@ import { environment } from '../../../../environments/environment';
     MatToolbarModule,
     MatIconModule,
     MatMenuModule,
-    MatButtonModule,
     TranslocoPipe,
     DiscordIconComponent,
     LangSelectorComponent,
