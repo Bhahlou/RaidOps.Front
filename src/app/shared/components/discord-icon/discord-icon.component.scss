@@ -1,3 +1,7 @@
+:host {
+  display: contents;
+}
+
 .avatar-wrapper {
   display: flex;
   align-items: center;
@@ -14,8 +18,8 @@
     color: var(--mat-sys-primary);
   }
   img {
-    width: 36px;
-    height: 36px;
+    width: var(--discord-icon-size, 36px);
+    height: var(--discord-icon-size, 36px);
     border-radius: 50%;
   }
 }

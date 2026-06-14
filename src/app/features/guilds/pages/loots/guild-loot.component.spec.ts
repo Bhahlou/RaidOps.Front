@@ -1,22 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { GuildLootComponent } from './guild-loot.component';
+import { AuthStore } from '../../../../core/stores/auth.store';
+
+const setup = (guildId: string | null) => {
+  TestBed.configureTestingModule({
+    imports: [GuildLootComponent],
+    providers: [
+      {
+        provide: ActivatedRoute,
+        useValue: { parent: { snapshot: { paramMap: { get: () => guildId } } } },
+      },
+      { provide: AuthStore, useValue: { user: signal(null) } },
+    ],
+  }).overrideComponent(GuildLootComponent, { set: { template: '', imports: [] } });
+
+  return TestBed.createComponent(GuildLootComponent).componentInstance;
+};
 
 describe('GuildLootComponent', () => {
-  let component: GuildLootComponent;
-  let fixture: ComponentFixture<GuildLootComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GuildLootComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(GuildLootComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  it('should create', () => {
+    expect(setup('g1')).toBeTruthy();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('extracts guildId from the parent route', () => {
+    expect(setup('guild-42').guildId).toBe('guild-42');
+  });
+
+  it('sets i18nKey to sidenav.guild.loot on the last breadcrumb', () => {
+    expect(setup('g1').breadcrumbs().at(-1)?.i18nKey).toBe('sidenav.guild.loot');
   });
 });

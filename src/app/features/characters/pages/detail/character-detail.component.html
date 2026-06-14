@@ -1,1 +1,32 @@
-<app-under-construction />
+<div class="character-page">
+  <app-page-header [items]="breadcrumbs()" />
+
+  @if (character(); as char) {
+    <mat-card appearance="outlined" class="page-card">
+      <div class="char-header">
+        @if (char.avatarUrl) {
+          <img class="char-avatar" [src]="char.avatarUrl" [alt]="char.name" />
+        } @else {
+          <app-wow-class-icon class="char-avatar" [classId]="char.classId" [className]="char.className" [size]="64" />
+        }
+        <div class="char-info">
+          <span class="char-name-row">
+            <span [style.color]="char.classColor">{{ char.name }}</span>
+            <app-wow-faction-icon [faction]="char.faction" [size]="16" />
+          </span>
+          @if (char.guildName) {
+            <span class="char-guild">&lt;{{ char.guildName }}&gt;</span>
+          }
+        </div>
+      </div>
+
+      <mat-card-content>
+        <div class="detail-layout">
+          <app-character-gear [characterId]="char.id" />
+          <app-character-bis-list [characterId]="char.id" />
+          <app-character-guilds [characterId]="char.id" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

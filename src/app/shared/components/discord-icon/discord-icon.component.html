@@ -1,8 +1,8 @@
-<div class="avatar-wrapper">
+<div class="avatar-wrapper" [style.width.px]="size()" [style.height.px]="size()">
   @if (!url) {
-    <mat-icon>account_circle</mat-icon>
+    <mat-icon [style.font-size.px]="size()">account_circle</mat-icon>
   }
   @if (url) {
-    <img [src]="url" [alt]="'Discord icon'" />
+    <img [src]="url" [alt]="'Discord icon'" [style.width.px]="size()" [style.height.px]="size()" />
   }
 </div>

@@ -48,12 +48,13 @@
     color: var(--mat-sys-on-surface);
   }
 
-  .mat-icon {
+  .user-avatar-icon {
     font-size: 36px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
     color: var(--mat-sys-primary);
   }
 }

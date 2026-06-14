@@ -79,6 +79,65 @@
       "action": "Register"
     }
   },
+  "characterDetail": {
+    "guilds": {
+      "title": "My guilds",
+      "empty": "This character has not joined any guild yet.",
+      "leave": "Leave guild",
+      "joinButton": "Join a guild",
+      "noEligible": "No guild is accessible for this character.",
+      "join": "Join"
+    }
+  },
+  "roster": {
+    "title": "Roster",
+    "addCharacter": "Add a character",
+    "addPanel": {
+      "title": "My available characters",
+      "empty": "All your characters are already in this guild.",
+      "join": "Join"
+    },
+    "myCharacters": "My characters in this guild",
+    "empty": "You have no characters in this guild yet.",
+    "leave": "Leave guild"
+  },
+  "home": {
+    "title": "Manage your guild.",
+    "titleAccent": "Dominate Azeroth.",
+    "tagline": "Roster, raids, loot, calendar — all in one place, connected to Discord.",
+    "cta": "Get started",
+    "badge1": "One tool. No more 18 tabs.",
+    "badge2": "No installation",
+    "badge3": "Discord-connected",
+    "features": {
+      "heading": "Everything you need to raid seriously.",
+      "subheading": "One tool to organize, coordinate and progress with your guild.",
+      "roster": {
+        "title": "Roster & Characters",
+        "desc": "Manage who plays what. Track every member's class, role and item level at a glance."
+      },
+      "calendar": {
+        "title": "Raid Calendar",
+        "desc": "Schedule events, manage sign-ups and keep the whole guild on the same page."
+      },
+      "loot": {
+        "title": "Loot Management",
+        "desc": "Distribute loot fairly with a full history of assignments per character."
+      },
+      "permissions": {
+        "title": "Permissions & Roles",
+        "desc": "Map your Discord roles to fine-grained permissions. Each officer sees exactly what they need."
+      },
+      "bot": {
+        "title": "Built-in Discord Bot",
+        "desc": "Event notifications, attendance confirmations and loot alerts sent directly to your channels."
+      },
+      "stats": {
+        "title": "Guild Statistics",
+        "desc": "Track progression, raid performance and member growth across tiers."
+      }
+    }
+  },
   "errors": {
     "network": "Network error. Please check your connection.",
     "server": "Server error. Please try again later."

@@ -1,0 +1,109 @@
+<mat-card appearance="outlined" class="my-chars-card">
+  <mat-card-header>
+    <mat-card-title>{{ 'roster.myCharacters' | transloco }}</mat-card-title>
+    <button
+      mat-icon-button
+      class="add-btn"
+      [class.active]="showAddPanel()"
+      (click)="toggleAddPanel()"
+      [title]="'roster.addCharacter' | transloco"
+    >
+      <mat-icon>{{ showAddPanel() ? 'close' : 'add' }}</mat-icon>
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (isLoading()) {
+      <mat-spinner diameter="32" />
+    } @else {
+
+      <!-- ── My characters ────────────────────────────────────────────────── -->
+      @if (myCharacters().length === 0 && !showAddPanel()) {
+        <p class="empty-hint">{{ 'roster.empty' | transloco }}</p>
+      } @else if (myCharacters().length > 0) {
+        <ul class="char-list">
+          @for (char of myCharacters(); track char.characterId) {
+            <li class="char-item">
+              @if (char.avatarUrl) {
+                <img class="avatar-sm" [src]="char.avatarUrl" [alt]="char.name" />
+              } @else {
+                <app-wow-class-icon [classId]="0" [className]="char.className" [size]="40" />
+              }
+              <div class="char-info">
+                <a class="char-name" [style.color]="char.classColor" [routerLink]="characterLink(char.characterId)">{{ char.name }}</a>
+                @if (char.guildName) {
+                  <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
+                }
+              </div>
+              <mat-select
+                class="rank-select rank-select--{{ char.characterRank.toLowerCase() }}"
+                panelClass="rank-select-panel"
+                [value]="char.characterRank"
+                [disabled]="updatingRankCharacterId() === char.characterId"
+                (selectionChange)="updateRank(char.characterId, $event.value)"
+              >
+                @for (rank of ranks; track rank) {
+                  <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
+                }
+              </mat-select>
+              <button
+                mat-icon-button
+                class="leave-btn"
+                [disabled]="leavingCharacterId() === char.characterId"
+                (click)="removeCharacter(char.characterId)"
+                [title]="'roster.leave' | transloco"
+              >
+                <mat-icon>logout</mat-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      <!-- ── Add panel ────────────────────────────────────────────────────── -->
+      @if (showAddPanel()) {
+        <div class="add-section" [class.with-divider]="myCharacters().length > 0">
+          @if (addableCharacters().length === 0) {
+            <p class="empty-hint">{{ 'roster.addPanel.empty' | transloco }}</p>
+          } @else {
+            <ul class="char-list">
+              @for (char of addableCharacters(); track char.id) {
+                <li class="char-item">
+                  @if (char.avatarUrl) {
+                    <img class="avatar-sm" [src]="char.avatarUrl" [alt]="char.name" />
+                  } @else {
+                    <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="40" />
+                  }
+                  <div class="char-info">
+                    <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
+                    @if (char.guildName) {
+                      <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
+                    }
+                  </div>
+                  <mat-select
+                    class="rank-select"
+                    panelClass="rank-select-panel"
+                    [value]="getRankSelection(char.id)"
+                    (selectionChange)="setRankSelection(char.id, $event.value)"
+                  >
+                    @for (rank of ranks; track rank) {
+                      <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
+                    }
+                  </mat-select>
+                  <button
+                    mat-flat-button
+                    [disabled]="joiningCharacterId() === char.id"
+                    (click)="joinCharacter(char)"
+                  >
+                    {{ 'roster.addPanel.join' | transloco }}
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+    }
+  </mat-card-content>
+</mat-card>

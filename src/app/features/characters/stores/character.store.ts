@@ -4,6 +4,7 @@ import { CharacterService } from '../services/character.service';
 import { BnetAccount } from '../models/bnet-account.model';
 import { Character } from '../models/character.model';
 import { BnetService } from '../../../shared/services/bnet.service';
+import { GuildMembershipStore } from '../../guilds/stores/guild-membership.store';
 
 /**
  * Signal store for character-related state.
@@ -17,6 +18,7 @@ import { BnetService } from '../../../shared/services/bnet.service';
 export class CharacterStore {
   readonly #characterService = inject(CharacterService);
   readonly #bnetService = inject(BnetService);
+  readonly #membershipStore = inject(GuildMembershipStore);
 
   readonly #bnetAccount = signal<BnetAccount | null | undefined>(undefined);
 
@@ -68,6 +70,7 @@ export class CharacterStore {
     return this.#characterService.deactivateCharacter(characterId).pipe(
       tap(() => {
         this.#characters.update((chars) => (chars ? chars.filter((c) => c.id !== characterId) : chars));
+        this.#membershipStore.evictCharacter(characterId);
       }),
     );
   }

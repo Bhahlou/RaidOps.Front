@@ -1,8 +1,6 @@
-<div class="settings-page">
-  <header class="page-header">
-    <h1 class="page-title">{{ 'guildSettings.pageTitle' | transloco }}</h1>
-    <p class="page-subtitle">{{ 'guildSettings.pageSubtitle' | transloco }}</p>
-  </header>
-
-  <app-guild-settings-form [guildId]="guildId" />
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" />
+  <div class="settings-content">
+    <app-guild-settings-form [guildId]="guildId" />
+  </div>
 </div>

@@ -1,3 +1,7 @@
 {
-  "vitest.rootConfig": "vitest.config.ts"
+  "vitest.rootConfig": "vitest.config.ts",
+  "sonarlint.connectedMode.project": {
+    "connectionId": "bhahlou",
+    "projectKey": "Bhahlou_RaidOps.Front"
+  }
 }

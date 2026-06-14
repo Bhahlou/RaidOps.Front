@@ -79,6 +79,65 @@
       "action": "Enregistrer"
     }
   },
+  "characterDetail": {
+    "guilds": {
+      "title": "Mes guildes",
+      "empty": "Ce personnage n'appartient encore à aucune guilde.",
+      "leave": "Quitter la guilde",
+      "joinButton": "Rejoindre une guilde",
+      "noEligible": "Aucune guilde accessible pour ce personnage.",
+      "join": "Rejoindre"
+    }
+  },
+  "roster": {
+    "title": "Roster",
+    "addCharacter": "Ajouter un personnage",
+    "addPanel": {
+      "title": "Mes personnages disponibles",
+      "empty": "Tous tes personnages sont déjà dans cette guilde.",
+      "join": "Rejoindre"
+    },
+    "myCharacters": "Mes personnages dans cette guilde",
+    "empty": "Tu n'as encore aucun personnage dans cette guilde.",
+    "leave": "Quitter la guilde"
+  },
+  "home": {
+    "title": "Gérez votre guilde.",
+    "titleAccent": "Dominez Azeroth.",
+    "tagline": "Roster, raids, loot, calendrier — tout en un seul endroit, connecté à Discord.",
+    "cta": "Commencer",
+    "badge1": "Un outil. Fini les 18 onglets.",
+    "badge2": "Sans installation",
+    "badge3": "Connecté à Discord",
+    "features": {
+      "heading": "Tout ce qu'il faut pour raider sérieusement.",
+      "subheading": "Un seul outil pour organiser, coordonner et progresser avec votre guilde.",
+      "discord": {
+        "title": "Discord au cœur de la guilde",
+        "desc": "Votre serveur Discord comme colonne vertébrale. Rôles Discord → permissions RaidOps, membres synchronisés automatiquement. Le bot notifie, log et gère les inscriptions sans que vous ayez à ouvrir RaidOps."
+      },
+      "roster": {
+        "title": "Roster vivant, toujours à jour",
+        "desc": "Qui joue quoi, à quel grade, avec quel gear. Inspection en temps réel via l'API Battle.net — vous savez exactement dans quel état arrivent vos joueurs."
+      },
+      "calendar": {
+        "title": "Planifiez. Relancez. Raidez.",
+        "desc": "Présent par défaut ou inscription volontaire. Gérez les absences, visualisez votre effectif, composez votre raid et partez en raid sans mauvaises surprises."
+      },
+      "loot": {
+        "title": "Wishlists intégrées. Splits automatiques.",
+        "desc": "Wishlists, historique des attributions et détection automatique des besoins encore actifs — RaidOps construit vos splits en sachant qui a encore besoin de quoi."
+      },
+      "assignments": {
+        "title": "Chaque joueur sait ce qu'il fait",
+        "desc": "Assignments boss par boss — qui dispel, qui soak, qui interrompt. Placements définis et partagés en quelques clics, directement depuis RaidOps."
+      },
+      "logs": {
+        "title": "Vos logs, passés au crible",
+        "desc": "Enchants, gemmes, consos, talents — RaidOps analyse vos logs et détecte les optimisations manquantes, sans passer par des outils externes."
+      }
+    }
+  },
   "errors": {
     "network": "Erreur réseau. Vérifie ta connexion.",
     "server": "Erreur serveur. Réessaie dans quelques instants."

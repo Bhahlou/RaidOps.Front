@@ -12,6 +12,7 @@ export class DiscordIconComponent {
   id = input.required<string>();
   hash = input<string | null>();
   type = input.required<DiscordIconType>();
+  size = input<number>(36);
 
   get url() {
     const baseUrl = 'https://cdn.discordapp.com';

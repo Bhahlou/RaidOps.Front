@@ -1,14 +1,18 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { Component, computed } from '@angular/core';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { injectGuildContext } from '../../inject-guild-context';
 
 @Component({
   selector: 'app-guild-settings',
-  imports: [GuildSettingsFormComponent, TranslocoPipe],
+  imports: [GuildSettingsFormComponent, PageHeaderComponent],
   templateUrl: './guild-settings.component.html',
   styleUrl: './guild-settings.component.scss',
 })
 export class GuildSettingsComponent {
-  readonly guildId = inject(ActivatedRoute).parent!.snapshot.paramMap.get('id')!;
+  readonly #guildContext = injectGuildContext();
+
+  readonly guildId = this.#guildContext.guildId;
+
+  readonly breadcrumbs = computed(() => this.#guildContext.breadcrumbs('sidenav.guild.settings'));
 }

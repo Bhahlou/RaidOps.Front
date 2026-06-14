@@ -1,22 +1,11 @@
-.settings-page {
+.guild-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+
+.settings-content {
   padding: 40px 48px;
   max-width: 680px;
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-title {
-  margin: 0 0 6px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
 }

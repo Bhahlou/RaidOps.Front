@@ -1,30 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { GuildSettingsComponent } from './guild-settings.component';
+import { AuthStore } from '../../../../core/stores/auth.store';
+
+const setup = (guildId: string | null) => {
+  TestBed.configureTestingModule({
+    imports: [GuildSettingsComponent],
+    providers: [
+      {
+        provide: ActivatedRoute,
+        useValue: { parent: { snapshot: { paramMap: { get: () => guildId } } } },
+      },
+      { provide: AuthStore, useValue: { user: signal(null) } },
+    ],
+  }).overrideComponent(GuildSettingsComponent, { set: { template: '', imports: [] } });
+
+  return TestBed.createComponent(GuildSettingsComponent).componentInstance;
+};
 
 describe('GuildSettingsComponent', () => {
-  let component: GuildSettingsComponent;
-  let fixture: ComponentFixture<GuildSettingsComponent>;
+  it('should create', () => {
+    expect(setup('g1')).toBeTruthy();
+  });
 
-  const setup = (guildId: string | null) => {
-    TestBed.configureTestingModule({
-      imports: [GuildSettingsComponent],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: { parent: { snapshot: { paramMap: { get: () => guildId } } } },
-        },
-      ],
-    }).overrideComponent(GuildSettingsComponent, { set: { template: '', imports: [] } });
+  it('extracts guildId from the parent route', () => {
+    expect(setup('guild-42').guildId).toBe('guild-42');
+  });
 
-    fixture   = TestBed.createComponent(GuildSettingsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  };
-
-  it('extracts the guildId from the parent route', () => {
-    setup('guild-42');
-    expect(component.guildId).toBe('guild-42');
+  it('sets i18nKey to sidenav.guild.settings on the last breadcrumb', () => {
+    expect(setup('g1').breadcrumbs().at(-1)?.i18nKey).toBe('sidenav.guild.settings');
   });
 });

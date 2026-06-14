@@ -1,22 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+  const setup = () => {
+    TestBed.configureTestingModule({ imports: [HomeComponent] })
+      .overrideComponent(HomeComponent, { set: { template: '', imports: [] } });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [HomeComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(HomeComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
+    const fixture = TestBed.createComponent(HomeComponent);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  };
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(setup()).toBeTruthy();
+  });
+
+  it('exposes 6 feature items', () => {
+    const component = setup() as unknown as { features: unknown[] };
+    expect(component.features.length).toBe(6);
   });
 });
