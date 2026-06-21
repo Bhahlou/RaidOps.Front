@@ -16,6 +16,7 @@ import { CharacterStore } from '../../stores/character.store';
 import { CharacterGuildsComponent } from '../../components/character-guilds/character-guilds.component';
 import { CharacterGearComponent } from '../../components/character-gear/character-gear.component';
 import { CharacterBisListComponent } from '../../components/character-bis-list/character-bis-list.component';
+import { CharacterRaidSpecsComponent } from '../../components/character-raid-specs/character-raid-specs.component';
 import { ConfirmDeactivateDialogComponent } from '../../components/confirm-deactivate-dialog/confirm-deactivate-dialog.component';
 import {
   SetRaidSpecsDialogComponent,
@@ -41,6 +42,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
     CharacterGuildsComponent,
     CharacterGearComponent,
     CharacterBisListComponent,
+    CharacterRaidSpecsComponent,
   ],
   templateUrl: './character-detail.component.html',
   styleUrl: './character-detail.component.scss',

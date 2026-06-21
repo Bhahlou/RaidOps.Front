@@ -91,6 +91,11 @@ export class CharacterStore {
     );
   }
 
+  /** Replaces a single character in the local list with the result of `patch`. */
+  #patchCharacter(characterId: number, patch: (character: Character) => Character): void {
+    this.#characters.update((chars) => chars?.map((c) => (c.id === characterId ? patch(c) : c)));
+  }
+
   /**
    * Sets the raid-viable specs for a character, replacing any previous set, and patches the
    * affected character in the local list using the already-cached spec reference data.
@@ -171,18 +176,10 @@ export class CharacterStore {
       tap(() => {
         this.#updatingRankCharacterId.set(null);
         this.#updatingRankGuildId.set(null);
-        this.#characters.update((chars) =>
-          chars?.map((c) =>
-            c.id === characterId
-              ? {
-                  ...c,
-                  guildMemberships: c.guildMemberships.map((m) =>
-                    m.guildId === guildId ? { ...m, characterRank: rank } : m,
-                  ),
-                }
-              : c,
-          ),
-        );
+        this.#patchCharacter(characterId, (c) => ({
+          ...c,
+          guildMemberships: c.guildMemberships.map((m) => (m.guildId === guildId ? { ...m, characterRank: rank } : m)),
+        }));
       }),
       catchError((err) => {
         this.#updatingRankCharacterId.set(null);
@@ -202,13 +199,10 @@ export class CharacterStore {
       tap(() => {
         this.#leavingGuildId.set(null);
         this.#leavingCharacterId.set(null);
-        this.#characters.update((chars) =>
-          chars?.map((c) =>
-            c.id === characterId
-              ? { ...c, guildMemberships: c.guildMemberships.filter((m) => m.guildId !== guildId) }
-              : c,
-          ),
-        );
+        this.#patchCharacter(characterId, (c) => ({
+          ...c,
+          guildMemberships: c.guildMemberships.filter((m) => m.guildId !== guildId),
+        }));
       }),
       catchError((err) => {
         this.#leavingGuildId.set(null);

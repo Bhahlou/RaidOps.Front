@@ -8,6 +8,7 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
+import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 
@@ -28,6 +29,7 @@ import { Character } from '../../../characters/models/character.model';
     MatOption,
     TranslocoPipe,
     WowClassIconComponent,
+    CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-my-characters.component.html',
   styleUrl: './guild-my-characters.component.scss',

@@ -36,19 +36,7 @@
                     <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
                   }
                 </div>
-                @if (char.raidSpecs.length > 0) {
-                  <div class="char-specs">
-                    @for (spec of char.raidSpecs; track spec.specId) {
-                      <div class="spec" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
-                        @if (spec.iconUrl) {
-                          <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
-                        } @else {
-                          <span class="spec-name">{{ 'specs.' + spec.specId | transloco }}</span>
-                        }
-                      </div>
-                    }
-                  </div>
-                }
+                <app-character-raid-specs [specs]="char.raidSpecs" />
               </div>
               <mat-select
                 class="rank-select rank-select--{{ rankFor(char).toLowerCase() }}"
@@ -96,19 +84,7 @@
                         <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
                       }
                     </div>
-                    @if (char.raidSpecs.length > 0) {
-                      <div class="char-specs">
-                        @for (spec of char.raidSpecs; track spec.specId) {
-                          <div class="spec" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
-                            @if (spec.iconUrl) {
-                              <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
-                            } @else {
-                              <span class="spec-name">{{ 'specs.' + spec.specId | transloco }}</span>
-                            }
-                          </div>
-                        }
-                      </div>
-                    }
+                    <app-character-raid-specs [specs]="char.raidSpecs" />
                   </div>
                   <mat-select
                     class="rank-select"
