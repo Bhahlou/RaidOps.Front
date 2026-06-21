@@ -201,6 +201,16 @@ describe('CharacterListComponent', () => {
       expect(dialogMock.open).toHaveBeenCalledTimes(2);
     });
 
+    it('does nothing when nothing was activated and there is no error', () => {
+      setup();
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ activated: 0 })) });
+
+      component.openImportDialog();
+
+      expect(snackbarMock.error).not.toHaveBeenCalled();
+      expect(dialogMock.open).toHaveBeenCalledTimes(1);
+    });
+
     describe('after a successful activation', () => {
       const activatedChars: Character[] = [
         { ...mockChar, id: 1 },

@@ -135,6 +135,15 @@ describe('SetRaidSpecsDialogComponent', () => {
       expect(state.mainSpecId).toBe(73);
     });
 
+    it('defaults the main spec to the first one when none is flagged as main', () => {
+      setup([makeChar(1, 1, { bnetSpecs: [makeSpec(71, false), makeSpec(72, false)] })]);
+      component.ngOnInit();
+
+      const state = component.characterStates()[0];
+      expect(state.viableSpecIds).toEqual(new Set([71, 72]));
+      expect(state.mainSpecId).toBe(71);
+    });
+
     it('ignores leftover raid specs from a previous activation cycle in activate mode', () => {
       setup(
         [
@@ -218,6 +227,42 @@ describe('SetRaidSpecsDialogComponent', () => {
       component.toggleViable(component.characterStates()[0], 71);
 
       expect(component.characterStates()[1].viableSpecIds.size).toBe(0);
+    });
+  });
+
+  describe('isViable', () => {
+    it('returns true when the spec is in viableSpecIds', () => {
+      setup([warrior]);
+      component.ngOnInit();
+      component.toggleViable(component.characterStates()[0], 71);
+
+      expect(component.isViable(component.characterStates()[0], 71)).toBe(true);
+    });
+
+    it('returns false when the spec is not in viableSpecIds', () => {
+      setup([warrior]);
+      component.ngOnInit();
+
+      expect(component.isViable(component.characterStates()[0], 71)).toBe(false);
+    });
+  });
+
+  describe('isMain', () => {
+    it('returns true when the spec is the main spec', () => {
+      setup([warrior]);
+      component.ngOnInit();
+      component.toggleViable(component.characterStates()[0], 71);
+
+      expect(component.isMain(component.characterStates()[0], 71)).toBe(true);
+    });
+
+    it('returns false when the spec is not the main spec', () => {
+      setup([warrior]);
+      component.ngOnInit();
+      component.toggleViable(component.characterStates()[0], 71);
+      component.toggleViable(component.characterStates()[0], 72);
+
+      expect(component.isMain(component.characterStates()[0], 72)).toBe(false);
     });
   });
 
