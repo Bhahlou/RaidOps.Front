@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BnetAccount } from '../../models/bnet-account.model';
 import { BnetLinkButtonComponent } from '../../../../shared/components/bnet-link-button/bnet-link-button.component';
+import { BnetIconComponent } from '../../../../shared/components/bnet-icon/bnet-icon.component';
 import { REGION_FLAGS } from '../../../../shared/constants/bnet-regions';
 
 /**
@@ -13,7 +14,7 @@ import { REGION_FLAGS } from '../../../../shared/constants/bnet-regions';
 @Component({
   selector: 'app-character-list-header',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, TranslocoPipe, BnetLinkButtonComponent],
+  imports: [MatButtonModule, MatIconModule, TranslocoPipe, BnetLinkButtonComponent, BnetIconComponent],
   templateUrl: './list-header.component.html',
   styleUrl: './list-header.component.scss',
 })

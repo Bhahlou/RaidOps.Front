@@ -6,6 +6,8 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
 import { WowFactionIconComponent } from '../../../../shared/components/wow-faction-icon/wow-faction-icon.component';
+import { BnetIconComponent } from '../../../../shared/components/bnet-icon/bnet-icon.component';
+import { CharacterRaidSpecsComponent } from '../character-raid-specs/character-raid-specs.component';
 import { Character } from '../../models/character.model';
 
 /** Displays a single imported WoW character as a compact card with a context menu. */
@@ -16,6 +18,8 @@ import { Character } from '../../models/character.model';
     RouterLink,
     WowClassIconComponent,
     WowFactionIconComponent,
+    BnetIconComponent,
+    CharacterRaidSpecsComponent,
     MatIconButton,
     MatIcon,
     MatMenu,
@@ -31,6 +35,7 @@ export class CharacterCardComponent {
 
   readonly resync = output<void>();
   readonly deactivate = output<void>();
+  readonly editRaidSpecs = output<void>();
 
   readonly charRoute = computed(() => {
     const c = this.character();

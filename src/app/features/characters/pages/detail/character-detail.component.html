@@ -17,6 +17,22 @@
           @if (char.guildName) {
             <span class="char-guild">&lt;{{ char.guildName }}&gt;</span>
           }
+          <app-character-raid-specs [specs]="char.raidSpecs" />
+        </div>
+
+        <div class="char-actions">
+          <button mat-stroked-button (click)="resyncCharacter()">
+            <app-bnet-icon [size]="18" />
+            {{ 'characters.card.resync' | transloco }}
+          </button>
+          <button mat-stroked-button (click)="editRaidSpecs()">
+            <img class="action-icon" src="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" />
+            {{ 'characters.card.editRaidSpecs' | transloco }}
+          </button>
+          <button mat-stroked-button class="char-actions__danger" (click)="deactivateCharacter()">
+            <mat-icon>person_remove</mat-icon>
+            {{ 'characters.card.deactivate' | transloco }}
+          </button>
         </div>
       </div>
 
@@ -24,7 +40,7 @@
         <div class="detail-layout">
           <app-character-gear [characterId]="char.id" />
           <app-character-bis-list [characterId]="char.id" />
-          <app-character-guilds [characterId]="char.id" />
+          <app-character-guilds [character]="char" />
         </div>
       </mat-card-content>
     </mat-card>

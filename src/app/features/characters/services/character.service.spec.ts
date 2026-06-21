@@ -2,9 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { CharacterService } from './character.service';
+import { CharacterService, GetCharactersResponse } from './character.service';
 import { Character } from '../models/character.model';
 import { SyncedCharacter } from '../models/synced-character.model';
+import { BnetAccount } from '../models/bnet-account.model';
 
 const makeChar = (id = 1): Character => ({
   id,
@@ -22,7 +23,9 @@ const makeChar = (id = 1): Character => ({
   itemLevel: 620,
   avatarUrl: null,
   guildName: null,
-  specs: [],
+  bnetSpecs: [],
+  raidSpecs: [],
+  guildMemberships: [],
 });
 
 describe('CharacterService', () => {
@@ -40,15 +43,18 @@ describe('CharacterService', () => {
   afterEach(() => controller.verify());
 
   describe('getCharacters', () => {
-    it('sends GET /characters and returns the list', () => {
-      let result: Character[] | undefined;
-      service.getCharacters().subscribe(c => { result = c; });
+    it('sends GET /characters and returns the bnetAccount + characters envelope', () => {
+      const account: BnetAccount = { bnetId: '1', battleTag: 'Test#0001', region: 'eu', tokenExpiry: '2026-01-01T00:00:00Z' };
+      const envelope: GetCharactersResponse = { bnetAccount: account, characters: [makeChar(1)] };
+
+      let result: GetCharactersResponse | undefined;
+      service.getCharacters().subscribe(r => { result = r; });
 
       const req = controller.expectOne(r => r.url.endsWith('/characters'));
       expect(req.request.method).toBe('GET');
-      req.flush([makeChar(1)]);
+      req.flush(envelope);
 
-      expect(result).toEqual([makeChar(1)]);
+      expect(result).toEqual(envelope);
     });
   });
 
@@ -127,6 +133,20 @@ describe('CharacterService', () => {
       req.flush(updated);
 
       expect(result).toEqual(updated);
+    });
+  });
+
+  describe('setRaidSpecs', () => {
+    it('sends POST /characters/:id/raid-specs with mainSpecId and viableSpecIds', () => {
+      let result: { message: string } | undefined;
+      service.setRaidSpecs(42, { mainSpecId: 72, viableSpecIds: [71, 72] }).subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/42/raid-specs'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ mainSpecId: 72, viableSpecIds: [71, 72] });
+      req.flush({ message: 'ok' });
+
+      expect(result).toEqual({ message: 'ok' });
     });
   });
 });

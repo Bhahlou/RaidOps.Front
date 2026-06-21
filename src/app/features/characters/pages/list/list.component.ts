@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CharacterStore } from '../../stores/character.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ListHeaderComponent } from '../../components/list-header/list-header.component';
@@ -8,9 +8,14 @@ import { ListContentComponent } from '../../components/list-content/list-content
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ConfirmDeactivateDialogComponent } from '../../components/confirm-deactivate-dialog/confirm-deactivate-dialog.component';
 import {
+  SetRaidSpecsDialogComponent,
+  SetRaidSpecsDialogData,
+} from '../../components/set-raid-specs-dialog/set-raid-specs-dialog.component';
+import {
   SyncBnetDialogComponent,
   SyncBnetDialogData,
 } from '../../components/sync-bnet-dialog/sync-bnet-dialog.component';
+import { Character } from '../../models/character.model';
 
 /** Shell page for the characters list. Handles routing concerns and delegates UI to sub-components. */
 @Component({
@@ -33,9 +38,6 @@ export class CharacterListComponent implements OnInit {
   readonly characters = this.#store.characterList;
 
   ngOnInit(): void {
-    this.#store.loadBnetAccount().subscribe((account) => {
-      if (account) this.#store.loadCharacters().subscribe();
-    });
     this.#handleOAuthCallback();
   }
 
@@ -75,6 +77,22 @@ export class CharacterListComponent implements OnInit {
     });
   }
 
+  /** Opens the raid-viable-specs dialog for a single already-activated character. Editing only — no rollback on cancel. */
+  editRaidSpecs(characterId: number): void {
+    const character = this.characters().find((c) => c.id === characterId);
+    if (!character) return;
+
+    this.#openRaidSpecsDialog([character], 'edit')
+      .afterClosed()
+      .subscribe((result?: { success?: boolean; error?: boolean }) => {
+        if (result?.success) {
+          this.#snackbar.success('characters.raidSpecs.submitSuccess');
+        } else if (result?.error) {
+          this.#snackbar.error('characters.raidSpecs.submitError');
+        }
+      });
+  }
+
   /** Opens the character activation dialog (select synced chars to use in RaidOps). */
   openImportDialog(): void {
     const dialogRef = this.#dialog.open(ImportDialogComponent, {
@@ -85,19 +103,51 @@ export class CharacterListComponent implements OnInit {
 
     dialogRef
       .afterClosed()
-      .subscribe((result?: { activated: number; error?: boolean; openSync?: boolean }) => {
-        if (!result) return;
-        if (result.openSync) {
-          this.openSyncDialog();
-          return;
-        }
-        if (result.error) {
-          this.#snackbar.error('characters.import.importError');
-        } else if (result.activated > 0) {
-          this.#snackbar.success('characters.import.importSuccess');
-          this.#store.loadCharacters().subscribe();
-        }
-      });
+      .subscribe(
+        (result?: { activated: number; error?: boolean; openSync?: boolean; activatedCharacterIds?: number[] }) => {
+          if (!result) return;
+          if (result.openSync) {
+            this.openSyncDialog();
+            return;
+          }
+          if (result.error) {
+            this.#snackbar.error('characters.import.importError');
+          } else if (result.activated > 0 && result.activatedCharacterIds?.length) {
+            this.#promptRaidSpecsAfterActivation(result.activatedCharacterIds);
+          }
+        },
+      );
+  }
+
+  /**
+   * Right after activation, the user must confirm raid-viable specs for each newly activated
+   * character. Cancelling or failing to save rolls the activation back entirely — an activated
+   * character with no raid specs configured is not a valid end state.
+   */
+  #promptRaidSpecsAfterActivation(characterIds: number[]): void {
+    this.#store.loadCharacters(true).subscribe((characters) => {
+      const activated = characters.filter((c) => characterIds.includes(c.id));
+
+      this.#openRaidSpecsDialog(activated, 'activate')
+        .afterClosed()
+        .subscribe((result?: { success?: boolean }) => {
+          if (result?.success) {
+            this.#snackbar.success('characters.import.importSuccess');
+          } else {
+            this.#snackbar.error('characters.raidSpecs.importRolledBack');
+            characterIds.forEach((id) => this.#store.deactivateCharacter(id).subscribe());
+          }
+        });
+    });
+  }
+
+  #openRaidSpecsDialog(characters: Character[], mode: SetRaidSpecsDialogData['mode']): MatDialogRef<SetRaidSpecsDialogComponent> {
+    return this.#dialog.open(SetRaidSpecsDialogComponent, {
+      width: '560px',
+      maxWidth: '95vw',
+      maxHeight: '85vh',
+      data: { characters, mode } satisfies SetRaidSpecsDialogData,
+    });
   }
 
   #openSyncDialog(region: string): void {
@@ -110,9 +160,7 @@ export class CharacterListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result?: { synced: boolean }) => {
       if (!result?.synced) return;
       this.#snackbar.success('characters.bnet.syncSuccess');
-      this.#store.loadBnetAccount().subscribe((account) => {
-        if (account) this.#store.loadCharacters().subscribe();
-      });
+      this.#store.loadCharacters(true).subscribe();
     });
   }
 

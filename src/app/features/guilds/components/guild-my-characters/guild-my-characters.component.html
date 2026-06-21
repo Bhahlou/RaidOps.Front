@@ -22,25 +22,28 @@
         <p class="empty-hint">{{ 'roster.empty' | transloco }}</p>
       } @else if (myCharacters().length > 0) {
         <ul class="char-list">
-          @for (char of myCharacters(); track char.characterId) {
+          @for (char of myCharacters(); track char.id) {
             <li class="char-item">
               @if (char.avatarUrl) {
                 <img class="avatar-sm" [src]="char.avatarUrl" [alt]="char.name" />
               } @else {
-                <app-wow-class-icon [classId]="0" [className]="char.className" [size]="40" />
+                <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="40" />
               }
               <div class="char-info">
-                <a class="char-name" [style.color]="char.classColor" [routerLink]="characterLink(char.characterId)">{{ char.name }}</a>
-                @if (char.guildName) {
-                  <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
-                }
+                <div class="char-text">
+                  <a class="char-name" [style.color]="char.classColor" [routerLink]="characterLink(char)">{{ char.name }}</a>
+                  @if (char.guildName) {
+                    <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
+                  }
+                </div>
+                <app-character-raid-specs [specs]="char.raidSpecs" />
               </div>
               <mat-select
-                class="rank-select rank-select--{{ char.characterRank.toLowerCase() }}"
+                class="rank-select rank-select--{{ rankFor(char).toLowerCase() }}"
                 panelClass="rank-select-panel"
-                [value]="char.characterRank"
-                [disabled]="updatingRankCharacterId() === char.characterId"
-                (selectionChange)="updateRank(char.characterId, $event.value)"
+                [value]="rankFor(char)"
+                [disabled]="updatingRankCharacterId() === char.id"
+                (selectionChange)="updateRank(char.id, $event.value)"
               >
                 @for (rank of ranks; track rank) {
                   <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
@@ -49,8 +52,8 @@
               <button
                 mat-icon-button
                 class="leave-btn"
-                [disabled]="leavingCharacterId() === char.characterId"
-                (click)="removeCharacter(char.characterId)"
+                [disabled]="leavingCharacterId() === char.id"
+                (click)="removeCharacter(char.id)"
                 [title]="'roster.leave' | transloco"
               >
                 <mat-icon>logout</mat-icon>
@@ -75,10 +78,13 @@
                     <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="40" />
                   }
                   <div class="char-info">
-                    <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
-                    @if (char.guildName) {
-                      <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
-                    }
+                    <div class="char-text">
+                      <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
+                      @if (char.guildName) {
+                        <span class="char-meta">&lt;{{ char.guildName }}&gt;</span>
+                      }
+                    </div>
+                    <app-character-raid-specs [specs]="char.raidSpecs" />
                   </div>
                   <mat-select
                     class="rank-select"

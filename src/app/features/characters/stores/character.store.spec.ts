@@ -1,14 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 import { CharacterStore } from './character.store';
-import { CharacterService } from '../services/character.service';
-import { BnetService } from '../../../shared/services/bnet.service';
-import { GuildMembershipStore } from '../../guilds/stores/guild-membership.store';
+import { CharacterService, GetCharactersResponse } from '../services/character.service';
+import { SpecService } from '../../../shared/services/spec.service';
+import { GuildMembershipService } from '../../guilds/services/guild-membership.service';
 import { Character } from '../models/character.model';
+import { GuildMembership } from '../../guilds/models/guild-membership.model';
+import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
+import { CharacterRank } from '../../guilds/models/character-rank.enum';
 import { BnetAccount } from '../models/bnet-account.model';
+import { Spec } from '../../../shared/models/spec.model';
 
-const makeChar = (id: number): Character => ({
+const makeChar = (id: number, overrides: Partial<Character> = {}): Character => ({
   id,
   name: `Char${id}`,
   classId: 1,
@@ -24,7 +28,18 @@ const makeChar = (id: number): Character => ({
   itemLevel: null,
   avatarUrl: null,
   guildName: null,
-  specs: [],
+  bnetSpecs: [],
+  raidSpecs: [],
+  guildMemberships: [],
+  ...overrides,
+});
+
+const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
+  guildId,
+  guildName: `Guild ${guildId}`,
+  guildIconHash: null,
+  characterRank: rank,
+  joinedAt: '2025-01-01',
 });
 
 const mockAccount: BnetAccount = {
@@ -34,31 +49,48 @@ const mockAccount: BnetAccount = {
   tokenExpiry: '2025-12-31T00:00:00Z',
 };
 
+const envelope = (characters: Character[], bnetAccount: BnetAccount | null = null): GetCharactersResponse => ({
+  bnetAccount,
+  characters,
+});
+
 describe('CharacterStore', () => {
   let store: CharacterStore;
   let charService: {
     getCharacters: ReturnType<typeof vi.fn>;
     deactivateCharacter: ReturnType<typeof vi.fn>;
     resyncCharacter: ReturnType<typeof vi.fn>;
+    setRaidSpecs: ReturnType<typeof vi.fn>;
   };
-  let bnetService: { getBnetAccount: ReturnType<typeof vi.fn> };
-  let evictCharacter: ReturnType<typeof vi.fn>;
+  let specService: { getAll: ReturnType<typeof vi.fn> };
+  let membershipService: {
+    getEligibleGuilds: ReturnType<typeof vi.fn>;
+    joinGuild: ReturnType<typeof vi.fn>;
+    updateRank: ReturnType<typeof vi.fn>;
+    leaveGuild: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     charService = {
-      getCharacters: vi.fn(),
+      getCharacters: vi.fn().mockReturnValue(of(envelope([]))),
       deactivateCharacter: vi.fn(),
       resyncCharacter: vi.fn(),
+      setRaidSpecs: vi.fn(),
     };
-    bnetService = { getBnetAccount: vi.fn() };
-    evictCharacter = vi.fn();
+    specService = { getAll: vi.fn() };
+    membershipService = {
+      getEligibleGuilds: vi.fn().mockReturnValue(of([])),
+      joinGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
+      updateRank: vi.fn().mockReturnValue(of({ message: 'ok' })),
+      leaveGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
+    };
 
     TestBed.configureTestingModule({
       providers: [
         CharacterStore,
         { provide: CharacterService, useValue: charService },
-        { provide: BnetService, useValue: bnetService },
-        { provide: GuildMembershipStore, useValue: { evictCharacter } },
+        { provide: SpecService, useValue: specService },
+        { provide: GuildMembershipService, useValue: membershipService },
       ],
     });
 
@@ -89,43 +121,63 @@ describe('CharacterStore', () => {
     it('characterList defaults to empty array while loading', () => {
       expect(store.characterList()).toEqual([]);
     });
-  });
 
-  describe('loadBnetAccount', () => {
-    it('sets bnetAccount and clears loading state on success', () => {
-      bnetService.getBnetAccount.mockReturnValue(of(mockAccount));
-      store.loadBnetAccount().subscribe();
-
-      expect(store.bnetAccount()).toEqual(mockAccount);
-      expect(store.isBnetLoading()).toBe(false);
-      expect(store.isBnetLinked()).toBe(true);
-    });
-
-    it('sets bnetAccount to null when no account is linked', () => {
-      bnetService.getBnetAccount.mockReturnValue(of(null));
-      store.loadBnetAccount().subscribe();
-
-      expect(store.bnetAccount()).toBeNull();
-      expect(store.isBnetLoading()).toBe(false);
-      expect(store.isBnetLinked()).toBe(false);
-    });
+    it('eligibleGuilds is undefined', () => expect(store.eligibleGuilds()).toBeUndefined());
+    it('isEligibleLoading is true', () => expect(store.isEligibleLoading()).toBe(true));
+    it('eligibleGuildList defaults to []', () => expect(store.eligibleGuildList()).toEqual([]));
+    it('joiningGuildId is null', () => expect(store.joiningGuildId()).toBeNull());
+    it('joiningCharacterId is null', () => expect(store.joiningCharacterId()).toBeNull());
+    it('leavingGuildId is null', () => expect(store.leavingGuildId()).toBeNull());
+    it('leavingCharacterId is null', () => expect(store.leavingCharacterId()).toBeNull());
+    it('updatingRankCharacterId is null', () => expect(store.updatingRankCharacterId()).toBeNull());
+    it('updatingRankGuildId is null', () => expect(store.updatingRankGuildId()).toBeNull());
   });
 
   describe('loadCharacters', () => {
-    it('populates the character list and clears loading state', () => {
+    it('populates the character list and bnet account, and clears loading state', () => {
       const chars = [makeChar(1), makeChar(2)];
-      charService.getCharacters.mockReturnValue(of(chars));
+      charService.getCharacters.mockReturnValue(of(envelope(chars, mockAccount)));
       store.loadCharacters().subscribe();
 
       expect(store.characters()).toEqual(chars);
       expect(store.characterList()).toEqual(chars);
       expect(store.isCharactersLoading()).toBe(false);
+      expect(store.bnetAccount()).toEqual(mockAccount);
+      expect(store.isBnetLinked()).toBe(true);
+    });
+
+    it('sets bnetAccount to null when no account is linked', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([], null)));
+      store.loadCharacters().subscribe();
+
+      expect(store.bnetAccount()).toBeNull();
+      expect(store.isBnetLinked()).toBe(false);
+    });
+
+    it('does not refetch on a second call (cached)', () => {
+      const chars = [makeChar(1)];
+      charService.getCharacters.mockReturnValue(of(envelope(chars)));
+      store.loadCharacters().subscribe();
+      store.loadCharacters().subscribe();
+
+      expect(charService.getCharacters).toHaveBeenCalledTimes(1);
+    });
+
+    it('refetches when force is true even if already cached', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1)])));
+      store.loadCharacters().subscribe();
+
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1), makeChar(2)])));
+      store.loadCharacters(true).subscribe();
+
+      expect(charService.getCharacters).toHaveBeenCalledTimes(2);
+      expect(store.characterList()).toHaveLength(2);
     });
   });
 
   describe('deactivateCharacter', () => {
     it('removes the deactivated character from the local list', () => {
-      charService.getCharacters.mockReturnValue(of([makeChar(1), makeChar(2), makeChar(3)]));
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1), makeChar(2), makeChar(3)])));
       store.loadCharacters().subscribe();
 
       charService.deactivateCharacter.mockReturnValue(of({ message: 'ok' }));
@@ -140,18 +192,11 @@ describe('CharacterStore', () => {
 
       expect(store.characters()).toBeUndefined();
     });
-
-    it('calls evictCharacter on the membership store with the character id', () => {
-      charService.deactivateCharacter.mockReturnValue(of({ message: 'ok' }));
-      store.deactivateCharacter(42).subscribe();
-
-      expect(evictCharacter).toHaveBeenCalledWith(42);
-    });
   });
 
   describe('resyncCharacter', () => {
     it('replaces the resynced character in the local list', () => {
-      charService.getCharacters.mockReturnValue(of([makeChar(1), makeChar(2)]));
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1), makeChar(2)])));
       store.loadCharacters().subscribe();
 
       const updated: Character = { ...makeChar(1), name: 'UpdatedName' };
@@ -167,6 +212,260 @@ describe('CharacterStore', () => {
       store.resyncCharacter(1).subscribe();
 
       expect(store.characters()).toBeUndefined();
+    });
+  });
+
+  describe('loadSpecs', () => {
+    const specs: Spec[] = [
+      { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
+      { id: 72, name: 'Fury', role: 'Dps', classId: 1, iconUrl: null },
+    ];
+
+    it('fetches and caches the spec list', () => {
+      specService.getAll.mockReturnValue(of(specs));
+      store.loadSpecs().subscribe();
+
+      expect(store.specs()).toEqual(specs);
+    });
+
+    it('does not refetch on subsequent calls', () => {
+      specService.getAll.mockReturnValue(of(specs));
+      store.loadSpecs().subscribe();
+      store.loadSpecs().subscribe();
+
+      expect(specService.getAll).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns the cached list on subsequent calls', () => {
+      specService.getAll.mockReturnValue(of(specs));
+      store.loadSpecs().subscribe();
+
+      let result: Spec[] | undefined;
+      store.loadSpecs().subscribe((s) => (result = s));
+
+      expect(result).toEqual(specs);
+    });
+  });
+
+  describe('setRaidSpecs', () => {
+    const specs: Spec[] = [
+      { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
+      { id: 72, name: 'Fury', role: 'Dps', classId: 1, iconUrl: null },
+    ];
+
+    it('patches the character with enriched raid specs using cached spec data', () => {
+      specService.getAll.mockReturnValue(of(specs));
+      store.loadSpecs().subscribe();
+
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1), makeChar(2)])));
+      store.loadCharacters().subscribe();
+
+      charService.setRaidSpecs.mockReturnValue(of({ message: 'ok' }));
+      store.setRaidSpecs(1, { mainSpecId: 72, viableSpecIds: [71, 72] }).subscribe();
+
+      const updated = store.characterList().find((c) => c.id === 1);
+      expect(updated?.raidSpecs).toEqual([
+        { specId: 71, name: 'Arms', iconUrl: 'https://cdn/arms.jpg', isMain: false },
+        { specId: 72, name: 'Fury', iconUrl: null, isMain: true },
+      ]);
+      expect(store.characterList().find((c) => c.id === 2)?.raidSpecs).toEqual([]);
+    });
+
+    it('skips spec ids that are not in the cached reference data', () => {
+      specService.getAll.mockReturnValue(of([specs[0]])); // only 71 cached
+      store.loadSpecs().subscribe();
+
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1)])));
+      store.loadCharacters().subscribe();
+
+      charService.setRaidSpecs.mockReturnValue(of({ message: 'ok' }));
+      store.setRaidSpecs(1, { mainSpecId: 71, viableSpecIds: [71, 999] }).subscribe();
+
+      expect(store.characterList()[0].raidSpecs).toEqual([
+        { specId: 71, name: 'Arms', iconUrl: 'https://cdn/arms.jpg', isMain: true },
+      ]);
+    });
+
+    it('leaves the characters signal as undefined when list has not been loaded yet', () => {
+      charService.setRaidSpecs.mockReturnValue(of({ message: 'ok' }));
+      store.setRaidSpecs(1, { mainSpecId: 71, viableSpecIds: [71] }).subscribe();
+
+      expect(store.characters()).toBeUndefined();
+    });
+  });
+
+  describe('loadEligibleGuilds', () => {
+    it('populates eligibleGuilds on success', () => {
+      const data: EligibleGuild[] = [{ guildId: 'g2', guildName: 'Guild g2', guildIconHash: null }];
+      membershipService.getEligibleGuilds.mockReturnValue(of(data));
+      store.loadEligibleGuilds(1);
+
+      expect(store.eligibleGuilds()).toEqual(data);
+      expect(store.isEligibleLoading()).toBe(false);
+    });
+
+    it('resets eligibleGuilds to [] on error', () => {
+      membershipService.getEligibleGuilds.mockReturnValue(throwError(() => new Error('fail')));
+      store.loadEligibleGuilds(1);
+
+      expect(store.eligibleGuilds()).toEqual([]);
+    });
+  });
+
+  describe('clearEligibleGuilds', () => {
+    it('resets eligibleGuilds to undefined after it was loaded', () => {
+      membershipService.getEligibleGuilds.mockReturnValue(of([{ guildId: 'g1', guildName: 'Guild g1', guildIconHash: null }]));
+      store.loadEligibleGuilds(1);
+      expect(store.eligibleGuilds()).toBeDefined();
+
+      store.clearEligibleGuilds();
+
+      expect(store.eligibleGuilds()).toBeUndefined();
+      expect(store.isEligibleLoading()).toBe(true);
+    });
+  });
+
+  describe('joinGuild', () => {
+    it('sets spinners while the request is in flight', () => {
+      const subject = new Subject<{ message: string }>();
+      membershipService.joinGuild.mockReturnValue(subject.asObservable());
+      store.joinGuild(1, 'g1', CharacterRank.Main).subscribe();
+
+      expect(store.joiningGuildId()).toBe('g1');
+      expect(store.joiningCharacterId()).toBe(1);
+
+      subject.next({ message: 'ok' });
+      subject.complete();
+
+      expect(store.joiningGuildId()).toBeNull();
+      expect(store.joiningCharacterId()).toBeNull();
+    });
+
+    it('force-reloads the character list after success', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1)])));
+      store.loadCharacters().subscribe();
+      charService.getCharacters.mockClear();
+      charService.getCharacters.mockReturnValue(
+        of(envelope([makeChar(1, { guildMemberships: [makeMembership('g1')] })])),
+      );
+
+      store.joinGuild(1, 'g1', CharacterRank.Main).subscribe();
+
+      expect(charService.getCharacters).toHaveBeenCalledTimes(1);
+      expect(store.characterList()[0].guildMemberships).toEqual([makeMembership('g1')]);
+    });
+
+    it('removes the joined guild from eligibleGuilds', () => {
+      membershipService.getEligibleGuilds.mockReturnValue(
+        of([{ guildId: 'g1', guildName: 'Guild g1', guildIconHash: null }, { guildId: 'g2', guildName: 'Guild g2', guildIconHash: null }]),
+      );
+      store.loadEligibleGuilds(1);
+
+      store.joinGuild(1, 'g1', CharacterRank.Main).subscribe();
+
+      expect(store.eligibleGuildList().map((g) => g.guildId)).toEqual(['g2']);
+    });
+
+    it('clears spinners and re-throws on error', () => {
+      membershipService.joinGuild.mockReturnValue(throwError(() => new Error('fail')));
+      let errorCaught = false;
+      store.joinGuild(1, 'g1', CharacterRank.Main).subscribe({ error: () => { errorCaught = true; } });
+
+      expect(errorCaught).toBe(true);
+      expect(store.joiningGuildId()).toBeNull();
+      expect(store.joiningCharacterId()).toBeNull();
+    });
+  });
+
+  describe('updateRank', () => {
+    it('sets spinners while the request is in flight', () => {
+      const subject = new Subject<{ message: string }>();
+      membershipService.updateRank.mockReturnValue(subject.asObservable());
+      store.updateRank(1, 'g1', CharacterRank.Alt).subscribe();
+
+      expect(store.updatingRankCharacterId()).toBe(1);
+      expect(store.updatingRankGuildId()).toBe('g1');
+
+      subject.next({ message: 'ok' });
+      subject.complete();
+
+      expect(store.updatingRankCharacterId()).toBeNull();
+      expect(store.updatingRankGuildId()).toBeNull();
+    });
+
+    it('updates the matching membership rank in the local cache', () => {
+      charService.getCharacters.mockReturnValue(
+        of(envelope([makeChar(1, { guildMemberships: [makeMembership('g1'), makeMembership('g2')] })])),
+      );
+      store.loadCharacters().subscribe();
+
+      store.updateRank(1, 'g1', CharacterRank.Alt).subscribe();
+
+      const memberships = store.characterList()[0].guildMemberships;
+      expect(memberships.find((m) => m.guildId === 'g1')?.characterRank).toBe(CharacterRank.Alt);
+      expect(memberships.find((m) => m.guildId === 'g2')?.characterRank).toBe(CharacterRank.Main);
+    });
+
+    it('does not affect other characters', () => {
+      charService.getCharacters.mockReturnValue(
+        of(envelope([
+          makeChar(1, { guildMemberships: [makeMembership('g1')] }),
+          makeChar(2, { guildMemberships: [makeMembership('g1')] }),
+        ])),
+      );
+      store.loadCharacters().subscribe();
+
+      store.updateRank(1, 'g1', CharacterRank.Alt).subscribe();
+
+      expect(store.characterList().find((c) => c.id === 2)?.guildMemberships[0].characterRank).toBe(CharacterRank.Main);
+    });
+
+    it('clears spinners and re-throws on error', () => {
+      membershipService.updateRank.mockReturnValue(throwError(() => new Error('fail')));
+      let errorCaught = false;
+      store.updateRank(1, 'g1', CharacterRank.Alt).subscribe({ error: () => { errorCaught = true; } });
+
+      expect(errorCaught).toBe(true);
+      expect(store.updatingRankCharacterId()).toBeNull();
+      expect(store.updatingRankGuildId()).toBeNull();
+    });
+  });
+
+  describe('leaveGuild', () => {
+    it('sets spinners while the request is in flight', () => {
+      const subject = new Subject<{ message: string }>();
+      membershipService.leaveGuild.mockReturnValue(subject.asObservable());
+      store.leaveGuild(1, 'g1').subscribe();
+
+      expect(store.leavingGuildId()).toBe('g1');
+      expect(store.leavingCharacterId()).toBe(1);
+
+      subject.next({ message: 'ok' });
+      subject.complete();
+
+      expect(store.leavingGuildId()).toBeNull();
+      expect(store.leavingCharacterId()).toBeNull();
+    });
+
+    it('removes the guild from the character local cache', () => {
+      charService.getCharacters.mockReturnValue(
+        of(envelope([makeChar(1, { guildMemberships: [makeMembership('g1'), makeMembership('g2')] })])),
+      );
+      store.loadCharacters().subscribe();
+
+      store.leaveGuild(1, 'g1').subscribe();
+
+      expect(store.characterList()[0].guildMemberships.map((m) => m.guildId)).toEqual(['g2']);
+    });
+
+    it('clears spinners and re-throws on error', () => {
+      membershipService.leaveGuild.mockReturnValue(throwError(() => new Error('fail')));
+      let errorCaught = false;
+      store.leaveGuild(1, 'g1').subscribe({ error: () => { errorCaught = true; } });
+
+      expect(errorCaught).toBe(true);
+      expect(store.leavingGuildId()).toBeNull();
+      expect(store.leavingCharacterId()).toBeNull();
     });
   });
 });

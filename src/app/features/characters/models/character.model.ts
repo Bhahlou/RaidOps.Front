@@ -1,4 +1,5 @@
 import { CharacterSpec } from './character-spec.model';
+import { GuildMembership } from '../../guilds/models/guild-membership.model';
 
 /** A WoW character imported into RaidOps. */
 export interface Character {
@@ -17,5 +18,7 @@ export interface Character {
   itemLevel: number | null;
   avatarUrl: string | null;
   guildName: string | null;
-  specs: CharacterSpec[];
+  bnetSpecs: CharacterSpec[];
+  raidSpecs: CharacterSpec[];
+  guildMemberships: GuildMembership[];
 }

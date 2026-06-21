@@ -3,6 +3,7 @@ import { UpperCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { REGIONS, REGION_FLAGS, BnetRegion } from '../../../shared/constants/bnet-regions';
+import { BnetIconComponent } from '../bnet-icon/bnet-icon.component';
 
 export type { BnetRegion };
 
@@ -17,7 +18,7 @@ export type { BnetRegion };
 @Component({
   selector: 'app-bnet-link-button',
   standalone: true,
-  imports: [UpperCasePipe, MatIconModule, MatMenuModule],
+  imports: [UpperCasePipe, MatIconModule, MatMenuModule, BnetIconComponent],
   templateUrl: './bnet-link-button.component.html',
   styleUrl: './bnet-link-button.component.scss',
 })

@@ -13,91 +13,85 @@
   </mat-card-header>
 
   <mat-card-content>
-    @if (isMembershipsLoading()) {
-      <mat-spinner diameter="32" />
-    } @else {
-
-      <!-- ── Memberships ──────────────────────────────────────────────────── -->
-      @if (memberships().length === 0 && !showEligible()) {
-        <p class="empty-hint">{{ 'characterDetail.guilds.empty' | transloco }}</p>
-      } @else if (memberships().length > 0) {
-        <ul class="membership-list">
-          @for (m of memberships(); track m.guildId) {
-            <li class="membership-item">
-              <app-discord-icon
-                [id]="m.guildId"
-                [hash]="m.guildIconHash"
-                [type]="DiscordIconType.Guild"
-                [size]="32"
-              />
-              <a class="guild-name" [routerLink]="['/guilds', m.guildId, 'roster']">{{ m.guildName }}</a>
-              <mat-select
-                class="rank-select"
-                panelClass="rank-select-panel"
-                [value]="m.characterRank"
-                [disabled]="updatingRankGuildId() === m.guildId"
-                (selectionChange)="updateRank(m.guildId, $event.value)"
-              >
-                @for (rank of ranks; track rank) {
-                  <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
-                }
-              </mat-select>
-              <button
-                mat-icon-button
-                class="leave-btn"
-                [disabled]="leavingGuildId() === m.guildId"
-                (click)="leaveGuild(m.guildId)"
-                [title]="'characterDetail.guilds.leave' | transloco"
-              >
-                <mat-icon>logout</mat-icon>
-              </button>
-            </li>
-          }
-        </ul>
-      }
-
-      <!-- ── Eligible panel ──────────────────────────────────────────────── -->
-      @if (showEligible()) {
-        <div class="eligible-panel" [class.with-divider]="memberships().length > 0">
-          @if (isEligibleLoading()) {
-            <mat-spinner diameter="24" />
-          } @else if (eligibleGuilds().length === 0) {
-            <p class="empty-hint">{{ 'characterDetail.guilds.noEligible' | transloco }}</p>
-          } @else {
-            <ul class="membership-list">
-              @for (g of eligibleGuilds(); track g.guildId) {
-                <li class="membership-item">
-                  <app-discord-icon
-                    [id]="g.guildId"
-                    [hash]="g.guildIconHash"
-                    [type]="DiscordIconType.Guild"
-                    [size]="32"
-                  />
-                  <span class="guild-name">{{ g.guildName }}</span>
-                  <mat-select
-                    class="rank-select"
-                    panelClass="rank-select-panel"
-                    [value]="getRankSelection(g.guildId)"
-                    (selectionChange)="setRankSelection(g.guildId, $event.value)"
-                  >
-                    @for (rank of ranks; track rank) {
-                      <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
-                    }
-                  </mat-select>
-                  <button
-                    mat-flat-button
-                    [disabled]="joiningGuildId() === g.guildId"
-                    (click)="joinGuild(g.guildId)"
-                  >
-                    {{ 'characterDetail.guilds.join' | transloco }}
-                  </button>
-                </li>
+    <!-- ── Memberships ──────────────────────────────────────────────────── -->
+    @if (memberships().length === 0 && !showEligible()) {
+      <p class="empty-hint">{{ 'characterDetail.guilds.empty' | transloco }}</p>
+    } @else if (memberships().length > 0) {
+      <ul class="membership-list">
+        @for (m of memberships(); track m.guildId) {
+          <li class="membership-item">
+            <app-discord-icon
+              [id]="m.guildId"
+              [hash]="m.guildIconHash"
+              [type]="DiscordIconType.Guild"
+              [size]="32"
+            />
+            <a class="guild-name" [routerLink]="['/guilds', m.guildId, 'roster']">{{ m.guildName }}</a>
+            <mat-select
+              class="rank-select"
+              panelClass="rank-select-panel"
+              [value]="m.characterRank"
+              [disabled]="updatingRankGuildId() === m.guildId"
+              (selectionChange)="updateRank(m.guildId, $event.value)"
+            >
+              @for (rank of ranks; track rank) {
+                <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
               }
-            </ul>
-          }
-        </div>
-      }
+            </mat-select>
+            <button
+              mat-icon-button
+              class="leave-btn"
+              [disabled]="leavingGuildId() === m.guildId"
+              (click)="leaveGuild(m.guildId)"
+              [title]="'characterDetail.guilds.leave' | transloco"
+            >
+              <mat-icon>logout</mat-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    }
 
+    <!-- ── Eligible panel ──────────────────────────────────────────────── -->
+    @if (showEligible()) {
+      <div class="eligible-panel" [class.with-divider]="memberships().length > 0">
+        @if (isEligibleLoading()) {
+          <mat-spinner diameter="24" />
+        } @else if (eligibleGuilds().length === 0) {
+          <p class="empty-hint">{{ 'characterDetail.guilds.noEligible' | transloco }}</p>
+        } @else {
+          <ul class="membership-list">
+            @for (g of eligibleGuilds(); track g.guildId) {
+              <li class="membership-item">
+                <app-discord-icon
+                  [id]="g.guildId"
+                  [hash]="g.guildIconHash"
+                  [type]="DiscordIconType.Guild"
+                  [size]="32"
+                />
+                <span class="guild-name">{{ g.guildName }}</span>
+                <mat-select
+                  class="rank-select"
+                  panelClass="rank-select-panel"
+                  [value]="getRankSelection(g.guildId)"
+                  (selectionChange)="setRankSelection(g.guildId, $event.value)"
+                >
+                  @for (rank of ranks; track rank) {
+                    <mat-option [value]="rank">{{ rankLabel(rank) }}</mat-option>
+                  }
+                </mat-select>
+                <button
+                  mat-flat-button
+                  [disabled]="joiningGuildId() === g.guildId"
+                  (click)="joinGuild(g.guildId)"
+                >
+                  {{ 'characterDetail.guilds.join' | transloco }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
     }
   </mat-card-content>
 </mat-card>

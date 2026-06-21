@@ -4,7 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Character } from '../models/character.model';
 import { SyncedCharacter } from '../models/synced-character.model';
+import { BnetAccount } from '../models/bnet-account.model';
 
+/** Response envelope for {@link CharacterService.getCharacters}. */
+export interface GetCharactersResponse {
+  bnetAccount: BnetAccount | null;
+  characters: Character[];
+}
 
 /**
  * Thin HTTP layer for character-related endpoints.
@@ -15,9 +21,12 @@ export class CharacterService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl + '/characters';
 
-  /** Returns all WoW characters activated in RaidOps by the authenticated user. */
-  getCharacters(): Observable<Character[]> {
-    return this.#http.get<Character[]>(`${this.#api}`);
+  /**
+   * Returns all WoW characters activated in RaidOps by the authenticated user, along with
+   * their linked Battle.net account, in a single request.
+   */
+  getCharacters(): Observable<GetCharactersResponse> {
+    return this.#http.get<GetCharactersResponse>(`${this.#api}`);
   }
 
   /** Returns all WoW characters synced from BNet, including inactive ones. */
@@ -50,5 +59,16 @@ export class CharacterService {
   /** Re-fetches the character's data from the BNet API and returns the updated character. */
   resyncCharacter(characterId: number): Observable<Character> {
     return this.#http.post<Character>(`${this.#api}/${characterId}/resync`, {});
+  }
+
+  /**
+   * Sets the specs the character is viable to raid with, replacing any previous set.
+   * Usable right after activation or later as an edit.
+   */
+  setRaidSpecs(
+    characterId: number,
+    payload: { mainSpecId: number; viableSpecIds: number[] },
+  ): Observable<{ message: string }> {
+    return this.#http.post<{ message: string }>(`${this.#api}/${characterId}/raid-specs`, payload);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
@@ -7,8 +7,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
-import { GuildMembershipStore } from '../../stores/guild-membership.store';
 import { CharacterStore } from '../../../characters/stores/character.store';
+import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 
@@ -29,6 +29,7 @@ import { Character } from '../../../characters/models/character.model';
     MatOption,
     TranslocoPipe,
     WowClassIconComponent,
+    CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-my-characters.component.html',
   styleUrl: './guild-my-characters.component.scss',
@@ -36,19 +37,27 @@ import { Character } from '../../../characters/models/character.model';
 export class GuildMyCharactersComponent {
   readonly guildId = input.required<string>();
 
-  readonly #store = inject(GuildMembershipStore);
-  readonly #characterStore = inject(CharacterStore);
+  readonly #store = inject(CharacterStore);
 
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
 
   // ── Store projections ─────────────────────────────────────────────────────
 
-  readonly myCharacters = this.#store.myCharacterList;
-  readonly isLoading = this.#store.isMyCharactersLoading;
+  readonly isLoading = this.#store.isCharactersLoading;
   readonly joiningCharacterId = this.#store.joiningCharacterId;
   readonly leavingCharacterId = this.#store.leavingCharacterId;
   readonly updatingRankCharacterId = this.#store.updatingRankCharacterId;
+
+  // ── Derived from CharacterStore.characterList ────────────────────────────
+
+  readonly myCharacters = computed(() =>
+    this.#store.characterList().filter(c => this.#isInGuild(c)),
+  );
+
+  readonly addableCharacters = computed(() =>
+    this.#store.characterList().filter(c => !this.#isInGuild(c)),
+  );
 
   // ── UI state ──────────────────────────────────────────────────────────────
 
@@ -57,23 +66,17 @@ export class GuildMyCharactersComponent {
   /** Rank selected per character in the add panel, defaults to Main. */
   readonly #rankSelections = signal(new Map<number, CharacterRank>());
 
-  readonly addableCharacters = computed(() => {
-    const inGuild = new Set(this.myCharacters().map(c => c.characterId));
-    return this.#characterStore.characterList().filter(c => !inGuild.has(c.id));
-  });
-
-  readonly #characterById = computed(() =>
-    new Map(this.#characterStore.characterList().map(c => [c.id, c]))
-  );
-
-  characterLink(characterId: number): string[] | null {
-    const c = this.#characterById().get(characterId);
-    if (!c) return null;
-    return ['/characters', c.branchName.toLowerCase().replace(/[\s_]+/g, '-'), c.realmSlug, c.name.toLowerCase()];
+  #isInGuild(character: Character): boolean {
+    return character.guildMemberships.some(m => m.guildId === this.guildId());
   }
 
-  constructor() {
-    effect(() => this.#store.loadMyCharactersInGuild(this.guildId()));
+  /** The character's roster rank for this guild. */
+  rankFor(character: Character): CharacterRank {
+    return character.guildMemberships.find(m => m.guildId === this.guildId())?.characterRank ?? CharacterRank.Main;
+  }
+
+  characterLink(character: Character): string[] {
+    return ['/characters', character.branchName.toLowerCase().replace(/[\s_]+/g, '-'), character.realmSlug, character.name.toLowerCase()];
   }
 
   toggleAddPanel(): void {

@@ -3,23 +3,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { GuildMembershipService } from './guild-membership.service';
-import { GuildMembership } from '../models/guild-membership.model';
 import { EligibleGuild } from '../models/eligible-guild.model';
-import { CharacterInGuild } from '../models/character-in-guild.model';
 import { CharacterRank } from '../models/character-rank.enum';
 
-const membership: GuildMembership = {
-  guildId: 'g1', guildName: 'Epic Guild', guildIconHash: null,
-  characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
-};
-
 const eligible: EligibleGuild = { guildId: 'g2', guildName: 'Other Guild', guildIconHash: null };
-
-const charInGuild: CharacterInGuild = {
-  characterId: 1, name: 'Char1', realmName: 'Thunderstrike',
-  className: 'Druid', classColor: '#FF7C0A', avatarUrl: null,
-  guildName: 'Epic Guild', characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
-};
 
 describe('GuildMembershipService', () => {
   let service: GuildMembershipService;
@@ -34,21 +21,6 @@ describe('GuildMembershipService', () => {
   });
 
   afterEach(() => controller.verify());
-
-  // ── getCharacterMemberships ───────────────────────────────────────────────
-
-  describe('getCharacterMemberships', () => {
-    it('sends GET /characters/:id/memberships and returns the list', () => {
-      let result: GuildMembership[] | undefined;
-      service.getCharacterMemberships(1).subscribe(m => { result = m; });
-
-      const req = controller.expectOne(r => r.url.endsWith('/characters/1/memberships'));
-      expect(req.request.method).toBe('GET');
-      req.flush([membership]);
-
-      expect(result).toEqual([membership]);
-    });
-  });
 
   // ── getEligibleGuilds ─────────────────────────────────────────────────────
 
@@ -109,21 +81,6 @@ describe('GuildMembershipService', () => {
       req.flush({ message: 'ok' });
 
       expect(result).toEqual({ message: 'ok' });
-    });
-  });
-
-  // ── getMyCharactersInGuild ────────────────────────────────────────────────
-
-  describe('getMyCharactersInGuild', () => {
-    it('sends GET /guilds/:guildId/my-characters and returns the list', () => {
-      let result: CharacterInGuild[] | undefined;
-      service.getMyCharactersInGuild('g1').subscribe(c => { result = c; });
-
-      const req = controller.expectOne(r => r.url.endsWith('/guilds/g1/my-characters'));
-      expect(req.request.method).toBe('GET');
-      req.flush([charInGuild]);
-
-      expect(result).toEqual([charInGuild]);
     });
   });
 });

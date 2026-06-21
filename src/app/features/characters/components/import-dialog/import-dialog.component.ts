@@ -169,9 +169,10 @@ export class ImportDialogComponent implements OnInit {
 
   activate(): void {
     if (this.selectedCount() === 0) return;
+    const activatedCharacterIds = [...this.selectedIds()];
     this.isActivating.set(true);
-    this.#service.activateCharacters([...this.selectedIds()]).subscribe({
-      next: () => this.#dialogRef.close({ activated: this.selectedCount() }),
+    this.#service.activateCharacters(activatedCharacterIds).subscribe({
+      next: () => this.#dialogRef.close({ activated: this.selectedCount(), activatedCharacterIds }),
       error: () => {
         this.isActivating.set(false);
         this.#dialogRef.close({ error: true });
