@@ -3,25 +3,37 @@ import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
 import { CharacterGuildsComponent } from './character-guilds.component';
-import { GuildMembershipStore } from '../../../guilds/stores/guild-membership.store';
+import { CharacterStore } from '../../stores/character.store';
+import { Character } from '../../models/character.model';
+import { GuildMembership } from '../../../guilds/models/guild-membership.model';
 import { CharacterRank } from '../../../guilds/models/character-rank.enum';
 
-const setup = (characterId = 1) => {
-  const loadMemberships   = vi.fn();
+const makeMembership = (guildId: string): GuildMembership => ({
+  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
+});
+
+const makeChar = (id: number, overrides: Partial<Character> = {}): Character => ({
+  id, name: `Char${id}`, classId: 1, className: 'Druid', classColor: '#FF7C0A',
+  raceId: 1, raceName: 'Night Elf', faction: 'ALLIANCE',
+  branchName: 'Classic Anniversary', realmName: 'Thunderstrike', realmSlug: 'thunderstrike',
+  level: 60, itemLevel: null, avatarUrl: null, guildName: null, bnetSpecs: [], raidSpecs: [],
+  guildMemberships: [],
+  ...overrides,
+});
+
+const setup = (character: Character = makeChar(1)) => {
   const loadEligibleGuilds = vi.fn();
   const joinGuild  = vi.fn().mockReturnValue(of(undefined));
   const updateRank = vi.fn().mockReturnValue(of(undefined));
   const leaveGuild = vi.fn().mockReturnValue(of(undefined));
 
   const mockStore = {
-    membershipList:       signal([]),
-    isMembershipsLoading: signal(false),
     eligibleGuildList:    signal([]),
     isEligibleLoading:    signal(false),
     joiningGuildId:       signal<string | null>(null),
     leavingGuildId:       signal<string | null>(null),
     updatingRankGuildId:  signal<string | null>(null),
-    loadMemberships,
     loadEligibleGuilds,
     joinGuild,
     updateRank,
@@ -30,14 +42,14 @@ const setup = (characterId = 1) => {
 
   TestBed.configureTestingModule({
     imports: [CharacterGuildsComponent],
-    providers: [{ provide: GuildMembershipStore, useValue: mockStore }],
+    providers: [{ provide: CharacterStore, useValue: mockStore }],
   }).overrideComponent(CharacterGuildsComponent, { set: { template: '', imports: [] } });
 
   const fixture = TestBed.createComponent(CharacterGuildsComponent);
-  fixture.componentRef.setInput('characterId', characterId);
+  fixture.componentRef.setInput('character', character);
   fixture.detectChanges();
 
-  return { component: fixture.componentInstance, fixture, loadMemberships, loadEligibleGuilds, joinGuild, updateRank, leaveGuild };
+  return { component: fixture.componentInstance, fixture, loadEligibleGuilds, joinGuild, updateRank, leaveGuild };
 };
 
 describe('CharacterGuildsComponent', () => {
@@ -45,11 +57,13 @@ describe('CharacterGuildsComponent', () => {
     expect(setup().component).toBeTruthy();
   });
 
-  // ── effect — loadMemberships ───────────────────────────────────────────────
+  // ── memberships ───────────────────────────────────────────────────────────
 
-  it('calls loadMemberships on construction with the characterId input', () => {
-    const { loadMemberships } = setup(42);
-    expect(loadMemberships).toHaveBeenCalledWith(42);
+  it('memberships reads guildMemberships directly off the character input', () => {
+    const char = makeChar(1, { guildMemberships: [makeMembership('g1')] });
+    const { component } = setup(char);
+
+    expect(component.memberships()).toEqual([makeMembership('g1')]);
   });
 
   // ── showEligible ──────────────────────────────────────────────────────────
@@ -62,7 +76,7 @@ describe('CharacterGuildsComponent', () => {
 
   describe('toggleEligible', () => {
     it('sets showEligible to true and loads eligible guilds when called while false', () => {
-      const { component, loadEligibleGuilds } = setup(7);
+      const { component, loadEligibleGuilds } = setup(makeChar(7));
 
       component.toggleEligible();
 
@@ -71,7 +85,7 @@ describe('CharacterGuildsComponent', () => {
     });
 
     it('sets showEligible to false without calling loadEligibleGuilds when called while true', () => {
-      const { component, loadEligibleGuilds } = setup(7);
+      const { component, loadEligibleGuilds } = setup(makeChar(7));
       component.showEligible.set(true);
 
       component.toggleEligible();
@@ -127,7 +141,7 @@ describe('CharacterGuildsComponent', () => {
 
   describe('joinGuild', () => {
     it('calls store.joinGuild with characterId, guildId and selected rank', () => {
-      const { component, joinGuild } = setup(5);
+      const { component, joinGuild } = setup(makeChar(5));
       component.setRankSelection('g1', CharacterRank.Split);
 
       component.joinGuild('g1');
@@ -148,7 +162,7 @@ describe('CharacterGuildsComponent', () => {
   // ── updateRank ────────────────────────────────────────────────────────────
 
   it('updateRank calls store.updateRank with characterId, guildId and rank', () => {
-    const { component, updateRank } = setup(3);
+    const { component, updateRank } = setup(makeChar(3));
 
     component.updateRank('g1', CharacterRank.Alt);
 
@@ -158,7 +172,7 @@ describe('CharacterGuildsComponent', () => {
   // ── leaveGuild ────────────────────────────────────────────────────────────
 
   it('leaveGuild calls store.leaveGuild with characterId and guildId', () => {
-    const { component, leaveGuild } = setup(3);
+    const { component, leaveGuild } = setup(makeChar(3));
 
     component.leaveGuild('g1');
 

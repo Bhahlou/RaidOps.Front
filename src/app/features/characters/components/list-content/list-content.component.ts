@@ -34,6 +34,7 @@ export class ListContentComponent {
   readonly openImport = output<void>();
   readonly deactivateCharacter = output<number>();
   readonly resyncCharacter = output<number>();
+  readonly editRaidSpecs = output<number>();
 
   readonly branchGroups = computed<BranchGroup[]>(() => {
     const branches = new Map<string, Map<string, Character[]>>();

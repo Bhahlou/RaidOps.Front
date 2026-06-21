@@ -35,6 +35,7 @@
                     [character]="char"
                     (resync)="resyncCharacter.emit(char.id)"
                     (deactivate)="deactivateCharacter.emit(char.id)"
+                    (editRaidSpecs)="editRaidSpecs.emit(char.id)"
                   />
                 }
               </div>

@@ -30,14 +30,14 @@
       }
     </span>
 
-    @if (character().specs.length > 0) {
+    @if (character().raidSpecs.length > 0) {
       <div class="char-specs">
-        @for (spec of character().specs; track spec.specId) {
-          <div class="spec" [class.spec--main]="spec.isMain" [title]="spec.name">
+        @for (spec of character().raidSpecs; track spec.specId) {
+          <div class="spec" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
             @if (spec.iconUrl) {
               <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
             } @else {
-              <span class="spec-name">{{ spec.name }}</span>
+              <span class="spec-name">{{ 'specs.' + spec.specId | transloco }}</span>
             }
           </div>
         }
@@ -59,9 +59,13 @@
 </article>
 
 <mat-menu #cardMenu="matMenu">
-  <button mat-menu-item (click)="resync.emit()">
-    <mat-icon>sync</mat-icon>
+  <button mat-menu-item class="resync-menu-item" (click)="resync.emit()">
+    <app-bnet-icon [size]="18" />
     <span>{{ 'characters.card.resync' | transloco }}</span>
+  </button>
+  <button mat-menu-item (click)="editRaidSpecs.emit()">
+    <img class="menu-icon" src="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" />
+    <span>{{ 'characters.card.editRaidSpecs' | transloco }}</span>
   </button>
   <button mat-menu-item class="menu-item--danger" (click)="deactivate.emit()">
     <mat-icon>person_remove</mat-icon>

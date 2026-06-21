@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { of, throwError } from 'rxjs';
 
 import { CharacterDetailComponent } from './character-detail.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { CharacterStore } from '../../stores/character.store';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { Character } from '../../models/character.model';
 import { User } from '../../../../core/models/user.model';
@@ -13,7 +16,7 @@ const makeChar = (overrides: Partial<Character> = {}): Character => ({
   id: 1, name: 'Bhahlounette', classId: 1, className: 'Druid', classColor: '#FF7C0A',
   raceId: 1, raceName: 'Night Elf', faction: 'ALLIANCE',
   branchName: 'Classic Anniversary', realmName: 'Thunderstrike', realmSlug: 'thunderstrike',
-  level: 60, itemLevel: null, avatarUrl: null, guildName: null, specs: [],
+  level: 60, itemLevel: null, avatarUrl: null, guildName: null, bnetSpecs: [], raidSpecs: [], guildMemberships: [],
   ...overrides,
 });
 
@@ -32,6 +35,15 @@ const setup = (chars: Character[] = [], user: User | null = null, params: Params
   const navigate = vi.fn();
   const { branch = BRANCH, realm = REALM, name = NAME } = params;
 
+  const storeMock = {
+    characterList: signal(chars),
+    resyncCharacter: vi.fn().mockReturnValue(of(makeChar())),
+    deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
+    loadCharacters: vi.fn().mockReturnValue(of(chars)),
+  };
+  const snackbarMock = { success: vi.fn(), error: vi.fn() };
+  const dialogMock = { open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }) };
+
   TestBed.configureTestingModule({
     imports: [CharacterDetailComponent],
     providers: [
@@ -48,13 +60,15 @@ const setup = (chars: Character[] = [], user: User | null = null, params: Params
       },
       { provide: Router, useValue: { navigate } },
       { provide: AuthStore, useValue: { user: signal(user) } },
-      { provide: CharacterStore, useValue: { characterList: signal(chars) } },
+      { provide: CharacterStore, useValue: storeMock },
+      { provide: SnackbarService, useValue: snackbarMock },
+      { provide: MatDialog, useValue: dialogMock },
     ],
   }).overrideComponent(CharacterDetailComponent, { set: { template: '', imports: [] } });
 
   const fixture = TestBed.createComponent(CharacterDetailComponent);
   fixture.detectChanges();
-  return { component: fixture.componentInstance, navigate };
+  return { component: fixture.componentInstance, navigate, storeMock, snackbarMock, dialogMock };
 };
 
 describe('CharacterDetailComponent', () => {
@@ -169,6 +183,133 @@ describe('CharacterDetailComponent', () => {
       const { component } = setup([], makeUser());
 
       expect(component.breadcrumbs()[2].label).toBe('…');
+    });
+  });
+
+  // ── resyncCharacter() ─────────────────────────────────────────────────────
+
+  describe('resyncCharacter()', () => {
+    it('does nothing when there is no character', () => {
+      const { component, storeMock } = setup([]);
+      component.resyncCharacter();
+      expect(storeMock.resyncCharacter).not.toHaveBeenCalled();
+    });
+
+    it('calls store.resyncCharacter and shows success snackbar', () => {
+      const char = makeChar();
+      const { component, storeMock, snackbarMock } = setup([char]);
+
+      component.resyncCharacter();
+
+      expect(storeMock.resyncCharacter).toHaveBeenCalledWith(char.id);
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.card.resyncSuccess');
+    });
+
+    it('shows error snackbar when the store call fails', () => {
+      const char = makeChar();
+      const { component, storeMock, snackbarMock } = setup([char]);
+      storeMock.resyncCharacter.mockReturnValue(throwError(() => new Error('fail')));
+
+      component.resyncCharacter();
+
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.card.resyncError');
+    });
+  });
+
+  // ── deactivateCharacter() ─────────────────────────────────────────────────
+
+  describe('deactivateCharacter()', () => {
+    it('does nothing when there is no character', () => {
+      const { component, dialogMock } = setup([]);
+      component.deactivateCharacter();
+      expect(dialogMock.open).not.toHaveBeenCalled();
+    });
+
+    it('opens the confirmation dialog', () => {
+      const { component, dialogMock } = setup([makeChar()]);
+      component.deactivateCharacter();
+      expect(dialogMock.open).toHaveBeenCalled();
+    });
+
+    it('does not deactivate when the user cancels', () => {
+      const { component, storeMock, dialogMock } = setup([makeChar()]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(false)) });
+
+      component.deactivateCharacter();
+
+      expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
+    });
+
+    it('deactivates and navigates to /characters when confirmed', () => {
+      const char = makeChar();
+      const { component, storeMock, navigate, dialogMock } = setup([char]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+
+      component.deactivateCharacter();
+
+      expect(storeMock.deactivateCharacter).toHaveBeenCalledWith(char.id);
+      expect(navigate).toHaveBeenCalledWith(['/characters']);
+    });
+
+    it('shows error snackbar when the store call fails after confirmation', () => {
+      const { component, storeMock, snackbarMock, dialogMock } = setup([makeChar()]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      storeMock.deactivateCharacter.mockReturnValue(throwError(() => new Error('fail')));
+
+      component.deactivateCharacter();
+
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.card.deactivateError');
+    });
+  });
+
+  // ── editRaidSpecs() ───────────────────────────────────────────────────────
+
+  describe('editRaidSpecs()', () => {
+    it('does nothing when there is no character', () => {
+      const { component, dialogMock } = setup([]);
+      component.editRaidSpecs();
+      expect(dialogMock.open).not.toHaveBeenCalled();
+    });
+
+    it('opens the raid-specs dialog in edit mode for the current character', () => {
+      const char = makeChar();
+      const { component, dialogMock } = setup([char]);
+
+      component.editRaidSpecs();
+
+      expect(dialogMock.open).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ data: { characters: [char], mode: 'edit' } }),
+      );
+    });
+
+    it('shows success when the dialog closes with success, without reloading (the store already patched locally)', () => {
+      const { component, storeMock, snackbarMock, dialogMock } = setup([makeChar()]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+
+      component.editRaidSpecs();
+
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.raidSpecs.submitSuccess');
+      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+    });
+
+    it('shows error snackbar when the dialog closes with error', () => {
+      const { component, snackbarMock, dialogMock } = setup([makeChar()]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+
+      component.editRaidSpecs();
+
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.raidSpecs.submitError');
+    });
+
+    it('does nothing extra when the dialog is cancelled', () => {
+      const { component, snackbarMock, dialogMock } = setup([makeChar()]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+
+      component.editRaidSpecs();
+
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+      expect(snackbarMock.error).not.toHaveBeenCalled();
     });
   });
 });

@@ -2,9 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { GuildMembership } from '../models/guild-membership.model';
 import { EligibleGuild } from '../models/eligible-guild.model';
-import { CharacterInGuild } from '../models/character-in-guild.model';
 import { CharacterRank } from '../models/character-rank.enum';
 
 /** Thin HTTP layer for guild roster membership endpoints. */
@@ -12,11 +10,6 @@ import { CharacterRank } from '../models/character-rank.enum';
 export class GuildMembershipService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;
-
-  /** Returns all guilds the given character is currently on the roster of. */
-  getCharacterMemberships(characterId: number): Observable<GuildMembership[]> {
-    return this.#http.get<GuildMembership[]>(`${this.#api}/characters/${characterId}/memberships`);
-  }
 
   /** Returns the guilds the given character is eligible to join. */
   getEligibleGuilds(characterId: number): Observable<EligibleGuild[]> {
@@ -44,10 +37,5 @@ export class GuildMembershipService {
     return this.#http.delete<{ message: string }>(
       `${this.#api}/characters/${characterId}/memberships/${guildId}`,
     );
-  }
-
-  /** Returns the requesting user's characters that are on the specified guild's roster. */
-  getMyCharactersInGuild(guildId: string): Observable<CharacterInGuild[]> {
-    return this.#http.get<CharacterInGuild[]>(`${this.#api}/guilds/${guildId}/my-characters`);
   }
 }

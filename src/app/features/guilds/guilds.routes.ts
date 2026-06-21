@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { discordAdminGuard } from './guards/discord-admin-guard';
 import { eligibleGuildGuard } from './guards/eligible-guild-guard';
 import { guildAccessGuard } from './guards/guild-access-guard';
+import { charactersResolver } from '../characters/characters.resolver';
 
 export const guildRoutes: Routes = [
   {
@@ -43,6 +44,7 @@ export const guildRoutes: Routes = [
           },
           {
             path: 'roster',
+            resolve: { characters: charactersResolver },
             loadComponent: () =>
               import('./pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
           },

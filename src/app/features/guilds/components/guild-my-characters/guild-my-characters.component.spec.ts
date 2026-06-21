@@ -3,45 +3,40 @@ import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
 import { GuildMyCharactersComponent } from './guild-my-characters.component';
-import { GuildMembershipStore } from '../../stores/guild-membership.store';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
-import { CharacterInGuild } from '../../models/character-in-guild.model';
+import { GuildMembership } from '../../models/guild-membership.model';
+
+const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
+  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  characterRank: rank, joinedAt: '2025-01-01',
+});
 
 const makeChar = (id: number, overrides: Partial<Character> = {}): Character => ({
   id, name: `Char${id}`, classId: 1, className: 'Druid', classColor: '#FF7C0A',
   raceId: 1, raceName: 'Night Elf', faction: 'ALLIANCE',
   branchName: 'Classic Anniversary', realmName: 'Thunderstrike', realmSlug: 'thunderstrike',
-  level: 60, itemLevel: null, avatarUrl: null, guildName: null, specs: [],
+  level: 60, itemLevel: null, avatarUrl: null, guildName: null, bnetSpecs: [], raidSpecs: [], guildMemberships: [],
   ...overrides,
-});
-
-const makeCharInGuild = (characterId: number): CharacterInGuild => ({
-  characterId, name: `Char${characterId}`, realmName: 'Thunderstrike',
-  className: 'Druid', classColor: '#FF7C0A', avatarUrl: null,
-  guildName: 'Epic Guild', characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
 });
 
 const setup = (opts: {
   guildId?: string;
-  myCharacters?: CharacterInGuild[];
   characterList?: Character[];
 } = {}) => {
-  const { guildId = 'g1', myCharacters = [], characterList = [] } = opts;
+  const { guildId = 'g1', characterList = [] } = opts;
 
-  const loadMyCharactersInGuild = vi.fn();
   const joinGuild  = vi.fn().mockReturnValue(of(undefined));
   const updateRank = vi.fn().mockReturnValue(of(undefined));
   const leaveGuild = vi.fn().mockReturnValue(of(undefined));
 
   const mockStore = {
-    myCharacterList:          signal(myCharacters),
-    isMyCharactersLoading:    signal(false),
+    characterList:            signal(characterList),
+    isCharactersLoading:      signal(false),
     joiningCharacterId:       signal<number | null>(null),
     leavingCharacterId:       signal<number | null>(null),
     updatingRankCharacterId:  signal<number | null>(null),
-    loadMyCharactersInGuild,
     joinGuild,
     updateRank,
     leaveGuild,
@@ -50,8 +45,7 @@ const setup = (opts: {
   TestBed.configureTestingModule({
     imports: [GuildMyCharactersComponent],
     providers: [
-      { provide: GuildMembershipStore, useValue: mockStore },
-      { provide: CharacterStore, useValue: { characterList: signal(characterList) } },
+      { provide: CharacterStore, useValue: mockStore },
     ],
   }).overrideComponent(GuildMyCharactersComponent, { set: { template: '', imports: [] } });
 
@@ -59,19 +53,12 @@ const setup = (opts: {
   fixture.componentRef.setInput('guildId', guildId);
   fixture.detectChanges();
 
-  return { component: fixture.componentInstance, loadMyCharactersInGuild, joinGuild, updateRank, leaveGuild };
+  return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild };
 };
 
 describe('GuildMyCharactersComponent', () => {
   it('should create', () => {
     expect(setup().component).toBeTruthy();
-  });
-
-  // ── effect — loadMyCharactersInGuild ──────────────────────────────────────
-
-  it('calls loadMyCharactersInGuild on construction with the guildId input', () => {
-    const { loadMyCharactersInGuild } = setup({ guildId: 'guild-42' });
-    expect(loadMyCharactersInGuild).toHaveBeenCalledWith('guild-42');
   });
 
   // ── showAddPanel ──────────────────────────────────────────────────────────
@@ -97,13 +84,29 @@ describe('GuildMyCharactersComponent', () => {
     });
   });
 
-  // ── addableCharacters ─────────────────────────────────────────────────────
+  // ── myCharacters / addableCharacters ─────────────────────────────────────
+
+  describe('myCharacters', () => {
+    it('returns characters with a membership in this guild', () => {
+      const { component } = setup({
+        guildId: 'g1',
+        characterList: [
+          makeChar(1, { guildMemberships: [makeMembership('g1')] }),
+          makeChar(2, { guildMemberships: [] }),
+        ],
+      });
+      expect(component.myCharacters().map(c => c.id)).toEqual([1]);
+    });
+  });
 
   describe('addableCharacters', () => {
     it('returns characters not already in the guild', () => {
       const { component } = setup({
-        myCharacters:  [makeCharInGuild(1)],
-        characterList: [makeChar(1), makeChar(2)],
+        guildId: 'g1',
+        characterList: [
+          makeChar(1, { guildMemberships: [makeMembership('g1')] }),
+          makeChar(2, { guildMemberships: [] }),
+        ],
       });
       expect(component.addableCharacters().map(c => c.id)).toEqual([2]);
     });
@@ -117,10 +120,31 @@ describe('GuildMyCharactersComponent', () => {
 
     it('returns empty when all characters are already in the guild', () => {
       const { component } = setup({
-        myCharacters:  [makeCharInGuild(1), makeCharInGuild(2)],
-        characterList: [makeChar(1), makeChar(2)],
+        guildId: 'g1',
+        characterList: [
+          makeChar(1, { guildMemberships: [makeMembership('g1')] }),
+          makeChar(2, { guildMemberships: [makeMembership('g1')] }),
+        ],
       });
       expect(component.addableCharacters()).toEqual([]);
+    });
+  });
+
+  // ── rankFor ───────────────────────────────────────────────────────────────
+
+  describe('rankFor', () => {
+    it('returns the membership rank for this guild', () => {
+      const char = makeChar(1, { guildMemberships: [makeMembership('g1', CharacterRank.Alt)] });
+      const { component } = setup({ guildId: 'g1', characterList: [char] });
+
+      expect(component.rankFor(char)).toBe(CharacterRank.Alt);
+    });
+
+    it('defaults to Main when no membership matches', () => {
+      const char = makeChar(1, { guildMemberships: [] });
+      const { component } = setup({ guildId: 'g1', characterList: [char] });
+
+      expect(component.rankFor(char)).toBe(CharacterRank.Main);
     });
   });
 
@@ -131,19 +155,14 @@ describe('GuildMyCharactersComponent', () => {
       const char = makeChar(1, { name: 'Bhahlounette', branchName: 'Classic Anniversary', realmSlug: 'thunderstrike' });
       const { component } = setup({ characterList: [char] });
 
-      expect(component.characterLink(1)).toEqual(['/characters', 'classic-anniversary', 'thunderstrike', 'bhahlounette']);
+      expect(component.characterLink(char)).toEqual(['/characters', 'classic-anniversary', 'thunderstrike', 'bhahlounette']);
     });
 
     it('converts underscores in branchName to dashes', () => {
       const char = makeChar(1, { name: 'Hero', branchName: 'Classic_Anniversary', realmSlug: 'realm' });
       const { component } = setup({ characterList: [char] });
 
-      expect(component.characterLink(1)?.[1]).toBe('classic-anniversary');
-    });
-
-    it('returns null when the character is not found', () => {
-      const { component } = setup();
-      expect(component.characterLink(999)).toBeNull();
+      expect(component.characterLink(char)[1]).toBe('classic-anniversary');
     });
   });
 

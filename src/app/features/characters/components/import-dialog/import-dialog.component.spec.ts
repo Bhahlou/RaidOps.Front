@@ -304,7 +304,10 @@ describe('ImportDialogComponent', () => {
       component.activate();
 
       expect(charService.activateCharacters).toHaveBeenCalledWith([1, 2]);
-      expect(mockClose).toHaveBeenCalledWith({ activated: 2 });
+      expect(mockClose).toHaveBeenCalledWith({
+        activated: 2,
+        activatedCharacterIds: [1, 2],
+      });
     });
 
     it('resets isActivating and closes with error on failure', () => {

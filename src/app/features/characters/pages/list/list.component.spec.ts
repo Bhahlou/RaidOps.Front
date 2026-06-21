@@ -21,7 +21,7 @@ const mockChar: Character = {
   id: 1, name: 'Char', classId: 1, className: 'Warrior', classColor: '#C69B3A',
   raceId: 1, raceName: 'Human', faction: 'ALLIANCE', branchName: 'Retail',
   realmName: 'Silvermoon', realmSlug: 'silvermoon', level: 80, itemLevel: null,
-  avatarUrl: null, guildName: null, specs: [],
+  avatarUrl: null, guildName: null, bnetSpecs: [], raidSpecs: [], guildMemberships: [],
 };
 
 describe('CharacterListComponent', () => {
@@ -32,7 +32,6 @@ describe('CharacterListComponent', () => {
     bnetAccount: ReturnType<typeof signal<BnetAccount | null | undefined>>;
     isCharactersLoading: ReturnType<typeof signal<boolean>>;
     characterList: ReturnType<typeof signal<Character[]>>;
-    loadBnetAccount: ReturnType<typeof vi.fn>;
     loadCharacters: ReturnType<typeof vi.fn>;
     deactivateCharacter: ReturnType<typeof vi.fn>;
     resyncCharacter: ReturnType<typeof vi.fn>;
@@ -50,7 +49,6 @@ describe('CharacterListComponent', () => {
       bnetAccount: signal(accountToEmit),
       isCharactersLoading: signal(false),
       characterList: signal([]),
-      loadBnetAccount: vi.fn().mockReturnValue(of(accountToEmit)),
       loadCharacters: vi.fn().mockReturnValue(of([])),
       deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
       resyncCharacter: vi.fn().mockReturnValue(of(mockChar)),
@@ -74,24 +72,6 @@ describe('CharacterListComponent', () => {
   };
 
   describe('ngOnInit', () => {
-    it('loads bnet account on init', () => {
-      setup();
-      component.ngOnInit();
-      expect(storeMock.loadBnetAccount).toHaveBeenCalled();
-    });
-
-    it('loads characters when account is linked', () => {
-      setup(null, mockAccount);
-      component.ngOnInit();
-      expect(storeMock.loadCharacters).toHaveBeenCalled();
-    });
-
-    it('does not load characters when account is null', () => {
-      setup(null, null);
-      component.ngOnInit();
-      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
-    });
-
     it('shows a BNet error snackbar when error query param is present', () => {
       vi.useFakeTimers();
       setup('BnetApiError');
@@ -201,16 +181,6 @@ describe('CharacterListComponent', () => {
       expect(dialogMock.open).toHaveBeenCalled();
     });
 
-    it('reloads characters when result.activated is positive', () => {
-      setup();
-      dialogMock.open.mockReturnValue({
-        afterClosed: vi.fn().mockReturnValue(of({ activated: 2 })),
-      });
-      component.openImportDialog();
-      expect(snackbarMock.success).toHaveBeenCalledWith('characters.import.importSuccess');
-      expect(storeMock.loadCharacters).toHaveBeenCalled();
-    });
-
     it('shows error snackbar when result.error is true', () => {
       setup();
       dialogMock.open.mockReturnValue({
@@ -229,6 +199,120 @@ describe('CharacterListComponent', () => {
       component.openImportDialog();
       // Sync dialog was opened as a follow-up
       expect(dialogMock.open).toHaveBeenCalledTimes(2);
+    });
+
+    describe('after a successful activation', () => {
+      const activatedChars: Character[] = [
+        { ...mockChar, id: 1 },
+        { ...mockChar, id: 2 },
+      ];
+
+      it('reloads characters and opens the raid-specs dialog with the newly activated ones', () => {
+        setup();
+        storeMock.loadCharacters.mockReturnValue(of(activatedChars));
+        dialogMock.open
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+
+        component.openImportDialog();
+
+        expect(storeMock.loadCharacters).toHaveBeenCalledWith(true);
+        expect(dialogMock.open).toHaveBeenNthCalledWith(2, expect.anything(),
+          expect.objectContaining({ data: { characters: activatedChars, mode: 'activate' } }));
+      });
+
+      it('shows success once raid specs are confirmed, without reloading again (the store already patched locally)', () => {
+        setup();
+        storeMock.loadCharacters.mockReturnValue(of(activatedChars));
+        dialogMock.open
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+
+        component.openImportDialog();
+
+        expect(snackbarMock.success).toHaveBeenCalledWith('characters.import.importSuccess');
+        expect(storeMock.loadCharacters).toHaveBeenCalledTimes(1);
+      });
+
+      it('rolls back activation when the raid-specs dialog is cancelled', () => {
+        setup();
+        storeMock.loadCharacters.mockReturnValue(of(activatedChars));
+        dialogMock.open
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+
+        component.openImportDialog();
+
+        expect(snackbarMock.error).toHaveBeenCalledWith('characters.raidSpecs.importRolledBack');
+        expect(storeMock.deactivateCharacter).toHaveBeenCalledWith(1);
+        expect(storeMock.deactivateCharacter).toHaveBeenCalledWith(2);
+      });
+
+      it('rolls back activation when raid-specs submission fails', () => {
+        setup();
+        storeMock.loadCharacters.mockReturnValue(of(activatedChars));
+        dialogMock.open
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
+          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+
+        component.openImportDialog();
+
+        expect(snackbarMock.error).toHaveBeenCalledWith('characters.raidSpecs.importRolledBack');
+        expect(storeMock.deactivateCharacter).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  describe('editRaidSpecs', () => {
+    it('does nothing when the character is not found', () => {
+      setup();
+      component.editRaidSpecs(999);
+      expect(dialogMock.open).not.toHaveBeenCalled();
+    });
+
+    it('opens the raid-specs dialog for the matching character', () => {
+      setup();
+      storeMock.characterList.set([mockChar]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+
+      component.editRaidSpecs(1);
+
+      expect(dialogMock.open).toHaveBeenCalledWith(expect.anything(),
+        expect.objectContaining({ data: { characters: [mockChar], mode: 'edit' } }));
+    });
+
+    it('shows success when the dialog closes with success, without reloading (the store already patched locally)', () => {
+      setup();
+      storeMock.characterList.set([mockChar]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+
+      component.editRaidSpecs(1);
+
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.raidSpecs.submitSuccess');
+      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+    });
+
+    it('shows error and does not roll back when the dialog closes with error', () => {
+      setup();
+      storeMock.characterList.set([mockChar]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+
+      component.editRaidSpecs(1);
+
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.raidSpecs.submitError');
+      expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
+    });
+
+    it('does nothing extra when the dialog is cancelled', () => {
+      setup();
+      storeMock.characterList.set([mockChar]);
+      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+
+      component.editRaidSpecs(1);
+
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+      expect(snackbarMock.error).not.toHaveBeenCalled();
+      expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
     });
   });
 
@@ -262,7 +346,7 @@ describe('CharacterListComponent', () => {
       dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
       component.linkBnet('eu');
       expect(snackbarMock.success).not.toHaveBeenCalled();
-      expect(storeMock.loadBnetAccount).not.toHaveBeenCalled();
+      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
     });
 
     it('does nothing when dialog closes with synced=false', () => {
@@ -272,28 +356,12 @@ describe('CharacterListComponent', () => {
       expect(snackbarMock.success).not.toHaveBeenCalled();
     });
 
-    it('shows syncSuccess snackbar and reloads account when synced=true', () => {
+    it('shows syncSuccess snackbar and force-reloads characters when synced=true', () => {
       setup();
       dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
       component.linkBnet('eu');
       expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.syncSuccess');
-      expect(storeMock.loadBnetAccount).toHaveBeenCalled();
-    });
-
-    it('loads characters after sync when account is still linked', () => {
-      setup(null, mockAccount);
-      storeMock.loadBnetAccount.mockReturnValue(of(mockAccount));
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
-      component.linkBnet('eu');
-      expect(storeMock.loadCharacters).toHaveBeenCalled();
-    });
-
-    it('does not load characters after sync when account is null', () => {
-      setup(null, null);
-      storeMock.loadBnetAccount.mockReturnValue(of(null));
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
-      component.linkBnet('eu');
-      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+      expect(storeMock.loadCharacters).toHaveBeenCalledWith(true);
     });
   });
 });

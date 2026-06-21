@@ -19,7 +19,9 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
   itemLevel: null,
   avatarUrl: null,
   guildName: null,
-  specs: [],
+  bnetSpecs: [],
+  raidSpecs: [],
+  guildMemberships: [],
   ...overrides,
 });
 

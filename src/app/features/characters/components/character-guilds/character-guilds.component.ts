@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
@@ -8,7 +8,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { GuildMembershipStore } from '../../../guilds/stores/guild-membership.store';
+import { CharacterStore } from '../../stores/character.store';
+import { Character } from '../../models/character.model';
 import { CharacterRank } from '../../../guilds/models/character-rank.enum';
 
 @Component({
@@ -33,18 +34,20 @@ import { CharacterRank } from '../../../guilds/models/character-rank.enum';
   styleUrl: './character-guilds.component.scss',
 })
 export class CharacterGuildsComponent {
-  readonly characterId = input.required<number>();
+  readonly character = input.required<Character>();
 
-  readonly #store = inject(GuildMembershipStore);
+  readonly #store = inject(CharacterStore);
 
   readonly DiscordIconType = DiscordIconType;
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
 
+  // ── Derived from the character input ─────────────────────────────────────
+
+  readonly memberships = computed(() => this.character().guildMemberships);
+
   // ── Store projections ─────────────────────────────────────────────────────
 
-  readonly memberships = this.#store.membershipList;
-  readonly isMembershipsLoading = this.#store.isMembershipsLoading;
   readonly eligibleGuilds = this.#store.eligibleGuildList;
   readonly isEligibleLoading = this.#store.isEligibleLoading;
   readonly joiningGuildId = this.#store.joiningGuildId;
@@ -58,17 +61,13 @@ export class CharacterGuildsComponent {
   /** Rank selected per guild in the eligible panel, defaults to Main. */
   readonly #rankSelections = signal(new Map<string, CharacterRank>());
 
-  constructor() {
-    effect(() => this.#store.loadMemberships(this.characterId()));
-  }
-
   toggleEligible(): void {
     if (this.showEligible()) {
       this.showEligible.set(false);
       return;
     }
     this.showEligible.set(true);
-    this.#store.loadEligibleGuilds(this.characterId());
+    this.#store.loadEligibleGuilds(this.character().id);
   }
 
   getRankSelection(guildId: string): CharacterRank {
@@ -80,17 +79,17 @@ export class CharacterGuildsComponent {
   }
 
   joinGuild(guildId: string): void {
-    this.#store.joinGuild(this.characterId(), guildId, this.getRankSelection(guildId)).subscribe({
+    this.#store.joinGuild(this.character().id, guildId, this.getRankSelection(guildId)).subscribe({
       next: () => this.showEligible.set(false),
     });
   }
 
   updateRank(guildId: string, rank: CharacterRank): void {
-    this.#store.updateRank(this.characterId(), guildId, rank).subscribe();
+    this.#store.updateRank(this.character().id, guildId, rank).subscribe();
   }
 
   leaveGuild(guildId: string): void {
-    this.#store.leaveGuild(this.characterId(), guildId).subscribe();
+    this.#store.leaveGuild(this.character().id, guildId).subscribe();
   }
 
   rankLabel(rank: CharacterRank): string {
