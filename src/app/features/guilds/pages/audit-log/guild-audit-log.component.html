@@ -190,8 +190,22 @@
             <div class="date-range-filter">
               <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-date-range-input [rangePicker]="picker">
-                  <input matStartDate [value]="dateRangeStart()" (dateChange)="setDateRangeStart($event.value)" [placeholder]="'auditLog.dateRangeStart' | transloco" />
-                  <input matEndDate [value]="dateRangeEnd()" (dateChange)="setDateRangeEnd($event.value)" [placeholder]="'auditLog.dateRangeEnd' | transloco" />
+                  <input
+                    matStartDate
+                    id="audit-log-date-range-start"
+                    [value]="dateRangeStart()"
+                    (dateChange)="setDateRangeStart($event.value)"
+                    [placeholder]="'auditLog.dateRangeStart' | transloco"
+                    [attr.aria-label]="'auditLog.dateRangeStart' | transloco"
+                  />
+                  <input
+                    matEndDate
+                    id="audit-log-date-range-end"
+                    [value]="dateRangeEnd()"
+                    (dateChange)="setDateRangeEnd($event.value)"
+                    [placeholder]="'auditLog.dateRangeEnd' | transloco"
+                    [attr.aria-label]="'auditLog.dateRangeEnd' | transloco"
+                  />
                 </mat-date-range-input>
                 <mat-datepicker-toggle matIconSuffix [for]="picker" />
                 <mat-date-range-picker #picker />
