@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { of } from 'rxjs';
 
 import { GuildRosterComponent } from './guild-roster.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
@@ -11,7 +12,12 @@ const setup = (guildId: string | null) => {
     providers: [
       {
         provide: ActivatedRoute,
-        useValue: { parent: { snapshot: { paramMap: { get: () => guildId } } } },
+        useValue: {
+          parent: {
+            snapshot: { paramMap: { get: () => guildId } },
+            paramMap: of(convertToParamMap(guildId ? { id: guildId } : {})),
+          },
+        },
       },
       { provide: AuthStore, useValue: { user: signal(null) } },
     ],

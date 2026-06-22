@@ -120,6 +120,12 @@ describe('RegisterComponent', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
 
+    it('does not redirect when guild was configured but is no longer registered (bot removed)', () => {
+      setup('abc', [makeGuild('abc', { isRegistered: false, isConfigured: true })]);
+
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
     it('redirects to /no-guild and clears loading on loadUser error', () => {
       setup('abc', [makeGuild('abc')], () => throwError(() => new Error('auth failed')));
 

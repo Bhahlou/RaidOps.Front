@@ -16,6 +16,7 @@
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Paramètres",
+      "auditLog": "Journal d'audit",
       "switch": "Changer de guilde"
     }
   },
@@ -65,7 +66,46 @@
       "threshold": "Seuil",
       "excluded": "Rôles exclus"
     },
-    "save": "Enregistrer les réglages"
+    "save": "Enregistrer les réglages",
+    "saveSuccess": "Réglages enregistrés."
+  },
+  "auditLog": {
+    "pageTitle": "Journal d'audit",
+    "pageSubtitle": "Historique des actions notables effectuées sur cette guilde.",
+    "filter": "Filtrer",
+    "filterSearchPlaceholder": "Rechercher…",
+    "filterAll": "Tout",
+    "clearFilter": "Réinitialiser",
+    "dateRangeStart": "Du",
+    "dateRangeEnd": "Au",
+    "loadMore": "Charger plus",
+    "empty": "Aucune activité enregistrée pour le moment.",
+    "noMatch": "Aucune entrée ne correspond à ce filtre.",
+    "columns": {
+      "actor": "Auteur",
+      "category": "Catégorie",
+      "action": "Action",
+      "change": "Avant / Après",
+      "time": "Date"
+    },
+    "categories": {
+      "Guild": "Guilde",
+      "Settings": "Paramètres",
+      "Roster": "Roster"
+    },
+    "settingsFields": {
+      "timezone": "Fuseau horaire",
+      "rosterMode": "Accès au roster",
+      "minRosterRoleId": "Seuil de rôle Discord modifié"
+    },
+    "actionLabels": {
+      "GuildRegistered": "Enregistrement",
+      "SettingsUpdated": "Paramètres modifiés",
+      "MemberJoined": "Membre rejoint",
+      "MemberLeft": "Membre parti",
+      "MemberExcluded": "Membre exclu",
+      "MemberRankUpdated": "Rang modifié"
+    }
   },
   "noGuild": {
     "noServer": {

@@ -58,6 +58,11 @@ export const guildRoutes: Routes = [
             loadComponent: () =>
               import('./pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),
           },
+          {
+            path: 'audit-log',
+            loadComponent: () =>
+              import('./pages/audit-log/guild-audit-log.component').then(m => m.GuildAuditLogComponent),
+          },
         ],
       },
     ],

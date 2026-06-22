@@ -83,6 +83,10 @@
               <mat-icon class="item-icon">settings</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.settings' | transloco }}</span>
             </a>
+            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'audit-log']" routerLinkActive="active-link">
+              <mat-icon class="item-icon">history</mat-icon>
+              <span class="sidenav-label">{{ 'sidenav.guild.auditLog' | transloco }}</span>
+            </a>
           }
         }
       </div>

@@ -58,7 +58,7 @@ export class RegisterComponent implements OnInit {
         this.loading.set(false);
         if (!this.guild()) {
           this.#router.navigate(['/no-guild']);
-        } else if (this.isAlreadyConfigured()) {
+        } else if (this.guild()?.isRegistered && this.isAlreadyConfigured()) {
           this.#router.navigate(['/guilds', this.#guildId, 'dashboard']);
         }
       },
