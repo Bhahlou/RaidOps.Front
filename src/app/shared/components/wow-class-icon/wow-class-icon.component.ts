@@ -17,6 +17,23 @@ const CLASS_ICON_NAMES: Record<number, string> = {
   13: 'evoker',
 };
 
+/** Official Blizzard class colors keyed by class ID. */
+export const CLASS_COLORS: Record<number, string> = {
+  1:  '#C79C6E',
+  2:  '#F58CBA',
+  3:  '#ABD473',
+  4:  '#FFF569',
+  5:  '#FFFFFF',
+  6:  '#C41F3B',
+  7:  '#0070DE',
+  8:  '#69CCF0',
+  9:  '#9482C9',
+  10: '#00FF96',
+  11: '#FF7D0A',
+  12: '#A330C9',
+  13: '#33937F',
+};
+
 /**
  * Renders a WoW class icon from the Blizzard CDN.
  * Accepts a `classId` (Blizzard's numeric ID), an optional `className` for

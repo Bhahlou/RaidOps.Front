@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { DateAdapter } from '@angular/material/core';
 import { provideRouter } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
@@ -27,6 +28,7 @@ describe('App', () => {
       providers: [
         provideRouter([]),
         { provide: TranslocoService, useValue: mockTransloco },
+        { provide: DateAdapter, useValue: { setLocale: () => {} } },
       ],
     }).compileComponents();
   });

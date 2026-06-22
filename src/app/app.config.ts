@@ -1,6 +1,7 @@
 import { ApplicationConfig, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { provideTransloco, provideTranslocoLoader } from '@jsverse/transloco';
 
 import { routes } from './app.routes';
@@ -24,5 +25,6 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     provideTranslocoLoader(TranslocoHttpLoader),
+    provideNativeDateAdapter(),
   ],
 };

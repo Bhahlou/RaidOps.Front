@@ -16,6 +16,7 @@
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Settings",
+      "auditLog": "Audit log",
       "switch": "Switch guild"
     }
   },
@@ -65,7 +66,46 @@
       "threshold": "Threshold",
       "excluded": "Excluded roles"
     },
-    "save": "Save settings"
+    "save": "Save settings",
+    "saveSuccess": "Settings saved."
+  },
+  "auditLog": {
+    "pageTitle": "Audit log",
+    "pageSubtitle": "History of notable actions performed on this guild.",
+    "filter": "Filter",
+    "filterSearchPlaceholder": "Search…",
+    "filterAll": "All",
+    "clearFilter": "Clear",
+    "dateRangeStart": "From",
+    "dateRangeEnd": "To",
+    "loadMore": "Load more",
+    "empty": "No activity recorded yet.",
+    "noMatch": "No entries match this filter.",
+    "columns": {
+      "actor": "Actor",
+      "category": "Category",
+      "action": "Action",
+      "change": "Before / After",
+      "time": "Date"
+    },
+    "categories": {
+      "Guild": "Guild",
+      "Settings": "Settings",
+      "Roster": "Roster"
+    },
+    "settingsFields": {
+      "timezone": "Timezone",
+      "rosterMode": "Roster access",
+      "minRosterRoleId": "Discord role threshold changed"
+    },
+    "actionLabels": {
+      "GuildRegistered": "Registration",
+      "SettingsUpdated": "Settings updated",
+      "MemberJoined": "Member joined",
+      "MemberLeft": "Member left",
+      "MemberExcluded": "Member excluded",
+      "MemberRankUpdated": "Rank updated"
+    }
   },
   "noGuild": {
     "noServer": {

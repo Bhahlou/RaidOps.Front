@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
+import { formatDiscordColor } from '../../../../shared/utils/discord-color.util';
 import { GuildSettings } from '../../models/guild-settings.model';
 import { RosterMode } from '../../models/roster-mode.enum';
 import { GuildSettingsService } from '../../services/guild-settings.service';
@@ -162,7 +163,7 @@ export class GuildSettingsFormComponent implements OnInit {
   }
 
   roleColor(role: DiscordRole): string | null {
-    return role.color === 0 ? null : '#' + role.color.toString(16).padStart(6, '0');
+    return formatDiscordColor(role.color);
   }
 
   roleIconUrl(role: DiscordRole): string | null {
@@ -186,6 +187,7 @@ export class GuildSettingsFormComponent implements OnInit {
       next: () => {
         this.submitting.set(false);
         this.#guildStore.patchSettings(this.guildId(), settings);
+        this.#snackbar.success('guildSettings.saveSuccess');
         this.saved.emit();
       },
       error: () => {

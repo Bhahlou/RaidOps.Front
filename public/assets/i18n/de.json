@@ -9,7 +9,16 @@
       "characters": "Charaktere",
       "equipment": "Ausrüstungsplaner"
     },
-    "guilds": "Meine Gilden"
+    "guilds": "Meine Gilden",
+    "guild": {
+      "dashboard": "Dashboard",
+      "calendar": "Kalender",
+      "roster": "Roster",
+      "loot": "Loot",
+      "settings": "Einstellungen",
+      "auditLog": "Audit-Log",
+      "switch": "Gilde wechseln"
+    }
   },
   "guildList": {
     "column": "Gilde",
@@ -21,13 +30,82 @@
     "admin": {
       "title": "Meine nicht registrierten Gilden",
       "subtitle": "Die folgenden Gilden sind nicht in RaidOps registriert, aber du bist deren Administrator. Du kannst sie registrieren, um RaidOps zu nutzen.",
-      "action": "Registrieren"
+      "action": "Registrieren",
+      "actionComplete": "Vervollständigen"
     }
   },
   "register": {
     "title": "Gilde registrieren",
+    "steps": {
+      "invite": "Bot einladen",
+      "settings": "Einstellungen"
+    },
     "description": "Um RaidOps auf diesem Server zu aktivieren, muss der Bot deinem Discord-Server beitreten. Indem du auf die Schaltfläche unten klickst, wirst du zu Discord weitergeleitet, um die Einladung zu autorisieren. Die Registrierung wird automatisch abgeschlossen, sobald der Bot eingeladen wurde.",
     "cta": "Bot einladen und registrieren"
+  },
+  "guildSettings": {
+    "pageTitle": "Gildeneinstellungen",
+    "pageSubtitle": "Konfiguriere die Zeitzone und die Roster-Zugriffsregeln.",
+    "timezone": {
+      "label": "Zeitzone",
+      "placeholder": "z. B. Europe/Paris",
+      "required": "Die Zeitzone ist erforderlich."
+    },
+    "rosterMode": {
+      "label": "Roster-Zugriff",
+      "open": "Für alle offen",
+      "discordRoleOnly": "Discord-Rolle erforderlich",
+      "hintOpen": "Jedes authentifizierte Mitglied kann dem Roster beitreten.",
+      "hintRole": "Mitglieder mit dieser Rolle oder einer höheren Rolle in der Discord-Hierarchie können dem Roster beitreten."
+    },
+    "roles": {
+      "label": "Roster-Zugriffsschwelle",
+      "loading": "Rollen werden geladen…",
+      "empty": "Keine zuweisbaren Rollen auf diesem Server gefunden.",
+      "hint": "Klicke auf eine Rolle, um die Mindestschwelle festzulegen. Diese Rolle und alle Rollen darüber erhalten Zugriff auf den Roster.",
+      "threshold": "Schwelle",
+      "excluded": "Ausgeschlossene Rollen"
+    },
+    "save": "Einstellungen speichern",
+    "saveSuccess": "Einstellungen gespeichert."
+  },
+  "auditLog": {
+    "pageTitle": "Audit-Log",
+    "pageSubtitle": "Verlauf der wichtigen Aktionen, die auf dieser Gilde durchgeführt wurden.",
+    "filter": "Filtern",
+    "filterSearchPlaceholder": "Suchen…",
+    "filterAll": "Alle",
+    "clearFilter": "Zurücksetzen",
+    "dateRangeStart": "Von",
+    "dateRangeEnd": "Bis",
+    "loadMore": "Mehr laden",
+    "empty": "Noch keine Aktivität erfasst.",
+    "noMatch": "Keine Einträge entsprechen diesem Filter.",
+    "columns": {
+      "actor": "Autor",
+      "category": "Kategorie",
+      "action": "Aktion",
+      "change": "Vorher / Nachher",
+      "time": "Datum"
+    },
+    "categories": {
+      "Guild": "Gilde",
+      "Settings": "Einstellungen",
+      "Roster": "Roster"
+    },
+    "settingsFields": {
+      "timezone": "Zeitzone",
+      "rosterMode": "Roster-Zugriff",
+      "minRosterRoleId": "Discord-Rollenschwelle geändert"
+    },
+    "actionLabels": {
+      "GuildRegistered": "Registrierung",
+      "SettingsUpdated": "Einstellungen geändert",
+      "MemberJoined": "Mitglied beigetreten",
+      "MemberLeft": "Mitglied ausgetreten",
+      "MemberExcluded": "Mitglied ausgeschlossen",
+      "MemberRankUpdated": "Rang geändert"
+    }
   },
   "noGuild": {
     "noServer": {
@@ -74,6 +152,10 @@
     "features": {
       "heading": "Alles, was du für ernsthaftes Raiden brauchst.",
       "subheading": "Ein Tool um deine Gilde zu organisieren, zu koordinieren und voranzubringen.",
+      "discord": {
+        "title": "Discord im Herzen der Gilde",
+        "desc": "Dein Discord-Server als Rückgrat. Discord-Rollen → RaidOps-Berechtigungen, Mitglieder automatisch synchronisiert. Der Bot benachrichtigt, protokolliert und verwaltet Anmeldungen, ohne dass du RaidOps öffnen musst."
+      },
       "roster": {
         "title": "Roster & Charaktere",
         "desc": "Verwalte, wer was spielt. Behalte Klasse, Rolle und Itemlevel jedes Mitglieds im Blick."
@@ -86,17 +168,13 @@
         "title": "Loot-Verwaltung",
         "desc": "Verteile Loot fair mit einer vollständigen Vergabehistorie pro Charakter."
       },
-      "permissions": {
-        "title": "Berechtigungen & Rollen",
-        "desc": "Ordne Discord-Rollen feingranularen Berechtigungen zu. Jeder Offizier sieht genau das, was er soll."
+      "assignments": {
+        "title": "Jeder Spieler weiß, was er zu tun hat",
+        "desc": "Assignments pro Boss — wer dispelt, wer soakt, wer unterbricht. Platzierungen in wenigen Klicks direkt aus RaidOps definiert und geteilt."
       },
-      "bot": {
-        "title": "Integrierter Discord-Bot",
-        "desc": "Event-Benachrichtigungen, Anwesenheitsbestätigungen und Loot-Meldungen direkt in deinen Channels."
-      },
-      "stats": {
-        "title": "Gildenstatistiken",
-        "desc": "Verfolge Fortschritt, Raid-Performance und Mitgliederentwicklung über alle Tiers."
+      "logs": {
+        "title": "Deine Logs, genau durchleuchtet",
+        "desc": "Verzauberungen, Edelsteine, Tränke, Talente — RaidOps analysiert deine Logs und erkennt fehlende Optimierungen, ganz ohne externe Tools."
       }
     }
   },

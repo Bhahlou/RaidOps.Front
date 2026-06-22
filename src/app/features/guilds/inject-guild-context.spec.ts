@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
 import { injectGuildContext } from './inject-guild-context';
 import { AuthStore } from '../../core/stores/auth.store';
@@ -18,12 +19,18 @@ const makeUser = (guilds: UserGuild[]): User => ({
   discordId: '123', name: 'TestUser', avatarHash: null, guilds,
 });
 
-const setup = (guildId: string | null, user: User | null = null) => {
+const setup = (
+  guildId: string | null,
+  user: User | null = null,
+  paramMap$: Observable<ParamMap> = of(convertToParamMap(guildId ? { id: guildId } : {})),
+) => {
   TestBed.configureTestingModule({
     providers: [
       {
         provide: ActivatedRoute,
-        useValue: { parent: { snapshot: { paramMap: { get: () => guildId } } } },
+        useValue: {
+          parent: { snapshot: { paramMap: { get: () => guildId } }, paramMap: paramMap$ },
+        },
       },
       { provide: AuthStore, useValue: { user: signal(user) } },
     ],
@@ -37,6 +44,23 @@ describe('injectGuildContext', () => {
 
   it('reads guildId from the parent route snapshot', () => {
     expect(setup('guild-42').guildId).toBe('guild-42');
+  });
+
+  // ── currentGuildId ────────────────────────────────────────────────────────────
+
+  describe('currentGuildId', () => {
+    it('starts at the snapshot value', () => {
+      expect(setup('g1').currentGuildId()).toBe('g1');
+    });
+
+    it('updates when the parent paramMap emits a different id', () => {
+      const paramMap$ = new BehaviorSubject(convertToParamMap({ id: 'g1' }));
+      const context = setup('g1', null, paramMap$);
+
+      paramMap$.next(convertToParamMap({ id: 'g2' }));
+
+      expect(context.currentGuildId()).toBe('g2');
+    });
   });
 
   // ── breadcrumbs — guild resolution ──────────────────────────────────────────
@@ -54,6 +78,17 @@ describe('injectGuildContext', () => {
 
     expect(crumbs[0].label).toBe('…');
     expect(crumbs[0].discordIcon).toBeUndefined();
+  });
+
+  it('reflects the new guild after the parent paramMap emits a different id', () => {
+    const guildA = makeGuild({ id: 'g1', name: 'Guild A' });
+    const guildB = makeGuild({ id: 'g2', name: 'Guild B' });
+    const paramMap$ = new BehaviorSubject(convertToParamMap({ id: 'g1' }));
+    const context = setup('g1', makeUser([guildA, guildB]), paramMap$);
+
+    paramMap$.next(convertToParamMap({ id: 'g2' }));
+
+    expect(context.breadcrumbs('sidenav.guild.settings')[0].label).toBe('Guild B');
   });
 
   // ── breadcrumbs — structure ──────────────────────────────────────────────────

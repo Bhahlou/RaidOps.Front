@@ -30,7 +30,7 @@ describe('GuildSettingsFormComponent', () => {
     loadSettings: ReturnType<typeof vi.fn>;
     patchSettings: ReturnType<typeof vi.fn>;
   };
-  let snackbar: { error: ReturnType<typeof vi.fn> };
+  let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
 
   const setup = (guildId = 'g1', storeSettings = settings()) => {
     settingsService = {
@@ -41,7 +41,7 @@ describe('GuildSettingsFormComponent', () => {
       loadSettings:   vi.fn().mockReturnValue(of(storeSettings)),
       patchSettings:  vi.fn(),
     };
-    snackbar = { error: vi.fn() };
+    snackbar = { error: vi.fn(), success: vi.fn() };
 
     TestBed.configureTestingModule({
       imports: [GuildSettingsFormComponent],
@@ -382,6 +382,7 @@ describe('GuildSettingsFormComponent', () => {
         'g1',
         expect.objectContaining({ timezone: 'UTC' }),
       );
+      expect(snackbar.success).toHaveBeenCalledWith('guildSettings.saveSuccess');
       expect(savedSpy).toHaveBeenCalled();
     });
 

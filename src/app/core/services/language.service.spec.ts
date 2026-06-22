@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { DateAdapter } from '@angular/material/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { vi } from 'vitest';
 
@@ -7,12 +8,14 @@ import { LanguageService } from './language.service';
 describe('LanguageService', () => {
   let setActiveLang: ReturnType<typeof vi.fn>;
   let getActiveLang: ReturnType<typeof vi.fn>;
+  let setLocale: ReturnType<typeof vi.fn>;
 
   const setup = () => {
     TestBed.configureTestingModule({
       providers: [
         LanguageService,
         { provide: TranslocoService, useValue: { setActiveLang, getActiveLang } },
+        { provide: DateAdapter, useValue: { setLocale } },
       ],
     });
     return TestBed.inject(LanguageService);
@@ -22,6 +25,7 @@ describe('LanguageService', () => {
     localStorage.clear();
     setActiveLang = vi.fn();
     getActiveLang = vi.fn().mockReturnValue('fr');
+    setLocale = vi.fn();
   });
 
   describe('initialisation', () => {
@@ -65,6 +69,14 @@ describe('LanguageService', () => {
 
       expect(setActiveLang).toHaveBeenCalledWith('en');
     });
+
+    it('syncs the date adapter locale to the resolved initial lang', () => {
+      localStorage.setItem('lang', 'de');
+
+      setup();
+
+      expect(setLocale).toHaveBeenCalledWith('de');
+    });
   });
 
   describe('setLang', () => {
@@ -83,8 +95,17 @@ describe('LanguageService', () => {
       service.setLang('zz');
 
       expect(localStorage.getItem('lang')).toBeNull();
-      // setActiveLang called once by constructor, not again
+      // setActiveLang/setLocale called once by constructor, not again
       expect(setActiveLang).toHaveBeenCalledOnce();
+      expect(setLocale).toHaveBeenCalledOnce();
+    });
+
+    it('syncs the date adapter locale to the new lang', () => {
+      const service = setup();
+
+      service.setLang('de');
+
+      expect(setLocale).toHaveBeenLastCalledWith('de');
     });
   });
 

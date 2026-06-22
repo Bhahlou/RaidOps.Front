@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { DateAdapter } from '@angular/material/core';
 import { TranslocoService } from '@jsverse/transloco';
 
 const STORAGE_KEY = 'lang';
@@ -8,9 +9,12 @@ type Lang = (typeof AVAILABLE_LANGS)[number];
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   readonly #transloco = inject(TranslocoService);
+  readonly #dateAdapter = inject(DateAdapter<Date>);
 
   constructor() {
-    this.#transloco.setActiveLang(this.#resolveInitialLang());
+    const lang = this.#resolveInitialLang();
+    this.#transloco.setActiveLang(lang);
+    this.#dateAdapter.setLocale(lang);
   }
 
   get activeLang(): Lang {
@@ -25,6 +29,7 @@ export class LanguageService {
     if (!AVAILABLE_LANGS.includes(lang as Lang)) return;
     localStorage.setItem(STORAGE_KEY, lang);
     this.#transloco.setActiveLang(lang);
+    this.#dateAdapter.setLocale(lang);
   }
 
   #resolveInitialLang(): Lang {

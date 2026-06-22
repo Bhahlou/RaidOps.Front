@@ -101,11 +101,7 @@
       type="submit"
       [disabled]="form.invalid || submitting()"
     >
-      @if (submitting()) {
-        <mat-spinner diameter="18" />
-      } @else {
-        <mat-icon>check_circle</mat-icon>
-      }
+      <mat-icon>check_circle</mat-icon>
       {{ 'guildSettings.save' | transloco }}
     </button>
   </div>
