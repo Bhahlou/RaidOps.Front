@@ -9,7 +9,7 @@ import { LangSelectorComponent } from '../../components/lang-selector/lang-selec
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { AuthService } from '../../../core/services/auth.service';
-import { environment } from '../../../../environments/environment';
+import { EnvBrandingService } from '../../../core/services/env-branding.service';
 
 @Component({
   selector: 'app-header',
@@ -31,7 +31,7 @@ export class HeaderComponent {
   readonly #authService = inject(AuthService);
   readonly #router = inject(Router);
 
-  readonly isProd = environment.production;
+  readonly envBranding = inject(EnvBrandingService);
   readonly iconType = DiscordIconType.User;
 
   readonly isAuthenticated = this.#authStore.isAuthenticated;

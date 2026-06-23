@@ -5,7 +5,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
 import { App } from './app';
-import { environment } from '../environments/environment';
+import { EnvBrandingService } from './core/services/env-branding.service';
 
 const mockTransloco = {
   getActiveLang: () => 'fr',
@@ -44,9 +44,7 @@ describe('App', () => {
 
   it('sets favicon to the correct URL for the current environment', () => {
     TestBed.createComponent(App);
-    const expected = environment.production
-      ? 'assets/Logo no background.svg'
-      : 'assets/Logo no background DEV.svg';
+    const expected = TestBed.inject(EnvBrandingService).logoPath;
     expect(faviconEl.getAttribute('href')).toBe(expected);
   });
 

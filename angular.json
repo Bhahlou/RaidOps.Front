@@ -72,6 +72,14 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "acceptance": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.acceptance.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -84,6 +92,12 @@
             },
             "development": {
               "buildTarget": "raidops-front:build:development",
+              "ssl": true,
+              "sslCert": "localhost.pem",
+              "sslKey": "localhost-key.pem"
+            },
+            "acceptance": {
+              "buildTarget": "raidops-front:build:production,acceptance",
               "ssl": true,
               "sslCert": "localhost.pem",
               "sslKey": "localhost-key.pem"
