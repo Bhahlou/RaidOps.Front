@@ -9,8 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './icon-card.component.scss',
 })
 export class IconCardComponent {
-  /** Material icon name displayed in the card header. */
-  readonly icon = input.required<string>();
+  /** Material icon name displayed in the card header. Ignored when `iconSrc` is set. */
+  readonly icon = input<string>();
+
+  /** Image URL displayed instead of the Material icon (e.g. a brand logo). */
+  readonly iconSrc = input<string>();
 
   /** Card title, already translated by the caller. */
   readonly title = input.required<string>();

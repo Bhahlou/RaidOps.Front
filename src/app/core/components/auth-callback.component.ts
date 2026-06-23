@@ -20,7 +20,7 @@ export class AuthCallbackComponent implements OnInit {
 
   ngOnInit(): void {
     this.#authStore.loadUser().subscribe({
-      next: () => this.#router.navigate(['/guilds']),
+      next: () => this.#router.navigate(['/get-started']),
       error: () => this.#router.navigate(['/home']),
     });
   }

@@ -1,0 +1,186 @@
+// ── Dialog states (loading / error / empty) ─────────────────────────────────
+
+.dialog-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  &--error {
+    color: var(--mat-sys-error);
+
+    mat-icon {
+      opacity: 1;
+    }
+  }
+}
+
+// ── Search field ─────────────────────────────────────────────────────────────
+
+.search-field {
+  width: 100%;
+  margin-bottom: 8px;
+
+  // Compact height
+  .mat-mdc-form-field-infix {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    min-height: unset !important;
+  }
+}
+
+// ── Results ──────────────────────────────────────────────────────────────────
+
+// Kept separate from .search-field so the field stays fixed in view while a long
+// (potentially nested-accordion) result list scrolls on its own underneath it.
+.results-scroll {
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+// ── Accordion panels ─────────────────────────────────────────────────────────
+
+// Differentiate realm header from character rows without ::ng-deep on global tokens.
+:host ::ng-deep {
+  .mat-expansion-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 8px !important;
+    margin-bottom: 6px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .mat-expansion-panel-header {
+      background: var(--mat-sys-surface-container-high) !important;
+      border-radius: 8px 8px 0 0;
+
+      &.mat-expanded {
+        border-radius: 8px 8px 0 0;
+      }
+      &:not(.mat-expanded) {
+        border-radius: 8px;
+      }
+
+      &:hover {
+        background: var(--mat-sys-surface-container-highest) !important;
+      }
+    }
+
+    .mat-expansion-panel-body {
+      padding: 4px 0 4px;
+      background: var(--mat-sys-surface-container-low);
+      border-radius: 0 0 8px 8px;
+    }
+  }
+}
+
+// ── Branch + Realm headers ────────────────────────────────────────────────────
+
+.branch-header {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface);
+}
+
+.branch-label {
+  letter-spacing: 0.02em;
+}
+
+.realm-accordion {
+  margin: 4px 0;
+}
+
+.realm-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.realm-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface-variant);
+  margin-left: 2px;
+}
+
+.char-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.char-row {
+  display: grid;
+  // checkbox (40px = full ripple zone) | class icon | name | level | faction icon | badge
+  grid-template-columns: 40px 24px 1fr 32px 20px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+  // button reset
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-highest);
+  }
+
+  &--imported {
+    opacity: 0.45;
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.char-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.char-level {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+  text-align: right;
+}
+
+.already-imported-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  opacity: 0.7;
+}

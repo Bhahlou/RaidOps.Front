@@ -1,0 +1,24 @@
+.step-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.step-desc {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.bnet-button-row {
+  display: flex;
+  justify-content: center;
+}
+
+.step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}

@@ -8,6 +8,7 @@ import { AuthStore } from '../../../../core/stores/auth.store';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { UserGuild } from '../../../../core/models/user-guild.model';
 import { User } from '../../../../core/models/user.model';
+import { GuildAccessLevel } from '../../../../core/models/guild-access-level.enum';
 
 const makeGuild = (id: string, overrides?: Partial<UserGuild>): UserGuild => ({
   id,
@@ -16,6 +17,7 @@ const makeGuild = (id: string, overrides?: Partial<UserGuild>): UserGuild => ({
   isRegistered: false,
   isConfigured: false,
   isAdmin: true,
+  accessLevel: GuildAccessLevel.Officer,
   ...overrides,
 });
 

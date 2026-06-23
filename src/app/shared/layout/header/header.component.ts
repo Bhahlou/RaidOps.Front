@@ -38,7 +38,7 @@ export class HeaderComponent {
   readonly user = this.#authStore.user;
 
   onLoginClick(): void {
-    this.#authService.signup();
+    this.#authService.signup(this.#router.url.startsWith('/get-started') ? 'get-started' : 'home');
   }
 
   onLogoutClick(): void {

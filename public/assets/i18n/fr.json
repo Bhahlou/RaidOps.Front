@@ -119,6 +119,46 @@
       "action": "Enregistrer"
     }
   },
+  "getStarted": {
+    "title": "Bienvenue sur RaidOps",
+    "subtitle": "Suis ces quelques étapes pour configurer ton compte et rejoindre ou enregistrer ta guilde.",
+    "steps": {
+      "discord": "Discord",
+      "guild": "Guilde",
+      "bnet": "Battle.net",
+      "link": "Roster"
+    },
+    "discordStep": {
+      "description": "Discord est la colonne vertébrale de RaidOps. Nous utilisons ton compte Discord comme compte principal RaidOps et pour accéder à la liste des serveurs sur lesquels tu es. Connecte-toi pour commencer.",
+      "cta": "Se connecter avec Discord"
+    },
+    "guildStep": {
+      "intro": "Derrière chaque guilde RaidOps, il y a un serveur Discord, permettant de synchroniser les permissions Discord, la liste des joueurs, et plus encore.",
+      "registered": {
+        "title": "Guildes déjà accessibles",
+        "subtitle": "Tu trouveras ci-dessous les guildes déjà enregistrées sur RaidOps, et si leur roster t'est accessible ou pas.",
+        "publicOnly": "Accès limité",
+        "rosterReady": "Roster accessible"
+      },
+      "admin": {
+        "title": "Guildes que tu peux enregistrer",
+        "subtitle": "Tu trouveras ci-dessous les serveurs Discord dont tu es administrateur, que tu pourrais enregistrer toi-même pour utiliser RaidOps.",
+        "action": "Enregistrer",
+        "settingsSubtitle": "Le bot a été invité — termine la configuration pour finaliser l'enregistrement."
+      },
+      "continue": "Continuer",
+      "empty": {
+        "title": "Aucune guilde disponible",
+        "description": "Aucune de tes guildes n'est enregistrée dans RaidOps, et tu n'es administrateur d'aucun serveur Discord. Rejoins un serveur déjà enregistré, ou deviens administrateur d'un serveur pour l'enregistrer toi-même."
+      }
+    },
+    "bnetStep": {
+      "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement."
+    },
+    "linkStep": {
+      "finish": "Terminer"
+    }
+  },
   "characterDetail": {
     "guilds": {
       "title": "Mes guildes",
@@ -126,7 +166,19 @@
       "leave": "Quitter la guilde",
       "joinButton": "Rejoindre une guilde",
       "noEligible": "Aucune guilde accessible pour ce personnage.",
-      "join": "Rejoindre"
+      "join": "Rejoindre",
+      "joinSuccess": "Personnage ajouté au roster.",
+      "leaveSuccess": "Personnage retiré du roster.",
+      "rankUpdateSuccess": "Rang mis à jour.",
+      "errors": {
+        "alreadyMember": "Ce personnage est déjà sur le roster de cette guilde.",
+        "notAMember": "Ce personnage n'est plus sur le roster de cette guilde.",
+        "rosterAccessDenied": "Tu n'as pas le rôle Discord requis pour rejoindre ce roster.",
+        "guildNotConfigured": "Les réglages de cette guilde n'ont pas encore été configurés.",
+        "forbidden": "Tu n'es pas membre de ce serveur Discord.",
+        "guildBotNotPresent": "Le bot RaidOps n'est pas présent sur ce serveur Discord.",
+        "generic": "Une erreur est survenue."
+      }
     }
   },
   "roster": {
@@ -180,7 +232,8 @@
   },
   "errors": {
     "network": "Erreur réseau. Vérifie ta connexion.",
-    "server": "Erreur serveur. Réessaie dans quelques instants."
+    "server": "Erreur serveur. Réessaie dans quelques instants.",
+    "discordLoginCancelled": "Connexion Discord annulée."
   },
   "characters": {
     "bnet": {

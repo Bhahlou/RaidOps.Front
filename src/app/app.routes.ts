@@ -24,6 +24,11 @@ export const routes: Routes = [
           import('./core/components/bnet-callback.component').then(m => m.BnetCallbackComponent),
       },
       {
+        path: 'get-started',
+        loadComponent: () =>
+          import('./features/get-started/get-started.component').then(m => m.GetStartedComponent),
+      },
+      {
         path: '',
         canActivate: [authGuard],
         children: [

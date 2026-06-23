@@ -30,8 +30,12 @@ export class AuthService {
     return this.#http.post<void>(`${this.#api}/discordAuth/logout`, {});
   }
 
-  /** Redirects the browser to the Discord OAuth2 sign-up flow. */
-  signup(): void {
-    this.#location.assign(`${this.#api}/discordAuth/signup`);
+  /**
+   * Redirects the browser to the Discord OAuth2 sign-up flow. returnTo is carried through the
+   * OAuth state so that if the user cancels Discord's consent screen, the backend sends them
+   * back to the page they started from instead of a fixed page.
+   */
+  signup(returnTo: 'home' | 'get-started'): void {
+    this.#location.assign(`${this.#api}/discordAuth/signup?returnTo=${returnTo}`);
   }
 }

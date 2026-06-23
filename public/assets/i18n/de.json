@@ -119,6 +119,46 @@
       "action": "Registrieren"
     }
   },
+  "getStarted": {
+    "title": "Willkommen bei RaidOps",
+    "subtitle": "Befolge diese paar Schritte, um dein Konto einzurichten und deiner Gilde beizutreten oder sie zu registrieren.",
+    "steps": {
+      "discord": "Discord",
+      "guild": "Gilde",
+      "bnet": "Battle.net",
+      "link": "Roster"
+    },
+    "discordStep": {
+      "description": "Discord ist das Rückgrat von RaidOps. Wir verwenden dein Discord-Konto als dein RaidOps-Hauptkonto und um auf die Liste der Server zuzugreifen, denen du angehörst. Melde dich an, um zu beginnen.",
+      "cta": "Mit Discord anmelden"
+    },
+    "guildStep": {
+      "intro": "Hinter jeder RaidOps-Gilde steht ein Discord-Server.",
+      "registered": {
+        "title": "Bereits zugängliche Gilden",
+        "subtitle": "Hier siehst du die bereits in RaidOps registrierten Gilden und ob du Zugriff auf ihr Roster hast.",
+        "publicOnly": "Eingeschränkter Zugriff",
+        "rosterReady": "Roster zugänglich"
+      },
+      "admin": {
+        "title": "Gilden, die du registrieren kannst",
+        "subtitle": "Hier siehst du die Discord-Server, die du administrierst und selbst registrieren könntest, um RaidOps zu nutzen.",
+        "action": "Registrieren",
+        "settingsSubtitle": "Der Bot wurde eingeladen — schließe die Einrichtung ab, um die Registrierung zu vervollständigen."
+      },
+      "continue": "Weiter",
+      "empty": {
+        "title": "Keine Gilde verfügbar",
+        "description": "Keine deiner Gilden ist in RaidOps registriert, und du bist Administrator keines Discord-Servers. Tritt einem bereits registrierten Server bei, oder werde Administrator eines Servers, um ihn selbst zu registrieren."
+      }
+    },
+    "bnetStep": {
+      "notLinkedDescription": "Verknüpfe dein Battle.net-Konto, um deine Charaktere zu importieren und zu aktivieren."
+    },
+    "linkStep": {
+      "finish": "Fertigstellen"
+    }
+  },
   "characterDetail": {
     "guilds": {
       "title": "Meine Gilden",
@@ -126,7 +166,19 @@
       "leave": "Gilde verlassen",
       "joinButton": "Einer Gilde beitreten",
       "noEligible": "Keine Gilde für diesen Charakter verfügbar.",
-      "join": "Beitreten"
+      "join": "Beitreten",
+      "joinSuccess": "Charakter zum Roster hinzugefügt.",
+      "leaveSuccess": "Charakter vom Roster entfernt.",
+      "rankUpdateSuccess": "Rang aktualisiert.",
+      "errors": {
+        "alreadyMember": "Dieser Charakter ist bereits im Roster dieser Gilde.",
+        "notAMember": "Dieser Charakter ist nicht mehr im Roster dieser Gilde.",
+        "rosterAccessDenied": "Du hast nicht die erforderliche Discord-Rolle, um diesem Roster beizutreten.",
+        "guildNotConfigured": "Die Einstellungen dieser Gilde wurden noch nicht konfiguriert.",
+        "forbidden": "Du bist kein Mitglied dieses Discord-Servers.",
+        "guildBotNotPresent": "Der RaidOps-Bot ist auf diesem Discord-Server nicht vorhanden.",
+        "generic": "Etwas ist schiefgelaufen."
+      }
     }
   },
   "roster": {
@@ -180,7 +232,8 @@
   },
   "errors": {
     "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
-    "server": "Serverfehler. Bitte versuche es später erneut."
+    "server": "Serverfehler. Bitte versuche es später erneut.",
+    "discordLoginCancelled": "Discord-Anmeldung abgebrochen."
   },
   "characters": {
     "bnet": {

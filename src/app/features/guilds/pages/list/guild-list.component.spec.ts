@@ -7,6 +7,7 @@ import { GuildListComponent } from './guild-list.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { UserGuild } from '../../../../core/models/user-guild.model';
 import { User } from '../../../../core/models/user.model';
+import { GuildAccessLevel } from '../../../../core/models/guild-access-level.enum';
 
 const guild = (overrides: Partial<UserGuild>): UserGuild => ({
   id: 'g1',
@@ -15,6 +16,7 @@ const guild = (overrides: Partial<UserGuild>): UserGuild => ({
   isRegistered: false,
   isConfigured: false,
   isAdmin: false,
+  accessLevel: GuildAccessLevel.Public,
   ...overrides,
 });
 

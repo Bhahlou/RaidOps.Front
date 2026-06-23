@@ -29,12 +29,12 @@ describe('AuthCallbackComponent', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('navigates to /guilds on successful loadUser', () => {
+  it('navigates to /get-started on successful loadUser', () => {
     setup(() => of(undefined));
 
     fixture.detectChanges();
 
-    expect(navigate).toHaveBeenCalledWith(['/guilds']);
+    expect(navigate).toHaveBeenCalledWith(['/get-started']);
   });
 
   it('navigates to /home when loadUser fails', () => {

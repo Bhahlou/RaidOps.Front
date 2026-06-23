@@ -119,6 +119,46 @@
       "action": "Register"
     }
   },
+  "getStarted": {
+    "title": "Welcome to RaidOps",
+    "subtitle": "Follow these few steps to set up your account and join or register your guild.",
+    "steps": {
+      "discord": "Discord",
+      "guild": "Guild",
+      "bnet": "Battle.net",
+      "link": "Roster"
+    },
+    "discordStep": {
+      "description": "Discord is the backbone of RaidOps. We use your Discord account as your main RaidOps account and to access the list of servers you belong to. Sign in to get started.",
+      "cta": "Sign in with Discord"
+    },
+    "guildStep": {
+      "intro": "Behind every RaidOps guild, there's a Discord server.",
+      "registered": {
+        "title": "Guilds already accessible",
+        "subtitle": "Below are the guilds already registered on RaidOps, and whether their roster is accessible to you.",
+        "publicOnly": "Limited access",
+        "rosterReady": "Roster accessible"
+      },
+      "admin": {
+        "title": "Guilds you can register",
+        "subtitle": "Below are the Discord servers you administer, which you could register yourself to use RaidOps.",
+        "action": "Register",
+        "settingsSubtitle": "The bot has been invited — finish the setup to complete registration."
+      },
+      "continue": "Continue",
+      "empty": {
+        "title": "No guild available",
+        "description": "None of your guilds is registered in RaidOps, and you're not an administrator of any Discord server. Join an already-registered server, or become an administrator of one to register it yourself."
+      }
+    },
+    "bnetStep": {
+      "notLinkedDescription": "Link your Battle.net account to import and activate your characters."
+    },
+    "linkStep": {
+      "finish": "Finish"
+    }
+  },
   "characterDetail": {
     "guilds": {
       "title": "My guilds",
@@ -126,7 +166,19 @@
       "leave": "Leave guild",
       "joinButton": "Join a guild",
       "noEligible": "No guild is accessible for this character.",
-      "join": "Join"
+      "join": "Join",
+      "joinSuccess": "Character added to the roster.",
+      "leaveSuccess": "Character removed from the roster.",
+      "rankUpdateSuccess": "Rank updated.",
+      "errors": {
+        "alreadyMember": "This character is already on this guild's roster.",
+        "notAMember": "This character is no longer on this guild's roster.",
+        "rosterAccessDenied": "You don't have the required Discord role to join this roster.",
+        "guildNotConfigured": "This guild's settings haven't been configured yet.",
+        "forbidden": "You're not a member of this Discord server.",
+        "guildBotNotPresent": "The RaidOps bot isn't present on this Discord server.",
+        "generic": "Something went wrong."
+      }
     }
   },
   "roster": {
@@ -180,7 +232,8 @@
   },
   "errors": {
     "network": "Network error. Please check your connection.",
-    "server": "Server error. Please try again later."
+    "server": "Server error. Please try again later.",
+    "discordLoginCancelled": "Discord login cancelled."
   },
   "characters": {
     "bnet": {
