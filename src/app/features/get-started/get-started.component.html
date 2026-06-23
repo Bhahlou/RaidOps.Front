@@ -1,0 +1,47 @@
+@if (isResolving()) {
+  <div class="get-started-loading">
+    <mat-spinner [diameter]="40" />
+  </div>
+} @else {
+  <div class="get-started-container">
+    <app-icon-card
+      iconSrc="assets/Logo no background.svg"
+      [title]="'getStarted.title' | transloco"
+      [subtitle]="'getStarted.subtitle' | transloco"
+    >
+      <mat-stepper [selectedIndex]="stepIndex()" linear class="get-started-stepper">
+
+        <mat-step [label]="'getStarted.steps.discord' | transloco" [completed]="isAuthenticated()" [editable]="false">
+          @if (!isAuthenticated()) {
+            <p class="step-desc">{{ 'getStarted.discordStep.description' | transloco }}</p>
+            <div class="discord-button-row">
+              <button mat-flat-button class="discord-button" (click)="signup()">
+                <app-discord-brand-icon [size]="20" />
+                {{ 'getStarted.discordStep.cta' | transloco }}
+              </button>
+            </div>
+          }
+        </mat-step>
+
+        <mat-step [label]="'getStarted.steps.guild' | transloco" [completed]="isGuildStepDone()">
+          <ng-template matStepContent>
+            <app-get-started-guild-step (continue)="continuePastGuildStep()" />
+          </ng-template>
+        </mat-step>
+
+        <mat-step [label]="'getStarted.steps.bnet' | transloco" [completed]="isBnetStepDone()">
+          <ng-template matStepContent>
+            <app-get-started-bnet-step />
+          </ng-template>
+        </mat-step>
+
+        <mat-step [label]="'getStarted.steps.link' | transloco" [completed]="isLinkStepDone()">
+          <ng-template matStepContent>
+            <app-get-started-link-step />
+          </ng-template>
+        </mat-step>
+
+      </mat-stepper>
+    </app-icon-card>
+  </div>
+}

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { SnackbarService } from '../../core/services/snackbar.service';
 
 const DISCORD_SVG =
   'M19.7322 4.86589C18.2661 4.1827 16.7208 3.70197 15.1356 3.42871C14.9194 3.82449 14.7211 4.22975 14.5462 4.64448C12.8595 4.38995 11.1404 4.38995 9.45262 4.64448C9.27322 4.22975 9.07608 3.82449 8.85991 3.43339C7.269 3.70676 5.72375 4.18738 4.25762 4.87069C1.34317 9.23888 0.556648 13.5034 0.952146 17.7019C2.65781 18.9788 4.56511 19.9495 6.59274 20.5716C7.0484 19.9495 7.45281 19.2853 7.79818 18.5924C7.13976 18.3427 6.50141 18.0365 5.89423 17.6689C6.05577 17.5512 6.21173 17.4333 6.36325 17.3013C9.93502 19.0072 14.0638 19.0072 17.6366 17.3013C17.7882 17.4286 17.9442 17.5512 18.1002 17.6689C17.4941 18.0318 16.8546 18.3427 16.1972 18.5924C16.5471 19.2853 16.947 19.9449 17.4016 20.5669C19.4292 19.9449 21.3366 18.9742 23.0422 17.6972H23.0478C23.5112 12.8342 22.2568 8.61209 19.7322 4.86589ZM8.29729 15.1187C7.19768 15.1187 6.29195 14.0961 6.29195 12.8521C6.29195 11.6082 7.17541 10.5856 8.29729 10.5856C9.41919 10.5856 10.3194 11.6082 10.3015 12.8521C10.3015 14.0961 9.41362 15.1187 8.29729 15.1187ZM15.6993 15.1187C14.5997 15.1187 13.6939 14.0961 13.6939 12.8521C13.6939 11.6082 14.5818 10.5856 15.6993 10.5856C16.8156 10.5856 17.7213 11.6082 17.7035 12.8521C17.7035 14.0961 16.8156 15.1187 15.6993 15.1187Z';
@@ -13,7 +14,10 @@ const DISCORD_SVG =
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  readonly #route = inject(ActivatedRoute);
+  readonly #snackbar = inject(SnackbarService);
+
   protected readonly features: { icon?: string; svg?: string; key: string }[] = [
     { svg: DISCORD_SVG, key: 'discord' },
     { icon: 'groups', key: 'roster' },
@@ -22,4 +26,12 @@ export class HomeComponent {
     { icon: 'checklist', key: 'assignments' },
     { icon: 'query_stats', key: 'logs' },
   ];
+
+  ngOnInit(): void {
+    if (this.#route.snapshot.queryParamMap.get('error') === 'access_denied') {
+      // Delayed because Transloco's translation file may not have finished loading yet on a
+      // fresh page load — translating right away can show the raw key instead of the message.
+      setTimeout(() => this.#snackbar.error('errors.discordLoginCancelled'), 200);
+    }
+  }
 }

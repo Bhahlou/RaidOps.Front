@@ -14,7 +14,7 @@ describe('HeaderComponent', () => {
   let navigate: ReturnType<typeof vi.fn>;
   let isAuthenticated: ReturnType<typeof signal<boolean>>;
 
-  const setup = (authenticated = false) => {
+  const setup = (authenticated = false, url = '/home') => {
     signup = vi.fn();
     logout = vi.fn().mockReturnValue(of(undefined));
     navigate = vi.fn().mockResolvedValue(true);
@@ -25,7 +25,7 @@ describe('HeaderComponent', () => {
       providers: [
         { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly(), user: signal(null), logout } },
         { provide: AuthService, useValue: { signup } },
-        { provide: Router, useValue: { navigate } },
+        { provide: Router, useValue: { navigate, url } },
       ],
     })
     .overrideComponent(HeaderComponent, { set: { template: '', imports: [] } });
@@ -49,9 +49,14 @@ describe('HeaderComponent', () => {
   });
 
   describe('onLoginClick', () => {
-    it('calls AuthService.signup', () => {
-      setup().onLoginClick();
-      expect(signup).toHaveBeenCalledOnce();
+    it('signs up with returnTo=home when not on get-started', () => {
+      setup(false, '/home').onLoginClick();
+      expect(signup).toHaveBeenCalledWith('home');
+    });
+
+    it('signs up with returnTo=get-started when on get-started', () => {
+      setup(false, '/get-started').onLoginClick();
+      expect(signup).toHaveBeenCalledWith('get-started');
     });
   });
 

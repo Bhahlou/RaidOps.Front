@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { CharacterService } from '../services/character.service';
 import { BnetAccount } from '../models/bnet-account.model';
@@ -9,6 +10,20 @@ import { Spec } from '../../../shared/models/spec.model';
 import { GuildMembershipService } from '../../guilds/services/guild-membership.service';
 import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
 import { CharacterRank } from '../../guilds/models/character-rank.enum';
+
+/**
+ * Backend ResponseDetail codes (see RaidOps.Service's ResponseDetail) for joinGuild/updateRank/
+ * leaveGuild, mapped to i18n keys — anything unlisted falls back to a generic message. Shared by
+ * every component that drives those three store methods so the mapping can't drift between them.
+ */
+const MEMBERSHIP_ERROR_KEYS: Record<string, string> = {
+  AlreadyMember: 'characterDetail.guilds.errors.alreadyMember',
+  NotAMember: 'characterDetail.guilds.errors.notAMember',
+  RosterAccessDenied: 'characterDetail.guilds.errors.rosterAccessDenied',
+  GuildNotConfigured: 'characterDetail.guilds.errors.guildNotConfigured',
+  Forbidden: 'characterDetail.guilds.errors.forbidden',
+  GuildBotNotPresent: 'characterDetail.guilds.errors.guildBotNotPresent',
+};
 
 /**
  * Signal store for character-related state, including the character↔guild-membership
@@ -156,7 +171,11 @@ export class CharacterStore {
       tap(() => {
         this.#joiningGuildId.set(null);
         this.#joiningCharacterId.set(null);
-        this.#eligibleGuilds.update((g) => g?.filter((eg) => eg.guildId !== guildId));
+        this.#eligibleGuildsByCharacter.update((m) => {
+          const current = m.get(characterId);
+          if (!current) return m;
+          return new Map(m).set(characterId, current.filter((eg) => eg.guildId !== guildId));
+        });
       }),
       catchError((err) => {
         this.#joiningGuildId.set(null);
@@ -213,24 +232,40 @@ export class CharacterStore {
     );
   }
 
-  // ── Eligible guilds (for a single character, shown when offering to join) ──
+  /** Maps a failed joinGuild/updateRank/leaveGuild HTTP error to an i18n key for display. */
+  membershipErrorKey(err: HttpErrorResponse): string {
+    const code = (err.error as { error?: string } | null)?.error;
+    return (code && MEMBERSHIP_ERROR_KEYS[code]) || 'characterDetail.guilds.errors.generic';
+  }
 
-  readonly #eligibleGuilds = signal<EligibleGuild[] | undefined>(undefined);
-  readonly eligibleGuilds = this.#eligibleGuilds.asReadonly();
-  readonly isEligibleLoading = computed(() => this.#eligibleGuilds() === undefined);
-  readonly eligibleGuildList = computed(() => this.#eligibleGuilds() ?? []);
+  // ── Eligible guilds (keyed by character — get-started can show several characters' panels
+  // at once, so a single flat signal would leak one character's results into another's) ──
+
+  readonly #eligibleGuildsByCharacter = signal<Map<number, EligibleGuild[] | undefined>>(new Map());
+
+  isEligibleLoading(characterId: number): boolean {
+    return this.#eligibleGuildsByCharacter().get(characterId) === undefined;
+  }
+
+  eligibleGuildList(characterId: number): EligibleGuild[] {
+    return this.#eligibleGuildsByCharacter().get(characterId) ?? [];
+  }
 
   /** Fetches the guilds a character is eligible to join. */
   loadEligibleGuilds(characterId: number): void {
-    this.#eligibleGuilds.set(undefined);
+    this.#eligibleGuildsByCharacter.update((m) => new Map(m).set(characterId, undefined));
     this.#membershipService.getEligibleGuilds(characterId).subscribe({
-      next: (g) => this.#eligibleGuilds.set(g),
-      error: () => this.#eligibleGuilds.set([]),
+      next: (g) => this.#eligibleGuildsByCharacter.update((m) => new Map(m).set(characterId, g)),
+      error: () => this.#eligibleGuildsByCharacter.update((m) => new Map(m).set(characterId, [])),
     });
   }
 
-  clearEligibleGuilds(): void {
-    this.#eligibleGuilds.set(undefined);
+  clearEligibleGuilds(characterId: number): void {
+    this.#eligibleGuildsByCharacter.update((m) => {
+      const next = new Map(m);
+      next.delete(characterId);
+      return next;
+    });
   }
 
   // ── Specs (reference data) ──────────────────────────────────────────────────

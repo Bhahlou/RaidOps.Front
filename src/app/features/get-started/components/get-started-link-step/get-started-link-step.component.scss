@@ -1,0 +1,17 @@
+.step-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.character-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

@@ -34,6 +34,10 @@
 
 .roster-toggle {
   align-self: flex-start;
+  // Wraps the two toggles onto separate lines when the host is too narrow to fit both labels
+  // (e.g. embedded side-by-side with other cards in get-started) — a no-op wherever there's
+  // already enough room, like the dedicated settings page.
+  flex-wrap: wrap;
 
   mat-button-toggle {
     gap: 6px;

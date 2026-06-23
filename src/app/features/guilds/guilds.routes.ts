@@ -3,6 +3,7 @@ import { discordAdminGuard } from './guards/discord-admin-guard';
 import { eligibleGuildGuard } from './guards/eligible-guild-guard';
 import { guildAccessGuard } from './guards/guild-access-guard';
 import { charactersResolver } from '../characters/characters.resolver';
+import { GuildAccessLevel } from '../../core/models/guild-access-level.enum';
 
 export const guildRoutes: Routes = [
   {
@@ -27,7 +28,7 @@ export const guildRoutes: Routes = [
       },
       {
         path: 'guilds/:id',
-        canActivate: [guildAccessGuard],
+        canActivateChild: [guildAccessGuard],
         loadComponent: () =>
           import('./layout/guild-layout.component').then(m => m.GuildLayoutComponent),
         children: [
@@ -39,6 +40,7 @@ export const guildRoutes: Routes = [
           },
           {
             path: 'calendar',
+            data: { minAccessLevel: GuildAccessLevel.Roster },
             loadComponent: () =>
               import('./pages/calendar/guild-calendar.component').then(m => m.GuildCalendarComponent),
           },
@@ -50,16 +52,19 @@ export const guildRoutes: Routes = [
           },
           {
             path: 'loot',
+            data: { minAccessLevel: GuildAccessLevel.Roster },
             loadComponent: () =>
               import('./pages/loots/guild-loot.component').then(m => m.GuildLootComponent),
           },
           {
             path: 'settings',
+            data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
               import('./pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),
           },
           {
             path: 'audit-log',
+            data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
               import('./pages/audit-log/guild-audit-log.component').then(m => m.GuildAuditLogComponent),
           },

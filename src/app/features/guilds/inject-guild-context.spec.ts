@@ -8,10 +8,11 @@ import { AuthStore } from '../../core/stores/auth.store';
 import { DiscordIconType } from '../../shared/models/discord-icon-type.enum';
 import { UserGuild } from '../../core/models/user-guild.model';
 import { User } from '../../core/models/user.model';
+import { GuildAccessLevel } from '../../core/models/guild-access-level.enum';
 
 const makeGuild = (overrides: Partial<UserGuild> = {}): UserGuild => ({
   id: 'g1', name: 'Epic Guild', iconHash: 'hash1',
-  isRegistered: true, isConfigured: true, isAdmin: false,
+  isRegistered: true, isConfigured: true, isAdmin: false, accessLevel: GuildAccessLevel.Public,
   ...overrides,
 });
 

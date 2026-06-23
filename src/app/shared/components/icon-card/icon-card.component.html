@@ -1,7 +1,11 @@
 <mat-card [appearance]="appearance()">
   <mat-card-header>
     <div mat-card-avatar class="icon-wrapper">
-      <mat-icon class="card-icon">{{ icon() }}</mat-icon>
+      @if (iconSrc()) {
+        <img [src]="iconSrc()" alt="" class="card-icon-img" />
+      } @else {
+        <mat-icon class="card-icon">{{ icon() }}</mat-icon>
+      }
     </div>
     <mat-card-title>{{ title() }}</mat-card-title>
     @if (subtitle()) {

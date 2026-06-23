@@ -1,0 +1,75 @@
+<div class="guild-step">
+
+  <p class="step-desc">{{ 'getStarted.guildStep.intro' | transloco }}</p>
+
+  <div class="guild-cards-row">
+    @if (registeredGuilds().length > 0) {
+      <app-icon-card
+        icon="shield"
+        [title]="'getStarted.guildStep.registered.title' | transloco"
+        [subtitle]="'getStarted.guildStep.registered.subtitle' | transloco"
+      >
+        <ul class="guild-list">
+          @for (guild of registeredGuilds(); track guild.id) {
+            <li class="guild-item">
+              <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" [size]="32" />
+              <span class="guild-name">{{ guild.name }}</span>
+              <span class="access-badge" [class.access-badge--roster]="guild.accessLevel !== GuildAccessLevel.Public">
+                {{ (guild.accessLevel === GuildAccessLevel.Public
+                  ? 'getStarted.guildStep.registered.publicOnly'
+                  : 'getStarted.guildStep.registered.rosterReady') | transloco }}
+              </span>
+            </li>
+          }
+        </ul>
+
+        <div class="continue-row">
+          <button mat-flat-button (click)="continue.emit()">
+            {{ 'getStarted.guildStep.continue' | transloco }}
+            <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </app-icon-card>
+    }
+
+    @if (pendingInviteGuilds().length > 0) {
+      <app-icon-card
+        icon="add_circle"
+        [title]="'getStarted.guildStep.admin.title' | transloco"
+        [subtitle]="'getStarted.guildStep.admin.subtitle' | transloco"
+      >
+        <ul class="guild-list">
+          @for (guild of pendingInviteGuilds(); track guild.id) {
+            <li class="guild-item">
+              <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" [size]="32" />
+              <span class="guild-name">{{ guild.name }}</span>
+              <button mat-flat-button (click)="inviteBot(guild.id)">
+                {{ 'getStarted.guildStep.admin.action' | transloco }}
+              </button>
+            </li>
+          }
+        </ul>
+      </app-icon-card>
+    }
+
+    @if (pendingSettingsGuilds().length > 0) {
+      @for (guild of pendingSettingsGuilds(); track guild.id) {
+        <app-icon-card
+          class="settings-card"
+          icon="settings"
+          [title]="guild.name"
+          [subtitle]="'getStarted.guildStep.admin.settingsSubtitle' | transloco"
+        >
+          <app-guild-settings-form [guildId]="guild.id" (saved)="onSettingsSaved()" />
+        </app-icon-card>
+      }
+    }
+
+    @if (hasNoGuild()) {
+      <app-icon-card icon="shield_lock" [title]="'getStarted.guildStep.empty.title' | transloco">
+        <p [innerHTML]="'getStarted.guildStep.empty.description' | transloco"></p>
+      </app-icon-card>
+    }
+  </div>
+
+</div>

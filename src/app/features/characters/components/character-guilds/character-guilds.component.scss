@@ -3,6 +3,12 @@
   align-items: center;
 }
 
+.guilds-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .add-btn {
   color: var(--color-text-muted);
 

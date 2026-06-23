@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { of, Subject, throwError } from 'rxjs';
 
 import { CharacterStore } from './character.store';
@@ -122,9 +123,8 @@ describe('CharacterStore', () => {
       expect(store.characterList()).toEqual([]);
     });
 
-    it('eligibleGuilds is undefined', () => expect(store.eligibleGuilds()).toBeUndefined());
-    it('isEligibleLoading is true', () => expect(store.isEligibleLoading()).toBe(true));
-    it('eligibleGuildList defaults to []', () => expect(store.eligibleGuildList()).toEqual([]));
+    it('isEligibleLoading is true', () => expect(store.isEligibleLoading(1)).toBe(true));
+    it('eligibleGuildList defaults to []', () => expect(store.eligibleGuildList(1)).toEqual([]));
     it('joiningGuildId is null', () => expect(store.joiningGuildId()).toBeNull());
     it('joiningCharacterId is null', () => expect(store.joiningCharacterId()).toBeNull());
     it('leavingGuildId is null', () => expect(store.leavingGuildId()).toBeNull());
@@ -295,33 +295,48 @@ describe('CharacterStore', () => {
   });
 
   describe('loadEligibleGuilds', () => {
-    it('populates eligibleGuilds on success', () => {
+    it('populates eligibleGuildList on success', () => {
       const data: EligibleGuild[] = [{ guildId: 'g2', guildName: 'Guild g2', guildIconHash: null }];
       membershipService.getEligibleGuilds.mockReturnValue(of(data));
       store.loadEligibleGuilds(1);
 
-      expect(store.eligibleGuilds()).toEqual(data);
-      expect(store.isEligibleLoading()).toBe(false);
+      expect(store.eligibleGuildList(1)).toEqual(data);
+      expect(store.isEligibleLoading(1)).toBe(false);
     });
 
-    it('resets eligibleGuilds to [] on error', () => {
+    it('resets eligibleGuildList to [] on error', () => {
       membershipService.getEligibleGuilds.mockReturnValue(throwError(() => new Error('fail')));
       store.loadEligibleGuilds(1);
 
-      expect(store.eligibleGuilds()).toEqual([]);
+      expect(store.eligibleGuildList(1)).toEqual([]);
+    });
+
+    it('keeps each character its own eligible list — loading one does not leak into another', () => {
+      membershipService.getEligibleGuilds.mockReturnValue(
+        of([{ guildId: 'g1', guildName: 'Guild g1', guildIconHash: null }]),
+      );
+      store.loadEligibleGuilds(1);
+
+      membershipService.getEligibleGuilds.mockReturnValue(
+        of([{ guildId: 'g2', guildName: 'Guild g2', guildIconHash: null }]),
+      );
+      store.loadEligibleGuilds(2);
+
+      expect(store.eligibleGuildList(1).map((g) => g.guildId)).toEqual(['g1']);
+      expect(store.eligibleGuildList(2).map((g) => g.guildId)).toEqual(['g2']);
     });
   });
 
   describe('clearEligibleGuilds', () => {
-    it('resets eligibleGuilds to undefined after it was loaded', () => {
+    it('resets eligibleGuildList to loading state for that character only', () => {
       membershipService.getEligibleGuilds.mockReturnValue(of([{ guildId: 'g1', guildName: 'Guild g1', guildIconHash: null }]));
       store.loadEligibleGuilds(1);
-      expect(store.eligibleGuilds()).toBeDefined();
+      store.loadEligibleGuilds(2);
 
-      store.clearEligibleGuilds();
+      store.clearEligibleGuilds(1);
 
-      expect(store.eligibleGuilds()).toBeUndefined();
-      expect(store.isEligibleLoading()).toBe(true);
+      expect(store.isEligibleLoading(1)).toBe(true);
+      expect(store.isEligibleLoading(2)).toBe(false);
     });
   });
 
@@ -355,7 +370,7 @@ describe('CharacterStore', () => {
       expect(store.characterList()[0].guildMemberships).toEqual([makeMembership('g1')]);
     });
 
-    it('removes the joined guild from eligibleGuilds', () => {
+    it('removes the joined guild from that character eligibleGuildList', () => {
       membershipService.getEligibleGuilds.mockReturnValue(
         of([{ guildId: 'g1', guildName: 'Guild g1', guildIconHash: null }, { guildId: 'g2', guildName: 'Guild g2', guildIconHash: null }]),
       );
@@ -363,7 +378,7 @@ describe('CharacterStore', () => {
 
       store.joinGuild(1, 'g1', CharacterRank.Main).subscribe();
 
-      expect(store.eligibleGuildList().map((g) => g.guildId)).toEqual(['g2']);
+      expect(store.eligibleGuildList(1).map((g) => g.guildId)).toEqual(['g2']);
     });
 
     it('clears spinners and re-throws on error', () => {
@@ -466,6 +481,29 @@ describe('CharacterStore', () => {
       expect(errorCaught).toBe(true);
       expect(store.leavingGuildId()).toBeNull();
       expect(store.leavingCharacterId()).toBeNull();
+    });
+  });
+
+  describe('membershipErrorKey', () => {
+    const err = (code: string) => new HttpErrorResponse({ error: { error: code }, status: 400 });
+
+    it.each([
+      ['AlreadyMember', 'characterDetail.guilds.errors.alreadyMember'],
+      ['NotAMember', 'characterDetail.guilds.errors.notAMember'],
+      ['RosterAccessDenied', 'characterDetail.guilds.errors.rosterAccessDenied'],
+      ['GuildNotConfigured', 'characterDetail.guilds.errors.guildNotConfigured'],
+      ['Forbidden', 'characterDetail.guilds.errors.forbidden'],
+      ['GuildBotNotPresent', 'characterDetail.guilds.errors.guildBotNotPresent'],
+    ])('maps %s to %s', (code, key) => {
+      expect(store.membershipErrorKey(err(code))).toBe(key);
+    });
+
+    it('falls back to the generic key for an unmapped code', () => {
+      expect(store.membershipErrorKey(err('SomethingUnexpected'))).toBe('characterDetail.guilds.errors.generic');
+    });
+
+    it('falls back to the generic key when the error body has no code', () => {
+      expect(store.membershipErrorKey(new HttpErrorResponse({ status: 500 }))).toBe('characterDetail.guilds.errors.generic');
     });
   });
 });

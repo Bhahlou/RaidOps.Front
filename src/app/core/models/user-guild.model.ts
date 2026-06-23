@@ -1,3 +1,5 @@
+import { GuildAccessLevel } from './guild-access-level.enum';
+
 export interface UserGuild {
   id: string;
   name: string;
@@ -5,4 +7,5 @@ export interface UserGuild {
   isRegistered: boolean;
   isConfigured: boolean;
   isAdmin: boolean;
+  accessLevel: GuildAccessLevel;
 }

@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
@@ -8,9 +9,12 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
+
+const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, CharacterRank.Alt];
 
 @Component({
   selector: 'app-guild-my-characters',
@@ -38,6 +42,7 @@ export class GuildMyCharactersComponent {
   readonly guildId = input.required<string>();
 
   readonly #store = inject(CharacterStore);
+  readonly #snackbar = inject(SnackbarService);
 
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
@@ -52,7 +57,9 @@ export class GuildMyCharactersComponent {
   // ── Derived from CharacterStore.characterList ────────────────────────────
 
   readonly myCharacters = computed(() =>
-    this.#store.characterList().filter(c => this.#isInGuild(c)),
+    this.#store.characterList()
+      .filter(c => this.#isInGuild(c))
+      .sort((a, b) => RANK_ORDER.indexOf(this.rankFor(a)) - RANK_ORDER.indexOf(this.rankFor(b))),
   );
 
   readonly addableCharacters = computed(() =>
@@ -93,16 +100,26 @@ export class GuildMyCharactersComponent {
 
   joinCharacter(character: Character): void {
     this.#store.joinGuild(character.id, this.guildId(), this.getRankSelection(character.id)).subscribe({
-      next: () => this.showAddPanel.set(false),
+      next: () => {
+        this.showAddPanel.set(false);
+        this.#snackbar.success('characterDetail.guilds.joinSuccess');
+      },
+      error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
   }
 
   updateRank(characterId: number, rank: CharacterRank): void {
-    this.#store.updateRank(characterId, this.guildId(), rank).subscribe();
+    this.#store.updateRank(characterId, this.guildId(), rank).subscribe({
+      next: () => this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess'),
+      error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
+    });
   }
 
   removeCharacter(characterId: number): void {
-    this.#store.leaveGuild(characterId, this.guildId()).subscribe();
+    this.#store.leaveGuild(characterId, this.guildId()).subscribe({
+      next: () => this.#snackbar.success('characterDetail.guilds.leaveSuccess'),
+      error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
+    });
   }
 
   rankLabel(rank: CharacterRank): string {

@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { GuildMyCharactersComponent } from './guild-my-characters.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildMembership } from '../../models/guild-membership.model';
@@ -30,6 +32,8 @@ const setup = (opts: {
   const joinGuild  = vi.fn().mockReturnValue(of(undefined));
   const updateRank = vi.fn().mockReturnValue(of(undefined));
   const leaveGuild = vi.fn().mockReturnValue(of(undefined));
+  const membershipErrorKey = vi.fn().mockReturnValue('characterDetail.guilds.errors.generic');
+  const snackbar = { success: vi.fn(), error: vi.fn(), info: vi.fn() };
 
   const mockStore = {
     characterList:            signal(characterList),
@@ -40,12 +44,14 @@ const setup = (opts: {
     joinGuild,
     updateRank,
     leaveGuild,
+    membershipErrorKey,
   };
 
   TestBed.configureTestingModule({
     imports: [GuildMyCharactersComponent],
     providers: [
       { provide: CharacterStore, useValue: mockStore },
+      { provide: SnackbarService, useValue: snackbar },
     ],
   }).overrideComponent(GuildMyCharactersComponent, { set: { template: '', imports: [] } });
 
@@ -53,7 +59,7 @@ const setup = (opts: {
   fixture.componentRef.setInput('guildId', guildId);
   fixture.detectChanges();
 
-  return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild };
+  return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild, membershipErrorKey, snackbar };
 };
 
 describe('GuildMyCharactersComponent', () => {
@@ -96,6 +102,31 @@ describe('GuildMyCharactersComponent', () => {
         ],
       });
       expect(component.myCharacters().map(c => c.id)).toEqual([1]);
+    });
+
+    it('sorts by roster rank — Main, then Split, then Alt', () => {
+      const { component } = setup({
+        guildId: 'g1',
+        characterList: [
+          makeChar(1, { guildMemberships: [makeMembership('g1', CharacterRank.Alt)] }),
+          makeChar(2, { guildMemberships: [makeMembership('g1', CharacterRank.Main)] }),
+          makeChar(3, { guildMemberships: [makeMembership('g1', CharacterRank.Split)] }),
+        ],
+      });
+
+      expect(component.myCharacters().map(c => c.id)).toEqual([2, 3, 1]);
+    });
+
+    it('keeps the original relative order between characters sharing the same rank', () => {
+      const { component } = setup({
+        guildId: 'g1',
+        characterList: [
+          makeChar(1, { guildMemberships: [makeMembership('g1', CharacterRank.Main)] }),
+          makeChar(2, { guildMemberships: [makeMembership('g1', CharacterRank.Main)] }),
+        ],
+      });
+
+      expect(component.myCharacters().map(c => c.id)).toEqual([1, 2]);
     });
   });
 
@@ -217,33 +248,70 @@ describe('GuildMyCharactersComponent', () => {
       expect(joinGuild).toHaveBeenCalledWith(5, 'g1', CharacterRank.Split);
     });
 
-    it('sets showAddPanel to false on success', () => {
-      const { component } = setup();
+    it('sets showAddPanel to false and shows a success snackbar', () => {
+      const { component, snackbar } = setup();
       component.showAddPanel.set(true);
 
       component.joinCharacter(makeChar(1));
 
       expect(component.showAddPanel()).toBe(false);
+      expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.joinSuccess');
+    });
+
+    it('shows an error snackbar mapped via store.membershipErrorKey when the join fails', () => {
+      const { component, joinGuild, membershipErrorKey, snackbar } = setup();
+      const err = new HttpErrorResponse({ error: { error: 'AlreadyMember' }, status: 400 });
+      joinGuild.mockReturnValue(throwError(() => err));
+      membershipErrorKey.mockReturnValue('characterDetail.guilds.errors.alreadyMember');
+
+      component.joinCharacter(makeChar(1));
+
+      expect(membershipErrorKey).toHaveBeenCalledWith(err);
+      expect(snackbar.error).toHaveBeenCalledWith('characterDetail.guilds.errors.alreadyMember');
     });
   });
 
   // ── updateRank ────────────────────────────────────────────────────────────
 
-  it('updateRank calls store.updateRank with characterId, guildId and rank', () => {
-    const { component, updateRank } = setup({ guildId: 'g1' });
+  describe('updateRank', () => {
+    it('calls store.updateRank with characterId, guildId and rank, and shows a success snackbar', () => {
+      const { component, updateRank, snackbar } = setup({ guildId: 'g1' });
 
-    component.updateRank(3, CharacterRank.Alt);
+      component.updateRank(3, CharacterRank.Alt);
 
-    expect(updateRank).toHaveBeenCalledWith(3, 'g1', CharacterRank.Alt);
+      expect(updateRank).toHaveBeenCalledWith(3, 'g1', CharacterRank.Alt);
+      expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.rankUpdateSuccess');
+    });
+
+    it('shows an error snackbar when the update fails', () => {
+      const { component, updateRank, snackbar } = setup({ guildId: 'g1' });
+      updateRank.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'NotAMember' }, status: 400 })));
+
+      component.updateRank(3, CharacterRank.Alt);
+
+      expect(snackbar.error).toHaveBeenCalled();
+    });
   });
 
   // ── removeCharacter ───────────────────────────────────────────────────────
 
-  it('removeCharacter calls store.leaveGuild with characterId and guildId', () => {
-    const { component, leaveGuild } = setup({ guildId: 'g1' });
+  describe('removeCharacter', () => {
+    it('calls store.leaveGuild with characterId and guildId, and shows a success snackbar', () => {
+      const { component, leaveGuild, snackbar } = setup({ guildId: 'g1' });
 
-    component.removeCharacter(7);
+      component.removeCharacter(7);
 
-    expect(leaveGuild).toHaveBeenCalledWith(7, 'g1');
+      expect(leaveGuild).toHaveBeenCalledWith(7, 'g1');
+      expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.leaveSuccess');
+    });
+
+    it('shows an error snackbar when the leave fails', () => {
+      const { component, leaveGuild, snackbar } = setup({ guildId: 'g1' });
+      leaveGuild.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'NotAMember' }, status: 400 })));
+
+      component.removeCharacter(7);
+
+      expect(snackbar.error).toHaveBeenCalled();
+    });
   });
 });

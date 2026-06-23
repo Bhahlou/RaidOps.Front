@@ -1,6 +1,13 @@
 <mat-card appearance="outlined" class="guilds-card">
   <mat-card-header>
-    <mat-card-title>{{ 'characterDetail.guilds.title' | transloco }}</mat-card-title>
+    <mat-card-title class="guilds-title">
+      @if (autoExpand()) {
+        <app-wow-class-icon [classId]="character().classId" [className]="character().className" [size]="22" />
+        <span [style.color]="character().classColor">{{ character().name }}</span>
+      } @else {
+        {{ 'characterDetail.guilds.title' | transloco }}
+      }
+    </mat-card-title>
     <button
       mat-icon-button
       class="add-btn"

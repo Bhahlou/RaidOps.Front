@@ -1,0 +1,81 @@
+.guild-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.guild-cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+
+  // min-width: 0 overrides the default content-based automatic minimum size — without it, the
+  // settings form's internal content (e.g. the roster-mode toggle group's unwrapped button
+  // labels) forces the card wider than its flex-basis, which pushes every card onto its own line.
+  > app-icon-card {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+
+  > .settings-card {
+    flex: 2 1 360px;
+  }
+
+  // Below this, the settings card gets squeezed enough to break the roster-mode toggle group's
+  // layout before the row would actually wrap on its own — stack pre-emptively instead.
+  @media (max-width: 960px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.continue-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.guild-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guild-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.guild-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.access-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--mat-sys-on-surface-variant);
+  background: var(--mat-sys-surface-container-highest);
+
+  &--roster {
+    color: var(--color-accent, #7c6af7);
+  }
+}

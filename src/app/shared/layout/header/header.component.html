@@ -1,9 +1,11 @@
 <mat-toolbar>
   <div routerLink="/" class="logo-wrapper">
-    <img src="assets/Logo no background.svg" alt="RaidOps Logo" class="logo" />
-    <span>RaidOps</span>
-    @if (!isProd) {
-      <span class="env-badge">Dev</span>
+    <img [src]="envBranding.logoPath" alt="RaidOps Logo" class="logo" />
+    <span [style.color]="envBranding.accentColor">RaidOps</span>
+    @if (envBranding.badgeLabel) {
+      <span class="env-badge" [style.background-color]="envBranding.accentColor">
+        {{ envBranding.badgeLabel }}
+      </span>
     }
   </div>
 

@@ -1,0 +1,33 @@
+.get-started-loading {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.get-started-container {
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.step-desc {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.discord-button-row {
+  display: flex;
+  justify-content: center;
+}
+
+.discord-button {
+  // mat-flat-button renders as .mat-mdc-unelevated-button, which reads the "filled" button
+  // tokens — not --mat-flat-button-* (that namespace doesn't exist) or --mdc-filled-button-*
+  // (legacy MDC name, not what this M3 mat.theme() setup wires up).
+  --mat-button-filled-container-color: #5865f2;
+  --mat-button-filled-label-text-color: #fff;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

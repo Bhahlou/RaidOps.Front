@@ -1,0 +1,17 @@
+@if (isCharactersLoading()) {
+  <div class="step-loading">
+    <mat-spinner [diameter]="36" />
+  </div>
+} @else {
+  <div class="character-list">
+    @for (character of characters(); track character.id) {
+      <app-character-guilds [character]="character" [autoExpand]="true" />
+    }
+  </div>
+
+  <div class="step-actions">
+    <button mat-flat-button [disabled]="!canFinish()" (click)="finish()">
+      {{ 'getStarted.linkStep.finish' | transloco }}
+    </button>
+  </div>
+}

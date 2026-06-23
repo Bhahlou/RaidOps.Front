@@ -77,9 +77,9 @@ describe('AuthService', () => {
   });
 
   describe('signup', () => {
-    it('redirects to /api/v1/discordAuth/signup', () => {
-      service.signup();
-      expect(mockAssign).toHaveBeenCalledWith(expect.stringContaining('/discordAuth/signup'));
+    it('redirects to /api/v1/discordAuth/signup with the given returnTo', () => {
+      service.signup('get-started');
+      expect(mockAssign).toHaveBeenCalledWith(expect.stringContaining('/discordAuth/signup?returnTo=get-started'));
     });
   });
 });
