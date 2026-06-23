@@ -263,6 +263,7 @@
       "fetchError": "Charaktere konnten nicht geladen werden. Bitte versuche es erneut.",
       "cancel": "Abbrechen",
       "importButton": "Importieren ({{ count }})",
+      "searchLabel": "Charaktere suchen",
       "searchPlaceholder": "Nach Name suchen…",
       "noResults": "Keine Charaktere entsprechen deiner Suche.",
       "importSuccess": "Charaktere erfolgreich importiert!",

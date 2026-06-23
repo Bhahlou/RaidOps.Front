@@ -263,6 +263,7 @@
       "fetchError": "Failed to load characters. Please try again.",
       "cancel": "Cancel",
       "importButton": "Import ({{ count }})",
+      "searchLabel": "Search characters",
       "searchPlaceholder": "Search by name…",
       "noResults": "No characters match your search.",
       "importSuccess": "Characters imported successfully!",

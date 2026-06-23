@@ -263,6 +263,7 @@
       "fetchError": "Impossible de charger les personnages. Réessaie.",
       "cancel": "Annuler",
       "importButton": "Importer ({{ count }})",
+      "searchLabel": "Rechercher des personnages",
       "searchPlaceholder": "Rechercher par nom…",
       "noResults": "Aucun personnage ne correspond à ta recherche.",
       "importSuccess": "Personnages importés avec succès !",

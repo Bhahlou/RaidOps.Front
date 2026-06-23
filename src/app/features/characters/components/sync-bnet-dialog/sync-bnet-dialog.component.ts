@@ -14,7 +14,6 @@ export interface SyncBnetDialogData {
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, TranslocoPipe, BnetSyncPanelComponent],
   templateUrl: './sync-bnet-dialog.component.html',
-  styleUrl: './sync-bnet-dialog.component.scss',
 })
 export class SyncBnetDialogComponent {
   readonly dialogRef = inject(MatDialogRef<SyncBnetDialogComponent>);
