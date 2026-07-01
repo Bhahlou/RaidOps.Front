@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { GetStartedLinkStepComponent } from './get-started-link-step.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
@@ -39,6 +40,7 @@ describe('GetStartedLinkStepComponent', () => {
   let navigate: ReturnType<typeof vi.fn>;
   let loadEligibleGuildsBulk: ReturnType<typeof vi.fn>;
   let joinGuildBulk: ReturnType<typeof vi.fn>;
+  let snackbarError: ReturnType<typeof vi.fn>;
 
   const setup = (opts: {
     characters?: Character[];
@@ -73,7 +75,7 @@ describe('GetStartedLinkStepComponent', () => {
           },
         },
         { provide: Router, useValue: { navigate } },
-        { provide: SnackbarService, useValue: { success: vi.fn(), error: vi.fn() } },
+        { provide: SnackbarService, useValue: { success: vi.fn(), error: (snackbarError = vi.fn()) } },
       ],
     });
     TestBed.overrideComponent(GetStartedLinkStepComponent, { set: { template: '', imports: [] } });
@@ -187,6 +189,18 @@ describe('GetStartedLinkStepComponent', () => {
       setup({ guilds: [guild] });
       component.joinGuild(guild);
       expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1', 'dashboard']);
+    });
+
+    it('shows snackbar error and clears joining state when joinGuildBulk fails', () => {
+      setup({ guilds: [guild] });
+      const err = new HttpErrorResponse({ status: 400, error: { error: 'RosterAccessDenied' } });
+      const storeMock = TestBed.inject(CharacterStore) as unknown as { joinGuildBulk: ReturnType<typeof vi.fn> };
+      storeMock.joinGuildBulk = vi.fn().mockReturnValue(throwError(() => err));
+
+      component.joinGuild(guild);
+
+      expect(component.isJoining(guild.guildId)).toBe(false);
+      expect(snackbarError).toHaveBeenCalledWith('error.key');
     });
 
     it('stays on page (does not navigate) when other guilds remain', () => {

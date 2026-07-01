@@ -9,6 +9,7 @@ import { GuildMembershipService } from '../../guilds/services/guild-membership.s
 import { Character } from '../models/character.model';
 import { GuildMembership } from '../../guilds/models/guild-membership.model';
 import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
+import { GuildEligibility } from '../../guilds/models/guild-eligibility.model';
 import { CharacterRank } from '../../guilds/models/character-rank.enum';
 import { BnetAccount } from '../models/bnet-account.model';
 import { Spec } from '../../../shared/models/spec.model';
@@ -66,6 +67,7 @@ describe('CharacterStore', () => {
   let specService: { getAll: ReturnType<typeof vi.fn> };
   let membershipService: {
     getEligibleGuilds: ReturnType<typeof vi.fn>;
+    getEligibleGuildsBulk: ReturnType<typeof vi.fn>;
     joinGuild: ReturnType<typeof vi.fn>;
     updateRank: ReturnType<typeof vi.fn>;
     leaveGuild: ReturnType<typeof vi.fn>;
@@ -81,6 +83,7 @@ describe('CharacterStore', () => {
     specService = { getAll: vi.fn() };
     membershipService = {
       getEligibleGuilds: vi.fn().mockReturnValue(of([])),
+      getEligibleGuildsBulk: vi.fn().mockReturnValue(of([])),
       joinGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
       updateRank: vi.fn().mockReturnValue(of({ message: 'ok' })),
       leaveGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
@@ -481,6 +484,96 @@ describe('CharacterStore', () => {
       expect(errorCaught).toBe(true);
       expect(store.leavingGuildId()).toBeNull();
       expect(store.leavingCharacterId()).toBeNull();
+    });
+  });
+
+  describe('loadEligibleGuildsBulk / eligibleGuildsBulk', () => {
+    const bulkGuild: GuildEligibility = {
+      guildId: 'g1',
+      guildName: 'Test Guild',
+      guildIconHash: null,
+      eligibleCharacters: [{ id: 1, name: 'Char1', classId: 1, className: 'Warrior', classColor: '#C69B3A' }],
+    };
+
+    it('isEligibleBulkLoading is true before loadEligibleGuildsBulk is called', () => {
+      expect(store.isEligibleBulkLoading()).toBe(true);
+    });
+
+    it('eligibleGuildsBulk defaults to [] while loading', () => {
+      expect(store.eligibleGuildsBulk()).toEqual([]);
+    });
+
+    it('populates eligibleGuildsBulk on success', () => {
+      membershipService.getEligibleGuildsBulk.mockReturnValue(of([bulkGuild]));
+      store.loadEligibleGuildsBulk();
+
+      expect(store.eligibleGuildsBulk()).toEqual([bulkGuild]);
+      expect(store.isEligibleBulkLoading()).toBe(false);
+    });
+
+    it('resets eligibleGuildsBulk to [] on error', () => {
+      membershipService.getEligibleGuildsBulk.mockReturnValue(throwError(() => new Error('fail')));
+      store.loadEligibleGuildsBulk();
+
+      expect(store.eligibleGuildsBulk()).toEqual([]);
+      expect(store.isEligibleBulkLoading()).toBe(false);
+    });
+
+    it('resets to loading state at the start of each call', () => {
+      membershipService.getEligibleGuildsBulk.mockReturnValue(of([bulkGuild]));
+      store.loadEligibleGuildsBulk();
+      expect(store.isEligibleBulkLoading()).toBe(false);
+
+      // second call should briefly set loading again (synchronously before subscribe resolves)
+      const subject = new Subject<GuildEligibility[]>();
+      membershipService.getEligibleGuildsBulk.mockReturnValue(subject.asObservable());
+      store.loadEligibleGuildsBulk();
+      expect(store.isEligibleBulkLoading()).toBe(true);
+    });
+  });
+
+  describe('joinGuildBulk', () => {
+    const bulkGuild: GuildEligibility = {
+      guildId: 'g1',
+      guildName: 'Test Guild',
+      guildIconHash: null,
+      eligibleCharacters: [{ id: 1, name: 'Char1', classId: 1, className: 'Warrior', classColor: '#C69B3A' }],
+    };
+
+    it('removes the joined guild from eligibleGuildsBulk on success', () => {
+      membershipService.getEligibleGuildsBulk.mockReturnValue(of([bulkGuild]));
+      store.loadEligibleGuildsBulk();
+      expect(store.eligibleGuildsBulk()).toHaveLength(1);
+
+      charService.getCharacters.mockReturnValue(of(envelope([])));
+      store.joinGuildBulk('g1', [{ characterId: 1, rank: CharacterRank.Main }]).subscribe();
+
+      expect(store.eligibleGuildsBulk()).toEqual([]);
+    });
+
+    it('force-reloads the character list after success', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1)])));
+      store.loadCharacters().subscribe();
+      charService.getCharacters.mockClear();
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1, { guildMemberships: [makeMembership('g1')] })])));
+
+      store.joinGuildBulk('g1', [{ characterId: 1, rank: CharacterRank.Main }]).subscribe();
+
+      expect(charService.getCharacters).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-throws on error without modifying eligibleGuildsBulk', () => {
+      membershipService.getEligibleGuildsBulk.mockReturnValue(of([bulkGuild]));
+      store.loadEligibleGuildsBulk();
+
+      membershipService.joinGuild.mockReturnValue(throwError(() => new Error('fail')));
+      let errorCaught = false;
+      store.joinGuildBulk('g1', [{ characterId: 1, rank: CharacterRank.Main }]).subscribe({
+        error: () => { errorCaught = true; },
+      });
+
+      expect(errorCaught).toBe(true);
+      expect(store.eligibleGuildsBulk()).toEqual([bulkGuild]);
     });
   });
 
