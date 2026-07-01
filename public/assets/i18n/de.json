@@ -156,7 +156,10 @@
       "notLinkedDescription": "Verknüpfe dein Battle.net-Konto, um deine Charaktere zu importieren und zu aktivieren."
     },
     "linkStep": {
-      "finish": "Fertigstellen"
+      "finish": "Fertigstellen",
+      "join": "Beitreten",
+      "noGuilds": "Momentan keine Gilden verfügbar. Du kannst später über deine Charaktere einer Gilde beitreten.",
+      "skip": "Diesen Schritt überspringen"
     }
   },
   "characterDetail": {

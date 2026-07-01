@@ -156,7 +156,10 @@
       "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement."
     },
     "linkStep": {
-      "finish": "Terminer"
+      "finish": "Terminer",
+      "join": "Rejoindre",
+      "noGuilds": "Aucune guilde accessible pour le moment. Tu pourras rejoindre une guilde plus tard depuis tes personnages.",
+      "skip": "Passer cette étape"
     }
   },
   "characterDetail": {

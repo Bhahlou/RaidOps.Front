@@ -156,7 +156,10 @@
       "notLinkedDescription": "Link your Battle.net account to import and activate your characters."
     },
     "linkStep": {
-      "finish": "Finish"
+      "finish": "Finish",
+      "join": "Join",
+      "noGuilds": "No guilds available at the moment. You can join a guild later from your characters page.",
+      "skip": "Skip this step"
     }
   },
   "characterDetail": {
