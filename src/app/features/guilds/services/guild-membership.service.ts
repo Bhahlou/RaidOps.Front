@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { EligibleGuild } from '../models/eligible-guild.model';
+import { GuildEligibility } from '../models/guild-eligibility.model';
 import { CharacterRank } from '../models/character-rank.enum';
 
 /** Thin HTTP layer for guild roster membership endpoints. */
@@ -14,6 +15,11 @@ export class GuildMembershipService {
   /** Returns the guilds the given character is eligible to join. */
   getEligibleGuilds(characterId: number): Observable<EligibleGuild[]> {
     return this.#http.get<EligibleGuild[]>(`${this.#api}/characters/${characterId}/eligible-guilds`);
+  }
+
+  /** Returns all eligible guilds for all of the user's characters in a single request. */
+  getEligibleGuildsBulk(): Observable<GuildEligibility[]> {
+    return this.#http.get<GuildEligibility[]>(`${this.#api}/characters/eligible-guilds`);
   }
 
   /** Adds a character to a guild's roster. */

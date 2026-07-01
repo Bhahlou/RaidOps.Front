@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { CharacterService } from '../services/character.service';
 import { BnetAccount } from '../models/bnet-account.model';
 import { Character } from '../models/character.model';
@@ -9,6 +9,7 @@ import { SpecService } from '../../../shared/services/spec.service';
 import { Spec } from '../../../shared/models/spec.model';
 import { GuildMembershipService } from '../../guilds/services/guild-membership.service';
 import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
+import { GuildEligibility } from '../../guilds/models/guild-eligibility.model';
 import { CharacterRank } from '../../guilds/models/character-rank.enum';
 
 /**
@@ -266,6 +267,41 @@ export class CharacterStore {
       next.delete(characterId);
       return next;
     });
+  }
+
+  // ── Eligible guilds bulk (get-started) ───────────────────────────────────────
+  // Single request returning all guilds with their eligible characters — replaces
+  // the N per-character calls used by the character-detail panel.
+
+  readonly #eligibleGuildsBulk = signal<GuildEligibility[] | undefined>(undefined);
+
+  readonly isEligibleBulkLoading = computed(() => this.#eligibleGuildsBulk() === undefined);
+
+  readonly eligibleGuildsBulk = computed(() => this.#eligibleGuildsBulk() ?? []);
+
+  /** Fetches all eligible guilds for all of the user's characters in one request. */
+  loadEligibleGuildsBulk(): void {
+    this.#eligibleGuildsBulk.set(undefined);
+    this.#membershipService.getEligibleGuildsBulk().subscribe({
+      next: (guilds) => this.#eligibleGuildsBulk.set(guilds),
+      error: () => this.#eligibleGuildsBulk.set([]),
+    });
+  }
+
+  /**
+   * Joins a guild with multiple characters in parallel, then reloads the character list once.
+   * Removes the joined guild from the bulk eligible list on success.
+   */
+  joinGuildBulk(guildId: string, entries: { characterId: number; rank: CharacterRank }[]): Observable<void> {
+    return forkJoin(
+      entries.map((e) => this.#membershipService.joinGuild(e.characterId, guildId, e.rank)),
+    ).pipe(
+      switchMap(() => this.loadCharacters(true)),
+      tap(() => {
+        this.#eligibleGuildsBulk.update((guilds) => guilds?.filter((g) => g.guildId !== guildId) ?? guilds);
+      }),
+      map(() => undefined),
+    );
   }
 
   // ── Specs (reference data) ──────────────────────────────────────────────────

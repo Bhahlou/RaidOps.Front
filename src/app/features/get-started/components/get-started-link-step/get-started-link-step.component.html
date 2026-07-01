@@ -1,11 +1,68 @@
-@if (isCharactersLoading()) {
+@if (isLoading()) {
   <div class="step-loading">
     <mat-spinner [diameter]="36" />
   </div>
+} @else if (guilds().length === 0 && !canFinish()) {
+  <p class="empty-hint">{{ 'getStarted.linkStep.noGuilds' | transloco }}</p>
+  <div class="step-actions">
+    <button mat-flat-button (click)="finish()">
+      {{ 'getStarted.linkStep.skip' | transloco }}
+    </button>
+  </div>
 } @else {
-  <div class="character-list">
-    @for (character of characters(); track character.id) {
-      <app-character-guilds [character]="character" [autoExpand]="true" />
+  <div class="guild-list">
+    @for (guild of guilds(); track guild.guildId) {
+      <mat-card appearance="outlined" class="guild-card">
+        <mat-card-header>
+          <app-discord-icon
+            [id]="guild.guildId"
+            [hash]="guild.guildIconHash"
+            [type]="DiscordIconType.Guild"
+            [size]="32"
+          />
+          <mat-card-title>{{ guild.guildName }}</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <ul class="character-list">
+            @for (char of guild.eligibleCharacters; track char.id) {
+              <li class="character-item">
+                <mat-checkbox
+                  [checked]="isChecked(guild.guildId, char.id)"
+                  (change)="toggle(guild.guildId, char.id, $event.checked)"
+                />
+                <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="20" />
+                <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
+                @if (isChecked(guild.guildId, char.id)) {
+                  <mat-select
+                    class="rank-select"
+                    panelClass="rank-select-panel"
+                    [value]="getRank(guild.guildId, char.id)"
+                    (selectionChange)="setRank(guild.guildId, char.id, $event.value)"
+                  >
+                    @for (rank of ranks; track rank) {
+                      <mat-option [value]="rank">{{ rank }}</mat-option>
+                    }
+                  </mat-select>
+                }
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button
+            mat-flat-button
+            [disabled]="!canJoinGuild(guild.guildId) || isJoining(guild.guildId)"
+            (click)="joinGuild(guild)"
+          >
+            @if (isJoining(guild.guildId)) {
+              <mat-spinner [diameter]="16" />
+            }
+            {{ 'getStarted.linkStep.join' | transloco }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
     }
   </div>
 
