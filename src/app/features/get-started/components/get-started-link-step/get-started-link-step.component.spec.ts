@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 
 import { GetStartedLinkStepComponent } from './get-started-link-step.component';
@@ -41,6 +41,7 @@ describe('GetStartedLinkStepComponent', () => {
   let loadEligibleGuildsBulk: ReturnType<typeof vi.fn>;
   let joinGuildBulk: ReturnType<typeof vi.fn>;
   let snackbarError: ReturnType<typeof vi.fn>;
+  let guildsSignal: WritableSignal<GuildEligibility[]>;
 
   const setup = (opts: {
     characters?: Character[];
@@ -51,7 +52,7 @@ describe('GetStartedLinkStepComponent', () => {
     loadEligibleGuildsBulk = vi.fn();
 
     const characters = opts.characters ?? [];
-    const guildsSignal = signal(opts.guilds ?? []);
+    guildsSignal = signal(opts.guilds ?? []);
 
     // Mock joinGuildBulk removes the joined guild from the signal so navigation
     // logic that reads guilds().length works correctly in tests.
@@ -141,6 +142,33 @@ describe('GetStartedLinkStepComponent', () => {
       component.setRank('g1', 1, CharacterRank.Alt);
       expect(component.getRank('g1', 1)).toBe(CharacterRank.Alt);
     });
+
+    it('preserves existing selections when the effect re-runs with the same guild (l74 false branch)', () => {
+      setup({ guilds: [guild] });
+      component.toggle('g1', 1, false); // deviate from initial state
+
+      guildsSignal.set([guild]); // new array ref → triggers effect again
+      TestBed.flushEffects();
+
+      expect(component.isChecked('g1', 1)).toBe(false); // not reset to true
+    });
+
+    it('getRank returns Main as default when characterId has no entry (l92 ?? branch)', () => {
+      setup({ guilds: [guild] });
+      expect(component.getRank('g1', 999)).toBe(CharacterRank.Main);
+    });
+
+    it('toggle creates a new entry for an unknown guildId (l98 ?? branch)', () => {
+      setup({ guilds: [guild] });
+      component.toggle('unknown', 1, true);
+      expect(component.isChecked('unknown', 1)).toBe(true);
+    });
+
+    it('setRank creates a new entry for an unknown guildId (l108 ?? branch)', () => {
+      setup({ guilds: [guild] });
+      component.setRank('unknown', 1, CharacterRank.Alt);
+      expect(component.getRank('unknown', 1)).toBe(CharacterRank.Alt);
+    });
   });
 
   // ── canJoinGuild ──────────────────────────────────────────────────────
@@ -169,6 +197,13 @@ describe('GetStartedLinkStepComponent', () => {
 
   describe('joinGuild', () => {
     const guild = makeGuild('g1', [{ id: 1, name: 'Char1' }, { id: 2, name: 'Char2' }]);
+
+    it('does nothing when the guild has no selections entry (l127 early return)', () => {
+      setup();
+      const unknownGuild = makeGuild('unknown', [{ id: 1, name: 'Char1' }]);
+      component.joinGuild(unknownGuild);
+      expect(joinGuildBulk).not.toHaveBeenCalled();
+    });
 
     it('calls joinGuildBulk with the checked characters', () => {
       setup({ guilds: [guild] });

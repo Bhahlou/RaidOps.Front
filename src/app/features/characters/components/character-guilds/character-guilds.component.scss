@@ -10,9 +10,14 @@
 }
 
 .add-btn {
-  color: var(--color-text-muted);
+  background-color: var(--mat-sys-primary);
 
-  &:hover, &.active { color: var(--color-accent); }
+  ::ng-deep mat-icon { color: #000; }
+
+  &:hover,
+  &.active {
+    background-color: color-mix(in srgb, var(--mat-sys-primary) 85%, black);
+  }
 }
 
 .membership-list {
@@ -40,7 +45,9 @@
   text-decoration: none;
   color: inherit;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .rank-select {
@@ -57,9 +64,9 @@
 }
 
 .leave-btn {
-  color: var(--color-text-muted);
-
-  &:hover { color: #f44336; }
+  &:hover {
+    color: #f44336;
+  }
 }
 
 .eligible-panel {
