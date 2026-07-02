@@ -194,7 +194,32 @@
     },
     "myCharacters": "Meine Charaktere in dieser Gilde",
     "empty": "Du hast noch keine Charaktere in dieser Gilde.",
-    "leave": "Gilde verlassen"
+    "leave": "Gilde verlassen",
+    "list": {
+      "empty": "Der Roster dieser Gilde ist leer.",
+      "emptyFiltered": "Kein Charakter entspricht den aktiven Filtern.",
+      "columns": {
+        "player": "Spieler",
+        "character": "Charakter",
+        "class": "Klasse",
+        "specs": "Specs",
+        "level": "Stufe",
+        "rank": "Rang",
+        "joined": "Beigetreten"
+      },
+      "rank": {
+        "Main": "Main",
+        "Split": "Split",
+        "Alt": "Alt"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Spieler oder Charakter suchen...",
+      "dateFrom": "Von",
+      "dateTo": "Bis",
+      "clear": "Löschen",
+      "clearAll": "Alle Filter zurücksetzen"
+    }
   },
   "home": {
     "title": "Verwalte deine Gilde.",
