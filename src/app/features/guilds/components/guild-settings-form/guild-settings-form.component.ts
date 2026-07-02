@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -10,12 +11,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
-import { formatDiscordColor } from '../../../../shared/utils/discord-color.util';
 import { GuildSettings } from '../../models/guild-settings.model';
+import { OfficerThreshold } from '../../models/officer-threshold.model';
 import { RosterMode } from '../../models/roster-mode.enum';
 import { GuildSettingsService } from '../../services/guild-settings.service';
+import { AuthStore } from '../../../../core/stores/auth.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GuildStore } from '../../stores/guild.store';
+import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
+import { RoleThresholdPickerComponent } from '../role-threshold-picker/role-threshold-picker.component';
 
 interface TimezoneOption {
   id: string;
@@ -52,6 +56,7 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
     MatIconModule,
     MatProgressSpinnerModule,
     TranslocoPipe,
+    RoleThresholdPickerComponent,
   ],
   templateUrl: './guild-settings-form.component.html',
   styleUrl: './guild-settings-form.component.scss',
@@ -62,18 +67,21 @@ export class GuildSettingsFormComponent implements OnInit {
 
   readonly #settingsService = inject(GuildSettingsService);
   readonly #guildStore = inject(GuildStore);
+  readonly #officerThresholdStore = inject(OfficerThresholdStore);
+  readonly #authStore = inject(AuthStore);
   readonly #snackbar = inject(SnackbarService);
 
   readonly RosterMode = RosterMode;
 
   readonly availableRoles = signal<DiscordRole[]>([]);
-  readonly rolesLoading = signal(false);
+  readonly rolesLoading = signal(true);
   readonly submitting = signal(false);
 
   readonly form = new FormGroup({
     timezone: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     rosterMode: new FormControl<RosterMode>(RosterMode.Open, { nonNullable: true }),
     minRosterRoleId: new FormControl<string | null>(null),
+    minOfficerRoleId: new FormControl<string | null>(null, { validators: [Validators.required] }),
   });
 
   readonly #timezoneValue = toSignal(this.form.controls.timezone.valueChanges, {
@@ -84,7 +92,11 @@ export class GuildSettingsFormComponent implements OnInit {
     initialValue: RosterMode.Open,
   });
 
-  readonly #minRoleIdValue = toSignal(this.form.controls.minRosterRoleId.valueChanges, {
+  readonly minRosterRoleIdValue = toSignal(this.form.controls.minRosterRoleId.valueChanges, {
+    initialValue: null,
+  });
+
+  readonly minOfficerRoleIdValue = toSignal(this.form.controls.minOfficerRoleId.valueChanges, {
     initialValue: null,
   });
 
@@ -117,15 +129,15 @@ export class GuildSettingsFormComponent implements OnInit {
       const ctrl = this.form.controls.minRosterRoleId;
       if (mode === RosterMode.DiscordRoleOnly) {
         ctrl.addValidators(Validators.required);
-        if (this.availableRoles().length === 0) {
-          this.#loadRoles();
-        }
       } else {
         ctrl.removeValidators(Validators.required);
         ctrl.setValue(null);
       }
       ctrl.updateValueAndValidity();
     });
+
+    // Roles are needed for both the roster and Officer threshold pickers, so load them eagerly.
+    this.#loadRoles();
 
     this.#guildStore.loadSettings(this.guildId()).subscribe({
       next: (settings) => {
@@ -136,58 +148,38 @@ export class GuildSettingsFormComponent implements OnInit {
         });
       },
     });
-  }
 
-  isRoleIncluded(role: DiscordRole): boolean {
-    const thresholdId = this.#minRoleIdValue();
-    if (!thresholdId) return false;
-    // Lower index = more powerful (Admin at 0). Included = index <= threshold index.
-    const roles = this.availableRoles();
-    return roles.findIndex((r) => r.id === role.id) <= roles.findIndex((r) => r.id === thresholdId);
-  }
-
-  isThreshold(role: DiscordRole): boolean {
-    return role.id === this.#minRoleIdValue();
-  }
-
-  isRoleExcluded(role: DiscordRole): boolean {
-    const thresholdId = this.#minRoleIdValue();
-    if (!thresholdId) return false;
-    const roles = this.availableRoles();
-    return roles.findIndex((r) => r.id === role.id) > roles.findIndex((r) => r.id === thresholdId);
-  }
-
-  selectThreshold(roleId: string): void {
-    const current = this.form.controls.minRosterRoleId.value;
-    this.form.controls.minRosterRoleId.setValue(current === roleId ? null : roleId);
-  }
-
-  roleColor(role: DiscordRole): string | null {
-    return formatDiscordColor(role.color);
-  }
-
-  roleIconUrl(role: DiscordRole): string | null {
-    return role.iconHash
-      ? `https://cdn.discordapp.com/role-icons/${role.id}/${role.iconHash}.webp?size=32`
-      : null;
+    this.#officerThresholdStore.loadOfficerThreshold(this.guildId()).subscribe({
+      next: (officerThreshold) => {
+        this.form.patchValue({ minOfficerRoleId: officerThreshold.minOfficerRoleId });
+      },
+    });
   }
 
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
 
-    const { timezone, rosterMode, minRosterRoleId } = this.form.getRawValue();
+    const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = this.form.getRawValue();
     const settings: GuildSettings = {
       timezone,
       rosterMode,
       minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
     };
+    const officerThreshold: OfficerThreshold = { minOfficerRoleId };
 
     this.submitting.set(true);
-    this.#settingsService.updateSettings(this.guildId(), settings).subscribe({
+    forkJoin([
+      this.#settingsService.updateSettings(this.guildId(), settings),
+      this.#settingsService.updateOfficerThreshold(this.guildId(), officerThreshold),
+    ]).subscribe({
       next: () => {
         this.submitting.set(false);
         this.#guildStore.patchSettings(this.guildId(), settings);
+        this.#officerThresholdStore.patchOfficerThreshold(this.guildId(), officerThreshold);
         this.#snackbar.success('guildSettings.saveSuccess');
+        // Resyncs /me so the "Officer threshold not configured" notification clears immediately
+        // instead of lingering until the next reload/login.
+        this.#authStore.loadUser().subscribe();
         this.saved.emit();
       },
       error: () => {

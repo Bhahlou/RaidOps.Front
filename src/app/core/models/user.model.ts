@@ -1,3 +1,4 @@
+import { Notification } from './notification.model';
 import { UserGuild } from './user-guild.model';
 
 export interface User {
@@ -5,4 +6,5 @@ export interface User {
   name: string;
   avatarHash: string | null;
   guilds: UserGuild[];
+  notifications: Notification[];
 }

@@ -66,8 +66,19 @@
       "threshold": "Schwelle",
       "excluded": "Ausgeschlossene Rollen"
     },
+    "officerThreshold": {
+      "label": "Officer-Zugriffsschwelle",
+      "hint": "Wähle die Mindestrolle für Officer-Zugriff aus. Diese Rolle und alle Rollen darüber werden Officer, unabhängig vom Roster-Zugriff. Discord-Server-Administratoren behalten unabhängig von dieser Wahl immer vollen Zugriff."
+    },
     "save": "Einstellungen speichern",
     "saveSuccess": "Einstellungen gespeichert."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "empty": "Keine Benachrichtigungen.",
+    "officerThresholdNotConfigured": "„{{ guildName }}“ hat noch keine Officer-Zugriffsschwelle konfiguriert — wähle in den Gildeneinstellungen, welche Discord-Rolle Officer-Zugriff gewährt.",
+    "viewLink": "Konfigurieren",
+    "dismiss": "Nie wieder anzeigen"
   },
   "auditLog": {
     "pageTitle": "Audit-Log",
@@ -96,7 +107,8 @@
     "settingsFields": {
       "timezone": "Zeitzone",
       "rosterMode": "Roster-Zugriff",
-      "minRosterRoleId": "Discord-Rollenschwelle geändert"
+      "minRosterRoleId": "Discord-Rollenschwelle geändert",
+      "minOfficerRoleId": "Officer-Zugriffsschwelle geändert"
     },
     "actionLabels": {
       "GuildRegistered": "Registrierung",
@@ -104,7 +116,8 @@
       "MemberJoined": "Mitglied beigetreten",
       "MemberLeft": "Mitglied ausgetreten",
       "MemberExcluded": "Mitglied ausgeschlossen",
-      "MemberRankUpdated": "Rang geändert"
+      "MemberRankUpdated": "Rang geändert",
+      "OfficerThresholdUpdated": "Officer-Schwelle geändert"
     }
   },
   "noGuild": {

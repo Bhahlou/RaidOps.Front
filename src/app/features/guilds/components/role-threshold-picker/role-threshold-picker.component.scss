@@ -1,0 +1,188 @@
+.field-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.roles-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+// ── Role threshold list ───────────────────────────────────────────────────────
+
+.roles-list-wrapper {
+  position: relative;
+  margin-top: 4px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.06));
+    pointer-events: none;
+    border-radius: 0 0 4px 4px;
+  }
+}
+
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+  }
+}
+
+.role-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover:not(.is-excluded) {
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+  }
+
+  &.is-included {
+    color: var(--color-text-primary);
+    background: color-mix(in srgb, var(--role-color, var(--color-accent)) 6%, transparent);
+
+    &.is-threshold {
+      border-color: var(--role-color, var(--color-accent));
+      background: color-mix(in srgb, var(--role-color, var(--color-accent)) 18%, transparent);
+      font-weight: 500;
+    }
+  }
+
+  &.is-excluded {
+    opacity: 0.45;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.7;
+      background: var(--color-bg-elevated);
+    }
+  }
+}
+
+// ── Role row indicator (icon/dot/check) ───────────────────────────────────────
+
+.role-row-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.role-row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--role-color, var(--color-accent));
+}
+
+.role-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.role-dot-empty {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.role-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// ── Threshold badge ───────────────────────────────────────────────────────────
+
+.threshold-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--role-color, var(--color-accent));
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid var(--role-color, var(--color-accent));
+  flex-shrink: 0;
+}
+
+// ── Threshold divider ─────────────────────────────────────────────────────────
+
+.threshold-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 0 12px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border-subtle);
+  }
+}
+
+.threshold-divider-label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}

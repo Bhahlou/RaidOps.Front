@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, shareReplay, tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+import { NotificationType } from '../models/notification.model';
 import { User } from '../models/user.model';
 
 const SESSION_KEY = 'raidops_user';
@@ -8,11 +10,13 @@ const SESSION_KEY = 'raidops_user';
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
   readonly #authService = inject(AuthService);
+  readonly #notificationService = inject(NotificationService);
 
   readonly #user = signal<User | null>(null);
   readonly user = this.#user.asReadonly();
 
   readonly isAuthenticated = computed(() => this.#user() !== null);
+  readonly notifications = computed(() => this.#user()?.notifications ?? []);
 
   #refresh$: Observable<void> | null = null;
 
@@ -59,6 +63,28 @@ export class AuthStore {
       tap(() => {
         this.#user.set(null);
         sessionStorage.removeItem(SESSION_KEY);
+      }),
+    );
+  }
+
+  /**
+   * Dismisses a notification: persists the dismissal server-side, then optimistically removes
+   * it from the cached user so it disappears immediately without a full `/me` refetch.
+   */
+  dismissNotification(type: NotificationType, guildId: string): Observable<void> {
+    return this.#notificationService.dismiss(type, guildId).pipe(
+      tap(() => {
+        const current = this.#user();
+        if (current === null) return;
+
+        const updated: User = {
+          ...current,
+          notifications: current.notifications.filter(
+            (n) => !(n.type === type && n.guildId === guildId),
+          ),
+        };
+        this.#user.set(updated);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(updated));
       }),
     );
   }

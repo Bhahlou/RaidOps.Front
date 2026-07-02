@@ -3,6 +3,8 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { AuthStore } from './auth.store';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+import { NotificationType } from '../models/notification.model';
 import { User } from '../models/user.model';
 
 const SESSION_KEY = 'raidops_user';
@@ -12,17 +14,20 @@ const mockUser: User = {
   name: 'TestUser',
   avatarHash: null,
   guilds: [],
+  notifications: [],
 };
 
 describe('AuthStore', () => {
   let getMe: ReturnType<typeof vi.fn>;
   let refresh: ReturnType<typeof vi.fn>;
   let logout: ReturnType<typeof vi.fn>;
+  let dismiss: ReturnType<typeof vi.fn>;
 
   const setup = () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthService, useValue: { getMe, refresh, logout } },
+        { provide: NotificationService, useValue: { dismiss } },
       ],
     });
     return TestBed.inject(AuthStore);
@@ -33,6 +38,7 @@ describe('AuthStore', () => {
     getMe = vi.fn().mockReturnValue(of(mockUser));
     refresh = vi.fn().mockReturnValue(of(undefined));
     logout = vi.fn().mockReturnValue(of(undefined));
+    dismiss = vi.fn().mockReturnValue(of(undefined));
   });
 
   // ── Constructor ───────────────────────────────────────────────────────────
@@ -143,6 +149,61 @@ describe('AuthStore', () => {
 
       expect(store.user()).toBeNull();
       expect(sessionStorage.getItem(SESSION_KEY)).toBeNull();
+    });
+  });
+
+  // ── notifications ─────────────────────────────────────────────────────────
+
+  describe('notifications', () => {
+    it('is empty when there is no user', () => {
+      const store = setup();
+
+      expect(store.notifications()).toEqual([]);
+    });
+
+    it('reflects the current user notifications', () => {
+      const notification = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g1', guildName: 'RaidOps' };
+      getMe.mockReturnValue(of({ ...mockUser, notifications: [notification] }));
+      const store = setup();
+
+      store.loadUser().subscribe();
+
+      expect(store.notifications()).toEqual([notification]);
+    });
+  });
+
+  // ── dismissNotification ───────────────────────────────────────────────────
+
+  describe('dismissNotification', () => {
+    const notificationA = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g1', guildName: 'Guild A' };
+    const notificationB = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g2', guildName: 'Guild B' };
+
+    it('calls NotificationService.dismiss with the type and guildId', () => {
+      const store = setup();
+      store.loadUser().subscribe();
+
+      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+
+      expect(dismiss).toHaveBeenCalledWith(NotificationType.OfficerThresholdNotConfigured, 'g1');
+    });
+
+    it('removes only the matching notification from the user signal and sessionStorage', () => {
+      getMe.mockReturnValue(of({ ...mockUser, notifications: [notificationA, notificationB] }));
+      const store = setup();
+      store.loadUser().subscribe();
+
+      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+
+      expect(store.notifications()).toEqual([notificationB]);
+      expect(JSON.parse(sessionStorage.getItem(SESSION_KEY)!).notifications).toEqual([notificationB]);
+    });
+
+    it('does nothing when there is no user', () => {
+      const store = setup();
+
+      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+
+      expect(store.user()).toBeNull();
     });
   });
 });

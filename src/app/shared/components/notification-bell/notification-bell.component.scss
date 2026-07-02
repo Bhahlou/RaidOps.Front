@@ -1,0 +1,14 @@
+// Mat-menu already caps panel height to the viewport and scrolls internally when the list is
+// long — no extra max-height/overflow needed here, just a sensible width for the dropdown.
+::ng-deep .notification-menu-panel {
+  min-width: 360px;
+  max-width: 460px;
+}
+
+::ng-deep .notification-menu-panel .empty-message {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
