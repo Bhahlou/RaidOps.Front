@@ -7,9 +7,11 @@ import { of, throwError } from 'rxjs';
 import { CharacterDetailComponent } from './character-detail.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { CharacterStore } from '../../stores/character.store';
+import { CharacterService } from '../../services/character.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { Character } from '../../models/character.model';
+import { CharacterDetail } from '../../models/character-detail.model';
 import { User } from '../../../../core/models/user.model';
 
 const makeChar = (overrides: Partial<Character> = {}): Character => ({
@@ -31,7 +33,12 @@ const NAME   = 'bhahlounette';
 
 type Params = { branch?: string | null; realm?: string | null; name?: string | null };
 
-const setup = (chars: Character[] = [], user: User | null = null, params: Params = {}) => {
+const setup = (
+  chars: Character[] = [],
+  user: User | null = null,
+  params: Params = {},
+  fetchedCharacter: CharacterDetail | 'error' = 'error',
+) => {
   const navigate = vi.fn();
   const { branch = BRANCH, realm = REALM, name = NAME } = params;
 
@@ -40,6 +47,11 @@ const setup = (chars: Character[] = [], user: User | null = null, params: Params
     resyncCharacter: vi.fn().mockReturnValue(of(makeChar())),
     deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
     loadCharacters: vi.fn().mockReturnValue(of(chars)),
+  };
+  const characterServiceMock = {
+    getCharacter: vi.fn().mockReturnValue(
+      fetchedCharacter === 'error' ? throwError(() => new Error('not found')) : of(fetchedCharacter),
+    ),
   };
   const snackbarMock = { success: vi.fn(), error: vi.fn() };
   const dialogMock = { open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }) };
@@ -61,6 +73,7 @@ const setup = (chars: Character[] = [], user: User | null = null, params: Params
       { provide: Router, useValue: { navigate } },
       { provide: AuthStore, useValue: { user: signal(user) } },
       { provide: CharacterStore, useValue: storeMock },
+      { provide: CharacterService, useValue: characterServiceMock },
       { provide: SnackbarService, useValue: snackbarMock },
       { provide: MatDialog, useValue: dialogMock },
     ],
@@ -68,7 +81,7 @@ const setup = (chars: Character[] = [], user: User | null = null, params: Params
 
   const fixture = TestBed.createComponent(CharacterDetailComponent);
   fixture.detectChanges();
-  return { component: fixture.componentInstance, navigate, storeMock, snackbarMock, dialogMock };
+  return { component: fixture.componentInstance, navigate, storeMock, characterServiceMock, snackbarMock, dialogMock };
 };
 
 describe('CharacterDetailComponent', () => {
@@ -83,7 +96,7 @@ describe('CharacterDetailComponent', () => {
       const char = makeChar();
       const { component } = setup([char]);
 
-      expect(component.character()).toEqual(char);
+      expect(component.character()).toEqual({ ...char, isOwner: true, canEditRaidSpecs: true });
     });
 
     it('returns undefined when no character matches', () => {
@@ -96,7 +109,7 @@ describe('CharacterDetailComponent', () => {
       const char = makeChar({ branchName: 'Classic_Anniversary' });
       const { component } = setup([char]);
 
-      expect(component.character()).toEqual(char);
+      expect(component.character()).toEqual({ ...char, isOwner: true, canEditRaidSpecs: true });
     });
   });
 
@@ -106,19 +119,19 @@ describe('CharacterDetailComponent', () => {
     it('defaults branch to "" and matches a character with empty branchName', () => {
       const char = makeChar({ branchName: '', realmSlug: REALM, name: NAME });
       const { component } = setup([char], null, { branch: null });
-      expect(component.character()).toEqual(char);
+      expect(component.character()).toEqual({ ...char, isOwner: true, canEditRaidSpecs: true });
     });
 
     it('defaults realm to "" and matches a character with empty realmSlug', () => {
       const char = makeChar({ branchName: 'Classic Anniversary', realmSlug: '', name: NAME });
       const { component } = setup([char], null, { realm: null });
-      expect(component.character()).toEqual(char);
+      expect(component.character()).toEqual({ ...char, isOwner: true, canEditRaidSpecs: true });
     });
 
     it('defaults name to "" and matches a character with empty name', () => {
       const char = makeChar({ branchName: 'Classic Anniversary', realmSlug: REALM, name: '' });
       const { component } = setup([char], null, { name: null });
-      expect(component.character()).toEqual(char);
+      expect(component.character()).toEqual({ ...char, isOwner: true, canEditRaidSpecs: true });
     });
   });
 
@@ -135,6 +148,55 @@ describe('CharacterDetailComponent', () => {
       const { navigate } = setup([makeChar()]);
 
       expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('does not call the character service when the character is one of the viewer\'s own', () => {
+      const { characterServiceMock } = setup([makeChar()]);
+
+      expect(characterServiceMock.getCharacter).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── viewing a non-owned character ────────────────────────────────────────
+
+  describe('viewing a non-owned character', () => {
+    it('fetches via CharacterService using the route branch/realm/name when not found in own store', () => {
+      const { characterServiceMock } = setup([]);
+
+      expect(characterServiceMock.getCharacter).toHaveBeenCalledWith(BRANCH, REALM, NAME);
+    });
+
+    it('exposes the fetched character with its own isOwner/canEditRaidSpecs flags', () => {
+      const fetched: CharacterDetail = { ...makeChar({ name: 'Teammate' }), isOwner: false, canEditRaidSpecs: true };
+      const { component } = setup([], null, {}, fetched);
+
+      expect(component.character()).toEqual(fetched);
+      expect(component.isOwner()).toBe(false);
+      expect(component.canEditRaidSpecs()).toBe(true);
+    });
+
+    it('navigates to /characters when the fetch fails (not found or forbidden)', () => {
+      const { navigate } = setup([], null, {}, 'error');
+
+      expect(navigate).toHaveBeenCalledWith(['/characters']);
+    });
+  });
+
+  // ── isOwner() / canEditRaidSpecs() ───────────────────────────────────────
+
+  describe('isOwner() / canEditRaidSpecs()', () => {
+    it('are both true for one of the viewer\'s own characters', () => {
+      const { component } = setup([makeChar()]);
+
+      expect(component.isOwner()).toBe(true);
+      expect(component.canEditRaidSpecs()).toBe(true);
+    });
+
+    it('are both false when no character is loaded yet', () => {
+      const { component } = setup([], null, {}, 'error');
+
+      expect(component.isOwner()).toBe(false);
+      expect(component.canEditRaidSpecs()).toBe(false);
     });
   });
 
@@ -279,7 +341,7 @@ describe('CharacterDetailComponent', () => {
 
       expect(dialogMock.open).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ data: { characters: [char], mode: 'edit' } }),
+        expect.objectContaining({ data: { characters: [{ ...char, isOwner: true, canEditRaidSpecs: true }], mode: 'edit' } }),
       );
     });
 

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,8 @@ import {
   BreadcrumbItem,
 } from '../../../../shared/components/page-header/page-header.component';
 import { CharacterStore } from '../../stores/character.store';
+import { CharacterService } from '../../services/character.service';
+import { CharacterDetail } from '../../models/character-detail.model';
 import { CharacterGuildsComponent } from '../../components/character-guilds/character-guilds.component';
 import { CharacterGearComponent } from '../../components/character-gear/character-gear.component';
 import { CharacterBisListComponent } from '../../components/character-bis-list/character-bis-list.component';
@@ -51,6 +53,7 @@ export class CharacterDetailComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #characterStore = inject(CharacterStore);
+  readonly #characterService = inject(CharacterService);
   readonly #authStore = inject(AuthStore);
   readonly #dialog = inject(MatDialog);
   readonly #snackbar = inject(SnackbarService);
@@ -59,7 +62,10 @@ export class CharacterDetailComponent implements OnInit {
   readonly #realm = this.#route.snapshot.paramMap.get('realm') ?? '';
   readonly #name = this.#route.snapshot.paramMap.get('name') ?? '';
 
-  readonly character = computed(() =>
+  /** Set only when the character isn't one of the viewer's own (fetched via the read API). */
+  readonly #fetchedCharacter = signal<CharacterDetail | null>(null);
+
+  readonly #ownCharacter = computed(() =>
     this.#characterStore
       .characterList()
       .find(
@@ -69,6 +75,15 @@ export class CharacterDetailComponent implements OnInit {
           c.name.toLowerCase() === this.#name,
       ),
   );
+
+  readonly character = computed<CharacterDetail | undefined>(() => {
+    const own = this.#ownCharacter();
+    if (own) return { ...own, isOwner: true, canEditRaidSpecs: true };
+    return this.#fetchedCharacter() ?? undefined;
+  });
+
+  readonly isOwner = computed(() => this.character()?.isOwner ?? false);
+  readonly canEditRaidSpecs = computed(() => this.character()?.canEditRaidSpecs ?? false);
 
   readonly breadcrumbs = computed((): BreadcrumbItem[] => {
     const user = this.#authStore.user();
@@ -86,9 +101,12 @@ export class CharacterDetailComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    if (!this.character()) {
-      this.#router.navigate(['/characters']);
-    }
+    if (this.#ownCharacter()) return;
+
+    this.#characterService.getCharacter(this.#branch, this.#realm, this.#name).subscribe({
+      next: (detail) => this.#fetchedCharacter.set(detail),
+      error: () => this.#router.navigate(['/characters']),
+    });
   }
 
   resyncCharacter(): void {

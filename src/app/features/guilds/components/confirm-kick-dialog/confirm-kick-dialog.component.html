@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>{{ 'roster.list.kickConfirmTitle' | transloco }}</h2>
+
+<mat-dialog-content>
+  <p>{{ 'roster.list.kickConfirmMessage' | transloco: { name: data.characterName } }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">
+    {{ 'roster.list.kickConfirmCancel' | transloco }}
+  </button>
+  <button mat-flat-button class="btn-danger" (click)="confirm()">
+    {{ 'roster.list.kickConfirmAction' | transloco }}
+  </button>
+</mat-dialog-actions>
