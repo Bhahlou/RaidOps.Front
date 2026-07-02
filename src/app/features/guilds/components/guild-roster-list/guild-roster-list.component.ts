@@ -26,6 +26,7 @@ import { GuildMembershipService } from '../../services/guild-membership.service'
 import { GuildRosterMember } from '../../models/guild-roster-member.model';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { ConfirmKickDialogComponent } from '../confirm-kick-dialog/confirm-kick-dialog.component';
+import { characterLink } from '../../../../shared/utils/character-link.util';
 
 type SortColumn = 'player' | 'character' | 'class' | 'level' | 'rank' | 'joinedAt';
 type SortDirection = 'asc' | 'desc';
@@ -264,12 +265,7 @@ export class GuildRosterListComponent implements OnInit {
   }
 
   characterLink(member: GuildRosterMember): string[] {
-    return [
-      '/characters',
-      member.branchName.toLowerCase().replace(/[\s_]+/g, '-'),
-      member.realmSlug,
-      member.characterName.toLowerCase(),
-    ];
+    return characterLink(member.branchName, member.realmSlug, member.characterName);
   }
 
   canEditRank(member: GuildRosterMember): boolean {

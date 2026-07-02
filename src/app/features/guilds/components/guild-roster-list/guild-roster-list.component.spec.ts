@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslocoService } from '@jsverse/transloco';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { GuildRosterListComponent } from './guild-roster-list.component';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
@@ -162,6 +162,20 @@ describe('GuildRosterListComponent', () => {
       expect(store.loadRoster).toHaveBeenCalledWith('g1', true);
       expect(characterStore.loadCharacters).toHaveBeenCalledWith(true);
     });
+
+    it('shows an error and does not refresh the stores when the service call fails', () => {
+      const component = setup();
+      const error = { status: 400 };
+      membershipService.updateRank.mockReturnValue(throwError(() => error));
+
+      component.updateRank(member(), CharacterRank.Alt);
+
+      expect(characterStore.membershipErrorKey).toHaveBeenCalledWith(error);
+      expect(snackbar.error).toHaveBeenCalledWith('characterDetail.guilds.errors.generic');
+      expect(snackbar.success).not.toHaveBeenCalled();
+      expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
+      expect(characterStore.loadCharacters).not.toHaveBeenCalled();
+    });
   });
 
   describe('kickMember', () => {
@@ -185,6 +199,20 @@ describe('GuildRosterListComponent', () => {
       expect(membershipService.leaveGuild).not.toHaveBeenCalled();
       expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
     });
+
+    it('shows an error and does not refresh the stores when the service call fails', () => {
+      const component = setup();
+      const error = { status: 400 };
+      membershipService.leaveGuild.mockReturnValue(throwError(() => error));
+
+      component.kickMember(member());
+
+      expect(characterStore.membershipErrorKey).toHaveBeenCalledWith(error);
+      expect(snackbar.error).toHaveBeenCalledWith('characterDetail.guilds.errors.generic');
+      expect(snackbar.success).not.toHaveBeenCalled();
+      expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
+      expect(characterStore.loadCharacters).not.toHaveBeenCalled();
+    });
   });
 
   describe('availableClasses', () => {
@@ -207,6 +235,12 @@ describe('GuildRosterListComponent', () => {
     it('is empty when there are no members', () => {
       const component = setup();
       store.members.set([]);
+      expect(component.availableClasses()).toEqual([]);
+    });
+
+    it('is empty when the roster has not loaded yet (null members)', () => {
+      const component = setup();
+      store.members.set(null);
       expect(component.availableClasses()).toEqual([]);
     });
   });
@@ -244,6 +278,12 @@ describe('GuildRosterListComponent', () => {
         member({ characterId: 1, raidSpecs: [{ specId: 2, name: 'Unholy', iconUrl: null, isMain: false }] }),
       ]);
 
+      expect(component.availableSpecs()).toEqual([]);
+    });
+
+    it('is empty when the roster has not loaded yet (null members)', () => {
+      const component = setup();
+      store.members.set(null);
       expect(component.availableSpecs()).toEqual([]);
     });
   });
@@ -479,6 +519,19 @@ describe('GuildRosterListComponent', () => {
       expect(component.filteredMembers()?.map((m) => m.characterName)).toEqual(['Arthas']);
     });
 
+    it('excludes a member with a null player name when the query only matches on player name', () => {
+      const component = setup();
+      store.members.set([
+        member({ characterId: 1, characterName: 'Jaina', playerName: null }),
+      ]);
+
+      // 'jaina' doesn't match the query, so the OR's right operand runs; playerName is null,
+      // so it must fall back to '' instead of throwing — and '' never contains a non-empty query.
+      component.setSearch('bhah');
+
+      expect(component.filteredMembers()?.map((m) => m.characterName)).toEqual([]);
+    });
+
     it('combines multiple filters with AND semantics', () => {
       const component = setup();
       store.members.set([
@@ -527,6 +580,10 @@ describe('GuildRosterListComponent', () => {
       component.toggleSort('character');
       expect(component.sortedMembers()?.map((m) => m.characterName)).toEqual(['Jaina', 'Arthas']);
       expect(component.sortIcon('character')).toBe('arrow_downward');
+
+      component.toggleSort('character');
+      expect(component.sortedMembers()?.map((m) => m.characterName)).toEqual(['Arthas', 'Jaina']);
+      expect(component.sortIcon('character')).toBe('arrow_upward');
     });
 
     it('resets to ascending when switching to a different column', () => {
@@ -555,6 +612,18 @@ describe('GuildRosterListComponent', () => {
       component.toggleSort('player');
 
       expect(component.sortedMembers()?.map((m) => m.characterName)).toEqual(['B', 'A']);
+    });
+
+    it('sorts by player name, falling back to the discord id, with the null name on the other side', () => {
+      const component = setup();
+      store.members.set([
+        member({ characterId: 1, characterName: 'C', playerName: null, playerDiscordId: 'a-fallback' }),
+        member({ characterId: 2, characterName: 'D', playerName: 'Zul', playerDiscordId: 'z' }),
+      ]);
+
+      component.toggleSort('player');
+
+      expect(component.sortedMembers()?.map((m) => m.characterName)).toEqual(['C', 'D']);
     });
 
     it('sorts by class name', () => {

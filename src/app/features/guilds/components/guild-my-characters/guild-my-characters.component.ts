@@ -14,6 +14,7 @@ import { CharacterRaidSpecsComponent } from '../../../characters/components/char
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
+import { characterLink } from '../../../../shared/utils/character-link.util';
 
 const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, CharacterRank.Alt];
 
@@ -85,7 +86,7 @@ export class GuildMyCharactersComponent {
   }
 
   characterLink(character: Character): string[] {
-    return ['/characters', character.branchName.toLowerCase().replace(/[\s_]+/g, '-'), character.realmSlug, character.name.toLowerCase()];
+    return characterLink(character.branchName, character.realmSlug, character.name);
   }
 
   toggleAddPanel(): void {

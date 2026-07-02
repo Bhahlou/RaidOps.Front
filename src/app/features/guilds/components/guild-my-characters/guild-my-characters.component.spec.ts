@@ -9,6 +9,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildMembership } from '../../models/guild-membership.model';
+import { GuildRosterStore } from '../../stores/guild-roster.store';
 
 const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
   guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
@@ -34,6 +35,7 @@ const setup = (opts: {
   const leaveGuild = vi.fn().mockReturnValue(of(undefined));
   const membershipErrorKey = vi.fn().mockReturnValue('characterDetail.guilds.errors.generic');
   const snackbar = { success: vi.fn(), error: vi.fn(), info: vi.fn() };
+  const loadRoster = vi.fn().mockReturnValue(of([]));
 
   const mockStore = {
     characterList:            signal(characterList),
@@ -46,12 +48,14 @@ const setup = (opts: {
     leaveGuild,
     membershipErrorKey,
   };
+  const mockRosterStore = { isLoading: signal(false), members: signal([]), loadRoster };
 
   TestBed.configureTestingModule({
     imports: [GuildMyCharactersComponent],
     providers: [
       { provide: CharacterStore, useValue: mockStore },
       { provide: SnackbarService, useValue: snackbar },
+      { provide: GuildRosterStore, useValue: mockRosterStore },
     ],
   }).overrideComponent(GuildMyCharactersComponent, { set: { template: '', imports: [] } });
 
@@ -59,7 +63,7 @@ const setup = (opts: {
   fixture.componentRef.setInput('guildId', guildId);
   fixture.detectChanges();
 
-  return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild, membershipErrorKey, snackbar };
+  return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild, membershipErrorKey, snackbar, loadRoster };
 };
 
 describe('GuildMyCharactersComponent', () => {
@@ -248,14 +252,15 @@ describe('GuildMyCharactersComponent', () => {
       expect(joinGuild).toHaveBeenCalledWith(5, 'g1', CharacterRank.Split);
     });
 
-    it('sets showAddPanel to false and shows a success snackbar', () => {
-      const { component, snackbar } = setup();
+    it('sets showAddPanel to false, shows a success snackbar, and refreshes the roster', () => {
+      const { component, snackbar, loadRoster } = setup({ guildId: 'g1' });
       component.showAddPanel.set(true);
 
       component.joinCharacter(makeChar(1));
 
       expect(component.showAddPanel()).toBe(false);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.joinSuccess');
+      expect(loadRoster).toHaveBeenCalledWith('g1', true);
     });
 
     it('shows an error snackbar mapped via store.membershipErrorKey when the join fails', () => {
@@ -274,13 +279,14 @@ describe('GuildMyCharactersComponent', () => {
   // ── updateRank ────────────────────────────────────────────────────────────
 
   describe('updateRank', () => {
-    it('calls store.updateRank with characterId, guildId and rank, and shows a success snackbar', () => {
-      const { component, updateRank, snackbar } = setup({ guildId: 'g1' });
+    it('calls store.updateRank with characterId, guildId and rank, shows a success snackbar, and refreshes the roster', () => {
+      const { component, updateRank, snackbar, loadRoster } = setup({ guildId: 'g1' });
 
       component.updateRank(3, CharacterRank.Alt);
 
       expect(updateRank).toHaveBeenCalledWith(3, 'g1', CharacterRank.Alt);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.rankUpdateSuccess');
+      expect(loadRoster).toHaveBeenCalledWith('g1', true);
     });
 
     it('shows an error snackbar when the update fails', () => {
@@ -296,13 +302,14 @@ describe('GuildMyCharactersComponent', () => {
   // ── removeCharacter ───────────────────────────────────────────────────────
 
   describe('removeCharacter', () => {
-    it('calls store.leaveGuild with characterId and guildId, and shows a success snackbar', () => {
-      const { component, leaveGuild, snackbar } = setup({ guildId: 'g1' });
+    it('calls store.leaveGuild with characterId and guildId, shows a success snackbar, and refreshes the roster', () => {
+      const { component, leaveGuild, snackbar, loadRoster } = setup({ guildId: 'g1' });
 
       component.removeCharacter(7);
 
       expect(leaveGuild).toHaveBeenCalledWith(7, 'g1');
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.leaveSuccess');
+      expect(loadRoster).toHaveBeenCalledWith('g1', true);
     });
 
     it('shows an error snackbar when the leave fails', () => {
