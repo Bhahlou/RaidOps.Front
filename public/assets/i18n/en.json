@@ -194,7 +194,32 @@
     },
     "myCharacters": "My characters in this guild",
     "empty": "You have no characters in this guild yet.",
-    "leave": "Leave guild"
+    "leave": "Leave guild",
+    "list": {
+      "empty": "This guild's roster is empty.",
+      "emptyFiltered": "No character matches the active filters.",
+      "columns": {
+        "player": "Player",
+        "character": "Character",
+        "class": "Class",
+        "specs": "Specs",
+        "level": "Level",
+        "rank": "Rank",
+        "joined": "Joined"
+      },
+      "rank": {
+        "Main": "Main",
+        "Split": "Split",
+        "Alt": "Alt"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Search player or character...",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "clear": "Clear",
+      "clearAll": "Clear all filters"
+    }
   },
   "home": {
     "title": "Manage your guild.",

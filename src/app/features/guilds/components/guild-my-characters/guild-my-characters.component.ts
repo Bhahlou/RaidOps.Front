@@ -13,6 +13,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
+import { GuildRosterStore } from '../../stores/guild-roster.store';
 
 const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, CharacterRank.Alt];
 
@@ -42,6 +43,7 @@ export class GuildMyCharactersComponent {
   readonly guildId = input.required<string>();
 
   readonly #store = inject(CharacterStore);
+  readonly #rosterStore = inject(GuildRosterStore);
   readonly #snackbar = inject(SnackbarService);
 
   readonly CharacterRank = CharacterRank;
@@ -103,6 +105,7 @@ export class GuildMyCharactersComponent {
       next: () => {
         this.showAddPanel.set(false);
         this.#snackbar.success('characterDetail.guilds.joinSuccess');
+        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
@@ -110,14 +113,20 @@ export class GuildMyCharactersComponent {
 
   updateRank(characterId: number, rank: CharacterRank): void {
     this.#store.updateRank(characterId, this.guildId(), rank).subscribe({
-      next: () => this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess'),
+      next: () => {
+        this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
+        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
+      },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
   }
 
   removeCharacter(characterId: number): void {
     this.#store.leaveGuild(characterId, this.guildId()).subscribe({
-      next: () => this.#snackbar.success('characterDetail.guilds.leaveSuccess'),
+      next: () => {
+        this.#snackbar.success('characterDetail.guilds.leaveSuccess');
+        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
+      },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
   }

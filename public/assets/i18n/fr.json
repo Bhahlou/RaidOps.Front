@@ -194,7 +194,32 @@
     },
     "myCharacters": "Mes personnages dans cette guilde",
     "empty": "Tu n'as encore aucun personnage dans cette guilde.",
-    "leave": "Quitter la guilde"
+    "leave": "Quitter la guilde",
+    "list": {
+      "empty": "Le roster de cette guilde est vide.",
+      "emptyFiltered": "Aucun personnage ne correspond aux filtres actifs.",
+      "columns": {
+        "player": "Joueur",
+        "character": "Personnage",
+        "class": "Classe",
+        "specs": "Specs",
+        "level": "Niveau",
+        "rank": "Rang",
+        "joined": "Depuis le"
+      },
+      "rank": {
+        "Main": "Main",
+        "Split": "Split",
+        "Alt": "Alt"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher un joueur ou un personnage...",
+      "dateFrom": "Du",
+      "dateTo": "Au",
+      "clear": "Effacer",
+      "clearAll": "Réinitialiser les filtres"
+    }
   },
   "home": {
     "title": "Gérez votre guilde.",

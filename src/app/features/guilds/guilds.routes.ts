@@ -46,6 +46,7 @@ export const guildRoutes: Routes = [
           },
           {
             path: 'roster',
+            data: { minAccessLevel: GuildAccessLevel.Roster },
             resolve: { characters: charactersResolver },
             loadComponent: () =>
               import('./pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
