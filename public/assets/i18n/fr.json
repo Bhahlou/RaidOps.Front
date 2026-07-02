@@ -198,6 +198,7 @@
     "list": {
       "empty": "Le roster de cette guilde est vide.",
       "emptyFiltered": "Aucun personnage ne correspond aux filtres actifs.",
+      "count": "{{ count }} personnage(s)",
       "columns": {
         "player": "Joueur",
         "character": "Personnage",

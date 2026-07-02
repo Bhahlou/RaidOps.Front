@@ -169,6 +169,25 @@ describe('SidenavComponent', () => {
     expect(component.isGuildsActive()).toBe(false);
   });
 
+  // ── hasRosterAccess ───────────────────────────────────────────────────────
+
+  describe('hasRosterAccess', () => {
+    it('is false for a Public-tier guild (e.g. no mapped Discord role)', () => {
+      const component = setup();
+      expect(component.hasRosterAccess(makeGuild({ accessLevel: GuildAccessLevel.Public }))).toBe(false);
+    });
+
+    it('is true for a Roster-tier guild', () => {
+      const component = setup();
+      expect(component.hasRosterAccess(makeGuild({ accessLevel: GuildAccessLevel.Roster }))).toBe(true);
+    });
+
+    it('is true for an Officer-tier guild', () => {
+      const component = setup();
+      expect(component.hasRosterAccess(makeGuild({ accessLevel: GuildAccessLevel.Officer }))).toBe(true);
+    });
+  });
+
   // ── auto-open guild section ───────────────────────────────────────────────
 
   describe('auto-open effect', () => {

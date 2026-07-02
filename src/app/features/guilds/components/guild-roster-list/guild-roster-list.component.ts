@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -74,7 +74,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   templateUrl: './guild-roster-list.component.html',
   styleUrl: './guild-roster-list.component.scss',
 })
-export class GuildRosterListComponent implements OnInit {
+export class GuildRosterListComponent {
   readonly guildId = input.required<string>();
 
   readonly #store = inject(GuildRosterStore);
@@ -174,6 +174,9 @@ export class GuildRosterListComponent implements OnInit {
     return list;
   });
 
+  /** Count of members matching the active filters — null while the roster hasn't loaded yet. */
+  readonly filteredCount = computed(() => this.filteredMembers()?.length ?? null);
+
   // ── Sorting ───────────────────────────────────────────────────────────────
 
   readonly #sortColumn = signal<SortColumn | null>(null);
@@ -190,10 +193,19 @@ export class GuildRosterListComponent implements OnInit {
     return [...members].sort((a, b) => dir * this.#compare(a, b, column));
   });
 
-  ngOnInit(): void {
-    // Always refetch on mount (not just when guildId changes) — the roster can be edited by
-    // other officers/players between visits, and the store's cache has no way to detect that.
-    this.#store.loadRoster(this.guildId(), true).subscribe();
+  constructor() {
+    // Reloads on first render and whenever guildId changes — the parent leaf route component
+    // is reused (not recreated) when only the guild switches, so ngOnInit alone would miss that.
+    // Always force a refetch (not just on guildId change) — the roster can be edited by other
+    // officers/players between visits, and the store's cache has no way to detect that.
+    //
+    // loadRoster() reads the store's internal state signal before writing to it; calling it
+    // untracked keeps that internal read/write pair from being captured as a dependency of this
+    // effect — otherwise the write re-triggers the effect, which calls loadRoster again, forever.
+    effect(() => {
+      const guildId = this.guildId();
+      untracked(() => this.#store.loadRoster(guildId, true).subscribe());
+    });
   }
 
   toggleSort(column: SortColumn): void {

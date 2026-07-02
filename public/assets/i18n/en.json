@@ -198,6 +198,7 @@
     "list": {
       "empty": "This guild's roster is empty.",
       "emptyFiltered": "No character matches the active filters.",
+      "count": "{{ count }} character(s)",
       "columns": {
         "player": "Player",
         "character": "Character",

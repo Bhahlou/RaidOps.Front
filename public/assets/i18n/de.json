@@ -198,6 +198,7 @@
     "list": {
       "empty": "Der Roster dieser Gilde ist leer.",
       "emptyFiltered": "Kein Charakter entspricht den aktiven Filtern.",
+      "count": "{{ count }} Charakter(e)",
       "columns": {
         "player": "Spieler",
         "character": "Charakter",

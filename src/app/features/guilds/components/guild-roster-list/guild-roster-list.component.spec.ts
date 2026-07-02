@@ -548,6 +548,44 @@ describe('GuildRosterListComponent', () => {
     });
   });
 
+  describe('filteredCount', () => {
+    it('is null before the roster has loaded', () => {
+      const component = setup();
+      store.members.set(null);
+      expect(component.filteredCount()).toBeNull();
+    });
+
+    it('reflects the unfiltered member count', () => {
+      const component = setup();
+      store.members.set([
+        member({ characterId: 1 }),
+        member({ characterId: 2 }),
+      ]);
+      expect(component.filteredCount()).toBe(2);
+    });
+
+    it('reflects the count after filters are applied', () => {
+      const component = setup();
+      store.members.set([
+        member({ characterId: 1, classId: 6 }),
+        member({ characterId: 2, classId: 1 }),
+      ]);
+
+      component.toggleClass(1);
+
+      expect(component.filteredCount()).toBe(1);
+    });
+
+    it('is 0 when no member matches the active filters', () => {
+      const component = setup();
+      store.members.set([member({ characterId: 1, classId: 6 })]);
+
+      component.toggleClass(1);
+
+      expect(component.filteredCount()).toBe(0);
+    });
+  });
+
   describe('toggleSort / sortIcon / sortedMembers', () => {
     it('returns members unsorted when no column is active, and sortIcon is null', () => {
       const component = setup();

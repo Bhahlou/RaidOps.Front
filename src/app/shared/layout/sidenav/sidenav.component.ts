@@ -7,6 +7,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { DiscordIconComponent } from '../../components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
+import { GuildAccessLevel, hasGuildAccess } from '../../../core/models/guild-access-level.enum';
+import { UserGuild } from '../../../core/models/user-guild.model';
 
 @Component({
   selector: 'app-sidenav',
@@ -71,5 +73,10 @@ export class SidenavComponent {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  }
+
+  /** Calendar/roster/loot require Roster-tier access — matches `minAccessLevel` in guilds.routes.ts. */
+  hasRosterAccess(guild: UserGuild): boolean {
+    return hasGuildAccess(guild.accessLevel, GuildAccessLevel.Roster);
   }
 }

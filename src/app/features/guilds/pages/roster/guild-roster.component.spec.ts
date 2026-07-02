@@ -32,7 +32,7 @@ describe('GuildRosterComponent', () => {
   });
 
   it('extracts guildId from the parent route', () => {
-    expect(setup('guild-42').guildId).toBe('guild-42');
+    expect(setup('guild-42').guildId()).toBe('guild-42');
   });
 
   it('sets i18nKey to sidenav.guild.roster on the last breadcrumb', () => {
