@@ -9,6 +9,8 @@ export interface GuildRosterMember {
   className: string;
   classColor: string;
   level: number;
+  branchName: string;
+  realmSlug: string;
   avatarUrl: string | null;
   playerDiscordId: string;
   playerName: string | null;

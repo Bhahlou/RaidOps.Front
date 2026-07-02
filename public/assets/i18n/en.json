@@ -211,7 +211,15 @@
         "Main": "Main",
         "Split": "Split",
         "Alt": "Alt"
-      }
+      },
+      "actions": "Actions",
+      "viewCharacter": "View character",
+      "kick": "Kick from guild",
+      "kickSuccess": "Character removed from the guild roster.",
+      "kickConfirmTitle": "Kick this character?",
+      "kickConfirmMessage": "{{name}} will be removed from this guild's roster. They can be added back later.",
+      "kickConfirmCancel": "Cancel",
+      "kickConfirmAction": "Kick"
     },
     "filters": {
       "searchPlaceholder": "Search player or character...",

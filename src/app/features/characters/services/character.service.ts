@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Character } from '../models/character.model';
+import { CharacterDetail } from '../models/character-detail.model';
 import { SyncedCharacter } from '../models/synced-character.model';
 import { BnetAccount } from '../models/bnet-account.model';
 
@@ -10,6 +11,13 @@ import { BnetAccount } from '../models/bnet-account.model';
 export interface GetCharactersResponse {
   bnetAccount: BnetAccount | null;
   characters: Character[];
+}
+
+/** Raw response envelope for {@link CharacterService.getCharacter}, flattened into CharacterDetail. */
+interface CharacterDetailResponse {
+  character: Character;
+  isOwner: boolean;
+  canEditRaidSpecs: boolean;
 }
 
 /**
@@ -27,6 +35,17 @@ export class CharacterService {
    */
   getCharacters(): Observable<GetCharactersResponse> {
     return this.#http.get<GetCharactersResponse>(`${this.#api}`);
+  }
+
+  /**
+   * Returns a single character's detail by branch/realm/name, regardless of owner — used to
+   * view a teammate's character from the guild roster. The requester must own the character or
+   * have at least Roster access to a guild it belongs to.
+   */
+  getCharacter(branch: string, realm: string, name: string): Observable<CharacterDetail> {
+    return this.#http.get<CharacterDetailResponse>(`${this.#api}/${branch}/${realm}/${name}`).pipe(
+      map(({ character, isOwner, canEditRaidSpecs }) => ({ ...character, isOwner, canEditRaidSpecs })),
+    );
   }
 
   /** Returns all WoW characters synced from BNet, including inactive ones. */

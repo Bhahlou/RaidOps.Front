@@ -1,20 +1,31 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatPrefix, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
+import { GuildAccessLevel, hasGuildAccess } from '../../../../core/models/guild-access-level.enum';
+import { AuthStore } from '../../../../core/stores/auth.store';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
+import { CharacterStore } from '../../../characters/stores/character.store';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
+import { GuildMembershipService } from '../../services/guild-membership.service';
 import { GuildRosterMember } from '../../models/guild-roster-member.model';
 import { CharacterRank } from '../../models/character-rank.enum';
+import { ConfirmKickDialogComponent } from '../confirm-kick-dialog/confirm-kick-dialog.component';
 
 type SortColumn = 'player' | 'character' | 'class' | 'level' | 'rank' | 'joinedAt';
 type SortDirection = 'asc' | 'desc';
@@ -37,6 +48,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   selector: 'app-guild-roster-list',
   standalone: true,
   imports: [
+    RouterLink,
     MatIconButton,
     MatCard,
     MatCardContent,
@@ -48,6 +60,9 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
     MatPrefix,
     MatIcon,
     MatInput,
+    MatMenuModule,
+    MatOption,
+    MatSelect,
     MatProgressSpinner,
     MatTableModule,
     TranslocoPipe,
@@ -62,13 +77,30 @@ export class GuildRosterListComponent implements OnInit {
   readonly guildId = input.required<string>();
 
   readonly #store = inject(GuildRosterStore);
+  readonly #characterStore = inject(CharacterStore);
   readonly #transloco = inject(TranslocoService);
+  readonly #authStore = inject(AuthStore);
+  readonly #membershipService = inject(GuildMembershipService);
+  readonly #snackbar = inject(SnackbarService);
+  readonly #dialog = inject(MatDialog);
 
   readonly DiscordIconType = DiscordIconType;
+  readonly ranks = RANK_ORDER;
 
-  readonly columns = ['player', 'character', 'class', 'specs', 'level', 'rank', 'joinedAt'];
+  readonly columns = ['player', 'character', 'class', 'specs', 'level', 'rank', 'joinedAt', 'actions'];
 
   readonly isLoading = this.#store.isLoading;
+
+  readonly isOfficer = computed(() => {
+    const guild = this.#authStore.user()?.guilds.find((g) => g.id === this.guildId());
+    return guild ? hasGuildAccess(guild.accessLevel, GuildAccessLevel.Officer) : false;
+  });
+
+  readonly #updatingRankCharacterId = signal<number | null>(null);
+  readonly updatingRankCharacterId = this.#updatingRankCharacterId.asReadonly();
+
+  readonly #kickingCharacterId = signal<number | null>(null);
+  readonly kickingCharacterId = this.#kickingCharacterId.asReadonly();
 
   readonly searchQuery = signal('');
 
@@ -79,8 +111,6 @@ export class GuildRosterListComponent implements OnInit {
   readonly #selectedRanks = signal<Set<CharacterRank>>(new Set());
   readonly dateRangeStart = signal<Date | null>(null);
   readonly dateRangeEnd = signal<Date | null>(null);
-
-  readonly ranks = RANK_ORDER;
 
   readonly availableClasses = computed<ClassOption[]>(() => {
     const byId = new Map<number, ClassOption>();
@@ -231,6 +261,62 @@ export class GuildRosterListComponent implements OnInit {
   /** Formats a timestamp using the app's current language, not a hardcoded locale. */
   formatDate(joinedAt: string): string {
     return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(new Date(joinedAt));
+  }
+
+  characterLink(member: GuildRosterMember): string[] {
+    return [
+      '/characters',
+      member.branchName.toLowerCase().replace(/[\s_]+/g, '-'),
+      member.realmSlug,
+      member.characterName.toLowerCase(),
+    ];
+  }
+
+  canEditRank(member: GuildRosterMember): boolean {
+    return this.isOfficer() || member.playerDiscordId === this.#authStore.user()?.discordId;
+  }
+
+  updateRank(member: GuildRosterMember, rank: CharacterRank): void {
+    this.#updatingRankCharacterId.set(member.characterId);
+    this.#membershipService.updateRank(member.characterId, this.guildId(), rank).subscribe({
+      next: () => {
+        this.#updatingRankCharacterId.set(null);
+        this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
+        this.#store.loadRoster(this.guildId(), true).subscribe();
+        this.#characterStore.loadCharacters(true).subscribe();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.#updatingRankCharacterId.set(null);
+        this.#snackbar.error(this.#characterStore.membershipErrorKey(err));
+      },
+    });
+  }
+
+  kickMember(member: GuildRosterMember): void {
+    this.#dialog
+      .open(ConfirmKickDialogComponent, {
+        width: '420px',
+        maxWidth: '95vw',
+        data: { characterName: member.characterName },
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+
+        this.#kickingCharacterId.set(member.characterId);
+        this.#membershipService.leaveGuild(member.characterId, this.guildId()).subscribe({
+          next: () => {
+            this.#kickingCharacterId.set(null);
+            this.#snackbar.success('roster.list.kickSuccess');
+            this.#store.loadRoster(this.guildId(), true).subscribe();
+            this.#characterStore.loadCharacters(true).subscribe();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.#kickingCharacterId.set(null);
+            this.#snackbar.error(this.#characterStore.membershipErrorKey(err));
+          },
+        });
+      });
   }
 
   #compare(a: GuildRosterMember, b: GuildRosterMember, column: SortColumn): number {

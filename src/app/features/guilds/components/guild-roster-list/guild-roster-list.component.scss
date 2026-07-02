@@ -65,6 +65,11 @@
   align-items: center;
   gap: 4px;
   margin-left: auto;
+  flex-shrink: 0;
+
+  mat-form-field {
+    width: 220px;
+  }
 }
 
 .filter-btn {
@@ -109,6 +114,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .spec-icon {
@@ -163,6 +173,28 @@
   &--main { color: var(--color-accent); }
   &--split { color: var(--color-text-primary); }
   &--alt { color: var(--color-text-muted); }
+}
+
+.rank-select {
+  width: 82px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-select-trigger {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+  }
+
+  &--main ::ng-deep .mat-mdc-select-value { color: var(--color-accent); }
+  &--split ::ng-deep .mat-mdc-select-value { color: var(--color-text-primary); }
+  &--alt ::ng-deep .mat-mdc-select-value { color: var(--color-text-muted); }
+}
+
+.actions-cell {
+  text-align: right;
+  width: 40px;
 }
 
 .rank-filter-btn {

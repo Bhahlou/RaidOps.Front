@@ -137,7 +137,7 @@
               } @else {
                 <app-wow-class-icon [classId]="member.classId" [className]="member.className" [size]="32" />
               }
-              <span class="character-name" [style.color]="member.classColor">{{ member.characterName }}</span>
+              <a class="character-name" [style.color]="member.classColor" [routerLink]="characterLink(member)">{{ member.characterName }}</a>
             </div>
           </td>
         </ng-container>
@@ -185,9 +185,23 @@
             </button>
           </th>
           <td mat-cell *matCellDef="let member">
-            <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
-              {{ 'roster.list.rank.' + member.characterRank | transloco }}
-            </span>
+            @if (canEditRank(member)) {
+              <mat-select
+                class="rank-select rank-select--{{ member.characterRank.toLowerCase() }}"
+                panelClass="rank-select-panel"
+                [value]="member.characterRank"
+                [disabled]="updatingRankCharacterId() === member.characterId"
+                (selectionChange)="updateRank(member, $event.value)"
+              >
+                @for (rank of ranks; track rank) {
+                  <mat-option [value]="rank">{{ 'roster.list.rank.' + rank | transloco }}</mat-option>
+                }
+              </mat-select>
+            } @else {
+              <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
+                {{ 'roster.list.rank.' + member.characterRank | transloco }}
+              </span>
+            }
           </td>
         </ng-container>
 
@@ -201,6 +215,31 @@
             </button>
           </th>
           <td mat-cell *matCellDef="let member">{{ formatDate(member.joinedAt) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let member" class="actions-cell">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" [title]="'roster.list.actions' | transloco">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <a mat-menu-item [routerLink]="characterLink(member)">
+                <mat-icon>visibility</mat-icon>
+                {{ 'roster.list.viewCharacter' | transloco }}
+              </a>
+              @if (isOfficer()) {
+                <button
+                  mat-menu-item
+                  [disabled]="kickingCharacterId() === member.characterId"
+                  (click)="kickMember(member)"
+                >
+                  <mat-icon>person_remove</mat-icon>
+                  {{ 'roster.list.kick' | transloco }}
+                </button>
+              }
+            </mat-menu>
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="columns"></tr>

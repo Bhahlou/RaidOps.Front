@@ -211,7 +211,15 @@
         "Main": "Main",
         "Split": "Split",
         "Alt": "Alt"
-      }
+      },
+      "actions": "Aktionen",
+      "viewCharacter": "Charakter ansehen",
+      "kick": "Aus der Gilde entfernen",
+      "kickSuccess": "Charakter aus dem Gilden-Roster entfernt.",
+      "kickConfirmTitle": "Diesen Charakter entfernen?",
+      "kickConfirmMessage": "{{name}} wird aus dem Roster dieser Gilde entfernt. Er/Sie kann später wieder hinzugefügt werden.",
+      "kickConfirmCancel": "Abbrechen",
+      "kickConfirmAction": "Entfernen"
     },
     "filters": {
       "searchPlaceholder": "Spieler oder Charakter suchen...",

@@ -211,7 +211,15 @@
         "Main": "Main",
         "Split": "Split",
         "Alt": "Alt"
-      }
+      },
+      "actions": "Actions",
+      "viewCharacter": "Voir le personnage",
+      "kick": "Éjecter de la guilde",
+      "kickSuccess": "Personnage retiré du roster de la guilde.",
+      "kickConfirmTitle": "Éjecter ce personnage ?",
+      "kickConfirmMessage": "{{name}} sera retiré du roster de cette guilde. Il pourra être ajouté à nouveau plus tard.",
+      "kickConfirmCancel": "Annuler",
+      "kickConfirmAction": "Éjecter"
     },
     "filters": {
       "searchPlaceholder": "Rechercher un joueur ou un personnage...",
