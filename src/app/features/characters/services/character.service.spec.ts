@@ -58,6 +58,21 @@ describe('CharacterService', () => {
     });
   });
 
+  describe('getCharacter', () => {
+    it('sends GET /characters/:branch/:realm/:name and flattens the envelope into a CharacterDetail', () => {
+      const char = makeChar(1);
+
+      let result: (Character & { isOwner: boolean; canEditRaidSpecs: boolean }) | undefined;
+      service.getCharacter('classic-anniversary', 'kazzak', 'arthas').subscribe(r => { result = r; });
+
+      const req = controller.expectOne(r => r.url.endsWith('/characters/classic-anniversary/kazzak/arthas'));
+      expect(req.request.method).toBe('GET');
+      req.flush({ character: char, isOwner: false, canEditRaidSpecs: true });
+
+      expect(result).toEqual({ ...char, isOwner: false, canEditRaidSpecs: true });
+    });
+  });
+
   describe('getSyncedCharacters', () => {
     it('sends GET /characters/synced and returns the list', () => {
       const synced: SyncedCharacter[] = [
