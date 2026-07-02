@@ -65,18 +65,20 @@
             <mat-icon class="item-icon">home</mat-icon>
             <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
           </a>
-          <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'calendar']" routerLinkActive="active-link">
-            <mat-icon class="item-icon">calendar_month</mat-icon>
-            <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
-          </a>
-          <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'roster']" routerLinkActive="active-link">
-            <mat-icon class="item-icon">groups</mat-icon>
-            <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
-          </a>
-          <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'loot']" routerLinkActive="active-link">
-            <mat-icon class="item-icon">diamond</mat-icon>
-            <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
-          </a>
+          @if (hasRosterAccess(guild)) {
+            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'calendar']" routerLinkActive="active-link">
+              <mat-icon class="item-icon">calendar_month</mat-icon>
+              <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
+            </a>
+            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'roster']" routerLinkActive="active-link">
+              <mat-icon class="item-icon">groups</mat-icon>
+              <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
+            </a>
+            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'loot']" routerLinkActive="active-link">
+              <mat-icon class="item-icon">diamond</mat-icon>
+              <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
+            </a>
+          }
           @if (guild.isAdmin) {
             <div class="section-separator"></div>
             <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'settings']" routerLinkActive="active-link">

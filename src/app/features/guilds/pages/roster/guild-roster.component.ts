@@ -14,7 +14,9 @@ import { injectGuildContext } from '../../inject-guild-context';
 export class GuildRosterComponent {
   readonly #guildContext = injectGuildContext();
 
-  readonly guildId = this.#guildContext.guildId;
+  // currentGuildId (not the static guildId snapshot) — this leaf route component is reused
+  // (not recreated) when only the parent's :id param changes, e.g. switching guilds.
+  readonly guildId = this.#guildContext.currentGuildId;
 
   readonly breadcrumbs = computed(() => this.#guildContext.breadcrumbs('sidenav.guild.roster'));
 }
