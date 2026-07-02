@@ -97,6 +97,10 @@
           </button>
         }
       </div>
+
+      @if (filteredCount() !== null) {
+        <p class="filtered-count">{{ 'roster.list.count' | transloco: { count: filteredCount() } }}</p>
+      }
     </div>
 
     @if (isLoading()) {

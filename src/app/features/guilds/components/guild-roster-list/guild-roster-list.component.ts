@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -174,6 +174,9 @@ export class GuildRosterListComponent {
     return list;
   });
 
+  /** Count of members matching the active filters — null while the roster hasn't loaded yet. */
+  readonly filteredCount = computed(() => this.filteredMembers()?.length ?? null);
+
   // ── Sorting ───────────────────────────────────────────────────────────────
 
   readonly #sortColumn = signal<SortColumn | null>(null);
@@ -195,8 +198,13 @@ export class GuildRosterListComponent {
     // is reused (not recreated) when only the guild switches, so ngOnInit alone would miss that.
     // Always force a refetch (not just on guildId change) — the roster can be edited by other
     // officers/players between visits, and the store's cache has no way to detect that.
+    //
+    // loadRoster() reads the store's internal state signal before writing to it; calling it
+    // untracked keeps that internal read/write pair from being captured as a dependency of this
+    // effect — otherwise the write re-triggers the effect, which calls loadRoster again, forever.
     effect(() => {
-      this.#store.loadRoster(this.guildId(), true).subscribe();
+      const guildId = this.guildId();
+      untracked(() => this.#store.loadRoster(guildId, true).subscribe());
     });
   }
 
