@@ -360,7 +360,8 @@ export class GuildAuditLogComponent {
       case GuildAuditAction.GuildRegistered:
         return entry.variables?.['guildName'] ?? '—';
 
-      case GuildAuditAction.SettingsUpdated: {
+      case GuildAuditAction.SettingsUpdated:
+      case GuildAuditAction.OfficerThresholdUpdated: {
         const changes = this.settingsFieldChanges(entry);
         if (changes.length === 0) return '—';
         if (changes.length === 1) return changes[0].summary;
@@ -417,6 +418,16 @@ export class GuildAuditLogComponent {
         const newRole = this.#roleDisplay(v, 'newMinRosterRole');
         return {
           labelKey: 'auditLog.settingsFields.minRosterRoleId',
+          summary: `${oldRole?.name ?? '—'} → ${newRole?.name ?? '—'}`,
+          roleChange: { old: oldRole, new: newRole },
+        };
+      }
+
+      case 'minOfficerRoleId': {
+        const oldRole = this.#roleDisplay(v, 'oldMinOfficerRole');
+        const newRole = this.#roleDisplay(v, 'newMinOfficerRole');
+        return {
+          labelKey: 'auditLog.settingsFields.minOfficerRoleId',
           summary: `${oldRole?.name ?? '—'} → ${newRole?.name ?? '—'}`,
           roleChange: { old: oldRole, new: newRole },
         };

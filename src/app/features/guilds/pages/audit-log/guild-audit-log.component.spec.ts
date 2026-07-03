@@ -657,6 +657,37 @@ describe('GuildAuditLogComponent', () => {
       expect(changes[0].summary).toBe('— → —');
     });
 
+    it('builds a role change with resolved name and color for minOfficerRoleId', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: {
+          changedFields: 'minOfficerRoleId',
+          oldMinOfficerRoleName: 'Officiers', oldMinOfficerRoleColor: '16711680',
+          newMinOfficerRoleName: 'Raiders',
+        },
+      }));
+
+      expect(changes[0].roleChange).toEqual({
+        old: { name: 'Officiers', color: '#ff0000', iconUrl: null },
+        new: { name: 'Raiders', color: null, iconUrl: null },
+      });
+      expect(changes[0].summary).toBe('Officiers → Raiders');
+    });
+
+    it('treats an unresolved officer role (bot not in guild) as null rather than failing', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: { changedFields: 'minOfficerRoleId' },
+      }));
+
+      expect(changes[0].roleChange).toEqual({ old: null, new: null });
+      expect(changes[0].summary).toBe('— → —');
+    });
+
     it('returns one entry per field, in changedFields order', () => {
       const component = setup();
 
@@ -737,6 +768,19 @@ describe('GuildAuditLogComponent', () => {
       const component = setup();
 
       expect(component.changeSummary(entry({ actionType: GuildAuditAction.SettingsUpdated }))).toBe('—');
+    });
+
+    it('builds the field summary for OfficerThresholdUpdated the same way as SettingsUpdated', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.OfficerThresholdUpdated,
+        variables: {
+          changedFields: 'minOfficerRoleId',
+          oldMinOfficerRoleName: 'Officiers',
+          newMinOfficerRoleName: 'Raiders',
+        },
+      }))).toBe('Officiers → Raiders');
     });
 
     it('shows the raw (untranslated) rank transition for MemberRankUpdated', () => {

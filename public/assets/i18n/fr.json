@@ -66,8 +66,19 @@
       "threshold": "Seuil",
       "excluded": "Rôles exclus"
     },
+    "officerThreshold": {
+      "label": "Seuil d'accès Officier",
+      "hint": "Sélectionne le rôle minimum requis pour l'accès Officier. Ce rôle et tous les rôles au-dessus deviennent Officiers, indépendamment de l'accès au roster. Les administrateurs du serveur Discord conservent toujours l'accès complet, quel que soit ce choix."
+    },
     "save": "Enregistrer les réglages",
     "saveSuccess": "Réglages enregistrés."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification.",
+    "officerThresholdNotConfigured": "« {{ guildName }} » n'a pas encore de seuil d'accès Officier configuré — choisis quel rôle Discord donne accès au statut Officier dans les paramètres de la guilde.",
+    "viewLink": "Configurer",
+    "dismiss": "Ne plus jamais afficher"
   },
   "auditLog": {
     "pageTitle": "Journal d'audit",
@@ -96,7 +107,8 @@
     "settingsFields": {
       "timezone": "Fuseau horaire",
       "rosterMode": "Accès au roster",
-      "minRosterRoleId": "Seuil de rôle Discord modifié"
+      "minRosterRoleId": "Seuil de rôle Discord modifié",
+      "minOfficerRoleId": "Seuil d'accès Officier modifié"
     },
     "actionLabels": {
       "GuildRegistered": "Enregistrement",
@@ -104,7 +116,8 @@
       "MemberJoined": "Membre rejoint",
       "MemberLeft": "Membre parti",
       "MemberExcluded": "Membre exclu",
-      "MemberRankUpdated": "Rang modifié"
+      "MemberRankUpdated": "Rang modifié",
+      "OfficerThresholdUpdated": "Seuil Officier modifié"
     }
   },
   "noGuild": {

@@ -66,8 +66,19 @@
       "threshold": "Threshold",
       "excluded": "Excluded roles"
     },
+    "officerThreshold": {
+      "label": "Officer access threshold",
+      "hint": "Select the minimum role required for Officer access. That role and all roles above it become Officers, independently of roster access. Discord server administrators always keep full access, regardless of this choice."
+    },
     "save": "Save settings",
     "saveSuccess": "Settings saved."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications.",
+    "officerThresholdNotConfigured": "\"{{ guildName }}\" has no Officer access threshold configured yet — choose which Discord role grants Officer access in the guild settings.",
+    "viewLink": "Configure",
+    "dismiss": "Never show again"
   },
   "auditLog": {
     "pageTitle": "Audit log",
@@ -96,7 +107,8 @@
     "settingsFields": {
       "timezone": "Timezone",
       "rosterMode": "Roster access",
-      "minRosterRoleId": "Discord role threshold changed"
+      "minRosterRoleId": "Discord role threshold changed",
+      "minOfficerRoleId": "Officer access threshold changed"
     },
     "actionLabels": {
       "GuildRegistered": "Registration",
@@ -104,7 +116,8 @@
       "MemberJoined": "Member joined",
       "MemberLeft": "Member left",
       "MemberExcluded": "Member excluded",
-      "MemberRankUpdated": "Rank updated"
+      "MemberRankUpdated": "Rank updated",
+      "OfficerThresholdUpdated": "Officer threshold updated"
     }
   },
   "noGuild": {

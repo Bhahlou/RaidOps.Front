@@ -4,8 +4,11 @@ import { of, Subject, throwError } from 'rxjs';
 import { GuildSettingsFormComponent } from './guild-settings-form.component';
 import { GuildSettingsService } from '../../services/guild-settings.service';
 import { GuildStore } from '../../stores/guild.store';
+import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
+import { AuthStore } from '../../../../core/stores/auth.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GuildSettings } from '../../models/guild-settings.model';
+import { OfficerThreshold } from '../../models/officer-threshold.model';
 import { RosterMode } from '../../models/roster-mode.enum';
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
 
@@ -19,36 +22,59 @@ const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
   ...overrides,
 });
 
+const officerThreshold = (overrides?: Partial<OfficerThreshold>): OfficerThreshold => ({
+  minOfficerRoleId: null,
+  ...overrides,
+});
+
 describe('GuildSettingsFormComponent', () => {
   let fixture: ComponentFixture<GuildSettingsFormComponent>;
   let component: GuildSettingsFormComponent;
   let settingsService: {
     getDiscordRoles: ReturnType<typeof vi.fn>;
     updateSettings: ReturnType<typeof vi.fn>;
+    updateOfficerThreshold: ReturnType<typeof vi.fn>;
   };
   let guildStore: {
     loadSettings: ReturnType<typeof vi.fn>;
     patchSettings: ReturnType<typeof vi.fn>;
   };
+  let officerThresholdStore: {
+    loadOfficerThreshold: ReturnType<typeof vi.fn>;
+    patchOfficerThreshold: ReturnType<typeof vi.fn>;
+  };
+  let authStore: { loadUser: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
 
-  const setup = (guildId = 'g1', storeSettings = settings()) => {
+  const setup = (
+    guildId = 'g1',
+    storeSettings = settings(),
+    storeOfficerThreshold = officerThreshold(),
+  ) => {
     settingsService = {
-      getDiscordRoles: vi.fn().mockReturnValue(of([])),
-      updateSettings:  vi.fn().mockReturnValue(of(undefined)),
+      getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+      updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+      updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
     };
     guildStore = {
       loadSettings:   vi.fn().mockReturnValue(of(storeSettings)),
       patchSettings:  vi.fn(),
     };
+    officerThresholdStore = {
+      loadOfficerThreshold:  vi.fn().mockReturnValue(of(storeOfficerThreshold)),
+      patchOfficerThreshold: vi.fn(),
+    };
+    authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
 
     TestBed.configureTestingModule({
       imports: [GuildSettingsFormComponent],
       providers: [
-        { provide: GuildSettingsService, useValue: settingsService },
-        { provide: GuildStore,           useValue: guildStore },
-        { provide: SnackbarService,      useValue: snackbar },
+        { provide: GuildSettingsService,   useValue: settingsService },
+        { provide: GuildStore,             useValue: guildStore },
+        { provide: OfficerThresholdStore,  useValue: officerThresholdStore },
+        { provide: AuthStore,              useValue: authStore },
+        { provide: SnackbarService,        useValue: snackbar },
       ],
     }).overrideComponent(GuildSettingsFormComponent, { set: { template: '', imports: [] } });
 
@@ -73,6 +99,35 @@ describe('GuildSettingsFormComponent', () => {
       fixture.detectChanges();
 
       expect(component.form.value.timezone).not.toBe('');
+    });
+
+    it('pre-fills minOfficerRoleId from the officer threshold store', () => {
+      setup('g1', settings(), officerThreshold({ minOfficerRoleId: 'r9' }));
+      fixture.detectChanges();
+
+      expect(component.form.value.minOfficerRoleId).toBe('r9');
+    });
+
+    it('loads Discord roles eagerly, regardless of roster mode', () => {
+      setup();
+      const roles = [role('r1'), role('r2')];
+      settingsService.getDiscordRoles.mockReturnValue(of(roles));
+
+      fixture.detectChanges();
+
+      expect(settingsService.getDiscordRoles).toHaveBeenCalledWith('g1');
+      expect(component.availableRoles()).toEqual(roles);
+      expect(component.rolesLoading()).toBe(false);
+    });
+
+    it('shows snackbar error and clears loading flag when role fetch fails', () => {
+      setup();
+      settingsService.getDiscordRoles.mockReturnValue(throwError(() => new Error()));
+
+      fixture.detectChanges();
+
+      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
+      expect(component.rolesLoading()).toBe(false);
     });
   });
 
@@ -118,31 +173,6 @@ describe('GuildSettingsFormComponent', () => {
   // ── rosterMode subscription ───────────────────────────────────────────────
 
   describe('rosterMode subscription', () => {
-    it('loads Discord roles when switching to DiscordRoleOnly', () => {
-      setup();
-      const roles = [role('r1'), role('r2')];
-      settingsService.getDiscordRoles.mockReturnValue(of(roles));
-      fixture.detectChanges();
-
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-
-      expect(settingsService.getDiscordRoles).toHaveBeenCalledWith('g1');
-      expect(component.availableRoles()).toEqual(roles);
-      expect(component.rolesLoading()).toBe(false);
-    });
-
-    it('does not re-fetch roles when they are already loaded', () => {
-      setup();
-      settingsService.getDiscordRoles.mockReturnValue(of([role('r1')]));
-      fixture.detectChanges();
-
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-      component.form.controls.rosterMode.setValue(RosterMode.Open);
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-
-      expect(settingsService.getDiscordRoles).toHaveBeenCalledTimes(1);
-    });
-
     it('clears minRosterRoleId when switching back to Open', () => {
       setup();
       fixture.detectChanges();
@@ -151,116 +181,6 @@ describe('GuildSettingsFormComponent', () => {
       component.form.controls.rosterMode.setValue(RosterMode.Open);
 
       expect(component.form.value.minRosterRoleId).toBeNull();
-    });
-
-    it('shows snackbar error and clears loading flag when role fetch fails', () => {
-      setup();
-      settingsService.getDiscordRoles.mockReturnValue(throwError(() => new Error()));
-      fixture.detectChanges();
-
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-
-      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
-      expect(component.rolesLoading()).toBe(false);
-    });
-  });
-
-  // ── role state methods ────────────────────────────────────────────────────
-
-  describe('role state methods', () => {
-    const setupWithRoles = () => {
-      setup();
-      fixture.detectChanges();
-      component.availableRoles.set([role('r1'), role('r2'), role('r3')]);
-      component.form.controls.minRosterRoleId.setValue('r2');
-    };
-
-    describe('isThreshold', () => {
-      it('returns true only for the current threshold role', () => {
-        setupWithRoles();
-
-        expect(component.isThreshold(role('r2'))).toBe(true);
-        expect(component.isThreshold(role('r1'))).toBe(false);
-        expect(component.isThreshold(role('r3'))).toBe(false);
-      });
-    });
-
-    describe('isRoleIncluded', () => {
-      it('returns true for roles at or before the threshold index', () => {
-        setupWithRoles();
-
-        expect(component.isRoleIncluded(role('r1'))).toBe(true);
-        expect(component.isRoleIncluded(role('r2'))).toBe(true);
-        expect(component.isRoleIncluded(role('r3'))).toBe(false);
-      });
-
-      it('returns false when no threshold is set', () => {
-        setup();
-        fixture.detectChanges();
-        component.availableRoles.set([role('r1')]);
-        component.form.controls.minRosterRoleId.setValue(null);
-
-        expect(component.isRoleIncluded(role('r1'))).toBe(false);
-      });
-    });
-
-    describe('isRoleExcluded', () => {
-      it('returns true for roles after the threshold index', () => {
-        setupWithRoles();
-
-        expect(component.isRoleExcluded(role('r1'))).toBe(false);
-        expect(component.isRoleExcluded(role('r2'))).toBe(false);
-        expect(component.isRoleExcluded(role('r3'))).toBe(true);
-      });
-
-      it('returns false when no threshold is set', () => {
-        setup();
-        fixture.detectChanges();
-        component.availableRoles.set([role('r1')]);
-        component.form.controls.minRosterRoleId.setValue(null);
-
-        expect(component.isRoleExcluded(role('r1'))).toBe(false);
-      });
-    });
-  });
-
-  // ── selectThreshold ───────────────────────────────────────────────────────
-
-  describe('selectThreshold', () => {
-    it('sets minRosterRoleId to the selected role', () => {
-      setup();
-      fixture.detectChanges();
-      component.selectThreshold('r1');
-
-      expect(component.form.value.minRosterRoleId).toBe('r1');
-    });
-
-    it('clears minRosterRoleId when the same role is selected again (toggle off)', () => {
-      setup();
-      fixture.detectChanges();
-      component.form.controls.minRosterRoleId.setValue('r1');
-      component.selectThreshold('r1');
-
-      expect(component.form.value.minRosterRoleId).toBeNull();
-    });
-  });
-
-  // ── roleColor ─────────────────────────────────────────────────────────────
-
-  describe('roleColor', () => {
-    it('returns a 6-digit lowercase hex string for a non-zero color', () => {
-      setup();
-      expect(component.roleColor(role('r1', 0xff0000))).toBe('#ff0000');
-    });
-
-    it('zero-pads the hex string to 6 characters', () => {
-      setup();
-      expect(component.roleColor(role('r1', 0x0000ff))).toBe('#0000ff');
-    });
-
-    it('returns null for a zero color', () => {
-      setup();
-      expect(component.roleColor(role('r1', 0))).toBeNull();
     });
   });
 
@@ -289,22 +209,6 @@ describe('GuildSettingsFormComponent', () => {
     });
   });
 
-  // ── roleIconUrl ───────────────────────────────────────────────────────────
-
-  describe('roleIconUrl', () => {
-    it('returns a Discord CDN URL containing the role id and icon hash', () => {
-      setup();
-      const url = component.roleIconUrl(role('r1', 0, 'abc123'));
-
-      expect(url).toContain('/role-icons/r1/abc123');
-    });
-
-    it('returns null when iconHash is null', () => {
-      setup();
-      expect(component.roleIconUrl(role('r1', 0, null))).toBeNull();
-    });
-  });
-
   // ── submit ────────────────────────────────────────────────────────────────
 
   describe('submit', () => {
@@ -316,6 +220,18 @@ describe('GuildSettingsFormComponent', () => {
       component.submit();
 
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
+      expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when minOfficerRoleId is not set (required)', () => {
+      setup();
+      fixture.detectChanges();
+      component.form.patchValue({ timezone: 'UTC' });
+
+      component.submit();
+
+      expect(settingsService.updateSettings).not.toHaveBeenCalled();
+      expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
     });
 
     it('does not submit a second time while already submitting', () => {
@@ -323,7 +239,7 @@ describe('GuildSettingsFormComponent', () => {
       const pending = new Subject<void>();
       settingsService.updateSettings.mockReturnValue(pending.asObservable());
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC' });
+      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
 
       component.submit();
       component.submit();
@@ -331,10 +247,10 @@ describe('GuildSettingsFormComponent', () => {
       expect(settingsService.updateSettings).toHaveBeenCalledTimes(1);
     });
 
-    it('calls updateSettings with the correct payload on success', () => {
+    it('calls updateSettings and updateOfficerThreshold with the correct payloads', () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open });
+      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
 
       component.submit();
 
@@ -342,6 +258,7 @@ describe('GuildSettingsFormComponent', () => {
         'g1',
         expect.objectContaining({ timezone: 'UTC', rosterMode: RosterMode.Open, minRosterRoleId: null }),
       );
+      expect(settingsService.updateOfficerThreshold).toHaveBeenCalledWith('g1', { minOfficerRoleId: 'r1' });
     });
 
     it('sends minRosterRoleId when rosterMode is DiscordRoleOnly', () => {
@@ -350,6 +267,7 @@ describe('GuildSettingsFormComponent', () => {
       fixture.detectChanges();
       component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
       component.form.controls.minRosterRoleId.setValue('r1');
+      component.form.controls.minOfficerRoleId.setValue('r1');
 
       component.submit();
 
@@ -360,7 +278,7 @@ describe('GuildSettingsFormComponent', () => {
     it('forces minRosterRoleId to null when rosterMode is Open', () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open });
+      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
       // Bypass rosterMode subscription to sneak a value into the control
       component.form.controls.minRosterRoleId.setValue('r1', { emitEvent: false });
 
@@ -370,10 +288,10 @@ describe('GuildSettingsFormComponent', () => {
       expect(sent.minRosterRoleId).toBeNull();
     });
 
-    it('patches the store and emits saved on success', () => {
+    it('patches both stores, resyncs the user and emits saved on success', () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC' });
+      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
       const savedSpy = vi.spyOn(component.saved, 'emit');
 
       component.submit();
@@ -382,15 +300,17 @@ describe('GuildSettingsFormComponent', () => {
         'g1',
         expect.objectContaining({ timezone: 'UTC' }),
       );
+      expect(officerThresholdStore.patchOfficerThreshold).toHaveBeenCalledWith('g1', { minOfficerRoleId: 'r1' });
+      expect(authStore.loadUser).toHaveBeenCalledOnce();
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.saveSuccess');
       expect(savedSpy).toHaveBeenCalled();
     });
 
-    it('shows snackbar error and resets submitting flag on failure', () => {
+    it('shows snackbar error and resets submitting flag when either call fails', () => {
       setup();
       settingsService.updateSettings.mockReturnValue(throwError(() => new Error()));
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC' });
+      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
 
       component.submit();
 

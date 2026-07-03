@@ -11,6 +11,10 @@
 
   <span class="spacer"></span>
 
+  @if (isAuthenticated()) {
+    <app-notification-bell />
+  }
+
   <app-lang-selector />
 
   <div class="user-trigger" [matMenuTriggerFor]="userMenu">

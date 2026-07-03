@@ -6,4 +6,5 @@ export enum GuildAuditAction {
   MemberLeft = 'MemberLeft',
   MemberExcluded = 'MemberExcluded',
   MemberRankUpdated = 'MemberRankUpdated',
+  OfficerThresholdUpdated = 'OfficerThresholdUpdated',
 }

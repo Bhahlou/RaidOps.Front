@@ -6,6 +6,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordIconComponent } from '../../components/discord-icon/discord-icon.component';
 import { LangSelectorComponent } from '../../components/lang-selector/lang-selector.component';
+import { NotificationBellComponent } from '../../components/notification-bell/notification-bell.component';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { AuthService } from '../../../core/services/auth.service';
@@ -22,6 +23,7 @@ import { EnvBrandingService } from '../../../core/services/env-branding.service'
     TranslocoPipe,
     DiscordIconComponent,
     LangSelectorComponent,
+    NotificationBellComponent,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',

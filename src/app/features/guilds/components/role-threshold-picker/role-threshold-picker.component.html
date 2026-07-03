@@ -1,0 +1,46 @@
+@if (loading()) {
+  <div class="roles-loading">
+    <mat-spinner diameter="24" />
+    <span>{{ 'guildSettings.roles.loading' | transloco }}</span>
+  </div>
+} @else if (roles().length > 0) {
+  <div class="roles-list-wrapper">
+    <div class="roles-list">
+      @for (role of roles(); track role.id; let last = $last) {
+        <button
+          type="button"
+          class="role-row"
+          [class.is-included]="isIncluded(role)"
+          [class.is-threshold]="isThreshold(role)"
+          [class.is-excluded]="isExcluded(role)"
+          [style.--role-color]="roleColor(role)"
+          (click)="select(role.id)"
+        >
+          <span class="role-row-indicator">
+            @if (isIncluded(role)) {
+              <mat-icon class="check-icon">check_circle</mat-icon>
+            } @else if (roleIconUrl(role); as iconUrl) {
+              <img class="role-icon" [src]="iconUrl" [alt]="" />
+            } @else if (roleColor(role); as color) {
+              <span class="role-dot" [style.background]="color"></span>
+            } @else {
+              <span class="role-dot-empty"></span>
+            }
+          </span>
+          <span class="role-row-name">{{ role.name }}</span>
+          @if (isThreshold(role)) {
+            <span class="threshold-badge">{{ 'guildSettings.roles.threshold' | transloco }}</span>
+          }
+        </button>
+
+        @if (isThreshold(role) && !last) {
+          <div class="threshold-divider">
+            <span class="threshold-divider-label">{{ 'guildSettings.roles.excluded' | transloco }}</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+} @else {
+  <p class="field-hint">{{ 'guildSettings.roles.empty' | transloco }}</p>
+}
