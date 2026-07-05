@@ -39,6 +39,11 @@ export const routes: Routes = [
           import('./features/changelog/changelog.component').then(m => m.ChangelogComponent),
       },
       {
+        path: 'roadmap',
+        loadComponent: () =>
+          import('./features/roadmap/roadmap.component').then(m => m.RoadmapComponent),
+      },
+      {
         path: '',
         canActivate: [authGuard],
         children: [

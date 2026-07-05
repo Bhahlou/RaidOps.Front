@@ -1,0 +1,144 @@
+.roadmap-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+
+  h1 {
+    margin: 0 0 8px;
+    color: var(--mat-sys-on-surface);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+}
+
+.intro {
+  margin: 0 0 32px;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.5;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 10px 6px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.roadmap-section {
+  margin-bottom: 28px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // The section currently being worked on gets its own frame, on top of the "En cours" badge.
+  &.roadmap-section--active {
+    padding: 16px 16px 20px;
+    border: 1px solid var(--mat-sys-primary);
+    border-radius: 14px;
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.section-title {
+  margin: 0;
+  color: var(--mat-sys-primary);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.section-progress {
+  margin-left: auto;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.section-badge {
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  color: var(--mat-sys-on-primary);
+  background: var(--mat-sys-primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.item-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container-high);
+
+  // Done items fade back — they're settled history, not what should catch the eye now.
+  &.item-box--done {
+    opacity: 0.7;
+  }
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-status {
+  flex: 0 0 auto;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  &.item-status--done {
+    color: var(--mat-sys-primary);
+  }
+
+  &.item-status--planned {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.item-title {
+  color: var(--mat-sys-on-surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.item-description {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}

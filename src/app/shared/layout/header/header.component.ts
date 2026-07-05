@@ -51,14 +51,16 @@ export class HeaderComponent {
   readonly unseenChangelogCount = this.#changelogStore.unseenCount;
 
   /**
-   * The "?" and "📣" header icons act like a toggle rather than plain navigation: clicking one
-   * while already inside its section returns to whatever route was open right before, instead of
-   * re-navigating to itself. Tracked from router events rather than browser history so it stays
-   * exact even if the user moves around between several manual articles or changelog visits.
+   * The "?", "📣" and roadmap header icons act like a toggle rather than plain navigation:
+   * clicking one while already inside its section returns to whatever route was open right
+   * before, instead of re-navigating to itself. Tracked from router events rather than browser
+   * history so it stays exact even if the user moves around between several manual articles or
+   * changelog/roadmap visits.
    */
   #currentUrl = this.#router.url;
   #returnFromManualUrl = '/';
   #returnFromChangelogUrl = '/';
+  #returnFromRoadmapUrl = '/';
 
   constructor() {
     this.#router.events
@@ -71,6 +73,7 @@ export class HeaderComponent {
         this.#currentUrl = e.urlAfterRedirects;
         if (!previousUrl.startsWith('/manual')) this.#returnFromManualUrl = previousUrl;
         if (!previousUrl.startsWith('/changelog')) this.#returnFromChangelogUrl = previousUrl;
+        if (!previousUrl.startsWith('/roadmap')) this.#returnFromRoadmapUrl = previousUrl;
       });
   }
 
@@ -84,6 +87,12 @@ export class HeaderComponent {
     if (!this.#currentUrl.startsWith('/changelog')) return;
     event.preventDefault();
     this.#router.navigateByUrl(this.#returnFromChangelogUrl);
+  }
+
+  onRoadmapClick(event: Event): void {
+    if (!this.#currentUrl.startsWith('/roadmap')) return;
+    event.preventDefault();
+    this.#router.navigateByUrl(this.#returnFromRoadmapUrl);
   }
 
   onLoginClick(): void {

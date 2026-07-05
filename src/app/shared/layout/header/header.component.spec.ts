@@ -163,4 +163,47 @@ describe('HeaderComponent', () => {
       expect(navigateByUrl).toHaveBeenCalledWith('/guilds');
     });
   });
+
+  describe('onRoadmapClick', () => {
+    it('does nothing when not currently on /roadmap', () => {
+      const component = setup(false, '/guilds');
+      const event = fakeClickEvent();
+
+      component.onRoadmapClick(event);
+
+      expect(event.preventDefault).not.toHaveBeenCalled();
+      expect(navigateByUrl).not.toHaveBeenCalled();
+    });
+
+    it('navigates back to the route open before entering /roadmap', () => {
+      const component = setup(false, '/guilds');
+      navigateTo('/roadmap');
+      const event = fakeClickEvent();
+
+      component.onRoadmapClick(event);
+
+      expect(event.preventDefault).toHaveBeenCalledOnce();
+      expect(navigateByUrl).toHaveBeenCalledWith('/guilds');
+    });
+
+    it('tracks the changelog and roadmap return urls independently', () => {
+      const component = setup(false, '/guilds');
+      navigateTo('/changelog');
+      navigateTo('/roadmap', 2);
+
+      component.onRoadmapClick(fakeClickEvent());
+
+      expect(navigateByUrl).toHaveBeenCalledWith('/changelog');
+    });
+
+    it('keeps the pre-roadmap return url stable while re-entering /roadmap', () => {
+      const component = setup(false, '/guilds');
+      navigateTo('/roadmap');
+      navigateTo('/roadmap', 2);
+
+      component.onRoadmapClick(fakeClickEvent());
+
+      expect(navigateByUrl).toHaveBeenCalledWith('/guilds');
+    });
+  });
 });

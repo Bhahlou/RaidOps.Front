@@ -35,6 +35,17 @@
     </mat-icon>
   </a>
 
+  <a
+    mat-icon-button
+    routerLink="/roadmap"
+    routerLinkActive="header-icon-active"
+    (click)="onRoadmapClick($event)"
+    [attr.aria-label]="'roadmap.pageTitle' | transloco"
+    [matTooltip]="'roadmap.pageTitle' | transloco"
+  >
+    <mat-icon>signpost</mat-icon>
+  </a>
+
   @if (isAuthenticated()) {
     <app-notification-bell />
   }
