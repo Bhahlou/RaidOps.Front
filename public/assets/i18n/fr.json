@@ -103,6 +103,169 @@
       }
     }
   },
+  "roadmap": {
+    "pageTitle": "Roadmap",
+    "intro": "Ce qui est prévu ou en réflexion pour la suite de RaidOps. Aucun ordre ni date garantis — juste de quoi se projeter sur la direction du projet.",
+    "inProgress": "En cours",
+    "status": {
+      "done": "Terminé",
+      "planned": "Prévu"
+    },
+    "section": {
+      "foundations": {
+        "title": "Fondations"
+      },
+      "loot": {
+        "title": "Gestion des loots"
+      },
+      "professions": {
+        "title": "Professions"
+      },
+      "privacy": {
+        "title": "RGPD et vie privée"
+      },
+      "technical": {
+        "title": "Technique"
+      },
+      "raidLogs": {
+        "title": "Raid logs"
+      }
+    },
+    "items": {
+      "discordAuth": {
+        "title": "Connexion Discord",
+        "description": "Authentification via son compte Discord."
+      },
+      "characterImport": {
+        "title": "Import de personnages",
+        "description": "Liaison Battle.net et import des personnages."
+      },
+      "characterManagement": {
+        "title": "Gestion du personnage",
+        "description": "Resync, désactivation, spés viables, guildes."
+      },
+      "guildRegister": {
+        "title": "Enregistrement de guilde",
+        "description": "Invitation du bot Discord pour enregistrer sa guilde."
+      },
+      "guildList": {
+        "title": "Liste des guildes",
+        "description": "Vue d'ensemble des guildes accessibles et à enregistrer."
+      },
+      "roster": {
+        "title": "Roster de guilde",
+        "description": "Tableau complet : recherche, filtres, tri, gestion des membres."
+      },
+      "auditLog": {
+        "title": "Journal d'audit",
+        "description": "Historique filtrable des actions notables de la guilde."
+      },
+      "notifications": {
+        "title": "Notifications in-app",
+        "description": "Alertes sur les actions requises côté officier."
+      },
+      "getStarted": {
+        "title": "Parcours d'onboarding",
+        "description": "Assistant guidé en 4 étapes pour démarrer."
+      },
+      "manual": {
+        "title": "Manuel d'aide",
+        "description": "Guides pas à pas accessibles depuis chaque page."
+      },
+      "whatsNew": {
+        "title": "Page Nouveautés",
+        "description": "Historique des fonctionnalités livrées."
+      },
+      "guildCalendar": {
+        "title": "Calendrier de guilde",
+        "description": "Gestion des absences et planification des events de raid."
+      },
+      "raidBuilder": {
+        "title": "Raid builder",
+        "description": "Compositions de raid, avec construction automatique."
+      },
+      "raidAssignments": {
+        "title": "Assignations de raid",
+        "description": "Qui doit faire quoi pendant le raid (dispel, soak, interrupt…)."
+      },
+      "raidHistory": {
+        "title": "Historique de raid",
+        "description": "Qui était présent, absent ou benché à chaque raid."
+      },
+      "guildDashboard": {
+        "title": "Dashboard de guilde",
+        "description": "Infos utiles au quotidien : prochains raids, personnages concernés, etc."
+      },
+      "gearArmory": {
+        "title": "Affichage du gear courant",
+        "description": "Équipement des personnages façon armory, avec les stats."
+      },
+      "bisLists": {
+        "title": "BIS lists",
+        "description": "Gestion des listes d'objets recherchés par personnage."
+      },
+      "lootHistoryImport": {
+        "title": "Import des historiques de loots",
+        "description": "Récupération de l'historique Gargul / RCLootCouncil dans la guilde."
+      },
+      "lootAwareRaidBuilder": {
+        "title": "Loots pris en compte dans les raids",
+        "description": "Les attributions de loot influencent la construction des raids."
+      },
+      "characterProfessions": {
+        "title": "Professions des personnages",
+        "description": "Renseigner les professions de chaque personnage."
+      },
+      "possibleCrafts": {
+        "title": "Liste des crafts possibles",
+        "description": "Voir ce que chaque personnage peut fabriquer."
+      },
+      "craftRequest": {
+        "title": "Demander un craft à la guilde",
+        "description": "Trouver qui, dans la guilde, peut fabriquer un objet donné."
+      },
+      "dataExport": {
+        "title": "Export de ses données",
+        "description": "Récupérer un export (blob) des données stockées par RaidOps."
+      },
+      "bnetAccountDeletion": {
+        "title": "Suppression de compte Battle.net",
+        "description": "Dissocier et supprimer les données liées à son compte Battle.net."
+      },
+      "discordAccountDeletion": {
+        "title": "Suppression de compte Discord",
+        "description": "Dissocier et supprimer les données liées à son compte Discord."
+      },
+      "characterDeletion": {
+        "title": "Suppression de personnage",
+        "description": "Supprimer définitivement un personnage de RaidOps."
+      },
+      "angular22Migration": {
+        "title": "Migration Angular 22",
+        "description": "Mise à jour du front vers Angular 22."
+      },
+      "securityHardening": {
+        "title": "Durcissement sécurité",
+        "description": "Revue et renforcement des points sensibles côté sécurité."
+      },
+      "responsiveness": {
+        "title": "Responsiveness du site",
+        "description": "Adaptation de l'interface aux petits écrans et mobiles."
+      },
+      "designPolish": {
+        "title": "Harmonisation du style",
+        "description": "Passe de cohérence visuelle sur l'ensemble de l'app (Material)."
+      },
+      "warcraftLogsIntegration": {
+        "title": "Intégration Warcraft Logs",
+        "description": "Suivi des logs de raid directement dans RaidOps."
+      },
+      "bossPerformanceTracking": {
+        "title": "Suivi de performance par boss",
+        "description": "Équivalent CLA/RPB : consommables, spés et gearcheck suivis boss par boss."
+      }
+    }
+  },
   "accessLevelBadge": {
     "public": "Public",
     "roster": "Roster",

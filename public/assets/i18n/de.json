@@ -103,6 +103,169 @@
       }
     }
   },
+  "roadmap": {
+    "pageTitle": "Roadmap",
+    "intro": "Was für RaidOps als Nächstes geplant ist oder überlegt wird. Ohne garantierte Reihenfolge oder Termine — nur ein Überblick über die Richtung des Projekts.",
+    "inProgress": "In Arbeit",
+    "status": {
+      "done": "Erledigt",
+      "planned": "Geplant"
+    },
+    "section": {
+      "foundations": {
+        "title": "Grundlagen"
+      },
+      "loot": {
+        "title": "Loot-Verwaltung"
+      },
+      "professions": {
+        "title": "Berufe"
+      },
+      "privacy": {
+        "title": "DSGVO und Datenschutz"
+      },
+      "technical": {
+        "title": "Technisch"
+      },
+      "raidLogs": {
+        "title": "Raid-Logs"
+      }
+    },
+    "items": {
+      "discordAuth": {
+        "title": "Discord-Anmeldung",
+        "description": "Authentifizierung über das Discord-Konto."
+      },
+      "characterImport": {
+        "title": "Charakterimport",
+        "description": "Battle.net-Verknüpfung und Charakterimport."
+      },
+      "characterManagement": {
+        "title": "Charakterverwaltung",
+        "description": "Resync, Deaktivierung, viable Specs, Gilden."
+      },
+      "guildRegister": {
+        "title": "Gildenregistrierung",
+        "description": "Einladung des Discord-Bots zur Gildenregistrierung."
+      },
+      "guildList": {
+        "title": "Gildenliste",
+        "description": "Überblick über zugängliche und registrierbare Gilden."
+      },
+      "roster": {
+        "title": "Gilden-Roster",
+        "description": "Vollständige Tabelle: Suche, Filter, Sortierung, Mitgliederverwaltung."
+      },
+      "auditLog": {
+        "title": "Audit-Log",
+        "description": "Filterbarer Verlauf wichtiger Gildenaktionen."
+      },
+      "notifications": {
+        "title": "In-App-Benachrichtigungen",
+        "description": "Hinweise auf erforderliche Officer-Aktionen."
+      },
+      "getStarted": {
+        "title": "Onboarding-Ablauf",
+        "description": "4-Schritte-Assistent für den Einstieg."
+      },
+      "manual": {
+        "title": "Hilfehandbuch",
+        "description": "Schritt-für-Schritt-Anleitungen auf jeder Seite."
+      },
+      "whatsNew": {
+        "title": "Neuigkeiten-Seite",
+        "description": "Verlauf der veröffentlichten Funktionen."
+      },
+      "guildCalendar": {
+        "title": "Gildenkalender",
+        "description": "Abwesenheitsverwaltung und Planung von Raid-Terminen."
+      },
+      "raidBuilder": {
+        "title": "Raid-Builder",
+        "description": "Raid-Zusammensetzungen, mit automatischem Aufbau."
+      },
+      "raidAssignments": {
+        "title": "Raid-Zuweisungen",
+        "description": "Wer macht was während des Raids (Dispel, Soak, Interrupt…)."
+      },
+      "raidHistory": {
+        "title": "Raid-Verlauf",
+        "description": "Wer bei welchem Raid anwesend, abwesend oder auf der Bank war."
+      },
+      "guildDashboard": {
+        "title": "Gilden-Dashboard",
+        "description": "Alltägliche Infos: kommende Raids, betroffene Charaktere usw."
+      },
+      "gearArmory": {
+        "title": "Anzeige der aktuellen Ausrüstung",
+        "description": "Ausrüstung der Charaktere im Armory-Stil, mit Werten."
+      },
+      "bisLists": {
+        "title": "BIS-Listen",
+        "description": "Verwaltung der Best-in-Slot-Wunschlisten pro Charakter."
+      },
+      "lootHistoryImport": {
+        "title": "Import der Loot-Historie",
+        "description": "Übernahme des Gargul-/RCLootCouncil-Verlaufs in die Gilde."
+      },
+      "lootAwareRaidBuilder": {
+        "title": "Loot-bewusster Raid-Aufbau",
+        "description": "Loot-Zuweisungen fließen in die Raid-Zusammensetzung ein."
+      },
+      "characterProfessions": {
+        "title": "Berufe der Charaktere",
+        "description": "Erfassen der Berufe jedes Charakters."
+      },
+      "possibleCrafts": {
+        "title": "Liste möglicher Craftings",
+        "description": "Sehen, was jeder Charakter herstellen kann."
+      },
+      "craftRequest": {
+        "title": "Craft bei der Gilde anfragen",
+        "description": "Finden, wer in der Gilde ein bestimmtes Objekt herstellen kann."
+      },
+      "dataExport": {
+        "title": "Export der eigenen Daten",
+        "description": "Einen Export (Blob) der von RaidOps gespeicherten Daten erhalten."
+      },
+      "bnetAccountDeletion": {
+        "title": "Löschung des Battle.net-Kontos",
+        "description": "Daten des verknüpften Battle.net-Kontos trennen und löschen."
+      },
+      "discordAccountDeletion": {
+        "title": "Löschung des Discord-Kontos",
+        "description": "Daten des verknüpften Discord-Kontos trennen und löschen."
+      },
+      "characterDeletion": {
+        "title": "Löschung eines Charakters",
+        "description": "Einen Charakter dauerhaft aus RaidOps löschen."
+      },
+      "angular22Migration": {
+        "title": "Migration zu Angular 22",
+        "description": "Aktualisierung des Frontends auf Angular 22."
+      },
+      "securityHardening": {
+        "title": "Sicherheitshärtung",
+        "description": "Überprüfung und Stärkung sicherheitsrelevanter Bereiche."
+      },
+      "responsiveness": {
+        "title": "Responsive Darstellung",
+        "description": "Anpassung der Oberfläche an kleine Bildschirme und Mobilgeräte."
+      },
+      "designPolish": {
+        "title": "Design-Feinschliff",
+        "description": "Ein Durchgang für visuelle Konsistenz über die ganze App (Material)."
+      },
+      "warcraftLogsIntegration": {
+        "title": "Warcraft-Logs-Integration",
+        "description": "Raid-Log-Tracking direkt in RaidOps."
+      },
+      "bossPerformanceTracking": {
+        "title": "Leistungsverfolgung pro Boss",
+        "description": "CLA/RPB-Äquivalent: Verbrauchsmaterialien, Specs und Gearchecks pro Boss verfolgt."
+      }
+    }
+  },
   "accessLevelBadge": {
     "public": "Öffentlich",
     "roster": "Roster",

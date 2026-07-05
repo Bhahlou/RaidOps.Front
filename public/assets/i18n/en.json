@@ -103,6 +103,169 @@
       }
     }
   },
+  "roadmap": {
+    "pageTitle": "Roadmap",
+    "intro": "What's planned or under consideration for RaidOps next. No guaranteed order or dates — just a sense of where the project is headed.",
+    "inProgress": "In progress",
+    "status": {
+      "done": "Done",
+      "planned": "Planned"
+    },
+    "section": {
+      "foundations": {
+        "title": "Foundations"
+      },
+      "loot": {
+        "title": "Loot management"
+      },
+      "professions": {
+        "title": "Professions"
+      },
+      "privacy": {
+        "title": "GDPR and privacy"
+      },
+      "technical": {
+        "title": "Technical"
+      },
+      "raidLogs": {
+        "title": "Raid logs"
+      }
+    },
+    "items": {
+      "discordAuth": {
+        "title": "Discord sign-in",
+        "description": "Authentication via your Discord account."
+      },
+      "characterImport": {
+        "title": "Character import",
+        "description": "Battle.net linking and character import."
+      },
+      "characterManagement": {
+        "title": "Character management",
+        "description": "Resync, deactivation, viable specs, guilds."
+      },
+      "guildRegister": {
+        "title": "Guild registration",
+        "description": "Inviting the Discord bot to register a guild."
+      },
+      "guildList": {
+        "title": "Guild list",
+        "description": "Overview of accessible and registerable guilds."
+      },
+      "roster": {
+        "title": "Guild roster",
+        "description": "Full table: search, filters, sorting, member management."
+      },
+      "auditLog": {
+        "title": "Audit log",
+        "description": "Filterable history of notable guild actions."
+      },
+      "notifications": {
+        "title": "In-app notifications",
+        "description": "Alerts for actions needed on the officer side."
+      },
+      "getStarted": {
+        "title": "Onboarding flow",
+        "description": "4-step guided wizard to get started."
+      },
+      "manual": {
+        "title": "Help manual",
+        "description": "Step-by-step guides available on every page."
+      },
+      "whatsNew": {
+        "title": "What's new page",
+        "description": "History of shipped features."
+      },
+      "guildCalendar": {
+        "title": "Guild calendar",
+        "description": "Absence management and raid event scheduling."
+      },
+      "raidBuilder": {
+        "title": "Raid builder",
+        "description": "Raid compositions, with automatic building."
+      },
+      "raidAssignments": {
+        "title": "Raid assignments",
+        "description": "Who does what during the raid (dispel, soak, interrupt…)."
+      },
+      "raidHistory": {
+        "title": "Raid history",
+        "description": "Who was present, absent, or benched for each raid."
+      },
+      "guildDashboard": {
+        "title": "Guild dashboard",
+        "description": "Day-to-day info: upcoming raids, characters involved, etc."
+      },
+      "gearArmory": {
+        "title": "Current gear display",
+        "description": "Character equipment, armory-style, with stats."
+      },
+      "bisLists": {
+        "title": "BIS lists",
+        "description": "Managing each character's best-in-slot wish lists."
+      },
+      "lootHistoryImport": {
+        "title": "Loot history import",
+        "description": "Pulling Gargul / RCLootCouncil history into the guild."
+      },
+      "lootAwareRaidBuilder": {
+        "title": "Loot-aware raid building",
+        "description": "Loot assignments feeding into raid composition."
+      },
+      "characterProfessions": {
+        "title": "Character professions",
+        "description": "Recording each character's professions."
+      },
+      "possibleCrafts": {
+        "title": "Possible crafts list",
+        "description": "Seeing what each character can craft."
+      },
+      "craftRequest": {
+        "title": "Request a craft from the guild",
+        "description": "Find who in the guild can craft a given item."
+      },
+      "dataExport": {
+        "title": "Data export",
+        "description": "Get an export (blob) of the data RaidOps stores about you."
+      },
+      "bnetAccountDeletion": {
+        "title": "Battle.net account deletion",
+        "description": "Unlink and delete data tied to your Battle.net account."
+      },
+      "discordAccountDeletion": {
+        "title": "Discord account deletion",
+        "description": "Unlink and delete data tied to your Discord account."
+      },
+      "characterDeletion": {
+        "title": "Character deletion",
+        "description": "Permanently delete a character from RaidOps."
+      },
+      "angular22Migration": {
+        "title": "Angular 22 migration",
+        "description": "Upgrading the front-end to Angular 22."
+      },
+      "securityHardening": {
+        "title": "Security hardening",
+        "description": "Reviewing and strengthening security-sensitive areas."
+      },
+      "responsiveness": {
+        "title": "Site responsiveness",
+        "description": "Adapting the interface for small screens and mobile."
+      },
+      "designPolish": {
+        "title": "Design polish",
+        "description": "A visual consistency pass across the app (Material)."
+      },
+      "warcraftLogsIntegration": {
+        "title": "Warcraft Logs integration",
+        "description": "Raid log tracking directly inside RaidOps."
+      },
+      "bossPerformanceTracking": {
+        "title": "Per-boss performance tracking",
+        "description": "CLA/RPB equivalent: consumables, specs and gear checks tracked boss by boss."
+      }
+    }
+  },
   "accessLevelBadge": {
     "public": "Public",
     "roster": "Roster",
