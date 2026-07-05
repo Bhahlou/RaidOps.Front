@@ -25,6 +25,7 @@ const user = (guilds: UserGuild[]): User => ({
   name: 'TestUser',
   avatarHash: null,
   guilds,
+  notifications: [],
 });
 
 describe('GuildListComponent', () => {
@@ -98,6 +99,37 @@ describe('GuildListComponent', () => {
       fixture.detectChanges();
 
       expect(component.adminGuilds()).toEqual([]);
+    });
+  });
+
+  // ── breadcrumbs ───────────────────────────────────────────────────────────
+
+  describe('breadcrumbs', () => {
+    it('uses the user name and a discord icon when authenticated', () => {
+      setup([]);
+      fixture.detectChanges();
+
+      const [first] = component.breadcrumbs();
+
+      expect(first.label).toBe('TestUser');
+      expect(first.discordIcon).toEqual({ id: '123', hash: null, type: component.DiscordIconType.User });
+    });
+
+    it('falls back to a placeholder label with no icon when there is no user', () => {
+      setup(null);
+      fixture.detectChanges();
+
+      const [first] = component.breadcrumbs();
+
+      expect(first.label).toBe('…');
+      expect(first.discordIcon).toBeUndefined();
+    });
+
+    it('always ends with the sidenav.guilds title crumb', () => {
+      setup([]);
+      fixture.detectChanges();
+
+      expect(component.breadcrumbs()[1]).toEqual({ i18nKey: 'sidenav.guilds' });
     });
   });
 

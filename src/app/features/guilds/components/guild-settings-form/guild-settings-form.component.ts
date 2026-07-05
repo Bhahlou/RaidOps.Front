@@ -28,7 +28,7 @@ interface TimezoneOption {
 
 const NOW = new Date();
 
-function buildTimezoneOption(tz: string): TimezoneOption {
+export function buildTimezoneOption(tz: string): TimezoneOption {
   try {
     const parts = new Intl.DateTimeFormat('en', {
       timeZone: tz,

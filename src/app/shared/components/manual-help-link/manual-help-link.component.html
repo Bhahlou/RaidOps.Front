@@ -1,0 +1,9 @@
+<a
+  class="manual-help-link"
+  mat-icon-button
+  [routerLink]="['/manual', category(), article()]"
+  [attr.aria-label]="'header.help' | transloco"
+  [matTooltip]="'header.help' | transloco"
+>
+  <mat-icon>help</mat-icon>
+</a>

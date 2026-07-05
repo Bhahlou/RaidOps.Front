@@ -1,0 +1,90 @@
+// Content is injected via [innerHTML], so Angular's emulated view encapsulation never attaches
+// its scoping attribute to it — ::ng-deep is required for these descendant selectors to match.
+.markdown-content {
+  color: var(--mat-sys-on-surface);
+  line-height: 1.6;
+
+  ::ng-deep {
+    h1, h2, h3 {
+      color: var(--mat-sys-on-surface);
+      font-weight: 600;
+      margin: 1.5em 0 0.5em;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    h1 { font-size: 1.5rem; }
+
+    h2 {
+      font-size: 1.15rem;
+      color: var(--mat-sys-primary);
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding-bottom: 0.35em;
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      color: var(--mat-sys-primary);
+    }
+
+    p {
+      margin: 0 0 1em;
+    }
+
+    ul, ol {
+      margin: 0 0 1em;
+      padding-left: 1.5em;
+    }
+
+    li {
+      margin-bottom: 0.4em;
+
+      &::marker {
+        color: var(--mat-sys-primary);
+      }
+    }
+
+    strong {
+      color: var(--mat-sys-on-surface);
+      font-weight: 600;
+    }
+
+    a {
+      color: var(--mat-sys-primary);
+    }
+
+    code {
+      background: var(--mat-sys-surface-container-high);
+      border-radius: 4px;
+      padding: 0.15em 0.4em;
+      font-size: 0.9em;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto 1em;
+      border-radius: 8px;
+      border: 1px solid var(--mat-sys-outline-variant);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    blockquote {
+      margin: 0 0 1em;
+      padding: 0.75em 1em;
+      border-left: 3px solid var(--mat-sys-primary);
+      border-radius: 0 8px 8px 0;
+      background: var(--mat-sys-surface-container-high);
+      color: var(--mat-sys-on-surface-variant);
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

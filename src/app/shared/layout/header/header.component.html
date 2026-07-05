@@ -11,6 +11,30 @@
 
   <span class="spacer"></span>
 
+  <a
+    mat-icon-button
+    routerLink="/manual"
+    routerLinkActive="header-icon-active"
+    (click)="onHelpClick($event)"
+    [attr.aria-label]="'header.help' | transloco"
+    [matTooltip]="'header.help' | transloco"
+  >
+    <mat-icon>help</mat-icon>
+  </a>
+
+  <a
+    mat-icon-button
+    routerLink="/changelog"
+    routerLinkActive="header-icon-active"
+    (click)="onChangelogClick($event)"
+    [attr.aria-label]="'changelog.pageTitle' | transloco"
+    [matTooltip]="'changelog.pageTitle' | transloco"
+  >
+    <mat-icon [matBadge]="unseenChangelogCount() || null" matBadgeColor="warn">
+      campaign
+    </mat-icon>
+  </a>
+
   @if (isAuthenticated()) {
     <app-notification-bell />
   }

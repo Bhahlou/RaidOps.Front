@@ -1,5 +1,5 @@
 <div class="guild-page">
-  <app-page-header [items]="breadcrumbs()" />
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'settings' }" />
   <div class="settings-content">
     <app-guild-settings-form [guildId]="guildId" />
   </div>

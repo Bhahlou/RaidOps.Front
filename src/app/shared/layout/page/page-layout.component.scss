@@ -6,5 +6,8 @@
 .page-content {
   height: 100%;
   overflow: auto;
-  margin-left: var(--sidebar-rail-width);
+
+  &.with-sidenav {
+    margin-left: var(--sidebar-rail-width);
+  }
 }

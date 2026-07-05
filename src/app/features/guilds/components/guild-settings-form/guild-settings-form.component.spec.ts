@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
 
-import { GuildSettingsFormComponent } from './guild-settings-form.component';
+import { GuildSettingsFormComponent, buildTimezoneOption } from './guild-settings-form.component';
 import { GuildSettingsService } from '../../services/guild-settings.service';
 import { GuildStore } from '../../stores/guild.store';
 import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
@@ -25,6 +25,22 @@ const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
 const officerThreshold = (overrides?: Partial<OfficerThreshold>): OfficerThreshold => ({
   minOfficerRoleId: null,
   ...overrides,
+});
+
+describe('buildTimezoneOption', () => {
+  it('falls back to the raw timezone id as the label when Intl.DateTimeFormat rejects it', () => {
+    expect(buildTimezoneOption('Not/ARealZone')).toEqual({ id: 'Not/ARealZone', label: 'Not/ARealZone' });
+  });
+
+  it('falls back to an empty offset when the formatted parts have no timeZoneName part', () => {
+    const spy = vi.spyOn(Intl.DateTimeFormat.prototype, 'formatToParts').mockReturnValue([
+      { type: 'literal', value: '' },
+    ]);
+
+    expect(buildTimezoneOption('Europe/Paris')).toEqual({ id: 'Europe/Paris', label: 'Europe/Paris ()' });
+
+    spy.mockRestore();
+  });
 });
 
 describe('GuildSettingsFormComponent', () => {
@@ -122,12 +138,25 @@ describe('GuildSettingsFormComponent', () => {
 
     it('shows snackbar error and clears loading flag when role fetch fails', () => {
       setup();
-      settingsService.getDiscordRoles.mockReturnValue(throwError(() => new Error()));
+      settingsService.getDiscordRoles.mockReturnValue(throwError(() => new Error('role fetch failed')));
 
       fixture.detectChanges();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.rolesLoading()).toBe(false);
+    });
+
+    it('leaves the timezone empty when the browser cannot resolve one and the store has none either', () => {
+      const intlSpy = vi.spyOn(Intl, 'DateTimeFormat').mockReturnValue({
+        resolvedOptions: () => ({ timeZone: undefined }),
+      } as unknown as Intl.DateTimeFormat);
+
+      setup('g1', settings({ timezone: '' }));
+      fixture.detectChanges();
+
+      expect(component.form.value.timezone).toBe('');
+
+      intlSpy.mockRestore();
     });
   });
 
@@ -308,7 +337,7 @@ describe('GuildSettingsFormComponent', () => {
 
     it('shows snackbar error and resets submitting flag when either call fails', () => {
       setup();
-      settingsService.updateSettings.mockReturnValue(throwError(() => new Error()));
+      settingsService.updateSettings.mockReturnValue(throwError(() => new Error('update failed')));
       fixture.detectChanges();
       component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
 

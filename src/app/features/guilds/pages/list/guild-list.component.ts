@@ -8,6 +8,7 @@ import { UserGuild } from '../../../../core/models/user-guild.model';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-guild-list',
@@ -18,6 +19,7 @@ import { IconCardComponent } from '../../../../shared/components/icon-card/icon-
     DiscordIconComponent,
     TranslocoPipe,
     IconCardComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './guild-list.component.html',
   styleUrl: './guild-list.component.scss',
@@ -27,6 +29,19 @@ export class GuildListComponent implements OnInit {
   readonly #router = inject(Router);
 
   readonly loading = signal(true);
+
+  readonly breadcrumbs = computed((): BreadcrumbItem[] => {
+    const user = this.#authStore.user();
+    return [
+      {
+        label: user?.name ?? '…',
+        discordIcon: user
+          ? { id: user.discordId, hash: user.avatarHash, type: DiscordIconType.User }
+          : undefined,
+      },
+      { i18nKey: 'sidenav.guilds' },
+    ];
+  });
 
   ngOnInit(): void {
     this.#authStore.loadUser().subscribe(() => {

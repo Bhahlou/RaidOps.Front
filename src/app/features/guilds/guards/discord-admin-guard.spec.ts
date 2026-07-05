@@ -15,6 +15,7 @@ const makeUser = (guilds: User['guilds']): User => ({
   name: 'Test',
   avatarHash: null,
   guilds,
+  notifications: [],
 });
 
 describe('discordAdminGuard', () => {

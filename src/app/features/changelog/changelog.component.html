@@ -1,0 +1,28 @@
+<div class="changelog-page">
+  <button class="back-link" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    {{ 'manual.back' | transloco }}
+  </button>
+
+  <h1>{{ 'changelog.pageTitle' | transloco }}</h1>
+
+  @for (entry of entries; track entry.id) {
+    <article class="entry" [class.entry--unseen]="isUnseen(entry)">
+      <div class="entry-header">
+        <span class="entry-type" [class.entry-type--feature]="entry.type === EntryType.Feature">
+          {{ (entry.type === EntryType.Feature ? 'changelog.type.feature' : 'changelog.type.fix') | transloco }}
+        </span>
+        <time class="entry-date" [attr.datetime]="entry.date.toISOString()">{{ formatDate(entry.date) }}</time>
+      </div>
+
+      <h2 class="entry-title">{{ entry.titleKey | transloco }}</h2>
+      <p class="entry-description">{{ entry.descriptionKey | transloco }}</p>
+
+      @if (entry.type === EntryType.Feature) {
+        <a class="entry-guide-link" [routerLink]="['/manual', entry.manualLink.category, entry.manualLink.article]">
+          {{ 'changelog.viewGuide' | transloco }}
+        </a>
+      }
+    </article>
+  }
+</div>

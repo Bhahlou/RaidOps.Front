@@ -1,5 +1,5 @@
 <div class="character-page">
-  <app-page-header [items]="breadcrumbs()" />
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'getting-started', article: 'character-detail' }" />
 
   @if (character(); as char) {
     <mat-card appearance="outlined" class="page-card">

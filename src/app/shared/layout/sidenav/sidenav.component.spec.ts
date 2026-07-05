@@ -25,6 +25,7 @@ const makeUser = (guilds: UserGuild[]): User => ({
   name: 'TestUser',
   avatarHash: null,
   guilds,
+  notifications: [],
 });
 
 describe('SidenavComponent', () => {

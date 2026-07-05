@@ -3,10 +3,10 @@ import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { By } from '@angular/platform-browser';
 
-import { PageHeaderComponent, BreadcrumbItem } from './page-header.component';
+import { PageHeaderComponent, BreadcrumbItem, ManualLink } from './page-header.component';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 
-const setup = (items: BreadcrumbItem[]): ComponentFixture<PageHeaderComponent> => {
+const setup = (items: BreadcrumbItem[], manualLink?: ManualLink): ComponentFixture<PageHeaderComponent> => {
   TestBed.configureTestingModule({
     imports: [
       PageHeaderComponent,
@@ -19,6 +19,7 @@ const setup = (items: BreadcrumbItem[]): ComponentFixture<PageHeaderComponent> =
   });
   const fixture = TestBed.createComponent(PageHeaderComponent);
   fixture.componentRef.setInput('items', items);
+  if (manualLink) fixture.componentRef.setInput('manualLink', manualLink);
   fixture.detectChanges();
   return fixture;
 };
@@ -135,6 +136,27 @@ describe('PageHeaderComponent', () => {
       const icon = fixture.debugElement.query(By.css('app-discord-icon'));
 
       expect(icon).toBeNull();
+    });
+  });
+
+  // ── manual help link ──────────────────────────────────────────────────────
+
+  describe('manual help link', () => {
+    it('renders app-manual-help-link next to the last item when manualLink is provided', () => {
+      const fixture = setup(
+        [{ label: 'Parent', link: ['/parent'] }, { label: 'Current' }],
+        { category: 'guild', article: 'roster' },
+      );
+      const link = fixture.debugElement.query(By.css('app-manual-help-link'));
+
+      expect(link).toBeTruthy();
+    });
+
+    it('does not render app-manual-help-link when manualLink is absent', () => {
+      const fixture = setup([{ label: 'Current' }]);
+      const link = fixture.debugElement.query(By.css('app-manual-help-link'));
+
+      expect(link).toBeNull();
     });
   });
 });

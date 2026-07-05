@@ -6,7 +6,7 @@
     <app-sidenav />
   }
 
-  <main class="page-content">
+  <main class="page-content" [class.with-sidenav]="isAuthenticated()">
     <router-outlet />
   </main>
 </div>

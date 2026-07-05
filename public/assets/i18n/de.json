@@ -2,7 +2,112 @@
   "header": {
     "login": "Anmelden",
     "logout": "Abmelden",
-    "language": "Sprache"
+    "language": "Sprache",
+    "help": "Hilfe"
+  },
+  "manual": {
+    "back": "Zurück",
+    "category": {
+      "welcome": "Willkommen",
+      "account": "Konto",
+      "gettingStarted": "Charaktere",
+      "guild": "Gilde"
+    },
+    "article": {
+      "onboarding": {
+        "title": "Starte mit RaidOps"
+      },
+      "discordAuth": {
+        "title": "Mit Discord anmelden"
+      },
+      "notifications": {
+        "title": "Benachrichtigungen"
+      },
+      "whatsNew": {
+        "title": "Wo du Neuigkeiten findest"
+      },
+      "createCharacter": {
+        "title": "Charakter importieren"
+      },
+      "characterDetail": {
+        "title": "Charakter verwalten"
+      },
+      "guildList": {
+        "title": "Meine Gilden"
+      },
+      "register": {
+        "title": "Gilde registrieren"
+      },
+      "roster": {
+        "title": "Der Roster"
+      },
+      "settings": {
+        "title": "Gildeneinstellungen"
+      },
+      "auditLog": {
+        "title": "Audit-Log"
+      }
+    }
+  },
+  "changelog": {
+    "pageTitle": "Neuigkeiten",
+    "type": {
+      "feature": "Neu",
+      "fix": "Korrektur"
+    },
+    "viewGuide": "Anleitung ansehen →",
+    "entries": {
+      "whatsNew": {
+        "title": "Eine Neuigkeiten-Seite, um Updates zu verfolgen",
+        "description": "Das 📣-Symbol im Header listet die Funktionen auf, die im Laufe der Zeit zu RaidOps hinzugefügt wurden, mit einem Badge, wenn es etwas Neues zu sehen gibt."
+      },
+      "manual": {
+        "title": "Ein Hilfehandbuch direkt in der App",
+        "description": "Jede Seite hat jetzt ein \"?\", das zu einer Schritt-für-Schritt-Anleitung führt: Discord-Anmeldung, Charakterimport, Gildenverwaltung (Roster, Einstellungen, Audit-Log) und mehr."
+      },
+      "notifications": {
+        "title": "In-App-Benachrichtigungen",
+        "description": "Eine Glocke im Header informiert dich, wenn auf deiner Seite etwas zu tun ist — z. B. die Officer-Schwelle für eine von dir administrierte Gilde zu konfigurieren."
+      },
+      "roster": {
+        "title": "Der Gilden-Roster als echte Tabelle",
+        "description": "Suche, Filter (Klasse, Spec, Rang, Beitrittsdatum), Sortierung nach Spalte und Verwaltung der eigenen Charaktere in der Gilde (beitreten, Rang ändern, verlassen) — alles in einer Tabelle."
+      },
+      "getStarted": {
+        "title": "Ein geführter Einstieg in RaidOps",
+        "description": "Ein 4-Schritte-Assistent (Discord, Gilde, Battle.net, Roster) begleitet Neulinge von Anfang bis Ende und setzt genau dort fort, wo sie aufgehört haben."
+      },
+      "auditLog": {
+        "title": "Audit-Log der Gilde",
+        "description": "Vollständiger Verlauf wichtiger Gildenaktionen (Einstellungen, Beitritte/Austritte, Rangänderungen), filter- und sortierbar nach Spalte."
+      },
+      "characterManagement": {
+        "title": "Erweiterte Charakterverwaltung",
+        "description": "Resync von Battle.net, Deaktivierung, Gilde beitreten/verlassen und Festlegen der viablen Raid-Specs — direkt von der Charakterkarte aus."
+      },
+      "characterImport": {
+        "title": "Charaktere von Battle.net importieren",
+        "description": "Verknüpfe dein Battle.net-Konto und importiere deine Charaktere in wenigen Klicks, mit Suche und Mehrfachauswahl."
+      },
+      "guildRegister": {
+        "title": "Gilde registrieren",
+        "description": "Lade den RaidOps-Bot auf deinen Discord-Server ein, um deine Gilde zu registrieren — die Registrierung wird automatisch abgeschlossen, sobald der Bot beigetreten ist."
+      },
+      "guildList": {
+        "title": "Deine Gilden finden",
+        "description": "Überblick über bereits registrierte und für dich zugängliche Gilden sowie über die, die du als Discord-Administrator selbst registrieren kannst."
+      },
+      "discordAuth": {
+        "title": "Mit Discord anmelden",
+        "description": "RaidOps nutzt dein Discord-Konto als Hauptidentität — Anmeldung mit einem Klick, kein Passwort zu verwalten."
+      }
+    }
+  },
+  "accessLevelBadge": {
+    "public": "Öffentlich",
+    "roster": "Roster",
+    "officer": "Offizier",
+    "requiresAuth": "Anmeldung erforderlich"
   },
   "sidenav": {
     "account": {

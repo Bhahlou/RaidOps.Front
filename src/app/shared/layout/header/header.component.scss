@@ -24,6 +24,10 @@
   flex: 1 1 auto;
 }
 
+.header-icon-active {
+  color: var(--mat-sys-primary);
+}
+
 .user-trigger {
   display: flex;
   align-items: center;

@@ -1,0 +1,15 @@
+@if (article(); as art) {
+  <article class="manual-article">
+    <header class="manual-article-header">
+      <h1>{{ art.labelKey | transloco }}</h1>
+      @if (art.requiresAuth) {
+        <app-requires-auth-badge />
+      }
+      @if (art.requiredAccessLevel) {
+        <app-access-level-badge [level]="art.requiredAccessLevel" />
+      }
+    </header>
+
+    <app-markdown-renderer [content]="content()" />
+  </article>
+}
