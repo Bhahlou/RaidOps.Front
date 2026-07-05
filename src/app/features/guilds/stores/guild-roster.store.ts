@@ -1,33 +1,33 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { httpResource } from '@angular/common/http';
+import { computed, Injectable, signal } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { GuildRosterMember } from '../models/guild-roster-member.model';
-import { GuildRosterService } from '../services/guild-roster.service';
-
-interface GuildRosterStoreState {
-  guildId: string | null;
-  members: GuildRosterMember[] | null;
-}
 
 @Injectable({ providedIn: 'root' })
 export class GuildRosterStore {
-  readonly #rosterService = inject(GuildRosterService);
-  readonly #state = signal<GuildRosterStoreState>({ guildId: null, members: null });
+  readonly #guildId = signal<string | null>(null);
+  readonly #reloadTrigger = signal(0);
 
-  readonly members = computed(() => this.#state().members);
-  readonly isLoading = computed(() => this.#state().members === null);
+  readonly #rosterResource = httpResource<GuildRosterMember[]>(() => {
+    const guildId = this.#guildId();
+    this.#reloadTrigger();
+    return guildId ? `${environment.apiUrl}/guilds/${guildId}/roster` : undefined;
+  });
 
-  loadRoster(guildId: string, force = false): Observable<GuildRosterMember[]> {
-    const current = this.#state();
-    if (!force && current.guildId === guildId && current.members !== null) {
-      return of(current.members);
-    }
-    this.#state.set({ guildId, members: null });
-    return this.#rosterService
-      .getRoster(guildId)
-      .pipe(tap((members) => this.#state.set({ guildId, members })));
+  readonly members = computed(() => this.#rosterResource.value() ?? null);
+  readonly isLoading = this.#rosterResource.isLoading;
+
+  /**
+   * Points the store at a guild's roster and forces a fresh fetch — the roster can be edited by
+   * other officers/players between visits, so cached data can't be trusted on its own.
+   */
+  loadRoster(guildId: string): void {
+    this.#guildId.set(guildId);
+    this.#reloadTrigger.update((n) => n + 1);
   }
 
-  invalidate(): void {
-    this.#state.set({ guildId: null, members: null });
+  /** Re-fetches the current guild's roster without changing which guild is tracked. */
+  reload(): void {
+    this.#reloadTrigger.update((n) => n + 1);
   }
 }

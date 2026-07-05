@@ -6,7 +6,6 @@ import { of, throwError } from 'rxjs';
 
 import { GuildRosterListComponent } from './guild-roster-list.component';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
-import { GuildMembershipService } from '../../services/guild-membership.service';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -34,10 +33,19 @@ const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
 });
 
 describe('GuildRosterListComponent', () => {
-  let store: { isLoading: ReturnType<typeof signal>; members: ReturnType<typeof signal>;
-    loadRoster: ReturnType<typeof vi.fn> };
-  let characterStore: { membershipErrorKey: ReturnType<typeof vi.fn>; loadCharacters: ReturnType<typeof vi.fn> };
-  let membershipService: { updateRank: ReturnType<typeof vi.fn>; leaveGuild: ReturnType<typeof vi.fn> };
+  let store: {
+    isLoading: ReturnType<typeof signal>;
+    members: ReturnType<typeof signal>;
+    loadRoster: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
+  };
+  let characterStore: {
+    membershipErrorKey: ReturnType<typeof vi.fn>;
+    updateRank: ReturnType<typeof vi.fn>;
+    leaveGuild: ReturnType<typeof vi.fn>;
+    updatingRankCharacterId: ReturnType<typeof signal>;
+    leavingCharacterId: ReturnType<typeof signal>;
+  };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
   let authStore: { user: ReturnType<typeof signal> };
@@ -53,15 +61,15 @@ describe('GuildRosterListComponent', () => {
     store = {
       isLoading: signal(false),
       members: signal([]),
-      loadRoster: vi.fn().mockReturnValue(of([])),
+      loadRoster: vi.fn(),
+      reload: vi.fn(),
     };
     characterStore = {
       membershipErrorKey: vi.fn().mockReturnValue('characterDetail.guilds.errors.generic'),
-      loadCharacters: vi.fn().mockReturnValue(of([])),
-    };
-    membershipService = {
       updateRank: vi.fn().mockReturnValue(of({ message: 'ok' })),
       leaveGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
+      updatingRankCharacterId: signal<number | null>(null),
+      leavingCharacterId: signal<number | null>(null),
     };
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialog = { open: vi.fn().mockReturnValue({ afterClosed: () => of(confirmKick) }) };
@@ -73,7 +81,6 @@ describe('GuildRosterListComponent', () => {
       providers: [
         { provide: GuildRosterStore, useValue: store },
         { provide: CharacterStore, useValue: characterStore },
-        { provide: GuildMembershipService, useValue: membershipService },
         { provide: SnackbarService, useValue: snackbar },
         { provide: MatDialog, useValue: dialog },
         { provide: AuthStore, useValue: authStore },
@@ -95,7 +102,7 @@ describe('GuildRosterListComponent', () => {
     it('force-loads the roster for the given guildId', () => {
       setup('g42');
 
-      expect(store.loadRoster).toHaveBeenCalledWith('g42', true);
+      expect(store.loadRoster).toHaveBeenCalledWith('g42');
     });
   });
 
@@ -152,43 +159,40 @@ describe('GuildRosterListComponent', () => {
   });
 
   describe('updateRank', () => {
-    it('updates the rank then refreshes both the roster and character stores', () => {
+    it('updates the rank then reloads the roster', () => {
       const component = setup();
 
       component.updateRank(member(), CharacterRank.Alt);
 
-      expect(membershipService.updateRank).toHaveBeenCalledWith(1, 'g1', CharacterRank.Alt);
+      expect(characterStore.updateRank).toHaveBeenCalledWith(1, 'g1', CharacterRank.Alt);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.rankUpdateSuccess');
-      expect(store.loadRoster).toHaveBeenCalledWith('g1', true);
-      expect(characterStore.loadCharacters).toHaveBeenCalledWith(true);
+      expect(store.reload).toHaveBeenCalled();
     });
 
-    it('shows an error and does not refresh the stores when the service call fails', () => {
+    it('shows an error and does not reload the roster when the call fails', () => {
       const component = setup();
       const error = { status: 400 };
-      membershipService.updateRank.mockReturnValue(throwError(() => error));
+      characterStore.updateRank.mockReturnValue(throwError(() => error));
 
       component.updateRank(member(), CharacterRank.Alt);
 
       expect(characterStore.membershipErrorKey).toHaveBeenCalledWith(error);
       expect(snackbar.error).toHaveBeenCalledWith('characterDetail.guilds.errors.generic');
       expect(snackbar.success).not.toHaveBeenCalled();
-      expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
-      expect(characterStore.loadCharacters).not.toHaveBeenCalled();
+      expect(store.reload).not.toHaveBeenCalled();
     });
   });
 
   describe('kickMember', () => {
-    it('kicks the character after confirmation and refreshes both stores', () => {
+    it('kicks the character after confirmation and reloads the roster', () => {
       const component = setup();
 
       component.kickMember(member());
 
       expect(dialog.open).toHaveBeenCalled();
-      expect(membershipService.leaveGuild).toHaveBeenCalledWith(1, 'g1');
+      expect(characterStore.leaveGuild).toHaveBeenCalledWith(1, 'g1');
       expect(snackbar.success).toHaveBeenCalledWith('roster.list.kickSuccess');
-      expect(store.loadRoster).toHaveBeenCalledWith('g1', true);
-      expect(characterStore.loadCharacters).toHaveBeenCalledWith(true);
+      expect(store.reload).toHaveBeenCalled();
     });
 
     it('does nothing when the confirmation dialog is cancelled', () => {
@@ -196,22 +200,21 @@ describe('GuildRosterListComponent', () => {
 
       component.kickMember(member());
 
-      expect(membershipService.leaveGuild).not.toHaveBeenCalled();
-      expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
+      expect(characterStore.leaveGuild).not.toHaveBeenCalled();
+      expect(store.reload).not.toHaveBeenCalled();
     });
 
-    it('shows an error and does not refresh the stores when the service call fails', () => {
+    it('shows an error and does not reload the roster when the call fails', () => {
       const component = setup();
       const error = { status: 400 };
-      membershipService.leaveGuild.mockReturnValue(throwError(() => error));
+      characterStore.leaveGuild.mockReturnValue(throwError(() => error));
 
       component.kickMember(member());
 
       expect(characterStore.membershipErrorKey).toHaveBeenCalledWith(error);
       expect(snackbar.error).toHaveBeenCalledWith('characterDetail.guilds.errors.generic');
       expect(snackbar.success).not.toHaveBeenCalled();
-      expect(store.loadRoster).toHaveBeenCalledTimes(1); // only the initial ngOnInit load
-      expect(characterStore.loadCharacters).not.toHaveBeenCalled();
+      expect(store.reload).not.toHaveBeenCalled();
     });
   });
 
