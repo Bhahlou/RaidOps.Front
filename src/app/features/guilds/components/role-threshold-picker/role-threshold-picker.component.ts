@@ -1,4 +1,5 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, model } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -10,6 +11,8 @@ import { formatDiscordColor } from '../../../../shared/utils/discord-color.util'
  * Discord hierarchy are "included", everything below is "excluded". Shared between the roster
  * access threshold and the Officer access threshold — the meaning of "included" is entirely up
  * to the caller, this component only renders the list and reports the selected role ID.
+ *
+ * Implements Signal Forms' FormValueControl so it can be bound directly via [formField].
  */
 @Component({
   selector: 'app-role-threshold-picker',
@@ -17,33 +20,32 @@ import { formatDiscordColor } from '../../../../shared/utils/discord-color.util'
   templateUrl: './role-threshold-picker.component.html',
   styleUrl: './role-threshold-picker.component.scss',
 })
-export class RoleThresholdPickerComponent {
+export class RoleThresholdPickerComponent implements FormValueControl<string | null> {
   readonly roles = input<DiscordRole[]>([]);
-  readonly selectedRoleId = input<string | null>(null);
   readonly loading = input(false);
 
-  readonly thresholdChange = output<string | null>();
+  readonly value = model<string | null>(null);
 
   isIncluded(role: DiscordRole): boolean {
-    const thresholdId = this.selectedRoleId();
+    const thresholdId = this.value();
     if (!thresholdId) return false;
     const roles = this.roles();
     return roles.findIndex((r) => r.id === role.id) <= roles.findIndex((r) => r.id === thresholdId);
   }
 
   isThreshold(role: DiscordRole): boolean {
-    return role.id === this.selectedRoleId();
+    return role.id === this.value();
   }
 
   isExcluded(role: DiscordRole): boolean {
-    const thresholdId = this.selectedRoleId();
+    const thresholdId = this.value();
     if (!thresholdId) return false;
     const roles = this.roles();
     return roles.findIndex((r) => r.id === role.id) > roles.findIndex((r) => r.id === thresholdId);
   }
 
   select(roleId: string): void {
-    this.thresholdChange.emit(this.selectedRoleId() === roleId ? null : roleId);
+    this.value.set(this.value() === roleId ? null : roleId);
   }
 
   roleColor(role: DiscordRole): string | null {

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { of, Subject, throwError } from 'rxjs';
 
 import { GuildSettingsFormComponent, buildTimezoneOption } from './guild-settings-form.component';
@@ -26,6 +27,9 @@ const officerThreshold = (overrides?: Partial<OfficerThreshold>): OfficerThresho
   minOfficerRoleId: null,
   ...overrides,
 });
+
+const toggleChange = (value: RosterMode): MatButtonToggleChange =>
+  ({ value }) as MatButtonToggleChange;
 
 describe('buildTimezoneOption', () => {
   it('falls back to the raw timezone id as the label when Intl.DateTimeFormat rejects it', () => {
@@ -106,22 +110,22 @@ describe('GuildSettingsFormComponent', () => {
       setup('g1', settings({ timezone: 'UTC', rosterMode: RosterMode.Open }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).toBe('UTC');
-      expect(component.form.value.rosterMode).toBe(RosterMode.Open);
+      expect(component.settingsForm.timezone().value()).toBe('UTC');
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.Open);
     });
 
     it('keeps the local timezone when the store returns an empty timezone', () => {
       setup('g1', settings({ timezone: '' }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).not.toBe('');
+      expect(component.settingsForm.timezone().value()).not.toBe('');
     });
 
     it('pre-fills minOfficerRoleId from the officer threshold store', () => {
       setup('g1', settings(), officerThreshold({ minOfficerRoleId: 'r9' }));
       fixture.detectChanges();
 
-      expect(component.form.value.minOfficerRoleId).toBe('r9');
+      expect(component.settingsForm.minOfficerRoleId().value()).toBe('r9');
     });
 
     it('loads Discord roles eagerly, regardless of roster mode', () => {
@@ -154,7 +158,7 @@ describe('GuildSettingsFormComponent', () => {
       setup('g1', settings({ timezone: '' }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).toBe('');
+      expect(component.settingsForm.timezone().value()).toBe('');
 
       intlSpy.mockRestore();
     });
@@ -173,7 +177,7 @@ describe('GuildSettingsFormComponent', () => {
     it('is true when rosterMode is DiscordRoleOnly', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
+      component.settingsForm.rosterMode().value.set(RosterMode.DiscordRoleOnly);
 
       expect(component.isDiscordRoleMode()).toBe(true);
     });
@@ -185,7 +189,7 @@ describe('GuildSettingsFormComponent', () => {
     it('returns options that match the current timezone input', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('Europe/Paris');
+      component.settingsForm.timezone().value.set('Europe/Paris');
 
       expect(component.filteredTimezones().some(tz => tz.id === 'Europe/Paris')).toBe(true);
     });
@@ -193,23 +197,34 @@ describe('GuildSettingsFormComponent', () => {
     it('returns an empty array when no timezone matches', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('ZZZ_NOT_REAL');
+      component.settingsForm.timezone().value.set('ZZZ_NOT_REAL');
 
       expect(component.filteredTimezones()).toEqual([]);
     });
   });
 
-  // ── rosterMode subscription ───────────────────────────────────────────────
+  // ── onRosterModeChange ────────────────────────────────────────────────────
 
-  describe('rosterMode subscription', () => {
+  describe('onRosterModeChange', () => {
     it('clears minRosterRoleId when switching back to Open', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.minRosterRoleId.setValue('r1');
+      component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.form.controls.rosterMode.setValue(RosterMode.Open);
+      component.onRosterModeChange(toggleChange(RosterMode.Open));
 
-      expect(component.form.value.minRosterRoleId).toBeNull();
+      expect(component.settingsForm.minRosterRoleId().value()).toBeNull();
+    });
+
+    it('keeps minRosterRoleId when switching to DiscordRoleOnly', () => {
+      setup();
+      fixture.detectChanges();
+      component.settingsForm.minRosterRoleId().value.set('r1');
+
+      component.onRosterModeChange(toggleChange(RosterMode.DiscordRoleOnly));
+
+      expect(component.settingsForm.minRosterRoleId().value()).toBe('r1');
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.DiscordRoleOnly);
     });
   });
 
@@ -241,47 +256,52 @@ describe('GuildSettingsFormComponent', () => {
   // ── submit ────────────────────────────────────────────────────────────────
 
   describe('submit', () => {
-    it('does nothing when the form is invalid', () => {
+    it('does nothing when the form is invalid', async () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('');
+      component.settingsForm.timezone().value.set('');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
       expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
     });
 
-    it('does nothing when minOfficerRoleId is not set (required)', () => {
+    it('does nothing when minOfficerRoleId is not set (required)', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC' });
+      component.settingsForm.timezone().value.set('UTC');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
       expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
     });
 
-    it('does not submit a second time while already submitting', () => {
+    it('does not submit a second time while already submitting', async () => {
       setup();
       const pending = new Subject<void>();
       settingsService.updateSettings.mockReturnValue(pending.asObservable());
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
-      component.submit();
+      const first = component.submit();
+      const second = component.submit();
+      pending.next();
+      pending.complete();
+      await Promise.all([first, second]);
 
       expect(settingsService.updateSettings).toHaveBeenCalledTimes(1);
     });
 
-    it('calls updateSettings and updateOfficerThreshold with the correct payloads', () => {
+    it('calls updateSettings and updateOfficerThreshold with the correct payloads', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).toHaveBeenCalledWith(
         'g1',
@@ -290,40 +310,43 @@ describe('GuildSettingsFormComponent', () => {
       expect(settingsService.updateOfficerThreshold).toHaveBeenCalledWith('g1', { minOfficerRoleId: 'r1' });
     });
 
-    it('sends minRosterRoleId when rosterMode is DiscordRoleOnly', () => {
+    it('sends minRosterRoleId when rosterMode is DiscordRoleOnly', async () => {
       setup();
       settingsService.getDiscordRoles.mockReturnValue(of([role('r1')]));
       fixture.detectChanges();
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-      component.form.controls.minRosterRoleId.setValue('r1');
-      component.form.controls.minOfficerRoleId.setValue('r1');
+      component.settingsForm.rosterMode().value.set(RosterMode.DiscordRoleOnly);
+      component.settingsForm.minRosterRoleId().value.set('r1');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       const [, sent] = settingsService.updateSettings.mock.calls[0] as [string, GuildSettings];
       expect(sent.minRosterRoleId).toBe('r1');
     });
 
-    it('forces minRosterRoleId to null when rosterMode is Open', () => {
+    it('forces minRosterRoleId to null when rosterMode is Open', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
-      // Bypass rosterMode subscription to sneak a value into the control
-      component.form.controls.minRosterRoleId.setValue('r1', { emitEvent: false });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
+      // rosterMode stays Open while minRosterRoleId is (incorrectly) populated —
+      // submit() must still null it out regardless of what's in the model.
+      component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       const [, sent] = settingsService.updateSettings.mock.calls[0] as [string, GuildSettings];
       expect(sent.minRosterRoleId).toBeNull();
     });
 
-    it('patches both stores, resyncs the user and emits saved on success', () => {
+    it('patches both stores, resyncs the user and emits saved on success', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
       const savedSpy = vi.spyOn(component.saved, 'emit');
 
-      component.submit();
+      await component.submit();
 
       expect(guildStore.patchSettings).toHaveBeenCalledWith(
         'g1',
@@ -335,13 +358,14 @@ describe('GuildSettingsFormComponent', () => {
       expect(savedSpy).toHaveBeenCalled();
     });
 
-    it('shows snackbar error and resets submitting flag when either call fails', () => {
+    it('shows snackbar error and resets submitting flag when either call fails', async () => {
       setup();
       settingsService.updateSettings.mockReturnValue(throwError(() => new Error('update failed')));
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.submitting()).toBe(false);
