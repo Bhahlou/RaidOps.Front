@@ -1,0 +1,105 @@
+.changelog-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+
+  h1 {
+    margin: 0 0 24px;
+    color: var(--mat-sys-on-surface);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 10px 6px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.entry {
+  padding: 20px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  // Not-yet-seen entries get their own card (full border) so they stand out from the plain
+  // history below — the shared border-bottom separator above would be redundant here.
+  &.entry--unseen {
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    border: 1px solid var(--mat-sys-primary);
+    border-radius: 12px;
+    background: var(--mat-sys-surface-container-high);
+  }
+}
+
+.entry-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.entry-type {
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+  background: var(--mat-sys-surface-container-high);
+  border: 1px solid var(--mat-sys-outline);
+
+  &.entry-type--feature {
+    color: var(--mat-sys-on-primary);
+    background: var(--mat-sys-primary);
+    border-color: transparent;
+  }
+}
+
+.entry-date {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.entry-title {
+  margin: 0 0 6px;
+  color: var(--mat-sys-on-surface);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.entry-description {
+  margin: 0 0 8px;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.5;
+}
+
+.entry-guide-link {
+  color: var(--mat-sys-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
