@@ -1,93 +1,64 @@
 import { ChangelogEntry, ChangelogEntryType } from '../models/changelog-entry.model';
+import { ManualLink } from '../../../shared/components/page-header/page-header.component';
+
+/** Every current entry is a Feature — `titleKey`/`descriptionKey` follow `changelog.entries.<key>.*`. */
+export function feature(
+  id: string,
+  date: string,
+  key: string,
+  manualLink: ManualLink,
+): ChangelogEntry {
+  return {
+    id,
+    date: new Date(date),
+    type: ChangelogEntryType.Feature,
+    titleKey: `changelog.entries.${key}.title`,
+    descriptionKey: `changelog.entries.${key}.description`,
+    manualLink,
+  };
+}
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
-  {
-    id: '2026-07-05-whats-new',
-    date: new Date('2026-07-05'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.whatsNew.title',
-    descriptionKey: 'changelog.entries.whatsNew.description',
-    manualLink: { category: 'account', article: 'whats-new' },
-  },
-  {
-    id: '2026-07-05-manual',
-    date: new Date('2026-07-05'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.manual.title',
-    descriptionKey: 'changelog.entries.manual.description',
-    manualLink: { category: 'getting-started', article: 'create-character' },
-  },
-  {
-    id: '2026-07-03-notifications',
-    date: new Date('2026-07-03'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.notifications.title',
-    descriptionKey: 'changelog.entries.notifications.description',
-    manualLink: { category: 'account', article: 'notifications' },
-  },
-  {
-    id: '2026-07-02-roster',
-    date: new Date('2026-07-02'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.roster.title',
-    descriptionKey: 'changelog.entries.roster.description',
-    manualLink: { category: 'guild', article: 'roster' },
-  },
-  {
-    id: '2026-07-01-get-started',
-    date: new Date('2026-07-01'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.getStarted.title',
-    descriptionKey: 'changelog.entries.getStarted.description',
-    manualLink: { category: 'welcome', article: 'onboarding' },
-  },
-  {
-    id: '2026-06-22-audit-log',
-    date: new Date('2026-06-22'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.auditLog.title',
-    descriptionKey: 'changelog.entries.auditLog.description',
-    manualLink: { category: 'guild', article: 'audit-log' },
-  },
-  {
-    id: '2026-06-21-character-management',
-    date: new Date('2026-06-21'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.characterManagement.title',
-    descriptionKey: 'changelog.entries.characterManagement.description',
-    manualLink: { category: 'getting-started', article: 'character-detail' },
-  },
-  {
-    id: '2026-06-04-character-import',
-    date: new Date('2026-06-04'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.characterImport.title',
-    descriptionKey: 'changelog.entries.characterImport.description',
-    manualLink: { category: 'getting-started', article: 'create-character' },
-  },
-  {
-    id: '2026-05-23-guild-register',
-    date: new Date('2026-05-23'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.guildRegister.title',
-    descriptionKey: 'changelog.entries.guildRegister.description',
-    manualLink: { category: 'guild', article: 'register' },
-  },
-  {
-    id: '2026-05-21-guild-list',
-    date: new Date('2026-05-21'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.guildList.title',
-    descriptionKey: 'changelog.entries.guildList.description',
-    manualLink: { category: 'guild', article: 'guild-list' },
-  },
-  {
-    id: '2026-05-21-discord-auth',
-    date: new Date('2026-05-21'),
-    type: ChangelogEntryType.Feature,
-    titleKey: 'changelog.entries.discordAuth.title',
-    descriptionKey: 'changelog.entries.discordAuth.description',
-    manualLink: { category: 'account', article: 'discord-auth' },
-  },
+  feature('2026-07-05-whats-new', '2026-07-05', 'whatsNew', {
+    category: 'account',
+    article: 'whats-new',
+  }),
+  feature('2026-07-05-manual', '2026-07-05', 'manual', {
+    category: 'getting-started',
+    article: 'create-character',
+  }),
+  feature('2026-07-03-notifications', '2026-07-03', 'notifications', {
+    category: 'account',
+    article: 'notifications',
+  }),
+  feature('2026-07-02-roster', '2026-07-02', 'roster', { category: 'guild', article: 'roster' }),
+  feature('2026-07-01-get-started', '2026-07-01', 'getStarted', {
+    category: 'welcome',
+    article: 'onboarding',
+  }),
+  feature('2026-06-22-audit-log', '2026-06-22', 'auditLog', {
+    category: 'guild',
+    article: 'audit-log',
+  }),
+  feature('2026-06-21-character-management', '2026-06-21', 'characterManagement', {
+    category: 'getting-started',
+    article: 'character-detail',
+  }),
+  feature('2026-06-04-character-import', '2026-06-04', 'characterImport', {
+    category: 'getting-started',
+    article: 'create-character',
+  }),
+  feature('2026-05-23-guild-register', '2026-05-23', 'guildRegister', {
+    category: 'guild',
+    article: 'register',
+  }),
+  feature('2026-05-21-guild-list', '2026-05-21', 'guildList', {
+    category: 'guild',
+    article: 'guild-list',
+  }),
+  feature('2026-05-21-discord-auth', '2026-05-21', 'discordAuth', {
+    category: 'account',
+    article: 'discord-auth',
+  }),
 ];
