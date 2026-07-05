@@ -1,4 +1,4 @@
-import { Component, computed, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -22,7 +22,6 @@ import { BranchGroup } from '../../models/branch-group.model';
     CharacterCardComponent,
   ],
   templateUrl: './list-content.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './list-content.component.scss',
 })
 export class ListContentComponent {

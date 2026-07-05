@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -29,7 +29,6 @@ import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enu
     PageHeaderComponent,
   ],
   templateUrl: './list-header.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './list-header.component.scss',
 })
 export class ListHeaderComponent {

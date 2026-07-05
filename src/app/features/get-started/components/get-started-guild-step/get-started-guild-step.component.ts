@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -34,7 +34,6 @@ import { environment } from '../../../../../environments/environment';
     TranslocoPipe,
   ],
   templateUrl: './get-started-guild-step.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './get-started-guild-step.component.scss',
 })
 export class GetStartedGuildStepComponent {

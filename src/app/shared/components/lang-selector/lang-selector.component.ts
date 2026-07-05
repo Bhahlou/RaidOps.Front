@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { LanguageService } from '../../../core/services/language.service';
@@ -8,7 +8,6 @@ import { LanguageService } from '../../../core/services/language.service';
   standalone: true,
   imports: [MatButtonModule, MatMenuModule],
   templateUrl: './lang-selector.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './lang-selector.component.scss',
 })
 export class LangSelectorComponent {

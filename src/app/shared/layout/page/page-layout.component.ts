@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { LoadingBarComponent } from '../../components/loading-bar/loading-bar.component';
@@ -9,7 +9,6 @@ import { AuthStore } from '../../../core/stores/auth.store';
   selector: 'app-page-layout',
   imports: [RouterOutlet, HeaderComponent, LoadingBarComponent, SidenavComponent],
   templateUrl: './page-layout.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './page-layout.component.scss',
 })
 export class PageLayoutComponent {

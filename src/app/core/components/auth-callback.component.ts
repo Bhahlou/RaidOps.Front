@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../stores/auth.store';
 
@@ -12,7 +12,6 @@ import { AuthStore } from '../stores/auth.store';
 @Component({
   selector: 'app-auth-callback',
   template: '',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [],
 })
 export class AuthCallbackComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-icon-card',
   imports: [MatCardModule, MatIconModule],
   templateUrl: './icon-card.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './icon-card.component.scss',
 })
 export class IconCardComponent {

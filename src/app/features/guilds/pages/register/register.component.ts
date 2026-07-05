@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,7 +32,6 @@ import {
     PageHeaderComponent,
   ],
   templateUrl: './register.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {

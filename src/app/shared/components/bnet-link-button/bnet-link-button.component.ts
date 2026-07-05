@@ -1,4 +1,4 @@
-import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -20,7 +20,6 @@ export type { BnetRegion };
   standalone: true,
   imports: [UpperCasePipe, MatIconModule, MatMenuModule, BnetIconComponent],
   templateUrl: './bnet-link-button.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bnet-link-button.component.scss',
 })
 export class BnetLinkButtonComponent {

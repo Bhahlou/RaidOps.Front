@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { LanguageService } from './core/services/language.service';
@@ -8,7 +8,6 @@ import { EnvBrandingService } from './core/services/env-branding.service';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [],
 })
 export class App {

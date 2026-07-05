@@ -1,4 +1,4 @@
-import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,7 +27,6 @@ import {
     NotificationListComponent,
   ],
   templateUrl: './notification-bell.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './notification-bell.component.scss',
 })
 export class NotificationBellComponent {

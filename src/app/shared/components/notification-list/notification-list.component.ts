@@ -1,4 +1,4 @@
-import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,7 +26,6 @@ const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notificatio
   selector: 'app-notification-list',
   imports: [RouterLink, MatButtonModule, MatIconModule, TranslocoPipe],
   templateUrl: './notification-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './notification-list.component.scss',
 })
 export class NotificationListComponent {

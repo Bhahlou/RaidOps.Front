@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 
@@ -6,7 +6,6 @@ import { DiscordIconType } from '../../models/discord-icon-type.enum';
   selector: 'app-discord-icon',
   imports: [MatIconModule],
   templateUrl: './discord-icon.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './discord-icon.component.scss',
 })
 export class DiscordIconComponent {

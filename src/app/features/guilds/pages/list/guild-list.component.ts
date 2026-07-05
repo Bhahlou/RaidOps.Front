@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -32,7 +25,6 @@ import {
     PageHeaderComponent,
   ],
   templateUrl: './guild-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-list.component.scss',
 })
 export class GuildListComponent implements OnInit {

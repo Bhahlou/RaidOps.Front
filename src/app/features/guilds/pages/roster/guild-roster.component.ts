@@ -1,4 +1,4 @@
-import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { GuildRosterListComponent } from '../../components/guild-roster-list/guild-roster-list.component';
 import { GuildMyCharactersComponent } from '../../components/guild-my-characters/guild-my-characters.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
@@ -9,7 +9,6 @@ import { injectGuildContext } from '../../inject-guild-context';
   standalone: true,
   imports: [GuildRosterListComponent, GuildMyCharactersComponent, PageHeaderComponent],
   templateUrl: './guild-roster.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-roster.component.scss',
 })
 export class GuildRosterComponent {

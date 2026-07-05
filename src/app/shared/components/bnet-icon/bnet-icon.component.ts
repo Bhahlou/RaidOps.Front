@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 /** Renders the Battle.net logo mark as an inline SVG. Color follows the host's `color` (currentColor). */
 @Component({
@@ -6,7 +6,6 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './bnet-icon.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bnet-icon.component.scss',
 })
 export class BnetIconComponent {

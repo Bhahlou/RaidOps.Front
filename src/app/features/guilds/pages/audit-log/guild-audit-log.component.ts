@@ -1,12 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -80,7 +73,6 @@ interface CharacterChangeDisplay {
     WowClassIconComponent,
   ],
   templateUrl: './guild-audit-log.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-audit-log.component.scss',
 })
 export class GuildAuditLogComponent {

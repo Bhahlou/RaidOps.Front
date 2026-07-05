@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +10,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
   selector: 'app-manual-help-link',
   imports: [RouterLink, MatButtonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './manual-help-link.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './manual-help-link.component.scss',
 })
 export class ManualHelpLinkComponent {

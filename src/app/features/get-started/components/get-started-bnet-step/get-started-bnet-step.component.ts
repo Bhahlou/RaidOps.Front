@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +33,6 @@ import {
     CharacterActivationPanelComponent,
   ],
   templateUrl: './get-started-bnet-step.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './get-started-bnet-step.component.scss',
 })
 export class GetStartedBnetStepComponent {

@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 const FACTION_ICONS: Record<string, string> = {
   ALLIANCE:
@@ -17,7 +17,6 @@ const FACTION_ICONS: Record<string, string> = {
   standalone: true,
   imports: [],
   templateUrl: './wow-faction-icon.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wow-faction-icon.component.scss',
 })
 export class WowFactionIconComponent {

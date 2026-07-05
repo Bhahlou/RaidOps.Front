@@ -1,12 +1,4 @@
-import {
-  Component,
-  computed,
-  OnInit,
-  inject,
-  output,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, OnInit, inject, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -54,7 +46,6 @@ interface BranchGroup {
     WowFactionIconComponent,
   ],
   templateUrl: './character-activation-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-activation-panel.component.scss',
 })
 export class CharacterActivationPanelComponent implements OnInit {

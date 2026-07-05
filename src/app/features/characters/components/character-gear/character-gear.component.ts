@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 
 @Component({
@@ -6,7 +6,6 @@ import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/m
   standalone: true,
   imports: [MatCard, MatCardContent, MatCardHeader, MatCardTitle],
   templateUrl: './character-gear.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-gear.component.scss',
 })
 export class CharacterGearComponent {

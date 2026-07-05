@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -10,7 +10,6 @@ import { RoadmapItemStatus, RoadmapSection } from './models/roadmap-section.mode
   selector: 'app-roadmap',
   imports: [MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './roadmap.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './roadmap.component.scss',
 })
 export class RoadmapComponent {

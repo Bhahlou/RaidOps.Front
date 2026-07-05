@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 /** Blizzard CDN icon slug keyed by class ID. */
 const CLASS_ICON_NAMES: Record<number, string> = {
@@ -44,7 +44,6 @@ export const CLASS_COLORS: Record<number, string> = {
   standalone: true,
   imports: [],
   templateUrl: './wow-class-icon.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wow-class-icon.component.scss',
 })
 export class WowClassIconComponent {

@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -10,7 +10,6 @@ import { DiscordBrandIconComponent } from '../../../../shared/components/discord
   selector: 'app-manual-sidebar',
   imports: [RouterLink, RouterLinkActive, MatIconModule, TranslocoPipe, DiscordBrandIconComponent],
   templateUrl: './manual-sidebar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './manual-sidebar.component.scss',
 })
 export class ManualSidebarComponent {

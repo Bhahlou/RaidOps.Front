@@ -1,4 +1,4 @@
-import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -15,7 +15,6 @@ import { formatDiscordColor } from '../../../../shared/utils/discord-color.util'
   selector: 'app-role-threshold-picker',
   imports: [MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   templateUrl: './role-threshold-picker.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './role-threshold-picker.component.scss',
 })
 export class RoleThresholdPickerComponent {

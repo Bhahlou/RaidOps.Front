@@ -1,4 +1,4 @@
-import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { marked } from 'marked';
 
 /**
@@ -9,7 +9,6 @@ import { marked } from 'marked';
 @Component({
   selector: 'app-markdown-renderer',
   templateUrl: './markdown-renderer.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './markdown-renderer.component.scss',
 })
 export class MarkdownRendererComponent {

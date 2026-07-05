@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -42,7 +35,6 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
     WowClassIconComponent,
   ],
   templateUrl: './get-started-link-step.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './get-started-link-step.component.scss',
 })
 export class GetStartedLinkStepComponent {

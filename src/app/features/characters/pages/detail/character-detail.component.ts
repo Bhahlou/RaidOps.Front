@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,7 +47,6 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
     CharacterRaidSpecsComponent,
   ],
   templateUrl: './character-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-detail.component.scss',
 })
 export class CharacterDetailComponent implements OnInit {

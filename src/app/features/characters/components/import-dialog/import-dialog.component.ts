@@ -1,4 +1,4 @@
-import { Component, inject, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +19,6 @@ import { CharacterActivationPanelComponent } from '../character-activation-panel
     CharacterActivationPanelComponent,
   ],
   templateUrl: './import-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './import-dialog.component.scss',
 })
 export class ImportDialogComponent {

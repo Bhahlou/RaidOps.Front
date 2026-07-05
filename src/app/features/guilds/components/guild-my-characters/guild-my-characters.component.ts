@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -38,7 +38,6 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
     CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-my-characters.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-my-characters.component.scss',
 })
 export class GuildMyCharactersComponent {

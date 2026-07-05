@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CharacterStore } from '../../stores/character.store';
@@ -23,7 +23,6 @@ import { Character } from '../../models/character.model';
   standalone: true,
   imports: [ListHeaderComponent, ListContentComponent],
   templateUrl: './list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './list.component.scss',
 })
 export class CharacterListComponent implements OnInit {

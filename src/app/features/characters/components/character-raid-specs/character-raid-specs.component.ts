@@ -1,4 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterSpec } from '../../models/character-spec.model';
 
@@ -8,7 +8,6 @@ import { CharacterSpec } from '../../models/character-spec.model';
   standalone: true,
   imports: [TranslocoPipe],
   templateUrl: './character-raid-specs.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-raid-specs.component.scss',
 })
 export class CharacterRaidSpecsComponent {

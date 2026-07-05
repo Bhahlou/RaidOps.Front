@@ -1,13 +1,4 @@
-import {
-  Component,
-  inject,
-  input,
-  OnDestroy,
-  OnInit,
-  output,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -28,7 +19,6 @@ export type BnetSyncStep = 'branches' | 'authenticating' | 'syncing' | 'error';
   standalone: true,
   imports: [MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   templateUrl: './bnet-sync-panel.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bnet-sync-panel.component.scss',
 })
 export class BnetSyncPanelComponent implements OnInit, OnDestroy {

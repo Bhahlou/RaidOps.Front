@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  signal,
-  untracked,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -81,7 +72,6 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
     CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-roster-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-roster-list.component.scss',
 })
 export class GuildRosterListComponent {
