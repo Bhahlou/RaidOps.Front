@@ -24,6 +24,7 @@ const makeUser = (guilds: UserGuild[]): User => ({
   name: 'Test',
   avatarHash: null,
   guilds,
+  notifications: [],
 });
 
 describe('guildAccessGuard', () => {

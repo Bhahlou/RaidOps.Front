@@ -23,7 +23,7 @@ const makeChar = (overrides: Partial<Character> = {}): Character => ({
 });
 
 const makeUser = (overrides: Partial<User> = {}): User => ({
-  discordId: '123', name: 'TestUser', avatarHash: 'avatar123', guilds: [],
+  discordId: '123', name: 'TestUser', avatarHash: 'avatar123', guilds: [], notifications: [],
   ...overrides,
 });
 

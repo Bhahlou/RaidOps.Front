@@ -49,7 +49,12 @@ describe('GetStartedComponent', () => {
   let snackbarMock: { error: ReturnType<typeof vi.fn> };
   let routeGet: ReturnType<typeof vi.fn>;
 
-  const setup = (user: User | null, characters: Character[] = [], errorParam: string | null = null) => {
+  const setup = (
+    userInput: Omit<User, 'notifications'> | null,
+    characters: Character[] = [],
+    errorParam: string | null = null,
+  ) => {
+    const user: User | null = userInput ? { ...userInput, notifications: [] } : null;
     userSignal = signal(user);
     isBnetLinkedSignal = signal(characters.length > 0);
     characterListSignal = signal(characters);

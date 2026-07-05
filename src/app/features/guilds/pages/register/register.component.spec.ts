@@ -26,6 +26,7 @@ const makeUser = (guilds: UserGuild[]): User => ({
   name: 'TestUser',
   avatarHash: null,
   guilds,
+  notifications: [],
 });
 
 describe('RegisterComponent', () => {
@@ -82,6 +83,58 @@ describe('RegisterComponent', () => {
       setup(null, [makeGuild('abc')]);
 
       expect(component.guild()).toBeNull();
+    });
+  });
+
+  // ── breadcrumbs ───────────────────────────────────────────────────────────
+
+  describe('breadcrumbs', () => {
+    it('uses the user name, a discord icon, and the guild name when both resolve', () => {
+      setup('abc', [makeGuild('abc', { name: 'My Guild' })]);
+
+      const [first, , last] = component.breadcrumbs();
+
+      expect(first.label).toBe('TestUser');
+      expect(first.discordIcon).toEqual({ id: '123', hash: null, type: component.DiscordIconType.User });
+      expect(last).toEqual({ label: 'My Guild' });
+    });
+
+    it('falls back to placeholder labels with no icon when there is no user or guild', () => {
+      setup('unknown', []);
+
+      const [first, , last] = component.breadcrumbs();
+
+      expect(first.label).toBe('…');
+      expect(first.discordIcon).toBeUndefined();
+      expect(last).toEqual({ label: '…' });
+    });
+
+    it('always includes the guilds list crumb linking back to /guilds', () => {
+      setup('abc', [makeGuild('abc')]);
+
+      expect(component.breadcrumbs()[1]).toEqual({ i18nKey: 'sidenav.guilds', link: ['/guilds'] });
+    });
+  });
+
+  // ── isAlreadyConfigured computed ──────────────────────────────────────────
+
+  describe('isAlreadyConfigured', () => {
+    it('is true when the guild is configured', () => {
+      setup('abc', [makeGuild('abc', { isConfigured: true })]);
+
+      expect(component.isAlreadyConfigured()).toBe(true);
+    });
+
+    it('is false when the guild is not configured', () => {
+      setup('abc', [makeGuild('abc', { isConfigured: false })]);
+
+      expect(component.isAlreadyConfigured()).toBe(false);
+    });
+
+    it('is false when there is no matching guild', () => {
+      setup('unknown', []);
+
+      expect(component.isAlreadyConfigured()).toBe(false);
     });
   });
 
