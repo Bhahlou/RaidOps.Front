@@ -13,6 +13,7 @@ import { IconCardComponent } from '../../../../shared/components/icon-card/icon-
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
+import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-register',
@@ -25,6 +26,7 @@ import { environment } from '../../../../../environments/environment';
     GuildSettingsFormComponent,
     TranslocoPipe,
     IconCardComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
@@ -42,6 +44,20 @@ export class RegisterComponent implements OnInit {
   readonly guild = computed<UserGuild | null>(
     () => this.#authStore.user()?.guilds.find((g) => g.id === this.#guildId) ?? null,
   );
+
+  readonly breadcrumbs = computed((): BreadcrumbItem[] => {
+    const user = this.#authStore.user();
+    return [
+      {
+        label: user?.name ?? '…',
+        discordIcon: user
+          ? { id: user.discordId, hash: user.avatarHash, type: DiscordIconType.User }
+          : undefined,
+      },
+      { i18nKey: 'sidenav.guilds', link: ['/guilds'] },
+      { label: this.guild()?.name ?? '…' },
+    ];
+  });
 
   /** 0 = invite bot, 1 = settings. Driven by isRegistered after fresh user load. */
   readonly stepIndex = computed(() => (this.guild()?.isRegistered ? 1 : 0));

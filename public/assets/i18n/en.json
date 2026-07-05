@@ -2,7 +2,112 @@
   "header": {
     "login": "Login",
     "logout": "Logout",
-    "language": "Language"
+    "language": "Language",
+    "help": "Help"
+  },
+  "manual": {
+    "back": "Back",
+    "category": {
+      "welcome": "Welcome",
+      "account": "Account",
+      "gettingStarted": "Characters",
+      "guild": "Guild"
+    },
+    "article": {
+      "onboarding": {
+        "title": "Get started with RaidOps"
+      },
+      "discordAuth": {
+        "title": "Sign in with Discord"
+      },
+      "notifications": {
+        "title": "Notifications"
+      },
+      "whatsNew": {
+        "title": "Where to find what's new"
+      },
+      "createCharacter": {
+        "title": "Import your character"
+      },
+      "characterDetail": {
+        "title": "Manage your character"
+      },
+      "guildList": {
+        "title": "My guilds"
+      },
+      "register": {
+        "title": "Register a guild"
+      },
+      "roster": {
+        "title": "The roster"
+      },
+      "settings": {
+        "title": "Guild settings"
+      },
+      "auditLog": {
+        "title": "Audit log"
+      }
+    }
+  },
+  "changelog": {
+    "pageTitle": "What's new",
+    "type": {
+      "feature": "New",
+      "fix": "Fix"
+    },
+    "viewGuide": "View guide →",
+    "entries": {
+      "whatsNew": {
+        "title": "A What's new page to track updates",
+        "description": "The 📣 icon in the header lists the features added to RaidOps over time, with a badge when there's something new to see."
+      },
+      "manual": {
+        "title": "An in-app help manual",
+        "description": "Every page now has a \"?\" pointing to a step-by-step guide: Discord sign-in, character import, guild management (roster, settings, audit log), and more."
+      },
+      "notifications": {
+        "title": "In-app notifications",
+        "description": "A bell in the header alerts you when an action is needed on your end — e.g. configuring the Officer threshold for a guild you administer."
+      },
+      "roster": {
+        "title": "The guild roster, as a real table",
+        "description": "Search, filters (class, spec, rank, join date), column sorting, and managing your own characters in the guild (join, change rank, leave) — all in one table."
+      },
+      "getStarted": {
+        "title": "A guided path to get started on RaidOps",
+        "description": "A 4-step wizard (Discord, guild, Battle.net, roster) guides newcomers end to end, picking up exactly where they left off."
+      },
+      "auditLog": {
+        "title": "Guild audit log",
+        "description": "Full history of notable guild actions (settings, joins/leaves, rank changes), filterable and sortable by column."
+      },
+      "characterManagement": {
+        "title": "Advanced character management",
+        "description": "Resync from Battle.net, deactivate, join/leave a guild, and set viable raid specs — all directly from the character card."
+      },
+      "characterImport": {
+        "title": "Import your characters from Battle.net",
+        "description": "Link your Battle.net account and import your characters in a few clicks, with search and multi-select."
+      },
+      "guildRegister": {
+        "title": "Register your guild",
+        "description": "Invite the RaidOps bot to your Discord server to register your guild — registration finalizes automatically once the bot has joined."
+      },
+      "guildList": {
+        "title": "Find your guilds",
+        "description": "An overview of guilds already registered and accessible to you, and the ones you can register yourself as a Discord administrator."
+      },
+      "discordAuth": {
+        "title": "Sign in with Discord",
+        "description": "RaidOps uses your Discord account as your main identity — one-click sign-in, no password to manage."
+      }
+    }
+  },
+  "accessLevelBadge": {
+    "public": "Public",
+    "roster": "Roster",
+    "officer": "Officer",
+    "requiresAuth": "Login required"
   },
   "sidenav": {
     "account": {

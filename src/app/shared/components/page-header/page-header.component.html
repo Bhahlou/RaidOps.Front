@@ -19,6 +19,8 @@
       </span>
       @if (!last) {
         <mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+      } @else if (manualLink(); as link) {
+        <app-manual-help-link [category]="link.category" [article]="link.article" />
       }
     }
   </nav>

@@ -29,6 +29,16 @@ export const routes: Routes = [
           import('./features/get-started/get-started.component').then(m => m.GetStartedComponent),
       },
       {
+        path: 'manual',
+        loadChildren: () =>
+          import('./features/manual/manual.routes').then(m => m.manualRoutes),
+      },
+      {
+        path: 'changelog',
+        loadComponent: () =>
+          import('./features/changelog/changelog.component').then(m => m.ChangelogComponent),
+      },
+      {
         path: '',
         canActivate: [authGuard],
         children: [

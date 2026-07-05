@@ -1,0 +1,34 @@
+<nav class="manual-sidebar">
+  <button class="back-link" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    {{ 'manual.back' | transloco }}
+  </button>
+
+  @for (category of categories; track category.id) {
+    <div class="section">
+      <button class="section-header" (click)="toggleCategory(category.id)">
+        @if (category.icon === 'discord') {
+          <app-discord-brand-icon class="section-icon" [size]="20" />
+        } @else {
+          <mat-icon class="section-icon">{{ category.icon }}</mat-icon>
+        }
+        <span class="section-name">{{ category.labelKey | transloco }}</span>
+        <mat-icon class="section-chevron">
+          {{ openCategoryIds().has(category.id) ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
+      </button>
+
+      @if (openCategoryIds().has(category.id)) {
+        @for (article of category.articles; track article.id) {
+          <a
+            class="sidebar-item"
+            [routerLink]="['/manual', category.id, article.id]"
+            routerLinkActive="active-link"
+          >
+            {{ article.labelKey | transloco }}
+          </a>
+        }
+      }
+    </div>
+  }
+</nav>

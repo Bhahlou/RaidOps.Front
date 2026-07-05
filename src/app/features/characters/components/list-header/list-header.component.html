@@ -1,6 +1,4 @@
-<div class="page-header">
-  <h1 class="title">{{ 'characters.list.title' | transloco }}</h1>
-
+<app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'getting-started', article: 'create-character' }">
   <div class="actions">
     @if (!isBnetLoading()) {
       @if (isBnetLinked()) {
@@ -20,4 +18,4 @@
       }
     }
   </div>
-</div>
+</app-page-header>
