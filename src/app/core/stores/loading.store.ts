@@ -1,11 +1,11 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 
 /**
  * Signal store that tracks the number of in-flight HTTP requests.
  * Consumed by the loadingInterceptor (increment/decrement) and
  * by LoadingBarComponent (isLoading).
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LoadingStore {
   readonly #pending = signal(0);
 

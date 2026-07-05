@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -6,7 +6,7 @@ import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildSettings } from '../models/guild-settings.model';
 import { OfficerThreshold } from '../models/officer-threshold.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class GuildSettingsService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;

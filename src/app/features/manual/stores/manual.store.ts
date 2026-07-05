@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MANUAL_CATEGORIES } from '../data/manual-content.data';
 import { ManualArticle, ManualCategory } from '../models/manual-article.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ManualStore {
   readonly #http = inject(HttpClient);
 

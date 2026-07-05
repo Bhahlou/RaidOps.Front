@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { Observable, of, tap } from 'rxjs';
 import { OfficerThreshold } from '../models/officer-threshold.model';
 import { GuildSettingsService } from '../services/guild-settings.service';
@@ -8,7 +8,7 @@ interface OfficerThresholdStoreState {
   officerThreshold: OfficerThreshold | null;
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class OfficerThresholdStore {
   readonly #settingsService = inject(GuildSettingsService);
   readonly #state = signal<OfficerThresholdStoreState>({ guildId: null, officerThreshold: null });

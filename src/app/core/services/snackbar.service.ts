@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -8,7 +8,7 @@ import { TranslocoService } from '@jsverse/transloco';
  * Accepts either an i18n key or a literal message — TranslocoService handles
  * the resolution and falls back to the raw string if no key is found.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SnackbarService {
   readonly #snackBar = inject(MatSnackBar);
   readonly #transloco = inject(TranslocoService);

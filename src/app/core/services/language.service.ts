@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { DateAdapter } from '@angular/material/core';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -6,7 +6,7 @@ const STORAGE_KEY = 'lang';
 const AVAILABLE_LANGS = ['fr', 'en', 'de'] as const;
 type Lang = (typeof AVAILABLE_LANGS)[number];
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LanguageService {
   readonly #transloco = inject(TranslocoService);
   readonly #dateAdapter = inject(DateAdapter<Date>);
