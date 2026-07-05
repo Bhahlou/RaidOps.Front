@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CharacterStore } from '../../stores/character.store';
@@ -23,6 +23,7 @@ import { Character } from '../../models/character.model';
   standalone: true,
   imports: [ListHeaderComponent, ListContentComponent],
   templateUrl: './list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './list.component.scss',
 })
 export class CharacterListComponent implements OnInit {
@@ -104,7 +105,12 @@ export class CharacterListComponent implements OnInit {
     dialogRef
       .afterClosed()
       .subscribe(
-        (result?: { activated: number; error?: boolean; openSync?: boolean; activatedCharacterIds?: number[] }) => {
+        (result?: {
+          activated: number;
+          error?: boolean;
+          openSync?: boolean;
+          activatedCharacterIds?: number[];
+        }) => {
           if (!result) return;
           if (result.openSync) {
             this.openSyncDialog();
@@ -141,7 +147,10 @@ export class CharacterListComponent implements OnInit {
     });
   }
 
-  #openRaidSpecsDialog(characters: Character[], mode: SetRaidSpecsDialogData['mode']): MatDialogRef<SetRaidSpecsDialogComponent> {
+  #openRaidSpecsDialog(
+    characters: Character[],
+    mode: SetRaidSpecsDialogData['mode'],
+  ): MatDialogRef<SetRaidSpecsDialogComponent> {
     return this.#dialog.open(SetRaidSpecsDialogComponent, {
       width: '560px',
       maxWidth: '95vw',

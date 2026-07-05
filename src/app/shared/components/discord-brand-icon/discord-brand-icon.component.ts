@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 /** Renders the Discord logo mark as an inline SVG. Color follows the host's `color` (currentColor). */
 @Component({
@@ -6,6 +6,7 @@ import { Component, input } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './discord-brand-icon.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './discord-brand-icon.component.scss',
 })
 export class DiscordBrandIconComponent {

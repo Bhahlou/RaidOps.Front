@@ -1,8 +1,10 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 const FACTION_ICONS: Record<string, string> = {
-  ALLIANCE: 'https://static.wikia.nocookie.net/wowpedia/images/7/7e/Alliance_64.png/revision/latest?cb=20110620204931',
-  HORDE:    'https://static.wikia.nocookie.net/wowpedia/images/9/92/Horde_64.png/revision/latest?cb=20110620204931',
+  ALLIANCE:
+    'https://static.wikia.nocookie.net/wowpedia/images/7/7e/Alliance_64.png/revision/latest?cb=20110620204931',
+  HORDE:
+    'https://static.wikia.nocookie.net/wowpedia/images/9/92/Horde_64.png/revision/latest?cb=20110620204931',
 };
 
 /**
@@ -15,6 +17,7 @@ const FACTION_ICONS: Record<string, string> = {
   standalone: true,
   imports: [],
   templateUrl: './wow-faction-icon.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wow-faction-icon.component.scss',
 })
 export class WowFactionIconComponent {

@@ -1,4 +1,12 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -35,6 +43,7 @@ import { CharacterRank } from '../../../guilds/models/character-rank.enum';
     WowClassIconComponent,
   ],
   templateUrl: './character-guilds.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-guilds.component.scss',
 })
 export class CharacterGuildsComponent implements OnInit {
@@ -90,7 +99,7 @@ export class CharacterGuildsComponent implements OnInit {
   }
 
   setRankSelection(guildId: string, rank: CharacterRank): void {
-    this.#rankSelections.update(m => new Map(m).set(guildId, rank));
+    this.#rankSelections.update((m) => new Map(m).set(guildId, rank));
   }
 
   joinGuild(guildId: string): void {

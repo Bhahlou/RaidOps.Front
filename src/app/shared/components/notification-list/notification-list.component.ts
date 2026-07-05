@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,15 +16,17 @@ export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>
 };
 
 /** Route the notification's call-to-action link points to. */
-const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> = {
-  [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
-};
+const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> =
+  {
+    [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
+  };
 
 /** Pure, presentational list of notification rows — caller owns filtering/state. */
 @Component({
   selector: 'app-notification-list',
   imports: [RouterLink, MatButtonModule, MatIconModule, TranslocoPipe],
   templateUrl: './notification-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './notification-list.component.scss',
 })
 export class NotificationListComponent {

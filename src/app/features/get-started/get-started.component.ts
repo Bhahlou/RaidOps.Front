@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +45,7 @@ import { GetStartedLinkStepComponent } from './components/get-started-link-step/
     GetStartedLinkStepComponent,
   ],
   templateUrl: './get-started.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './get-started.component.scss',
 })
 export class GetStartedComponent implements OnInit {

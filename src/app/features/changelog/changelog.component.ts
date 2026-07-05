@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -10,6 +10,7 @@ import { ChangelogEntry, ChangelogEntryType } from './models/changelog-entry.mod
   selector: 'app-changelog',
   imports: [RouterLink, MatIconModule, TranslocoPipe],
   templateUrl: './changelog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './changelog.component.scss',
 })
 export class ChangelogComponent {
@@ -33,6 +34,8 @@ export class ChangelogComponent {
   }
 
   formatDate(date: Date): string {
-    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'long' }).format(date);
+    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'long' }).format(
+      date,
+    );
   }
 }

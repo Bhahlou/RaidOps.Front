@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,6 +52,7 @@ type LoadState = 'loading' | 'idle' | 'error' | 'submitting';
     WowClassIconComponent,
   ],
   templateUrl: './set-raid-specs-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './set-raid-specs-dialog.component.scss',
 })
 export class SetRaidSpecsDialogComponent implements OnInit {

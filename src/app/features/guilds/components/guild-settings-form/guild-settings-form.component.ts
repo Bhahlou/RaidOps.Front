@@ -1,4 +1,13 @@
-import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -59,6 +68,7 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
     RoleThresholdPickerComponent,
   ],
   templateUrl: './guild-settings-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-settings-form.component.scss',
 })
 export class GuildSettingsFormComponent implements OnInit {

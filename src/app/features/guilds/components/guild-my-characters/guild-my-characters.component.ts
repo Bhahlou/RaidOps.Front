@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -38,6 +38,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
     CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-my-characters.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-my-characters.component.scss',
 })
 export class GuildMyCharactersComponent {
@@ -60,13 +61,14 @@ export class GuildMyCharactersComponent {
   // ── Derived from CharacterStore.characterList ────────────────────────────
 
   readonly myCharacters = computed(() =>
-    this.#store.characterList()
-      .filter(c => this.#isInGuild(c))
+    this.#store
+      .characterList()
+      .filter((c) => this.#isInGuild(c))
       .sort((a, b) => RANK_ORDER.indexOf(this.rankFor(a)) - RANK_ORDER.indexOf(this.rankFor(b))),
   );
 
   readonly addableCharacters = computed(() =>
-    this.#store.characterList().filter(c => !this.#isInGuild(c)),
+    this.#store.characterList().filter((c) => !this.#isInGuild(c)),
   );
 
   // ── UI state ──────────────────────────────────────────────────────────────
@@ -77,12 +79,15 @@ export class GuildMyCharactersComponent {
   readonly #rankSelections = signal(new Map<number, CharacterRank>());
 
   #isInGuild(character: Character): boolean {
-    return character.guildMemberships.some(m => m.guildId === this.guildId());
+    return character.guildMemberships.some((m) => m.guildId === this.guildId());
   }
 
   /** The character's roster rank for this guild. */
   rankFor(character: Character): CharacterRank {
-    return character.guildMemberships.find(m => m.guildId === this.guildId())?.characterRank ?? CharacterRank.Main;
+    return (
+      character.guildMemberships.find((m) => m.guildId === this.guildId())?.characterRank ??
+      CharacterRank.Main
+    );
   }
 
   characterLink(character: Character): string[] {
@@ -90,7 +95,7 @@ export class GuildMyCharactersComponent {
   }
 
   toggleAddPanel(): void {
-    this.showAddPanel.update(v => !v);
+    this.showAddPanel.update((v) => !v);
   }
 
   getRankSelection(charId: number): CharacterRank {
@@ -98,18 +103,21 @@ export class GuildMyCharactersComponent {
   }
 
   setRankSelection(charId: number, rank: CharacterRank): void {
-    this.#rankSelections.update(m => new Map(m).set(charId, rank));
+    this.#rankSelections.update((m) => new Map(m).set(charId, rank));
   }
 
   joinCharacter(character: Character): void {
-    this.#store.joinGuild(character.id, this.guildId(), this.getRankSelection(character.id)).subscribe({
-      next: () => {
-        this.showAddPanel.set(false);
-        this.#snackbar.success('characterDetail.guilds.joinSuccess');
-        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
-      },
-      error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
-    });
+    this.#store
+      .joinGuild(character.id, this.guildId(), this.getRankSelection(character.id))
+      .subscribe({
+        next: () => {
+          this.showAddPanel.set(false);
+          this.#snackbar.success('characterDetail.guilds.joinSuccess');
+          this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
+        },
+        error: (err: HttpErrorResponse) =>
+          this.#snackbar.error(this.#store.membershipErrorKey(err)),
+      });
   }
 
   updateRank(characterId: number, rank: CharacterRank): void {

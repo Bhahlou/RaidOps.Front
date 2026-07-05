@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -24,6 +24,7 @@ export interface ManualLink {
   standalone: true,
   imports: [RouterLink, MatIcon, TranslocoPipe, DiscordIconComponent, ManualHelpLinkComponent],
   templateUrl: './page-header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './page-header.component.scss',
 })
 export class PageHeaderComponent {

@@ -1,4 +1,4 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, inject, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -13,6 +13,7 @@ export interface SyncBnetDialogData {
   selector: 'app-sync-bnet-dialog',
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, TranslocoPipe, BnetSyncPanelComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sync-bnet-dialog.component.html',
 })
 export class SyncBnetDialogComponent {

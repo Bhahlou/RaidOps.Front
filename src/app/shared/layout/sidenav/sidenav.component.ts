@@ -1,4 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
@@ -14,6 +21,7 @@ import { UserGuild } from '../../../core/models/user-guild.model';
   selector: 'app-sidenav',
   imports: [RouterLink, RouterLinkActive, MatIconModule, TranslocoPipe, DiscordIconComponent],
   templateUrl: './sidenav.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sidenav.component.scss',
 })
 export class SidenavComponent {

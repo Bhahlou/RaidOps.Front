@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GuildAccessLevel } from '../../../core/models/guild-access-level.enum';
@@ -20,6 +20,7 @@ const ICONS: Record<GuildAccessLevel, string> = {
   selector: 'app-access-level-badge',
   imports: [MatIconModule, TranslocoPipe],
   templateUrl: './access-level-badge.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './access-level-badge.component.scss',
 })
 export class AccessLevelBadgeComponent {

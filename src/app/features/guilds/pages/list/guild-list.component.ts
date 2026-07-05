@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -8,7 +15,10 @@ import { UserGuild } from '../../../../core/models/user-guild.model';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
-import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
+import {
+  PageHeaderComponent,
+  BreadcrumbItem,
+} from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-guild-list',
@@ -22,6 +32,7 @@ import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/componen
     PageHeaderComponent,
   ],
   templateUrl: './guild-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-list.component.scss',
 })
 export class GuildListComponent implements OnInit {
@@ -48,7 +59,11 @@ export class GuildListComponent implements OnInit {
       this.loading.set(false);
       if (this.registeredGuilds().length === 1 && this.adminGuilds().length === 0) {
         this.#router.navigate(['/guilds', this.registeredGuilds()[0].id, 'dashboard']);
-      } else if (this.registeredGuilds().length === 0 && this.adminGuilds().length === 1 && !this.adminGuilds()[0].isRegistered) {
+      } else if (
+        this.registeredGuilds().length === 0 &&
+        this.adminGuilds().length === 1 &&
+        !this.adminGuilds()[0].isRegistered
+      ) {
         this.#router.navigate(['/guild-register', this.adminGuilds()[0].id]);
       }
     });
@@ -62,9 +77,9 @@ export class GuildListComponent implements OnInit {
   /** Guilds where the bot is invited but settings are incomplete, or not yet registered at all. */
   readonly adminGuilds = computed<UserGuild[]>(
     () =>
-      this.#authStore.user()?.guilds.filter(
-        (g) => g.isAdmin && (!g.isRegistered || !g.isConfigured),
-      ) ?? [],
+      this.#authStore
+        .user()
+        ?.guilds.filter((g) => g.isAdmin && (!g.isRegistered || !g.isConfigured)) ?? [],
   );
 
   readonly DiscordIconType = DiscordIconType;

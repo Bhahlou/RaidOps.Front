@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { injectGuildContext } from '../../inject-guild-context';
@@ -7,6 +7,7 @@ import { injectGuildContext } from '../../inject-guild-context';
   selector: 'app-guild-settings',
   imports: [GuildSettingsFormComponent, PageHeaderComponent],
   templateUrl: './guild-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-settings.component.scss',
 })
 export class GuildSettingsComponent {

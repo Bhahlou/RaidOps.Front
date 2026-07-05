@@ -11,8 +11,8 @@
         <div class="section-avatar">
           <app-discord-icon
             [type]="iconTypeUser"
-            [hash]="user()?.avatarHash"
-            [id]="user()?.discordId!"
+            [hash]="$safeNavigationMigration(user()?.avatarHash)"
+            [id]="$safeNavigationMigration(user()?.discordId)!"
           />
         </div>
         <span class="sidenav-label section-name">{{ user()?.name }}</span>
@@ -46,11 +46,7 @@
       <div class="section">
         <button class="section-header" (click)="isExpanded() && toggleGuild(guild.id)">
           <div class="section-avatar guild-avatar">
-            <app-discord-icon
-              [type]="iconTypeGuild"
-              [hash]="guild.iconHash"
-              [id]="guild.id"
-            />
+            <app-discord-icon [type]="iconTypeGuild" [hash]="guild.iconHash" [id]="guild.id" />
           </div>
           <span class="sidenav-label section-name">{{ guild.name }}</span>
           @if (isExpanded()) {
@@ -61,31 +57,55 @@
         </button>
 
         @if (openGuildIds().has(guild.id)) {
-          <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'dashboard']" routerLinkActive="active-link">
+          <a
+            class="sidenav-item"
+            [routerLink]="['/guilds', guild.id, 'dashboard']"
+            routerLinkActive="active-link"
+          >
             <mat-icon class="item-icon">home</mat-icon>
             <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
           </a>
           @if (hasRosterAccess(guild)) {
-            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'calendar']" routerLinkActive="active-link">
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'calendar']"
+              routerLinkActive="active-link"
+            >
               <mat-icon class="item-icon">calendar_month</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
             </a>
-            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'roster']" routerLinkActive="active-link">
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'roster']"
+              routerLinkActive="active-link"
+            >
               <mat-icon class="item-icon">groups</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
             </a>
-            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'loot']" routerLinkActive="active-link">
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'loot']"
+              routerLinkActive="active-link"
+            >
               <mat-icon class="item-icon">diamond</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
             </a>
           }
           @if (guild.isAdmin) {
             <div class="section-separator"></div>
-            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'settings']" routerLinkActive="active-link">
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'settings']"
+              routerLinkActive="active-link"
+            >
               <mat-icon class="item-icon">settings</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.settings' | transloco }}</span>
             </a>
-            <a class="sidenav-item" [routerLink]="['/guilds', guild.id, 'audit-log']" routerLinkActive="active-link">
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'audit-log']"
+              routerLinkActive="active-link"
+            >
               <mat-icon class="item-icon">history</mat-icon>
               <span class="sidenav-label">{{ 'sidenav.guild.auditLog' | transloco }}</span>
             </a>

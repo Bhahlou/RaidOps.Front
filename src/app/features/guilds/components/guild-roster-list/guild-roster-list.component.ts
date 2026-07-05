@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -72,6 +81,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
     CharacterRaidSpecsComponent,
   ],
   templateUrl: './guild-roster-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guild-roster-list.component.scss',
 })
 export class GuildRosterListComponent {
@@ -88,7 +98,16 @@ export class GuildRosterListComponent {
   readonly DiscordIconType = DiscordIconType;
   readonly ranks = RANK_ORDER;
 
-  readonly columns = ['player', 'character', 'class', 'specs', 'level', 'rank', 'joinedAt', 'actions'];
+  readonly columns = [
+    'player',
+    'character',
+    'class',
+    'specs',
+    'level',
+    'rank',
+    'joinedAt',
+    'actions',
+  ];
 
   readonly isLoading = this.#store.isLoading;
 
@@ -117,7 +136,11 @@ export class GuildRosterListComponent {
     const byId = new Map<number, ClassOption>();
     for (const m of this.#store.members() ?? []) {
       if (!byId.has(m.classId)) {
-        byId.set(m.classId, { classId: m.classId, className: m.className, classColor: m.classColor });
+        byId.set(m.classId, {
+          classId: m.classId,
+          className: m.className,
+          classColor: m.classColor,
+        });
       }
     }
     return [...byId.values()].sort((a, b) => a.className.localeCompare(b.className));
@@ -128,19 +151,24 @@ export class GuildRosterListComponent {
     for (const m of this.#store.members() ?? []) {
       const mainSpec = m.raidSpecs.find((s) => s.isMain);
       if (mainSpec && !byId.has(mainSpec.specId)) {
-        byId.set(mainSpec.specId, { specId: mainSpec.specId, name: mainSpec.name, iconUrl: mainSpec.iconUrl });
+        byId.set(mainSpec.specId, {
+          specId: mainSpec.specId,
+          name: mainSpec.name,
+          iconUrl: mainSpec.iconUrl,
+        });
       }
     }
     return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  readonly hasActiveFilters = computed(() =>
-    this.#selectedClassIds().size > 0
-    || this.#selectedSpecIds().size > 0
-    || this.#selectedRanks().size > 0
-    || this.dateRangeStart() !== null
-    || this.dateRangeEnd() !== null
-    || this.searchQuery().trim() !== '',
+  readonly hasActiveFilters = computed(
+    () =>
+      this.#selectedClassIds().size > 0 ||
+      this.#selectedSpecIds().size > 0 ||
+      this.#selectedRanks().size > 0 ||
+      this.dateRangeStart() !== null ||
+      this.dateRangeEnd() !== null ||
+      this.searchQuery().trim() !== '',
   );
 
   readonly filteredMembers = computed(() => {
@@ -156,7 +184,8 @@ export class GuildRosterListComponent {
     const query = this.searchQuery().trim().toLowerCase();
 
     if (classIds.size > 0) list = list.filter((m) => classIds.has(m.classId));
-    if (specIds.size > 0) list = list.filter((m) => m.raidSpecs.some((s) => s.isMain && specIds.has(s.specId)));
+    if (specIds.size > 0)
+      list = list.filter((m) => m.raidSpecs.some((s) => s.isMain && specIds.has(s.specId)));
     if (ranks.size > 0) list = list.filter((m) => ranks.has(m.characterRank));
     if (start) {
       const from = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0, 0);
@@ -167,8 +196,11 @@ export class GuildRosterListComponent {
       list = list.filter((m) => new Date(m.joinedAt) <= to);
     }
     if (query) {
-      list = list.filter((m) =>
-        m.characterName.toLowerCase().includes(query) || (m.playerName ?? '').toLowerCase().includes(query));
+      list = list.filter(
+        (m) =>
+          m.characterName.toLowerCase().includes(query) ||
+          (m.playerName ?? '').toLowerCase().includes(query),
+      );
     }
 
     return list;
@@ -273,7 +305,9 @@ export class GuildRosterListComponent {
 
   /** Formats a timestamp using the app's current language, not a hardcoded locale. */
   formatDate(joinedAt: string): string {
-    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(new Date(joinedAt));
+    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(
+      new Date(joinedAt),
+    );
   }
 
   characterLink(member: GuildRosterMember): string[] {

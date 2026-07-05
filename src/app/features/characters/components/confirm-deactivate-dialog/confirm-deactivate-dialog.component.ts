@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -9,6 +9,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, TranslocoPipe],
   templateUrl: './confirm-deactivate-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './confirm-deactivate-dialog.component.scss',
 })
 export class ConfirmDeactivateDialogComponent {

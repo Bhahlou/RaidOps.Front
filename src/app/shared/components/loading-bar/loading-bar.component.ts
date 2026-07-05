@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingStore } from '../../../core/stores/loading.store';
 
@@ -11,6 +11,7 @@ import { LoadingStore } from '../../../core/stores/loading.store';
   standalone: true,
   imports: [MatProgressBarModule],
   templateUrl: './loading-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './loading-bar.component.scss',
 })
 export class LoadingBarComponent {

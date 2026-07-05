@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [MatIconModule],
   templateUrl: './under-construction.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './under-construction.component.scss',
 })
 export class UnderConstructionComponent {}

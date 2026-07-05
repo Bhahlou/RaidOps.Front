@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, of, switchMap } from 'rxjs';
@@ -10,8 +10,14 @@ import { MarkdownRendererComponent } from '../../../../shared/components/markdow
 
 @Component({
   selector: 'app-manual-article',
-  imports: [TranslocoPipe, AccessLevelBadgeComponent, RequiresAuthBadgeComponent, MarkdownRendererComponent],
+  imports: [
+    TranslocoPipe,
+    AccessLevelBadgeComponent,
+    RequiresAuthBadgeComponent,
+    MarkdownRendererComponent,
+  ],
   templateUrl: './manual-article.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './manual-article.component.scss',
 })
 export class ManualArticleComponent {

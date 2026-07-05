@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 /**
@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-bnet-callback',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 export class BnetCallbackComponent implements OnInit {

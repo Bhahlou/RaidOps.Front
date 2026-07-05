@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -28,6 +28,7 @@ import { Character } from '../../models/character.model';
     TranslocoPipe,
   ],
   templateUrl: './character-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './character-card.component.scss',
 })
 export class CharacterCardComponent {
