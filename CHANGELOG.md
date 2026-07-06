@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.1...raidops-front-v1.0.2) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* clarify README branching wording (pipeline end-to-end test) ([#32](https://github.com/Bhahlou/RaidOps.Front/issues/32)) ([91ddc68](https://github.com/Bhahlou/RaidOps.Front/commit/91ddc68c705aba0b001c2a2fa376ece527cd876d))
+
 ## [1.0.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.0...raidops-front-v1.0.1) (2026-07-06)
 
 
