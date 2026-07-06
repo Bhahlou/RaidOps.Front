@@ -3,15 +3,16 @@ name: Deploy
 on:
   # Every push to next is an already-tagged snapshot promoted from dev (see
   # promote-to-next.yml) — always safe to (re)build the acceptance image.
-  # Every push to master is either a promotion from next (already tagged) or
-  # a hotfix commit (not yet tagged) — the prod-from-promotion job below
-  # figures out which and no-ops on the latter until its own release is cut.
   push:
-    branches: [next, master]
+    branches: [next]
     paths-ignore:
       - 'CHANGELOG.md'
       - '.release-please-manifest.json'
       - 'package.json'
+  # A next → master promotion PR merging is the signal to deploy the
+  # already-tagged content it carries (see prod-from-promotion below).
+  pull_request:
+    types: [closed]
   # A published release from the master hotfix lane deploys to production.
   release:
     types: [published]
@@ -102,23 +103,41 @@ jobs:
 
   # ── Production (hotfix lane) : release cut directly on master ─────────────
   prod-from-hotfix-release:
-    if: github.event_name == 'release' && github.event.release.target_commitish == 'master'
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
+      # release.target_commitish is the raw commit SHA, not a branch name —
+      # ask GitHub which branch(es) currently have that SHA as their tip.
+      - name: Check this release was cut on master
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.release.target_commitish }}
+        run: |
+          BRANCHES=$(gh api "repos/${{ github.repository }}/commits/$SHA/branches-where-head" --jq '.[].name')
+          if echo "$BRANCHES" | grep -qx "master"; then
+            echo "is_master=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_master=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout released tag
+        if: steps.check.outputs.is_master == 'true'
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
         with:
           ref: ${{ github.event.release.tag_name }}
 
       - name: Log in to GHCR
+        if: steps.check.outputs.is_master == 'true'
         run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & push :latest + version tag
+        if: steps.check.outputs.is_master == 'true'
         env:
           VERSION: ${{ github.event.release.tag_name }}
         run: |
@@ -128,6 +147,7 @@ jobs:
           docker push $IMAGE_NAME:$VERSION
 
       - name: Notify Discord (production)
+        if: steps.check.outputs.is_master == 'true'
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_PROD_WEBHOOK_URL }}
           SHORT_REPO: ${{ github.event.repository.name }}
@@ -154,37 +174,33 @@ jobs:
                 }]
               }')"
 
-  # ── Production (promotion lane) : next → master brings an already-tagged commit ──
+  # ── Production (promotion lane) : next → master PR merged ─────────────────
+  # No SHA/tag matching needed here: by the time this PR merges, the release
+  # was already published when cut on dev — we just look it up by version.
   prod-from-promotion:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'master' &&
+      github.event.pull_request.head.ref == 'next'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
-      - name: Checkout code
+      - name: Checkout master
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
         with:
-          fetch-depth: 0
+          ref: master
 
-      - name: Check for a release already cut elsewhere (dev) than master
+      - name: Look up the release matching the promoted version
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || true)
-          if [ -z "$TAG" ]; then
-            # Untagged commit on master = a hotfix waiting on its own Release PR merge.
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          TARGET=$(gh release view "$TAG" --json targetCommitish -q .targetCommitish)
-          if [ "$TARGET" = "master" ]; then
-            # Cut by the master hotfix lane — handled by prod-from-hotfix-release instead.
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          MANIFEST_VERSION=$(jq -r '.["."]' .release-please-manifest.json)
+          PKG_NAME=$(jq -r '.name' package.json)
+          TAG="${PKG_NAME}-v${MANIFEST_VERSION}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "url=$(gh release view "$TAG" --json url -q .url)" >> "$GITHUB_OUTPUT"
           {
@@ -194,13 +210,11 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
-        if: steps.check.outputs.should_deploy == 'true'
         run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & push :latest + version tag
-        if: steps.check.outputs.should_deploy == 'true'
         env:
           VERSION: ${{ steps.check.outputs.tag }}
         run: |
@@ -210,7 +224,6 @@ jobs:
           docker push $IMAGE_NAME:$VERSION
 
       - name: Notify Discord (production)
-        if: steps.check.outputs.should_deploy == 'true'
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_PROD_WEBHOOK_URL }}
           SHORT_REPO: ${{ github.event.repository.name }}
