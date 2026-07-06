@@ -27,7 +27,7 @@ jobs:
               ;;
             next)
               case "$HEAD" in
-                dev|forward-port/master-into-next-*)
+                dev|promote/*|forward-port/master-into-next-*)
                   echo "OK: '$HEAD' → next is an allowed promotion/forward-port source."
                   exit 0
                   ;;
