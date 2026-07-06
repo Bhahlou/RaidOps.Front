@@ -33,6 +33,8 @@ export class ChangelogComponent {
   }
 
   formatDate(date: Date): string {
-    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'long' }).format(date);
+    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'long' }).format(
+      date,
+    );
   }
 }

@@ -1,14 +1,17 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { httpResource } from '@angular/common/http';
+import { computed, Service, signal } from '@angular/core';
 import { MANUAL_CATEGORIES } from '../data/manual-content.data';
 import { ManualArticle, ManualCategory } from '../models/manual-article.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ManualStore {
-  readonly #http = inject(HttpClient);
-
   readonly categories: readonly ManualCategory[] = MANUAL_CATEGORIES;
+
+  readonly #contentPath = signal<string | undefined>(undefined);
+
+  readonly #contentResource = httpResource.text(() => this.#contentPath());
+
+  readonly content = computed(() => this.#contentResource.value() ?? '');
 
   getArticle(categoryId: string, articleId: string): ManualArticle | undefined {
     return this.categories
@@ -16,7 +19,8 @@ export class ManualStore {
       ?.articles.find((article) => article.id === articleId);
   }
 
-  loadArticleContent(path: string): Observable<string> {
-    return this.#http.get(path, { responseType: 'text' });
+  /** Points the store at an article's markdown file for the given language, or clears it (`undefined`) when no article is resolved. */
+  loadArticleContent(path: string | undefined): void {
+    this.#contentPath.set(path);
   }
 }

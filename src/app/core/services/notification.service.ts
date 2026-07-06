@@ -1,10 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NotificationType } from '../models/notification.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class NotificationService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;

@@ -15,6 +15,6 @@ export class GuildDashboardComponent {
   readonly guildId = this.#guildContext.guildId;
 
   readonly breadcrumbs = computed(() =>
-    this.#guildContext.breadcrumbs('sidenav.guild.dashboard', false)
+    this.#guildContext.breadcrumbs('sidenav.guild.dashboard', false),
   );
 }

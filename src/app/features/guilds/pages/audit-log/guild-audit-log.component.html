@@ -304,7 +304,7 @@
     @if (role) {
       <span class="role-chip" [style.--role-color]="role.color">
         @if (role.iconUrl) {
-          <img class="role-icon" [src]="role.iconUrl" alt="" />
+          <img class="role-icon" [ngSrc]="role.iconUrl" alt="" width="18" height="18" />
         } @else {
           <span class="role-dot"></span>
         }

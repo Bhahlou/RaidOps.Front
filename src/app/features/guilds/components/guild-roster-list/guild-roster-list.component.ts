@@ -1,4 +1,5 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -22,7 +23,6 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
-import { GuildMembershipService } from '../../services/guild-membership.service';
 import { GuildRosterMember } from '../../models/guild-roster-member.model';
 import { CharacterRank } from '../../models/character-rank.enum';
 import { ConfirmKickDialogComponent } from '../confirm-kick-dialog/confirm-kick-dialog.component';
@@ -49,6 +49,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   selector: 'app-guild-roster-list',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterLink,
     MatIconButton,
     MatCard,
@@ -81,14 +82,22 @@ export class GuildRosterListComponent {
   readonly #characterStore = inject(CharacterStore);
   readonly #transloco = inject(TranslocoService);
   readonly #authStore = inject(AuthStore);
-  readonly #membershipService = inject(GuildMembershipService);
   readonly #snackbar = inject(SnackbarService);
   readonly #dialog = inject(MatDialog);
 
   readonly DiscordIconType = DiscordIconType;
   readonly ranks = RANK_ORDER;
 
-  readonly columns = ['player', 'character', 'class', 'specs', 'level', 'rank', 'joinedAt', 'actions'];
+  readonly columns = [
+    'player',
+    'character',
+    'class',
+    'specs',
+    'level',
+    'rank',
+    'joinedAt',
+    'actions',
+  ];
 
   readonly isLoading = this.#store.isLoading;
 
@@ -97,11 +106,8 @@ export class GuildRosterListComponent {
     return guild ? hasGuildAccess(guild.accessLevel, GuildAccessLevel.Officer) : false;
   });
 
-  readonly #updatingRankCharacterId = signal<number | null>(null);
-  readonly updatingRankCharacterId = this.#updatingRankCharacterId.asReadonly();
-
-  readonly #kickingCharacterId = signal<number | null>(null);
-  readonly kickingCharacterId = this.#kickingCharacterId.asReadonly();
+  readonly updatingRankCharacterId = this.#characterStore.updatingRankCharacterId;
+  readonly kickingCharacterId = this.#characterStore.leavingCharacterId;
 
   readonly searchQuery = signal('');
 
@@ -117,7 +123,11 @@ export class GuildRosterListComponent {
     const byId = new Map<number, ClassOption>();
     for (const m of this.#store.members() ?? []) {
       if (!byId.has(m.classId)) {
-        byId.set(m.classId, { classId: m.classId, className: m.className, classColor: m.classColor });
+        byId.set(m.classId, {
+          classId: m.classId,
+          className: m.className,
+          classColor: m.classColor,
+        });
       }
     }
     return [...byId.values()].sort((a, b) => a.className.localeCompare(b.className));
@@ -128,19 +138,24 @@ export class GuildRosterListComponent {
     for (const m of this.#store.members() ?? []) {
       const mainSpec = m.raidSpecs.find((s) => s.isMain);
       if (mainSpec && !byId.has(mainSpec.specId)) {
-        byId.set(mainSpec.specId, { specId: mainSpec.specId, name: mainSpec.name, iconUrl: mainSpec.iconUrl });
+        byId.set(mainSpec.specId, {
+          specId: mainSpec.specId,
+          name: mainSpec.name,
+          iconUrl: mainSpec.iconUrl,
+        });
       }
     }
     return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  readonly hasActiveFilters = computed(() =>
-    this.#selectedClassIds().size > 0
-    || this.#selectedSpecIds().size > 0
-    || this.#selectedRanks().size > 0
-    || this.dateRangeStart() !== null
-    || this.dateRangeEnd() !== null
-    || this.searchQuery().trim() !== '',
+  readonly hasActiveFilters = computed(
+    () =>
+      this.#selectedClassIds().size > 0 ||
+      this.#selectedSpecIds().size > 0 ||
+      this.#selectedRanks().size > 0 ||
+      this.dateRangeStart() !== null ||
+      this.dateRangeEnd() !== null ||
+      this.searchQuery().trim() !== '',
   );
 
   readonly filteredMembers = computed(() => {
@@ -156,7 +171,8 @@ export class GuildRosterListComponent {
     const query = this.searchQuery().trim().toLowerCase();
 
     if (classIds.size > 0) list = list.filter((m) => classIds.has(m.classId));
-    if (specIds.size > 0) list = list.filter((m) => m.raidSpecs.some((s) => s.isMain && specIds.has(s.specId)));
+    if (specIds.size > 0)
+      list = list.filter((m) => m.raidSpecs.some((s) => s.isMain && specIds.has(s.specId)));
     if (ranks.size > 0) list = list.filter((m) => ranks.has(m.characterRank));
     if (start) {
       const from = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0, 0);
@@ -167,8 +183,11 @@ export class GuildRosterListComponent {
       list = list.filter((m) => new Date(m.joinedAt) <= to);
     }
     if (query) {
-      list = list.filter((m) =>
-        m.characterName.toLowerCase().includes(query) || (m.playerName ?? '').toLowerCase().includes(query));
+      list = list.filter(
+        (m) =>
+          m.characterName.toLowerCase().includes(query) ||
+          (m.playerName ?? '').toLowerCase().includes(query),
+      );
     }
 
     return list;
@@ -196,15 +215,12 @@ export class GuildRosterListComponent {
   constructor() {
     // Reloads on first render and whenever guildId changes — the parent leaf route component
     // is reused (not recreated) when only the guild switches, so ngOnInit alone would miss that.
-    // Always force a refetch (not just on guildId change) — the roster can be edited by other
-    // officers/players between visits, and the store's cache has no way to detect that.
-    //
-    // loadRoster() reads the store's internal state signal before writing to it; calling it
-    // untracked keeps that internal read/write pair from being captured as a dependency of this
-    // effect — otherwise the write re-triggers the effect, which calls loadRoster again, forever.
+    // loadRoster() always forces a fresh fetch (the roster can be edited by other officers/players
+    // between visits, so the store's cache can't be trusted) and only writes signals, so no
+    // self-triggering-loop risk here — no untracked() needed.
     effect(() => {
       const guildId = this.guildId();
-      untracked(() => this.#store.loadRoster(guildId, true).subscribe());
+      this.#store.loadRoster(guildId);
     });
   }
 
@@ -273,7 +289,9 @@ export class GuildRosterListComponent {
 
   /** Formats a timestamp using the app's current language, not a hardcoded locale. */
   formatDate(joinedAt: string): string {
-    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(new Date(joinedAt));
+    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(
+      new Date(joinedAt),
+    );
   }
 
   characterLink(member: GuildRosterMember): string[] {
@@ -285,16 +303,12 @@ export class GuildRosterListComponent {
   }
 
   updateRank(member: GuildRosterMember, rank: CharacterRank): void {
-    this.#updatingRankCharacterId.set(member.characterId);
-    this.#membershipService.updateRank(member.characterId, this.guildId(), rank).subscribe({
+    this.#characterStore.updateRank(member.characterId, this.guildId(), rank).subscribe({
       next: () => {
-        this.#updatingRankCharacterId.set(null);
         this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
-        this.#store.loadRoster(this.guildId(), true).subscribe();
-        this.#characterStore.loadCharacters(true).subscribe();
+        this.#store.reload();
       },
       error: (err: HttpErrorResponse) => {
-        this.#updatingRankCharacterId.set(null);
         this.#snackbar.error(this.#characterStore.membershipErrorKey(err));
       },
     });
@@ -311,16 +325,12 @@ export class GuildRosterListComponent {
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
 
-        this.#kickingCharacterId.set(member.characterId);
-        this.#membershipService.leaveGuild(member.characterId, this.guildId()).subscribe({
+        this.#characterStore.leaveGuild(member.characterId, this.guildId()).subscribe({
           next: () => {
-            this.#kickingCharacterId.set(null);
             this.#snackbar.success('roster.list.kickSuccess');
-            this.#store.loadRoster(this.guildId(), true).subscribe();
-            this.#characterStore.loadCharacters(true).subscribe();
+            this.#store.reload();
           },
           error: (err: HttpErrorResponse) => {
-            this.#kickingCharacterId.set(null);
             this.#snackbar.error(this.#characterStore.membershipErrorKey(err));
           },
         });

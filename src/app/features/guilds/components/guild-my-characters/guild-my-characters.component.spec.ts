@@ -35,7 +35,7 @@ const setup = (opts: {
   const leaveGuild = vi.fn().mockReturnValue(of(undefined));
   const membershipErrorKey = vi.fn().mockReturnValue('characterDetail.guilds.errors.generic');
   const snackbar = { success: vi.fn(), error: vi.fn(), info: vi.fn() };
-  const loadRoster = vi.fn().mockReturnValue(of([]));
+  const loadRoster = vi.fn();
 
   const mockStore = {
     characterList:            signal(characterList),
@@ -260,7 +260,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(component.showAddPanel()).toBe(false);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.joinSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1', true);
+      expect(loadRoster).toHaveBeenCalledWith('g1');
     });
 
     it('shows an error snackbar mapped via store.membershipErrorKey when the join fails', () => {
@@ -286,7 +286,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(updateRank).toHaveBeenCalledWith(3, 'g1', CharacterRank.Alt);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.rankUpdateSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1', true);
+      expect(loadRoster).toHaveBeenCalledWith('g1');
     });
 
     it('shows an error snackbar when the update fails', () => {
@@ -309,7 +309,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(leaveGuild).toHaveBeenCalledWith(7, 'g1');
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.leaveSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1', true);
+      expect(loadRoster).toHaveBeenCalledWith('g1');
     });
 
     it('shows an error snackbar when the leave fails', () => {

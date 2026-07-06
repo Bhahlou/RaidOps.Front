@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { CharacterService } from '../services/character.service';
@@ -36,7 +36,7 @@ const MEMBERSHIP_ERROR_KEYS: Record<string, string> = {
  *  - `null`      — fetched, no account linked
  *  - `BnetAccount` — fetched, account linked
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CharacterStore {
   readonly #characterService = inject(CharacterService);
   readonly #specService = inject(SpecService);

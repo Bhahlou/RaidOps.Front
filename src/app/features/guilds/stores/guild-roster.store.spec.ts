@@ -1,9 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
 
 import { GuildRosterMember } from '../models/guild-roster-member.model';
 import { CharacterRank } from '../models/character-rank.enum';
-import { GuildRosterService } from '../services/guild-roster.service';
 import { GuildRosterStore } from './guild-roster.store';
 
 const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
@@ -27,87 +28,94 @@ const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
 
 describe('GuildRosterStore', () => {
   let store: GuildRosterStore;
-  let service: { getRoster: ReturnType<typeof vi.fn> };
+  let controller: HttpTestingController;
 
   beforeEach(() => {
-    service = { getRoster: vi.fn().mockReturnValue(of([member()])) };
-
     TestBed.configureTestingModule({
-      providers: [
-        GuildRosterStore,
-        { provide: GuildRosterService, useValue: service },
-      ],
+      providers: [GuildRosterStore, provideHttpClient(), provideHttpClientTesting()],
     });
     store = TestBed.inject(GuildRosterStore);
+    controller = TestBed.inject(HttpTestingController);
   });
+
+  afterEach(() => controller.verify());
 
   // ── members / isLoading ──────────────────────────────────────────────────
 
   describe('members', () => {
-    it('is null before any load', () => {
+    it('is null before any guild is set', () => {
+      TestBed.tick();
       expect(store.members()).toBeNull();
-    });
-
-    it('reports isLoading true before any load', () => {
-      expect(store.isLoading()).toBe(true);
+      expect(store.isLoading()).toBe(false);
     });
   });
 
   // ── loadRoster ────────────────────────────────────────────────────────────
 
   describe('loadRoster', () => {
-    it('calls the service and updates the members signal', () => {
+    it('fetches the roster for the given guild', async () => {
       const m = [member({ characterName: 'Jaina' })];
-      service.getRoster.mockReturnValue(of(m));
 
-      store.loadRoster('g1').subscribe();
+      store.loadRoster('g1');
+      TestBed.tick();
 
-      expect(service.getRoster).toHaveBeenCalledWith('g1');
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster'));
+      expect(req.request.method).toBe('GET');
+      req.flush(m);
+      await TestBed.inject(ApplicationRef).whenStable();
+
       expect(store.members()).toEqual(m);
       expect(store.isLoading()).toBe(false);
     });
 
-    it('returns the cached value without re-fetching for the same guildId', () => {
-      store.loadRoster('g1').subscribe();
-      store.loadRoster('g1').subscribe();
+    it('re-fetches every time it is called, even for the same guildId', async () => {
+      store.loadRoster('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(service.getRoster).toHaveBeenCalledTimes(1);
-    });
+      store.loadRoster('g1');
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster'));
+      req.flush([member({ characterName: 'Jaina' })]);
+      await TestBed.inject(ApplicationRef).whenStable();
 
-    it('re-fetches when the guildId changes', () => {
-      store.loadRoster('g1').subscribe();
-      service.getRoster.mockReturnValue(of([member({ characterName: 'Jaina' })]));
-      store.loadRoster('g2').subscribe();
-
-      expect(service.getRoster).toHaveBeenCalledTimes(2);
       expect(store.members()?.[0].characterName).toBe('Jaina');
     });
 
-    it('re-fetches when force is true, even for the same guildId', () => {
-      store.loadRoster('g1').subscribe();
-      store.loadRoster('g1', true).subscribe();
+    it('re-fetches when the guildId changes', async () => {
+      store.loadRoster('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(service.getRoster).toHaveBeenCalledTimes(2);
+      store.loadRoster('g2');
+      TestBed.tick();
+      controller
+        .expectOne((r) => r.url.endsWith('/guilds/g2/roster'))
+        .flush([member({ characterName: 'Jaina' })]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.members()?.[0].characterName).toBe('Jaina');
     });
   });
 
-  // ── invalidate ────────────────────────────────────────────────────────────
+  // ── reload ────────────────────────────────────────────────────────────────
 
-  describe('invalidate', () => {
-    it('clears the cached members', () => {
-      store.loadRoster('g1').subscribe();
+  describe('reload', () => {
+    it('re-fetches the currently tracked guild roster', async () => {
+      store.loadRoster('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      store.invalidate();
+      store.reload();
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster'));
+      req.flush([member({ characterName: 'Jaina' })]);
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(store.members()).toBeNull();
-    });
-
-    it('forces a re-fetch on next loadRoster for the same guildId', () => {
-      store.loadRoster('g1').subscribe();
-      store.invalidate();
-      store.loadRoster('g1').subscribe();
-
-      expect(service.getRoster).toHaveBeenCalledTimes(2);
+      expect(store.members()?.[0].characterName).toBe('Jaina');
     });
   });
 });

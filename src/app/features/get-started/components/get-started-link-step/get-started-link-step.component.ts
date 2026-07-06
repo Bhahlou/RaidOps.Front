@@ -48,7 +48,9 @@ export class GetStartedLinkStepComponent {
 
   readonly isLoading = this.#characterStore.isEligibleBulkLoading;
   readonly guilds = this.#characterStore.eligibleGuildsBulk;
-  readonly canFinish = computed(() => this.#characterStore.characterList().some((c) => c.guildMemberships.length > 0));
+  readonly canFinish = computed(() =>
+    this.#characterStore.characterList().some((c) => c.guildMemberships.length > 0),
+  );
 
   /** characterId → rank (undefined = unchecked) per guild */
   readonly #selections = signal<Map<string, Map<number, CharacterRank | undefined>>>(new Map());

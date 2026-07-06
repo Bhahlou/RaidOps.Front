@@ -1,6 +1,6 @@
 <mat-toolbar>
   <div routerLink="/" class="logo-wrapper">
-    <img [src]="envBranding.logoPath" alt="RaidOps Logo" class="logo" />
+    <img [ngSrc]="envBranding.logoPath" alt="RaidOps Logo" class="logo" width="40" height="40" priority />
     <span [style.color]="envBranding.accentColor">RaidOps</span>
     @if (envBranding.badgeLabel) {
       <span class="env-badge" [style.background-color]="envBranding.accentColor">
@@ -30,9 +30,7 @@
     [attr.aria-label]="'changelog.pageTitle' | transloco"
     [matTooltip]="'changelog.pageTitle' | transloco"
   >
-    <mat-icon [matBadge]="unseenChangelogCount() || null" matBadgeColor="warn">
-      campaign
-    </mat-icon>
+    <mat-icon [matBadge]="unseenChangelogCount() || null" matBadgeColor="warn"> campaign </mat-icon>
   </a>
 
   <a
@@ -57,7 +55,11 @@
       <span class="user-name">{{ user()?.name }}</span>
     }
     @if (user()?.discordId) {
-      <app-discord-icon [type]="iconType" [id]="user()?.discordId!" [hash]="user()?.avatarHash" />
+      <app-discord-icon
+        [type]="iconType"
+        [id]="$safeNavigationMigration(user()?.discordId)!"
+        [hash]="$safeNavigationMigration(user()?.avatarHash)"
+      />
     } @else {
       <mat-icon class="user-avatar-icon">account_circle</mat-icon>
     }

@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterSpec } from '../../models/character-spec.model';
@@ -6,7 +7,7 @@ import { CharacterSpec } from '../../models/character-spec.model';
 @Component({
   selector: 'app-character-raid-specs',
   standalone: true,
-  imports: [TranslocoPipe],
+  imports: [NgOptimizedImage, TranslocoPipe],
   templateUrl: './character-raid-specs.component.html',
   styleUrl: './character-raid-specs.component.scss',
 })

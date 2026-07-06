@@ -8,7 +8,10 @@ import { UserGuild } from '../../../../core/models/user-guild.model';
 import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
-import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
+import {
+  PageHeaderComponent,
+  BreadcrumbItem,
+} from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-guild-list',
@@ -48,7 +51,11 @@ export class GuildListComponent implements OnInit {
       this.loading.set(false);
       if (this.registeredGuilds().length === 1 && this.adminGuilds().length === 0) {
         this.#router.navigate(['/guilds', this.registeredGuilds()[0].id, 'dashboard']);
-      } else if (this.registeredGuilds().length === 0 && this.adminGuilds().length === 1 && !this.adminGuilds()[0].isRegistered) {
+      } else if (
+        this.registeredGuilds().length === 0 &&
+        this.adminGuilds().length === 1 &&
+        !this.adminGuilds()[0].isRegistered
+      ) {
         this.#router.navigate(['/guild-register', this.adminGuilds()[0].id]);
       }
     });
@@ -62,9 +69,9 @@ export class GuildListComponent implements OnInit {
   /** Guilds where the bot is invited but settings are incomplete, or not yet registered at all. */
   readonly adminGuilds = computed<UserGuild[]>(
     () =>
-      this.#authStore.user()?.guilds.filter(
-        (g) => g.isAdmin && (!g.isRegistered || !g.isConfigured),
-      ) ?? [],
+      this.#authStore
+        .user()
+        ?.guilds.filter((g) => g.isAdmin && (!g.isRegistered || !g.isConfigured)) ?? [],
   );
 
   readonly DiscordIconType = DiscordIconType;

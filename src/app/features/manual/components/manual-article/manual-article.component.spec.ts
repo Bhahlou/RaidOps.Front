@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
@@ -10,6 +11,7 @@ import { ManualArticle } from '../../models/manual-article.model';
 describe('ManualArticleComponent', () => {
   let getArticle: ReturnType<typeof vi.fn>;
   let loadArticleContent: ReturnType<typeof vi.fn>;
+  let content: ReturnType<typeof signal<string>>;
   let langChanges$: Subject<string>;
 
   const article: ManualArticle = {
@@ -20,13 +22,14 @@ describe('ManualArticleComponent', () => {
 
   const setup = (categoryId: string | null, articleId: string | null) => {
     getArticle = vi.fn().mockReturnValue(article);
-    loadArticleContent = vi.fn().mockReturnValue(of('# content'));
+    loadArticleContent = vi.fn();
+    content = signal('');
     langChanges$ = new Subject<string>();
 
     TestBed.configureTestingModule({
       imports: [ManualArticleComponent],
       providers: [
-        { provide: ManualStore, useValue: { getArticle, loadArticleContent } },
+        { provide: ManualStore, useValue: { getArticle, loadArticleContent, content } },
         {
           provide: ActivatedRoute,
           useValue: { paramMap: of(convertToParamMap({ categoryId: categoryId ?? '', articleId: articleId ?? '' })) },
@@ -61,22 +64,29 @@ describe('ManualArticleComponent', () => {
   // ── content ───────────────────────────────────────────────────────────────
 
   describe('content', () => {
-    it('loads the article content for the initial active language', () => {
-      const component = setup('welcome', 'onboarding').componentInstance;
+    it('points the store at the resolved article content path for the initial active language', () => {
+      setup('welcome', 'onboarding');
 
       expect(loadArticleContent).toHaveBeenCalledWith('assets/manual/en/welcome/onboarding.md');
+    });
+
+    it('reflects the store content signal', () => {
+      const component = setup('welcome', 'onboarding').componentInstance;
+      content.set('# content');
+
       expect(component.content()).toBe('# content');
     });
 
-    it('is empty when no article resolves for the current route', () => {
+    it('clears the store content path when no article resolves for the current route', () => {
       getArticle = vi.fn().mockReturnValue(undefined);
       loadArticleContent = vi.fn();
+      content = signal('');
       langChanges$ = new Subject<string>();
 
       TestBed.configureTestingModule({
         imports: [ManualArticleComponent],
         providers: [
-          { provide: ManualStore, useValue: { getArticle, loadArticleContent } },
+          { provide: ManualStore, useValue: { getArticle, loadArticleContent, content } },
           {
             provide: ActivatedRoute,
             useValue: { paramMap: of(convertToParamMap({ categoryId: 'nope', articleId: 'nope' })) },
@@ -88,19 +98,17 @@ describe('ManualArticleComponent', () => {
       const fixture = TestBed.createComponent(ManualArticleComponent);
       fixture.detectChanges();
 
+      expect(loadArticleContent).toHaveBeenCalledWith(undefined);
       expect(fixture.componentInstance.content()).toBe('');
-      expect(loadArticleContent).not.toHaveBeenCalled();
     });
 
-    it('re-fetches with the new language path when the active language changes', () => {
+    it('re-points the store at the new language path when the active language changes', () => {
       const fixture = setup('welcome', 'onboarding');
-      loadArticleContent.mockReturnValue(of('# french content'));
 
       langChanges$.next('fr');
       fixture.detectChanges();
 
       expect(loadArticleContent).toHaveBeenCalledWith('assets/manual/fr/welcome/onboarding.md');
-      expect(fixture.componentInstance.content()).toBe('# french content');
     });
   });
 });

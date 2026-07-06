@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
@@ -22,6 +23,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   selector: 'app-guild-my-characters',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterLink,
     MatButton,
     MatIconButton,
@@ -60,13 +62,14 @@ export class GuildMyCharactersComponent {
   // ── Derived from CharacterStore.characterList ────────────────────────────
 
   readonly myCharacters = computed(() =>
-    this.#store.characterList()
-      .filter(c => this.#isInGuild(c))
+    this.#store
+      .characterList()
+      .filter((c) => this.#isInGuild(c))
       .sort((a, b) => RANK_ORDER.indexOf(this.rankFor(a)) - RANK_ORDER.indexOf(this.rankFor(b))),
   );
 
   readonly addableCharacters = computed(() =>
-    this.#store.characterList().filter(c => !this.#isInGuild(c)),
+    this.#store.characterList().filter((c) => !this.#isInGuild(c)),
   );
 
   // ── UI state ──────────────────────────────────────────────────────────────
@@ -77,12 +80,15 @@ export class GuildMyCharactersComponent {
   readonly #rankSelections = signal(new Map<number, CharacterRank>());
 
   #isInGuild(character: Character): boolean {
-    return character.guildMemberships.some(m => m.guildId === this.guildId());
+    return character.guildMemberships.some((m) => m.guildId === this.guildId());
   }
 
   /** The character's roster rank for this guild. */
   rankFor(character: Character): CharacterRank {
-    return character.guildMemberships.find(m => m.guildId === this.guildId())?.characterRank ?? CharacterRank.Main;
+    return (
+      character.guildMemberships.find((m) => m.guildId === this.guildId())?.characterRank ??
+      CharacterRank.Main
+    );
   }
 
   characterLink(character: Character): string[] {
@@ -90,7 +96,7 @@ export class GuildMyCharactersComponent {
   }
 
   toggleAddPanel(): void {
-    this.showAddPanel.update(v => !v);
+    this.showAddPanel.update((v) => !v);
   }
 
   getRankSelection(charId: number): CharacterRank {
@@ -98,25 +104,28 @@ export class GuildMyCharactersComponent {
   }
 
   setRankSelection(charId: number, rank: CharacterRank): void {
-    this.#rankSelections.update(m => new Map(m).set(charId, rank));
+    this.#rankSelections.update((m) => new Map(m).set(charId, rank));
   }
 
   joinCharacter(character: Character): void {
-    this.#store.joinGuild(character.id, this.guildId(), this.getRankSelection(character.id)).subscribe({
-      next: () => {
-        this.showAddPanel.set(false);
-        this.#snackbar.success('characterDetail.guilds.joinSuccess');
-        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
-      },
-      error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
-    });
+    this.#store
+      .joinGuild(character.id, this.guildId(), this.getRankSelection(character.id))
+      .subscribe({
+        next: () => {
+          this.showAddPanel.set(false);
+          this.#snackbar.success('characterDetail.guilds.joinSuccess');
+          this.#rosterStore.loadRoster(this.guildId());
+        },
+        error: (err: HttpErrorResponse) =>
+          this.#snackbar.error(this.#store.membershipErrorKey(err)),
+      });
   }
 
   updateRank(characterId: number, rank: CharacterRank): void {
     this.#store.updateRank(characterId, this.guildId(), rank).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
-        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
+        this.#rosterStore.loadRoster(this.guildId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
@@ -126,7 +135,7 @@ export class GuildMyCharactersComponent {
     this.#store.leaveGuild(characterId, this.guildId()).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.leaveSuccess');
-        this.#rosterStore.loadRoster(this.guildId(), true).subscribe();
+        this.#rosterStore.loadRoster(this.guildId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });

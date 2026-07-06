@@ -7,12 +7,7 @@ import { AuthStore } from '../../../core/stores/auth.store';
 
 @Component({
   selector: 'app-page-layout',
-  imports: [
-    RouterOutlet,
-    HeaderComponent,
-    LoadingBarComponent,
-    SidenavComponent,
-  ],
+  imports: [RouterOutlet, HeaderComponent, LoadingBarComponent, SidenavComponent],
   templateUrl: './page-layout.component.html',
   styleUrl: './page-layout.component.scss',
 })

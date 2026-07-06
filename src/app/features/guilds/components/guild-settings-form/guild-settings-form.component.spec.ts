@@ -1,4 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormField, FormRoot } from '@angular/forms/signals';
 import { of, Subject, throwError } from 'rxjs';
 
 import { GuildSettingsFormComponent, buildTimezoneOption } from './guild-settings-form.component';
@@ -27,6 +36,9 @@ const officerThreshold = (overrides?: Partial<OfficerThreshold>): OfficerThresho
   ...overrides,
 });
 
+const toggleChange = (value: RosterMode): MatButtonToggleChange =>
+  ({ value }) as MatButtonToggleChange;
+
 describe('buildTimezoneOption', () => {
   it('falls back to the raw timezone id as the label when Intl.DateTimeFormat rejects it', () => {
     expect(buildTimezoneOption('Not/ARealZone')).toEqual({ id: 'Not/ARealZone', label: 'Not/ARealZone' });
@@ -52,10 +64,12 @@ describe('GuildSettingsFormComponent', () => {
     updateOfficerThreshold: ReturnType<typeof vi.fn>;
   };
   let guildStore: {
+    settings: ReturnType<typeof signal<GuildSettings | null>>;
     loadSettings: ReturnType<typeof vi.fn>;
     patchSettings: ReturnType<typeof vi.fn>;
   };
   let officerThresholdStore: {
+    officerThreshold: ReturnType<typeof signal<OfficerThreshold | null>>;
     loadOfficerThreshold: ReturnType<typeof vi.fn>;
     patchOfficerThreshold: ReturnType<typeof vi.fn>;
   };
@@ -73,13 +87,19 @@ describe('GuildSettingsFormComponent', () => {
       updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
     };
     guildStore = {
-      loadSettings:   vi.fn().mockReturnValue(of(storeSettings)),
-      patchSettings:  vi.fn(),
+      settings:      signal<GuildSettings | null>(null),
+      loadSettings:  vi.fn(),
+      patchSettings: vi.fn(),
     };
+    guildStore.loadSettings.mockImplementation(() => guildStore.settings.set(storeSettings));
     officerThresholdStore = {
-      loadOfficerThreshold:  vi.fn().mockReturnValue(of(storeOfficerThreshold)),
+      officerThreshold:      signal<OfficerThreshold | null>(null),
+      loadOfficerThreshold:  vi.fn(),
       patchOfficerThreshold: vi.fn(),
     };
+    officerThresholdStore.loadOfficerThreshold.mockImplementation(() =>
+      officerThresholdStore.officerThreshold.set(storeOfficerThreshold),
+    );
     authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
 
@@ -106,22 +126,22 @@ describe('GuildSettingsFormComponent', () => {
       setup('g1', settings({ timezone: 'UTC', rosterMode: RosterMode.Open }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).toBe('UTC');
-      expect(component.form.value.rosterMode).toBe(RosterMode.Open);
+      expect(component.settingsForm.timezone().value()).toBe('UTC');
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.Open);
     });
 
     it('keeps the local timezone when the store returns an empty timezone', () => {
       setup('g1', settings({ timezone: '' }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).not.toBe('');
+      expect(component.settingsForm.timezone().value()).not.toBe('');
     });
 
     it('pre-fills minOfficerRoleId from the officer threshold store', () => {
       setup('g1', settings(), officerThreshold({ minOfficerRoleId: 'r9' }));
       fixture.detectChanges();
 
-      expect(component.form.value.minOfficerRoleId).toBe('r9');
+      expect(component.settingsForm.minOfficerRoleId().value()).toBe('r9');
     });
 
     it('loads Discord roles eagerly, regardless of roster mode', () => {
@@ -154,7 +174,7 @@ describe('GuildSettingsFormComponent', () => {
       setup('g1', settings({ timezone: '' }));
       fixture.detectChanges();
 
-      expect(component.form.value.timezone).toBe('');
+      expect(component.settingsForm.timezone().value()).toBe('');
 
       intlSpy.mockRestore();
     });
@@ -173,7 +193,7 @@ describe('GuildSettingsFormComponent', () => {
     it('is true when rosterMode is DiscordRoleOnly', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
+      component.settingsForm.rosterMode().value.set(RosterMode.DiscordRoleOnly);
 
       expect(component.isDiscordRoleMode()).toBe(true);
     });
@@ -185,7 +205,7 @@ describe('GuildSettingsFormComponent', () => {
     it('returns options that match the current timezone input', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('Europe/Paris');
+      component.settingsForm.timezone().value.set('Europe/Paris');
 
       expect(component.filteredTimezones().some(tz => tz.id === 'Europe/Paris')).toBe(true);
     });
@@ -193,23 +213,34 @@ describe('GuildSettingsFormComponent', () => {
     it('returns an empty array when no timezone matches', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('ZZZ_NOT_REAL');
+      component.settingsForm.timezone().value.set('ZZZ_NOT_REAL');
 
       expect(component.filteredTimezones()).toEqual([]);
     });
   });
 
-  // ── rosterMode subscription ───────────────────────────────────────────────
+  // ── onRosterModeChange ────────────────────────────────────────────────────
 
-  describe('rosterMode subscription', () => {
+  describe('onRosterModeChange', () => {
     it('clears minRosterRoleId when switching back to Open', () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.minRosterRoleId.setValue('r1');
+      component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.form.controls.rosterMode.setValue(RosterMode.Open);
+      component.onRosterModeChange(toggleChange(RosterMode.Open));
 
-      expect(component.form.value.minRosterRoleId).toBeNull();
+      expect(component.settingsForm.minRosterRoleId().value()).toBeNull();
+    });
+
+    it('keeps minRosterRoleId when switching to DiscordRoleOnly', () => {
+      setup();
+      fixture.detectChanges();
+      component.settingsForm.minRosterRoleId().value.set('r1');
+
+      component.onRosterModeChange(toggleChange(RosterMode.DiscordRoleOnly));
+
+      expect(component.settingsForm.minRosterRoleId().value()).toBe('r1');
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.DiscordRoleOnly);
     });
   });
 
@@ -241,47 +272,52 @@ describe('GuildSettingsFormComponent', () => {
   // ── submit ────────────────────────────────────────────────────────────────
 
   describe('submit', () => {
-    it('does nothing when the form is invalid', () => {
+    it('does nothing when the form is invalid', async () => {
       setup();
       fixture.detectChanges();
-      component.form.controls.timezone.setValue('');
+      component.settingsForm.timezone().value.set('');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
       expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
     });
 
-    it('does nothing when minOfficerRoleId is not set (required)', () => {
+    it('does nothing when minOfficerRoleId is not set (required)', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC' });
+      component.settingsForm.timezone().value.set('UTC');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
       expect(settingsService.updateOfficerThreshold).not.toHaveBeenCalled();
     });
 
-    it('does not submit a second time while already submitting', () => {
+    it('does not submit a second time while already submitting', async () => {
       setup();
       const pending = new Subject<void>();
       settingsService.updateSettings.mockReturnValue(pending.asObservable());
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
-      component.submit();
+      const first = component.submit();
+      const second = component.submit();
+      pending.next();
+      pending.complete();
+      await Promise.all([first, second]);
 
       expect(settingsService.updateSettings).toHaveBeenCalledTimes(1);
     });
 
-    it('calls updateSettings and updateOfficerThreshold with the correct payloads', () => {
+    it('calls updateSettings and updateOfficerThreshold with the correct payloads', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       expect(settingsService.updateSettings).toHaveBeenCalledWith(
         'g1',
@@ -290,40 +326,43 @@ describe('GuildSettingsFormComponent', () => {
       expect(settingsService.updateOfficerThreshold).toHaveBeenCalledWith('g1', { minOfficerRoleId: 'r1' });
     });
 
-    it('sends minRosterRoleId when rosterMode is DiscordRoleOnly', () => {
+    it('sends minRosterRoleId when rosterMode is DiscordRoleOnly', async () => {
       setup();
       settingsService.getDiscordRoles.mockReturnValue(of([role('r1')]));
       fixture.detectChanges();
-      component.form.controls.rosterMode.setValue(RosterMode.DiscordRoleOnly);
-      component.form.controls.minRosterRoleId.setValue('r1');
-      component.form.controls.minOfficerRoleId.setValue('r1');
+      component.settingsForm.rosterMode().value.set(RosterMode.DiscordRoleOnly);
+      component.settingsForm.minRosterRoleId().value.set('r1');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       const [, sent] = settingsService.updateSettings.mock.calls[0] as [string, GuildSettings];
       expect(sent.minRosterRoleId).toBe('r1');
     });
 
-    it('forces minRosterRoleId to null when rosterMode is Open', () => {
+    it('forces minRosterRoleId to null when rosterMode is Open', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', rosterMode: RosterMode.Open, minOfficerRoleId: 'r1' });
-      // Bypass rosterMode subscription to sneak a value into the control
-      component.form.controls.minRosterRoleId.setValue('r1', { emitEvent: false });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
+      // rosterMode stays Open while minRosterRoleId is (incorrectly) populated —
+      // submit() must still null it out regardless of what's in the model.
+      component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       const [, sent] = settingsService.updateSettings.mock.calls[0] as [string, GuildSettings];
       expect(sent.minRosterRoleId).toBeNull();
     });
 
-    it('patches both stores, resyncs the user and emits saved on success', () => {
+    it('patches both stores, resyncs the user and emits saved on success', async () => {
       setup();
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
       const savedSpy = vi.spyOn(component.saved, 'emit');
 
-      component.submit();
+      await component.submit();
 
       expect(guildStore.patchSettings).toHaveBeenCalledWith(
         'g1',
@@ -335,16 +374,247 @@ describe('GuildSettingsFormComponent', () => {
       expect(savedSpy).toHaveBeenCalled();
     });
 
-    it('shows snackbar error and resets submitting flag when either call fails', () => {
+    it('shows snackbar error and resets submitting flag when either call fails', async () => {
       setup();
       settingsService.updateSettings.mockReturnValue(throwError(() => new Error('update failed')));
       fixture.detectChanges();
-      component.form.patchValue({ timezone: 'UTC', minOfficerRoleId: 'r1' });
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
 
-      component.submit();
+      await component.submit();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.submitting()).toBe(false);
+    });
+  });
+
+  // ── real <form> submission wiring ────────────────────────────────────────
+  //
+  // Every test above overrides the template to '', so none of them exercise the actual <form>
+  // element — which is exactly how a real bug slipped through: (ngSubmit) was left in the
+  // template after ReactiveFormsModule was removed, with nothing left to back it, so clicking
+  // submit fell through to the browser's native (page-reloading) form submission instead of
+  // ever calling the component. These tests render the real [formRoot] wrapper (not the full
+  // production template, to avoid dragging in mat-autocomplete/mat-button-toggle rendering) and
+  // dispatch a genuine DOM 'submit' event, the same way a user's click on the submit button does.
+
+  describe('real <form> submission wiring', () => {
+    const setupRealForm = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
+        patchSettings: vi.fn(),
+      };
+      guildStore.loadSettings.mockImplementation(() => guildStore.settings.set(settings()));
+      officerThresholdStore = {
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
+        patchOfficerThreshold: vi.fn(),
+      };
+      officerThresholdStore.loadOfficerThreshold.mockImplementation(() =>
+        officerThresholdStore.officerThreshold.set(officerThreshold()),
+      );
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: { template: `<form [formRoot]="settingsForm"><button type="submit">Save</button></form>`, imports: [FormRoot] },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    const dispatchSubmit = (): Event => {
+      const event = new Event('submit', { bubbles: true, cancelable: true });
+      fixture.nativeElement.querySelector('form')!.dispatchEvent(event);
+      return event;
+    };
+
+    it('prevents the native page submission and calls the backend when the form is valid', async () => {
+      setupRealForm();
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
+
+      const event = dispatchSubmit();
+      await fixture.whenStable();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(settingsService.updateSettings).toHaveBeenCalled();
+    });
+
+    it('prevents the native page submission but does not call the backend when the form is invalid', async () => {
+      setupRealForm();
+      // minOfficerRoleId left unset — required, so the form is invalid.
+
+      const event = dispatchSubmit();
+      await fixture.whenStable();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(settingsService.updateSettings).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── real mat-autocomplete wiring ─────────────────────────────────────────
+  //
+  // Same rationale as above: (optionSelected) is a manual bridge (mat-autocomplete reports a
+  // clicked option through its own ControlValueAccessor hook, not a native input event, so
+  // [formField] alone never sees it — see onTimezoneSelected's own doc comment). No test above
+  // renders the real <mat-autocomplete>, so nothing has ever proven the template actually wires
+  // (optionSelected) to onTimezoneSelected. Emitting on the real MatAutocomplete/MatOption
+  // instances (found via the real, rendered template) exercises that exact wiring without needing
+  // to drive the CDK overlay panel itself, which is Material's own already-tested concern.
+
+  describe('real mat-autocomplete wiring', () => {
+    const setupRealAutocomplete = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
+        patchSettings: vi.fn(),
+      };
+      officerThresholdStore = {
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
+        patchOfficerThreshold: vi.fn(),
+      };
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: {
+          template: `
+            <input [formField]="settingsForm.timezone" [matAutocomplete]="tzAuto" />
+            <mat-autocomplete #tzAuto (optionSelected)="onTimezoneSelected($event)">
+              <mat-option value="Europe/Paris">Europe/Paris</mat-option>
+            </mat-autocomplete>
+          `,
+          imports: [FormField, MatAutocompleteModule],
+        },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    it('updates the timezone field when an option is selected from the dropdown', () => {
+      setupRealAutocomplete();
+      // Set to something other than the option's own value first — the field's initial value
+      // defaults to the test machine's local timezone, which could coincidentally already be
+      // 'Europe/Paris' and make the assertion below pass even if the binding were broken.
+      component.settingsForm.timezone().value.set('Not/TheRightZone');
+      const autocomplete = fixture.debugElement.query(By.directive(MatAutocomplete))
+        .componentInstance as MatAutocomplete;
+      // <mat-option> only mounts into the DOM once the overlay panel is actually open, but
+      // MatAutocomplete's @ContentChildren captures it as soon as it's projected either way.
+      const option = autocomplete.options.first;
+
+      autocomplete.optionSelected.emit({ option, source: autocomplete } as MatAutocompleteSelectedEvent);
+
+      expect(component.settingsForm.timezone().value()).toBe('Europe/Paris');
+    });
+  });
+
+  // ── real mat-button-toggle-group wiring ──────────────────────────────────
+  //
+  // Same rationale again: mat-button-toggle-group doesn't implement Signal Forms'
+  // FormValueControl (see onRosterModeChange's doc comment), so it's wired manually via (change).
+  // No test above renders the real <mat-button-toggle-group>, so nothing has proven the template
+  // wires that event to onRosterModeChange. Clicking the real rendered toggle button (not
+  // synthesizing a MatButtonToggleChange by hand) exercises the actual DOM path a user takes.
+
+  describe('real mat-button-toggle-group wiring', () => {
+    const setupRealToggle = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
+        patchSettings: vi.fn(),
+      };
+      officerThresholdStore = {
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
+        patchOfficerThreshold: vi.fn(),
+      };
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: {
+          template: `
+            <mat-button-toggle-group
+              [value]="settingsForm.rosterMode().value()"
+              (change)="onRosterModeChange($event)"
+            >
+              <mat-button-toggle [value]="RosterMode.Open">Open</mat-button-toggle>
+              <mat-button-toggle [value]="RosterMode.DiscordRoleOnly">Discord</mat-button-toggle>
+            </mat-button-toggle-group>
+          `,
+          imports: [MatButtonToggleModule],
+        },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    it('updates rosterMode when the user clicks a different toggle button', () => {
+      setupRealToggle();
+      const buttons = fixture.nativeElement.querySelectorAll('button');
+      const discordToggleButton = Array.from(buttons).find((b) =>
+        (b as HTMLButtonElement).textContent?.includes('Discord'),
+      ) as HTMLButtonElement;
+
+      discordToggleButton.click();
+      fixture.detectChanges();
+
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.DiscordRoleOnly);
     });
   });
 });

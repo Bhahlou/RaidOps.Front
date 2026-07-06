@@ -1,10 +1,10 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 import { CHANGELOG_ENTRIES } from '../data/changelog-entries.data';
 import { ChangelogEntry } from '../models/changelog-entry.model';
 
 const STORAGE_KEY = 'changelog-last-seen';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ChangelogStore {
   readonly entries: readonly ChangelogEntry[] = CHANGELOG_ENTRIES;
 

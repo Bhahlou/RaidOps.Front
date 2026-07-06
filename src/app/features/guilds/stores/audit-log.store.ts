@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { tap } from 'rxjs';
 import { AuditLogEntry } from '../models/audit-log-entry.model';
 import { GuildAuditAction } from '../models/guild-audit-action.enum';
@@ -29,7 +29,7 @@ const INITIAL_STATE: AuditLogStoreState = {
   loadingMore: false,
 };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuditLogStore {
   readonly #auditLogService = inject(AuditLogService);
   readonly #state = signal<AuditLogStoreState>(INITIAL_STATE);

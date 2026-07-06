@@ -13,7 +13,10 @@ import { IconCardComponent } from '../../../../shared/components/icon-card/icon-
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
-import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/page-header/page-header.component';
+import {
+  PageHeaderComponent,
+  BreadcrumbItem,
+} from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-register',

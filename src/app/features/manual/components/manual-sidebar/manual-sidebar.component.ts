@@ -19,7 +19,9 @@ export class ManualSidebarComponent {
   readonly categories = this.#manualStore.categories;
 
   /** All categories start expanded — the list is small enough that collapsing adds friction, not clarity. */
-  readonly openCategoryIds = signal<Set<string>>(new Set(this.categories.map((category) => category.id)));
+  readonly openCategoryIds = signal<Set<string>>(
+    new Set(this.categories.map((category) => category.id)),
+  );
 
   goBack(): void {
     this.#location.back();

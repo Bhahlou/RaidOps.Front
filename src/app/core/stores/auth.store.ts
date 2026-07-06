@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { Observable, shareReplay, tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
@@ -7,7 +7,7 @@ import { User } from '../models/user.model';
 
 const SESSION_KEY = 'raidops_user';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuthStore {
   readonly #authService = inject(AuthService);
   readonly #notificationService = inject(NotificationService);

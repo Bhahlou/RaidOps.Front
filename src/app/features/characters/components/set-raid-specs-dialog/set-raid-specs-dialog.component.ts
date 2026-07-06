@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,6 +37,7 @@ type LoadState = 'loading' | 'idle' | 'error' | 'submitting';
   selector: 'app-set-raid-specs-dialog',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,

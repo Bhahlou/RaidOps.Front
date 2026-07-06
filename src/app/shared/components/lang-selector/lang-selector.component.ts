@@ -13,7 +13,11 @@ import { LanguageService } from '../../../core/services/language.service';
 export class LangSelectorComponent {
   readonly #langService = inject(LanguageService);
 
-  readonly langLabels: Partial<Record<string, string>> = { fr: 'Français', en: 'English', de: 'Deutsch' };
+  readonly langLabels: Partial<Record<string, string>> = {
+    fr: 'Français',
+    en: 'English',
+    de: 'Deutsch',
+  };
   readonly langFlags: Partial<Record<string, string>> = { fr: 'fr', en: 'gb', de: 'de' };
 
   get activeLang() {

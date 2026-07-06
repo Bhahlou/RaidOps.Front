@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -56,6 +56,7 @@ interface CharacterChangeDisplay {
 @Component({
   selector: 'app-guild-audit-log',
   imports: [
+    NgOptimizedImage,
     NgTemplateOutlet,
     MatIcon,
     MatButton,

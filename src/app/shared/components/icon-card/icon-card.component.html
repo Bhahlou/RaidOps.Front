@@ -1,8 +1,8 @@
 <mat-card [appearance]="appearance()">
   <mat-card-header>
     <div mat-card-avatar class="icon-wrapper">
-      @if (iconSrc()) {
-        <img [src]="iconSrc()" alt="" class="card-icon-img" />
+      @if (iconSrc(); as src) {
+        <img [ngSrc]="src" alt="" class="card-icon-img" width="40" height="40" />
       } @else {
         <mat-icon class="card-icon">{{ icon() }}</mat-icon>
       }

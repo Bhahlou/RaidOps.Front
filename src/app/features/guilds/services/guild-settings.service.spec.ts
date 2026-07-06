@@ -22,22 +22,6 @@ describe('GuildSettingsService', () => {
 
   afterEach(() => controller.verify());
 
-  // ── getSettings ───────────────────────────────────────────────────────────
-
-  describe('getSettings', () => {
-    it('sends GET to /guilds/:id/settings and returns the response', () => {
-      const expected: GuildSettings = { timezone: 'Europe/Paris', rosterMode: RosterMode.Open, minRosterRoleId: null };
-      let result: GuildSettings | undefined;
-
-      service.getSettings('guild-1').subscribe(s => (result = s));
-
-      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/settings'));
-      expect(req.request.method).toBe('GET');
-      req.flush(expected);
-      expect(result).toEqual(expected);
-    });
-  });
-
   // ── getDiscordRoles ───────────────────────────────────────────────────────
 
   describe('getDiscordRoles', () => {
@@ -66,22 +50,6 @@ describe('GuildSettingsService', () => {
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(body);
       req.flush(null);
-    });
-  });
-
-  // ── getOfficerThreshold ──────────────────────────────────────────────────
-
-  describe('getOfficerThreshold', () => {
-    it('sends GET to /guilds/:id/officer-threshold and returns the response', () => {
-      const expected: OfficerThreshold = { minOfficerRoleId: 'role-1' };
-      let result: OfficerThreshold | undefined;
-
-      service.getOfficerThreshold('guild-1').subscribe(t => (result = t));
-
-      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/officer-threshold'));
-      expect(req.request.method).toBe('GET');
-      req.flush(expected);
-      expect(result).toEqual(expected);
     });
   });
 

@@ -20,7 +20,7 @@
             @if (isIncluded(role)) {
               <mat-icon class="check-icon">check_circle</mat-icon>
             } @else if (roleIconUrl(role); as iconUrl) {
-              <img class="role-icon" [src]="iconUrl" [alt]="" />
+              <img class="role-icon" [ngSrc]="iconUrl" alt="" width="18" height="18" />
             } @else if (roleColor(role); as color) {
               <span class="role-dot" [style.background]="color"></span>
             } @else {

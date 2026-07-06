@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
@@ -22,6 +23,7 @@ import { ChangelogStore } from '../../../features/changelog/stores/changelog.sto
   selector: 'app-header',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterModule,
     MatToolbarModule,
     MatBadgeModule,

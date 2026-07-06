@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="submit()" class="settings-form">
+<form [formRoot]="settingsForm" class="settings-form">
 
   <!-- Timezone -->
   <mat-form-field appearance="outline" class="full-width">
@@ -6,17 +6,22 @@
     <input
       id="guild-settings-timezone-input"
       matInput
-      formControlName="timezone"
+      [formField]="settingsForm.timezone"
       [matAutocomplete]="tzAuto"
       [placeholder]="'guildSettings.timezone.placeholder' | transloco"
       [attr.aria-label]="'guildSettings.timezone.label' | transloco"
     />
-    <mat-autocomplete #tzAuto autoActiveFirstOption [displayWith]="displayTimezone">
+    <mat-autocomplete
+      #tzAuto
+      autoActiveFirstOption
+      [displayWith]="displayTimezone"
+      (optionSelected)="onTimezoneSelected($event)"
+    >
       @for (tz of filteredTimezones(); track tz.id) {
         <mat-option [value]="tz.id">{{ tz.label }}</mat-option>
       }
     </mat-autocomplete>
-    @if (form.controls.timezone.hasError('required')) {
+    @if (settingsForm.timezone().invalid()) {
       <mat-error>{{ 'guildSettings.timezone.required' | transloco }}</mat-error>
     }
   </mat-form-field>
@@ -24,7 +29,11 @@
   <!-- Roster mode -->
   <div class="field-group">
     <p class="field-label">{{ 'guildSettings.rosterMode.label' | transloco }}</p>
-    <mat-button-toggle-group formControlName="rosterMode" class="roster-toggle">
+    <mat-button-toggle-group
+      [value]="settingsForm.rosterMode().value()"
+      (change)="onRosterModeChange($event)"
+      class="roster-toggle"
+    >
       <mat-button-toggle [value]="RosterMode.Open">
         <mat-icon>public</mat-icon>
         {{ 'guildSettings.rosterMode.open' | transloco }}
@@ -46,9 +55,8 @@
       <p class="field-hint">{{ 'guildSettings.roles.hint' | transloco }}</p>
       <app-role-threshold-picker
         [roles]="sortedRoles()"
-        [selectedRoleId]="minRosterRoleIdValue()"
         [loading]="rolesLoading()"
-        (thresholdChange)="form.controls.minRosterRoleId.setValue($event)"
+        [formField]="settingsForm.minRosterRoleId"
       />
     </div>
   }
@@ -59,9 +67,8 @@
     <p class="field-hint">{{ 'guildSettings.officerThreshold.hint' | transloco }}</p>
     <app-role-threshold-picker
       [roles]="sortedRoles()"
-      [selectedRoleId]="minOfficerRoleIdValue()"
       [loading]="rolesLoading()"
-      (thresholdChange)="form.controls.minOfficerRoleId.setValue($event)"
+      [formField]="settingsForm.minOfficerRoleId"
     />
   </div>
 
@@ -71,7 +78,7 @@
       mat-flat-button
       color="primary"
       type="submit"
-      [disabled]="form.invalid || submitting()"
+      [disabled]="settingsForm().invalid() || submitting()"
     >
       <mat-icon>check_circle</mat-icon>
       {{ 'guildSettings.save' | transloco }}

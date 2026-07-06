@@ -1,10 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { BnetAccount } from '../../features/characters/models/bnet-account.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class BnetService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl + '/bnet';

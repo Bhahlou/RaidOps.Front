@@ -1,8 +1,10 @@
 import { Component, input } from '@angular/core';
 
 const FACTION_ICONS: Record<string, string> = {
-  ALLIANCE: 'https://static.wikia.nocookie.net/wowpedia/images/7/7e/Alliance_64.png/revision/latest?cb=20110620204931',
-  HORDE:    'https://static.wikia.nocookie.net/wowpedia/images/9/92/Horde_64.png/revision/latest?cb=20110620204931',
+  ALLIANCE:
+    'https://static.wikia.nocookie.net/wowpedia/images/7/7e/Alliance_64.png/revision/latest?cb=20110620204931',
+  HORDE:
+    'https://static.wikia.nocookie.net/wowpedia/images/9/92/Horde_64.png/revision/latest?cb=20110620204931',
 };
 
 /**

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -24,7 +24,7 @@ interface CharacterDetailResponse {
  * Thin HTTP layer for character-related endpoints.
  * Holds no state — use CharacterStore for state management.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CharacterService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl + '/characters';

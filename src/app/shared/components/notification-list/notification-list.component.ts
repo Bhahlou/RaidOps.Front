@@ -16,9 +16,10 @@ export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>
 };
 
 /** Route the notification's call-to-action link points to. */
-const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> = {
-  [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
-};
+const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> =
+  {
+    [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
+  };
 
 /** Pure, presentational list of notification rows — caller owns filtering/state. */
 @Component({

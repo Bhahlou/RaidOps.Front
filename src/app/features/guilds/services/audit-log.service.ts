@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -6,7 +6,7 @@ import { AuditLogPage } from '../models/audit-log-page.model';
 import { GuildAuditAction } from '../models/guild-audit-action.enum';
 import { GuildAuditCategory } from '../models/guild-audit-category.enum';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuditLogService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;

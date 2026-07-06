@@ -17,7 +17,7 @@ describe('RoleThresholdPickerComponent', () => {
 
     fixture = TestBed.createComponent(RoleThresholdPickerComponent);
     fixture.componentRef.setInput('roles', roles);
-    fixture.componentRef.setInput('selectedRoleId', selectedRoleId);
+    fixture.componentRef.setInput('value', selectedRoleId);
     component = fixture.componentInstance;
     fixture.detectChanges();
   };
@@ -73,22 +73,20 @@ describe('RoleThresholdPickerComponent', () => {
   // ── select ────────────────────────────────────────────────────────────────
 
   describe('select', () => {
-    it('emits the selected role id', () => {
+    it('sets the selected role id', () => {
       setup([role('r1')], null);
-      const spy = vi.spyOn(component.thresholdChange, 'emit');
 
       component.select('r1');
 
-      expect(spy).toHaveBeenCalledWith('r1');
+      expect(component.value()).toBe('r1');
     });
 
-    it('emits null when the same role is selected again (toggle off)', () => {
+    it('sets null when the same role is selected again (toggle off)', () => {
       setup([role('r1')], 'r1');
-      const spy = vi.spyOn(component.thresholdChange, 'emit');
 
       component.select('r1');
 
-      expect(spy).toHaveBeenCalledWith(null);
+      expect(component.value()).toBeNull();
     });
   });
 

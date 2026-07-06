@@ -104,7 +104,12 @@ export class CharacterListComponent implements OnInit {
     dialogRef
       .afterClosed()
       .subscribe(
-        (result?: { activated: number; error?: boolean; openSync?: boolean; activatedCharacterIds?: number[] }) => {
+        (result?: {
+          activated: number;
+          error?: boolean;
+          openSync?: boolean;
+          activatedCharacterIds?: number[];
+        }) => {
           if (!result) return;
           if (result.openSync) {
             this.openSyncDialog();
@@ -141,7 +146,10 @@ export class CharacterListComponent implements OnInit {
     });
   }
 
-  #openRaidSpecsDialog(characters: Character[], mode: SetRaidSpecsDialogData['mode']): MatDialogRef<SetRaidSpecsDialogComponent> {
+  #openRaidSpecsDialog(
+    characters: Character[],
+    mode: SetRaidSpecsDialogData['mode'],
+  ): MatDialogRef<SetRaidSpecsDialogComponent> {
     return this.#dialog.open(SetRaidSpecsDialogComponent, {
       width: '560px',
       maxWidth: '95vw',

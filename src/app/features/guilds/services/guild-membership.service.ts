@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -7,7 +7,7 @@ import { GuildEligibility } from '../models/guild-eligibility.model';
 import { CharacterRank } from '../models/character-rank.enum';
 
 /** Thin HTTP layer for guild roster membership endpoints. */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class GuildMembershipService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;

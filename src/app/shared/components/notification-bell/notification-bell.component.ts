@@ -6,7 +6,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { Notification } from '../../../core/models/notification.model';
-import { NOTIFICATION_MESSAGE_KEYS, NotificationListComponent } from '../notification-list/notification-list.component';
+import {
+  NOTIFICATION_MESSAGE_KEYS,
+  NotificationListComponent,
+} from '../notification-list/notification-list.component';
 
 /**
  * Header trigger: a bell icon with a badge count, opening a dropdown panel of the user's active
@@ -15,7 +18,14 @@ import { NOTIFICATION_MESSAGE_KEYS, NotificationListComponent } from '../notific
  */
 @Component({
   selector: 'app-notification-bell',
-  imports: [MatBadgeModule, MatButtonModule, MatIconModule, MatMenuModule, TranslocoPipe, NotificationListComponent],
+  imports: [
+    MatBadgeModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    TranslocoPipe,
+    NotificationListComponent,
+  ],
   templateUrl: './notification-bell.component.html',
   styleUrl: './notification-bell.component.scss',
 })

@@ -25,7 +25,14 @@ import { environment } from '../../../../../environments/environment';
  */
 @Component({
   selector: 'app-get-started-guild-step',
-  imports: [MatButtonModule, MatIconModule, DiscordIconComponent, IconCardComponent, GuildSettingsFormComponent, TranslocoPipe],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    DiscordIconComponent,
+    IconCardComponent,
+    GuildSettingsFormComponent,
+    TranslocoPipe,
+  ],
   templateUrl: './get-started-guild-step.component.html',
   styleUrl: './get-started-guild-step.component.scss',
 })
@@ -51,7 +58,10 @@ export class GetStartedGuildStepComponent {
 
   /** Admin guilds where the bot is invited but settings haven't been saved yet. */
   readonly pendingSettingsGuilds = computed<UserGuild[]>(
-    () => this.#authStore.user()?.guilds.filter((g) => g.isAdmin && g.isRegistered && !g.isConfigured) ?? [],
+    () =>
+      this.#authStore
+        .user()
+        ?.guilds.filter((g) => g.isAdmin && g.isRegistered && !g.isConfigured) ?? [],
   );
 
   readonly hasNoGuild = computed(
@@ -62,7 +72,9 @@ export class GetStartedGuildStepComponent {
   );
 
   inviteBot(guildId: string): void {
-    this.#location.assign(`${environment.apiUrl}/guilds/register/initiate?guildId=${guildId}&returnTo=get-started`);
+    this.#location.assign(
+      `${environment.apiUrl}/guilds/register/initiate?guildId=${guildId}&returnTo=get-started`,
+    );
   }
 
   onSettingsSaved(): void {

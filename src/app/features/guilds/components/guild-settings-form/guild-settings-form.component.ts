@@ -1,10 +1,9 @@
-import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
+import { form, FormField, FormRoot, required, submit as submitForm } from '@angular/forms/signals';
+import { firstValueFrom, forkJoin } from 'rxjs';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -24,6 +23,13 @@ import { RoleThresholdPickerComponent } from '../role-threshold-picker/role-thre
 interface TimezoneOption {
   id: string;
   label: string;
+}
+
+interface SettingsFormModel {
+  timezone: string;
+  rosterMode: RosterMode;
+  minRosterRoleId: string | null;
+  minOfficerRoleId: string | null;
 }
 
 const NOW = new Date();
@@ -47,7 +53,8 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
 @Component({
   selector: 'app-guild-settings-form',
   imports: [
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
@@ -75,38 +82,68 @@ export class GuildSettingsFormComponent implements OnInit {
 
   readonly availableRoles = signal<DiscordRole[]>([]);
   readonly rolesLoading = signal(true);
-  readonly submitting = signal(false);
 
-  readonly form = new FormGroup({
-    timezone: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    rosterMode: new FormControl<RosterMode>(RosterMode.Open, { nonNullable: true }),
-    minRosterRoleId: new FormControl<string | null>(null),
-    minOfficerRoleId: new FormControl<string | null>(null, { validators: [Validators.required] }),
+  readonly #model = signal<SettingsFormModel>({
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? '',
+    rosterMode: RosterMode.Open,
+    minRosterRoleId: null,
+    minOfficerRoleId: null,
   });
 
-  readonly #timezoneValue = toSignal(this.form.controls.timezone.valueChanges, {
-    initialValue: Intl.DateTimeFormat().resolvedOptions().timeZone ?? '',
-  });
+  readonly settingsForm = form(
+    this.#model,
+    (schemaPath) => {
+      required(schemaPath.timezone);
+      required(schemaPath.minRosterRoleId, {
+        when: ({ valueOf }) => valueOf(schemaPath.rosterMode) === RosterMode.DiscordRoleOnly,
+      });
+      required(schemaPath.minOfficerRoleId);
+    },
+    {
+      submission: {
+        action: async (field) => {
+          const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = field().value();
+          const settings: GuildSettings = {
+            timezone,
+            rosterMode,
+            minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
+          };
+          const officerThreshold: OfficerThreshold = { minOfficerRoleId };
 
-  readonly #rosterModeValue = toSignal(this.form.controls.rosterMode.valueChanges, {
-    initialValue: RosterMode.Open,
-  });
+          try {
+            await firstValueFrom(
+              forkJoin([
+                this.#settingsService.updateSettings(this.guildId(), settings),
+                this.#settingsService.updateOfficerThreshold(this.guildId(), officerThreshold),
+              ]),
+            );
+          } catch {
+            this.#snackbar.error('errors.server');
+            return { kind: 'serverError', message: 'errors.server' };
+          }
 
-  readonly minRosterRoleIdValue = toSignal(this.form.controls.minRosterRoleId.valueChanges, {
-    initialValue: null,
-  });
+          this.#guildStore.patchSettings(this.guildId(), settings);
+          this.#officerThresholdStore.patchOfficerThreshold(this.guildId(), officerThreshold);
+          this.#snackbar.success('guildSettings.saveSuccess');
+          // Resyncs /me so the "Officer threshold not configured" notification clears immediately
+          // instead of lingering until the next reload/login.
+          this.#authStore.loadUser().subscribe();
+          this.saved.emit();
+          return undefined;
+        },
+      },
+    },
+  );
 
-  readonly minOfficerRoleIdValue = toSignal(this.form.controls.minOfficerRoleId.valueChanges, {
-    initialValue: null,
-  });
+  readonly submitting = computed(() => this.settingsForm().submitting());
 
   readonly filteredTimezones = computed(() => {
-    const query = this.#timezoneValue().toLowerCase();
+    const query = this.settingsForm.timezone().value().toLowerCase();
     return ALL_TIMEZONE_OPTIONS.filter((tz) => tz.label.toLowerCase().includes(query));
   });
 
   readonly isDiscordRoleMode = computed(
-    () => this.#rosterModeValue() === RosterMode.DiscordRoleOnly,
+    () => this.settingsForm.rosterMode().value() === RosterMode.DiscordRoleOnly,
   );
 
   /**
@@ -119,74 +156,64 @@ export class GuildSettingsFormComponent implements OnInit {
   readonly displayTimezone = (id: string): string =>
     ALL_TIMEZONE_OPTIONS.find((tz) => tz.id === id)?.label ?? id;
 
-  ngOnInit(): void {
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (localTz) {
-      this.form.controls.timezone.setValue(localTz);
-    }
-
-    this.form.controls.rosterMode.valueChanges.subscribe((mode) => {
-      const ctrl = this.form.controls.minRosterRoleId;
-      if (mode === RosterMode.DiscordRoleOnly) {
-        ctrl.addValidators(Validators.required);
-      } else {
-        ctrl.removeValidators(Validators.required);
-        ctrl.setValue(null);
-      }
-      ctrl.updateValueAndValidity();
+  constructor() {
+    // GuildStore/OfficerThresholdStore are httpResource()-backed and thus resolve asynchronously —
+    // these effects patch the local form model whenever their signals produce a value, instead of
+    // the one-shot Observable.subscribe() the pre-httpResource version used. Also re-fires (as a
+    // harmless no-op) right after this component's own patchSettings()/patchOfficerThreshold() calls
+    // on submit, since those write the same values the model already holds.
+    effect(() => {
+      const settings = this.#guildStore.settings();
+      if (!settings) return;
+      this.#model.update((m) => ({
+        ...m,
+        ...(settings.timezone ? { timezone: settings.timezone } : {}),
+        rosterMode: settings.rosterMode,
+        minRosterRoleId: settings.minRosterRoleId,
+      }));
     });
 
-    // Roles are needed for both the roster and Officer threshold pickers, so load them eagerly.
-    this.#loadRoles();
-
-    this.#guildStore.loadSettings(this.guildId()).subscribe({
-      next: (settings) => {
-        this.form.patchValue({
-          ...(settings.timezone ? { timezone: settings.timezone } : {}),
-          rosterMode: settings.rosterMode,
-          minRosterRoleId: settings.minRosterRoleId,
-        });
-      },
-    });
-
-    this.#officerThresholdStore.loadOfficerThreshold(this.guildId()).subscribe({
-      next: (officerThreshold) => {
-        this.form.patchValue({ minOfficerRoleId: officerThreshold.minOfficerRoleId });
-      },
+    effect(() => {
+      const officerThreshold = this.#officerThresholdStore.officerThreshold();
+      if (!officerThreshold) return;
+      this.#model.update((m) => ({ ...m, minOfficerRoleId: officerThreshold.minOfficerRoleId }));
     });
   }
 
-  submit(): void {
-    if (this.form.invalid || this.submitting()) return;
+  ngOnInit(): void {
+    // Roles are needed for both the roster and Officer threshold pickers, so load them eagerly.
+    this.#loadRoles();
+    this.#guildStore.loadSettings(this.guildId());
+    this.#officerThresholdStore.loadOfficerThreshold(this.guildId());
+  }
 
-    const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = this.form.getRawValue();
-    const settings: GuildSettings = {
-      timezone,
-      rosterMode,
-      minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
-    };
-    const officerThreshold: OfficerThreshold = { minOfficerRoleId };
+  /**
+   * mat-button-toggle-group doesn't implement Signal Forms' FormValueControl (it only speaks the
+   * older ControlValueAccessor), so its value is wired manually instead of via [formField].
+   */
+  onRosterModeChange(event: MatButtonToggleChange): void {
+    this.settingsForm.rosterMode().value.set(event.value as RosterMode);
+    if (event.value !== RosterMode.DiscordRoleOnly) {
+      this.settingsForm.minRosterRoleId().value.set(null);
+    }
+  }
 
-    this.submitting.set(true);
-    forkJoin([
-      this.#settingsService.updateSettings(this.guildId(), settings),
-      this.#settingsService.updateOfficerThreshold(this.guildId(), officerThreshold),
-    ]).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.#guildStore.patchSettings(this.guildId(), settings);
-        this.#officerThresholdStore.patchOfficerThreshold(this.guildId(), officerThreshold);
-        this.#snackbar.success('guildSettings.saveSuccess');
-        // Resyncs /me so the "Officer threshold not configured" notification clears immediately
-        // instead of lingering until the next reload/login.
-        this.#authStore.loadUser().subscribe();
-        this.saved.emit();
-      },
-      error: () => {
-        this.submitting.set(false);
-        this.#snackbar.error('errors.server');
-      },
-    });
+  /**
+   * mat-autocomplete reports option selection through its own ControlValueAccessor hook, not a
+   * native input event, so [formField] alone (which only listens for native input/change events)
+   * never sees a value picked from the dropdown — only typed input. Bridged manually here.
+   */
+  onTimezoneSelected(event: MatAutocompleteSelectedEvent): void {
+    this.settingsForm.timezone().value.set(event.option.value as string);
+  }
+
+  /**
+   * The <form> uses [formRoot] to trigger submission from a real DOM submit event (see the
+   * template) — this method exists so the submission flow can also be triggered directly (used
+   * by this component's own tests). Both paths run the same pre-configured submission.action.
+   */
+  async submit(): Promise<void> {
+    await submitForm(this.settingsForm);
   }
 
   #loadRoles(): void {

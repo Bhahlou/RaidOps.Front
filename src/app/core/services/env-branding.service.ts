@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 export const LOGO_BY_ENV: Record<string, string> = {
@@ -38,7 +38,7 @@ export function resolveEnvBranding(envName: string): EnvBranding {
 }
 
 /** Centralizes the env-dependent branding (favicon, header logo, header badge) so app.ts and HeaderComponent stay in sync. */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class EnvBrandingService {
   readonly envName = environment.envName;
 

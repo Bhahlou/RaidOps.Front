@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -9,7 +9,7 @@ import { LOCATION } from '../tokens/location.token';
  * Thin HTTP layer for auth-related endpoints.
  * Holds no state — use AuthStore for state management.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuthService {
   readonly #http = inject(HttpClient);
   readonly #location = inject(LOCATION);

@@ -90,7 +90,7 @@ export class CharacterGuildsComponent implements OnInit {
   }
 
   setRankSelection(guildId: string, rank: CharacterRank): void {
-    this.#rankSelections.update(m => new Map(m).set(guildId, rank));
+    this.#rankSelections.update((m) => new Map(m).set(guildId, rank));
   }
 
   joinGuild(guildId: string): void {
