@@ -57,8 +57,8 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Branching & releases
 
 This repo uses three long-lived branches: `dev` (integration, release-please
-lives here) → `next` (acceptance, auto-promoted from dev's cuts) → `master`
-(prod, promotions + a dedicated hotfix release-please lane).
+lives here) → `next` (acceptance, auto-promoted from dev's release cuts) →
+`master` (prod, promotions + a dedicated hotfix release-please lane).
 
 ## Additional Resources
 
