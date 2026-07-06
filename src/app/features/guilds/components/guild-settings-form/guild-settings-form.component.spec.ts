@@ -1,7 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { FormRoot } from '@angular/forms/signals';
+import { By } from '@angular/platform-browser';
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormField, FormRoot } from '@angular/forms/signals';
 import { of, Subject, throwError } from 'rxjs';
 
 import { GuildSettingsFormComponent, buildTimezoneOption } from './guild-settings-form.component';
@@ -462,6 +468,153 @@ describe('GuildSettingsFormComponent', () => {
 
       expect(event.defaultPrevented).toBe(true);
       expect(settingsService.updateSettings).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── real mat-autocomplete wiring ─────────────────────────────────────────
+  //
+  // Same rationale as above: (optionSelected) is a manual bridge (mat-autocomplete reports a
+  // clicked option through its own ControlValueAccessor hook, not a native input event, so
+  // [formField] alone never sees it — see onTimezoneSelected's own doc comment). No test above
+  // renders the real <mat-autocomplete>, so nothing has ever proven the template actually wires
+  // (optionSelected) to onTimezoneSelected. Emitting on the real MatAutocomplete/MatOption
+  // instances (found via the real, rendered template) exercises that exact wiring without needing
+  // to drive the CDK overlay panel itself, which is Material's own already-tested concern.
+
+  describe('real mat-autocomplete wiring', () => {
+    const setupRealAutocomplete = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
+        patchSettings: vi.fn(),
+      };
+      officerThresholdStore = {
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
+        patchOfficerThreshold: vi.fn(),
+      };
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: {
+          template: `
+            <input [formField]="settingsForm.timezone" [matAutocomplete]="tzAuto" />
+            <mat-autocomplete #tzAuto (optionSelected)="onTimezoneSelected($event)">
+              <mat-option value="Europe/Paris">Europe/Paris</mat-option>
+            </mat-autocomplete>
+          `,
+          imports: [FormField, MatAutocompleteModule],
+        },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    it('updates the timezone field when an option is selected from the dropdown', () => {
+      setupRealAutocomplete();
+      // Set to something other than the option's own value first — the field's initial value
+      // defaults to the test machine's local timezone, which could coincidentally already be
+      // 'Europe/Paris' and make the assertion below pass even if the binding were broken.
+      component.settingsForm.timezone().value.set('Not/TheRightZone');
+      const autocomplete = fixture.debugElement.query(By.directive(MatAutocomplete))
+        .componentInstance as MatAutocomplete;
+      // <mat-option> only mounts into the DOM once the overlay panel is actually open, but
+      // MatAutocomplete's @ContentChildren captures it as soon as it's projected either way.
+      const option = autocomplete.options.first;
+
+      autocomplete.optionSelected.emit({ option, source: autocomplete } as MatAutocompleteSelectedEvent);
+
+      expect(component.settingsForm.timezone().value()).toBe('Europe/Paris');
+    });
+  });
+
+  // ── real mat-button-toggle-group wiring ──────────────────────────────────
+  //
+  // Same rationale again: mat-button-toggle-group doesn't implement Signal Forms'
+  // FormValueControl (see onRosterModeChange's doc comment), so it's wired manually via (change).
+  // No test above renders the real <mat-button-toggle-group>, so nothing has proven the template
+  // wires that event to onRosterModeChange. Clicking the real rendered toggle button (not
+  // synthesizing a MatButtonToggleChange by hand) exercises the actual DOM path a user takes.
+
+  describe('real mat-button-toggle-group wiring', () => {
+    const setupRealToggle = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
+        patchSettings: vi.fn(),
+      };
+      officerThresholdStore = {
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
+        patchOfficerThreshold: vi.fn(),
+      };
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: {
+          template: `
+            <mat-button-toggle-group
+              [value]="settingsForm.rosterMode().value()"
+              (change)="onRosterModeChange($event)"
+            >
+              <mat-button-toggle [value]="RosterMode.Open">Open</mat-button-toggle>
+              <mat-button-toggle [value]="RosterMode.DiscordRoleOnly">Discord</mat-button-toggle>
+            </mat-button-toggle-group>
+          `,
+          imports: [MatButtonToggleModule],
+        },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    it('updates rosterMode when the user clicks a different toggle button', () => {
+      setupRealToggle();
+      const buttons = fixture.nativeElement.querySelectorAll('button');
+      const discordToggleButton = Array.from(buttons).find((b) =>
+        (b as HTMLButtonElement).textContent?.includes('Discord'),
+      ) as HTMLButtonElement;
+
+      discordToggleButton.click();
+      fixture.detectChanges();
+
+      expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.DiscordRoleOnly);
     });
   });
 });
