@@ -37,51 +37,39 @@ jobs:
           docker build --build-arg BUILD_CONFIGURATION=acceptance --build-arg APP_VERSION="$VERSION" -t $IMAGE_NAME:acceptance .
           docker push $IMAGE_NAME:acceptance
 
+      # The pushed commit here is the dev→next promotion PR's squash commit
+      # ("chore: promote vX.Y.Z to next"), not the actual release changelog —
+      # look up the real release notes for this version instead.
+      - name: Look up the release matching this version
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MANIFEST_VERSION=$(jq -r '.["."]' .release-please-manifest.json)
+          PKG_NAME=$(jq -r '.name' package.json)
+          TAG="${PKG_NAME}-v${MANIFEST_VERSION}"
+          echo "url=$(gh release view "$TAG" --json url -q .url)" >> "$GITHUB_OUTPUT"
+          {
+            echo "body<<RELEASE_BODY_EOF"
+            gh release view "$TAG" --json body -q .body
+            echo "RELEASE_BODY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Notify Discord (acceptance)
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_ACCEPTANCE_WEBHOOK_URL }}
-          FULL_REPO: ${{ github.repository }}
-          AUTHOR: ${{ github.actor }}
-          MESSAGE: ${{ github.event.head_commit.message }}
-          COMMIT_URL: ${{ github.event.head_commit.url }}
           VERSION: ${{ steps.build.outputs.version }}
+          BODY: ${{ steps.release.outputs.body }}
+          URL: ${{ steps.release.outputs.url }}
         run: |
-          # First line of the squash commit = the conventional PR title
-          DESC=$(echo "$MESSAGE" | head -n 1)
-          # Extract the PR number from the squash title "(#NN)" → link to the PR
-          # (fall back to the commit URL for a direct push without a PR)
-          PR_NUMBER=$(echo "$DESC" | grep -oE '#[0-9]+' | tail -1 | tr -d '#')
-          if [ -n "$PR_NUMBER" ]; then
-            LINK="https://github.com/$FULL_REPO/pull/$PR_NUMBER"
-          else
-            LINK="$COMMIT_URL"
-          fi
-
-          # Conventional commit type → emoji (mirrors release-please-config.json sections)
-          PREFIX=$(echo "$DESC" | grep -oE '^[a-z]+' || true)
-          case "$PREFIX" in
-            feat)     EMOJI="🚀" ;;
-            fix)      EMOJI="🐛" ;;
-            perf)     EMOJI="⚡" ;;
-            refactor) EMOJI="🔧" ;;
-            docs)     EMOJI="📚" ;;
-            test)     EMOJI="✅" ;;
-            build)    EMOJI="📦" ;;
-            ci)       EMOJI="🤖" ;;
-            chore)    EMOJI="🧹" ;;
-            *)        EMOJI="🔹" ;;
-          esac
-
-          # Strip the "type(scope)?: " prefix and trailing " (#NN)" PR reference
-          CLEAN_TITLE=$(echo "$DESC" | sed -E 's/^[a-z]+(\([^)]*\))?!?: //; s/ \(#[0-9]+\)$//')
-          DESCRIPTION="$EMOJI $CLEAN_TITLE"$'\n\n'"Click this notification title to get more detail of the change in PR."
-
+          # release-please already generated a markdown changelog with clickable links
+          DESC=$(echo "$BODY" | head -c 4000)
           curl -s -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-              --arg title "RaidOps frontend — $AUTHOR pushed a new version to acceptance: $VERSION" \
-              --arg desc "$DESCRIPTION" \
-              --arg url "$LINK" \
+              --arg title "RaidOps frontend — new version pushed to acceptance: $VERSION" \
+              --arg desc "$DESC" \
+              --arg url "$URL" \
               '{
                 embeds: [{
                   title: $title,
