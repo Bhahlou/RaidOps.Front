@@ -1,9 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
 
 import { GuildSettings } from '../models/guild-settings.model';
 import { RosterMode } from '../models/roster-mode.enum';
-import { GuildSettingsService } from '../services/guild-settings.service';
 import { GuildStore } from './guild.store';
 
 const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
@@ -15,24 +16,23 @@ const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
 
 describe('GuildStore', () => {
   let store: GuildStore;
-  let service: { getSettings: ReturnType<typeof vi.fn> };
+  let controller: HttpTestingController;
 
   beforeEach(() => {
-    service = { getSettings: vi.fn().mockReturnValue(of(settings())) };
-
     TestBed.configureTestingModule({
-      providers: [
-        GuildStore,
-        { provide: GuildSettingsService, useValue: service },
-      ],
+      providers: [GuildStore, provideHttpClient(), provideHttpClientTesting()],
     });
     store = TestBed.inject(GuildStore);
+    controller = TestBed.inject(HttpTestingController);
   });
+
+  afterEach(() => controller.verify());
 
   // ── settings ──────────────────────────────────────────────────────────────
 
   describe('settings', () => {
     it('is null before any load', () => {
+      TestBed.tick();
       expect(store.settings()).toBeNull();
     });
   });
@@ -40,29 +40,45 @@ describe('GuildStore', () => {
   // ── loadSettings ──────────────────────────────────────────────────────────
 
   describe('loadSettings', () => {
-    it('calls the service and updates the settings signal', () => {
+    it('fetches the settings for the given guild', async () => {
       const s = settings({ timezone: 'UTC' });
-      service.getSettings.mockReturnValue(of(s));
 
-      store.loadSettings('g1').subscribe();
+      store.loadSettings('g1');
+      TestBed.tick();
 
-      expect(service.getSettings).toHaveBeenCalledWith('g1');
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/settings'));
+      expect(req.request.method).toBe('GET');
+      req.flush(s);
+      await TestBed.inject(ApplicationRef).whenStable();
+
       expect(store.settings()).toEqual(s);
     });
 
-    it('returns the cached value without re-fetching for the same guildId', () => {
-      store.loadSettings('g1').subscribe();
-      store.loadSettings('g1').subscribe();
+    it('does not re-fetch for the same guildId', async () => {
+      store.loadSettings('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/settings')).flush(settings());
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(service.getSettings).toHaveBeenCalledTimes(1);
+      store.loadSettings('g1');
+      TestBed.tick();
+
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/settings'));
     });
 
-    it('re-fetches when the guildId changes', () => {
-      store.loadSettings('g1').subscribe();
-      service.getSettings.mockReturnValue(of(settings({ timezone: 'UTC' })));
-      store.loadSettings('g2').subscribe();
+    it('re-fetches when the guildId changes', async () => {
+      store.loadSettings('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/settings')).flush(settings());
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(service.getSettings).toHaveBeenCalledTimes(2);
+      store.loadSettings('g2');
+      TestBed.tick();
+      controller
+        .expectOne((r) => r.url.endsWith('/guilds/g2/settings'))
+        .flush(settings({ timezone: 'UTC' }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
       expect(store.settings()?.timezone).toBe('UTC');
     });
   });
@@ -70,32 +86,13 @@ describe('GuildStore', () => {
   // ── patchSettings ─────────────────────────────────────────────────────────
 
   describe('patchSettings', () => {
-    it('updates settings in place without calling the service', () => {
+    it('updates settings in place without calling the backend', () => {
       const s = settings({ timezone: 'America/New_York' });
       store.patchSettings('g1', s);
+      TestBed.tick();
 
       expect(store.settings()).toEqual(s);
-      expect(service.getSettings).not.toHaveBeenCalled();
-    });
-  });
-
-  // ── invalidate ────────────────────────────────────────────────────────────
-
-  describe('invalidate', () => {
-    it('clears the cached settings', () => {
-      store.loadSettings('g1').subscribe();
-
-      store.invalidate();
-
-      expect(store.settings()).toBeNull();
-    });
-
-    it('forces a re-fetch on next loadSettings for the same guildId', () => {
-      store.loadSettings('g1').subscribe();
-      store.invalidate();
-      store.loadSettings('g1').subscribe();
-
-      expect(service.getSettings).toHaveBeenCalledTimes(2);
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/settings'));
     });
   });
 });

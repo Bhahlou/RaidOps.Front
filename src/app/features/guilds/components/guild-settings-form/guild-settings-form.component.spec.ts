@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { FormRoot } from '@angular/forms/signals';
 import { of, Subject, throwError } from 'rxjs';
@@ -57,10 +58,12 @@ describe('GuildSettingsFormComponent', () => {
     updateOfficerThreshold: ReturnType<typeof vi.fn>;
   };
   let guildStore: {
+    settings: ReturnType<typeof signal<GuildSettings | null>>;
     loadSettings: ReturnType<typeof vi.fn>;
     patchSettings: ReturnType<typeof vi.fn>;
   };
   let officerThresholdStore: {
+    officerThreshold: ReturnType<typeof signal<OfficerThreshold | null>>;
     loadOfficerThreshold: ReturnType<typeof vi.fn>;
     patchOfficerThreshold: ReturnType<typeof vi.fn>;
   };
@@ -78,13 +81,19 @@ describe('GuildSettingsFormComponent', () => {
       updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
     };
     guildStore = {
-      loadSettings:   vi.fn().mockReturnValue(of(storeSettings)),
-      patchSettings:  vi.fn(),
+      settings:      signal<GuildSettings | null>(null),
+      loadSettings:  vi.fn(),
+      patchSettings: vi.fn(),
     };
+    guildStore.loadSettings.mockImplementation(() => guildStore.settings.set(storeSettings));
     officerThresholdStore = {
-      loadOfficerThreshold:  vi.fn().mockReturnValue(of(storeOfficerThreshold)),
+      officerThreshold:      signal<OfficerThreshold | null>(null),
+      loadOfficerThreshold:  vi.fn(),
       patchOfficerThreshold: vi.fn(),
     };
+    officerThresholdStore.loadOfficerThreshold.mockImplementation(() =>
+      officerThresholdStore.officerThreshold.set(storeOfficerThreshold),
+    );
     authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
 
@@ -391,13 +400,19 @@ describe('GuildSettingsFormComponent', () => {
         updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
       };
       guildStore = {
-        loadSettings:  vi.fn().mockReturnValue(of(settings())),
+        settings:      signal<GuildSettings | null>(null),
+        loadSettings:  vi.fn(),
         patchSettings: vi.fn(),
       };
+      guildStore.loadSettings.mockImplementation(() => guildStore.settings.set(settings()));
       officerThresholdStore = {
-        loadOfficerThreshold:  vi.fn().mockReturnValue(of(officerThreshold())),
+        officerThreshold:      signal<OfficerThreshold | null>(null),
+        loadOfficerThreshold:  vi.fn(),
         patchOfficerThreshold: vi.fn(),
       };
+      officerThresholdStore.loadOfficerThreshold.mockImplementation(() =>
+        officerThresholdStore.officerThreshold.set(officerThreshold()),
+      );
       authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
       snackbar = { error: vi.fn(), success: vi.fn() };
 

@@ -1,35 +1,26 @@
-import { computed, inject, Service, signal } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { httpResource } from '@angular/common/http';
+import { computed, Service, signal } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { OfficerThreshold } from '../models/officer-threshold.model';
-import { GuildSettingsService } from '../services/guild-settings.service';
-
-interface OfficerThresholdStoreState {
-  guildId: string | null;
-  officerThreshold: OfficerThreshold | null;
-}
 
 @Service()
 export class OfficerThresholdStore {
-  readonly #settingsService = inject(GuildSettingsService);
-  readonly #state = signal<OfficerThresholdStoreState>({ guildId: null, officerThreshold: null });
+  readonly #guildId = signal<string | null>(null);
 
-  readonly officerThreshold = computed(() => this.#state().officerThreshold);
+  readonly #officerThresholdResource = httpResource<OfficerThreshold>(() => {
+    const guildId = this.#guildId();
+    return guildId ? `${environment.apiUrl}/guilds/${guildId}/officer-threshold` : undefined;
+  });
 
-  loadOfficerThreshold(guildId: string): Observable<OfficerThreshold> {
-    const current = this.#state();
-    if (current.guildId === guildId && current.officerThreshold !== null) {
-      return of(current.officerThreshold);
-    }
-    return this.#settingsService
-      .getOfficerThreshold(guildId)
-      .pipe(tap((officerThreshold) => this.#state.set({ guildId, officerThreshold })));
+  readonly officerThreshold = computed(() => this.#officerThresholdResource.value() ?? null);
+
+  loadOfficerThreshold(guildId: string): void {
+    this.#guildId.set(guildId);
   }
 
+  /** Optimistically updates the cached threshold after a successful save, without a re-fetch. */
   patchOfficerThreshold(guildId: string, officerThreshold: OfficerThreshold): void {
-    this.#state.set({ guildId, officerThreshold });
-  }
-
-  invalidate(): void {
-    this.#state.set({ guildId: null, officerThreshold: null });
+    this.#guildId.set(guildId);
+    this.#officerThresholdResource.set(officerThreshold);
   }
 }

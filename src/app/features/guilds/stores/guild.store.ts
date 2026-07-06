@@ -1,35 +1,26 @@
-import { computed, inject, Service, signal } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { httpResource } from '@angular/common/http';
+import { computed, Service, signal } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { GuildSettings } from '../models/guild-settings.model';
-import { GuildSettingsService } from '../services/guild-settings.service';
-
-interface GuildStoreState {
-  guildId: string | null;
-  settings: GuildSettings | null;
-}
 
 @Service()
 export class GuildStore {
-  readonly #settingsService = inject(GuildSettingsService);
-  readonly #state = signal<GuildStoreState>({ guildId: null, settings: null });
+  readonly #guildId = signal<string | null>(null);
 
-  readonly settings = computed(() => this.#state().settings);
+  readonly #settingsResource = httpResource<GuildSettings>(() => {
+    const guildId = this.#guildId();
+    return guildId ? `${environment.apiUrl}/guilds/${guildId}/settings` : undefined;
+  });
 
-  loadSettings(guildId: string): Observable<GuildSettings> {
-    const current = this.#state();
-    if (current.guildId === guildId && current.settings !== null) {
-      return of(current.settings);
-    }
-    return this.#settingsService
-      .getSettings(guildId)
-      .pipe(tap((settings) => this.#state.set({ guildId, settings })));
+  readonly settings = computed(() => this.#settingsResource.value() ?? null);
+
+  loadSettings(guildId: string): void {
+    this.#guildId.set(guildId);
   }
 
+  /** Optimistically updates the cached settings after a successful save, without a re-fetch. */
   patchSettings(guildId: string, settings: GuildSettings): void {
-    this.#state.set({ guildId, settings });
-  }
-
-  invalidate(): void {
-    this.#state.set({ guildId: null, settings: null });
+    this.#guildId.set(guildId);
+    this.#settingsResource.set(settings);
   }
 }

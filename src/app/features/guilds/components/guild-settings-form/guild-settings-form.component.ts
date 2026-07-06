@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { form, FormField, FormRoot, required, submit as submitForm } from '@angular/forms/signals';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -156,26 +156,35 @@ export class GuildSettingsFormComponent implements OnInit {
   readonly displayTimezone = (id: string): string =>
     ALL_TIMEZONE_OPTIONS.find((tz) => tz.id === id)?.label ?? id;
 
+  constructor() {
+    // GuildStore/OfficerThresholdStore are httpResource()-backed and thus resolve asynchronously —
+    // these effects patch the local form model whenever their signals produce a value, instead of
+    // the one-shot Observable.subscribe() the pre-httpResource version used. Also re-fires (as a
+    // harmless no-op) right after this component's own patchSettings()/patchOfficerThreshold() calls
+    // on submit, since those write the same values the model already holds.
+    effect(() => {
+      const settings = this.#guildStore.settings();
+      if (!settings) return;
+      this.#model.update((m) => ({
+        ...m,
+        ...(settings.timezone ? { timezone: settings.timezone } : {}),
+        rosterMode: settings.rosterMode,
+        minRosterRoleId: settings.minRosterRoleId,
+      }));
+    });
+
+    effect(() => {
+      const officerThreshold = this.#officerThresholdStore.officerThreshold();
+      if (!officerThreshold) return;
+      this.#model.update((m) => ({ ...m, minOfficerRoleId: officerThreshold.minOfficerRoleId }));
+    });
+  }
+
   ngOnInit(): void {
     // Roles are needed for both the roster and Officer threshold pickers, so load them eagerly.
     this.#loadRoles();
-
-    this.#guildStore.loadSettings(this.guildId()).subscribe({
-      next: (settings) => {
-        this.#model.update((m) => ({
-          ...m,
-          ...(settings.timezone ? { timezone: settings.timezone } : {}),
-          rosterMode: settings.rosterMode,
-          minRosterRoleId: settings.minRosterRoleId,
-        }));
-      },
-    });
-
-    this.#officerThresholdStore.loadOfficerThreshold(this.guildId()).subscribe({
-      next: (officerThreshold) => {
-        this.#model.update((m) => ({ ...m, minOfficerRoleId: officerThreshold.minOfficerRoleId }));
-      },
-    });
+    this.#guildStore.loadSettings(this.guildId());
+    this.#officerThresholdStore.loadOfficerThreshold(this.guildId());
   }
 
   /**
