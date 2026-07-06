@@ -68,7 +68,10 @@ jobs:
           URL: ${{ github.event.release.html_url }}
         run: |
           # release-please already generated a markdown changelog with clickable links
-          DESC=$(echo "$BODY" | head -c 4000)
+          # release-please HTML-escapes commit messages when building the
+          # changelog (e.g. "->" becomes "-&gt;") — Discord doesn't decode
+          # HTML entities, so undo that before sending.
+          DESC=$(echo "$BODY" | head -c 4000 | sed -e 's/&gt;/>/g' -e 's/&lt;/</g' -e 's/&amp;/\&/g' -e "s/&#39;/'/g" -e 's/&quot;/"/g')
           curl -s -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
