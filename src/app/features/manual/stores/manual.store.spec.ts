@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { ManualStore } from './manual.store';
@@ -48,19 +49,50 @@ describe('ManualStore', () => {
     });
   });
 
-  // ── loadArticleContent ────────────────────────────────────────────────────
+  // ── loadArticleContent / content ─────────────────────────────────────────
 
   describe('loadArticleContent', () => {
-    it('GETs the given path as plain text', () => {
-      let result: string | undefined;
-      store.loadArticleContent('assets/manual/en/welcome/onboarding.md').subscribe((r) => (result = r));
+    it('is empty before any path is set', () => {
+      TestBed.tick();
+      expect(store.content()).toBe('');
+    });
+
+    it('GETs the given path as plain text', async () => {
+      store.loadArticleContent('assets/manual/en/welcome/onboarding.md');
+      TestBed.tick();
 
       const req = controller.expectOne('assets/manual/en/welcome/onboarding.md');
       expect(req.request.method).toBe('GET');
-      expect(req.request.responseType).toBe('text');
       req.flush('# Hello');
+      await TestBed.inject(ApplicationRef).whenStable();
 
-      expect(result).toBe('# Hello');
+      expect(store.content()).toBe('# Hello');
+    });
+
+    it('re-fetches when given a different path', async () => {
+      store.loadArticleContent('assets/manual/en/welcome/onboarding.md');
+      TestBed.tick();
+      controller.expectOne('assets/manual/en/welcome/onboarding.md').flush('# Hello');
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.loadArticleContent('assets/manual/fr/welcome/onboarding.md');
+      TestBed.tick();
+      controller.expectOne('assets/manual/fr/welcome/onboarding.md').flush('# Bonjour');
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.content()).toBe('# Bonjour');
+    });
+
+    it('clears the content when given undefined', async () => {
+      store.loadArticleContent('assets/manual/en/welcome/onboarding.md');
+      TestBed.tick();
+      controller.expectOne('assets/manual/en/welcome/onboarding.md').flush('# Hello');
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.loadArticleContent(undefined);
+      TestBed.tick();
+
+      expect(store.content()).toBe('');
     });
   });
 });
