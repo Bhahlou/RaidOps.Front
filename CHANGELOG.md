@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.3](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.2...raidops-front-v1.0.3) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* squash-merge promotion PR and reduce workflow run noise ([#35](https://github.com/Bhahlou/RaidOps.Front/issues/35)) ([28a79e6](https://github.com/Bhahlou/RaidOps.Front/commit/28a79e66b89ff42b74f686cecac744b83965a942))
+
+## [1.0.2](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.1...raidops-front-v1.0.2) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* clarify README branching wording (pipeline end-to-end test) ([#32](https://github.com/Bhahlou/RaidOps.Front/issues/32)) ([91ddc68](https://github.com/Bhahlou/RaidOps.Front/commit/91ddc68c705aba0b001c2a2fa376ece527cd876d))
+
+## [1.0.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.0...raidops-front-v1.0.1) (2026-07-06)
+
+
+### 🔧 Refactoring
+
+* angular 22 migration ([#26](https://github.com/Bhahlou/RaidOps.Front/issues/26)) ([e9bf798](https://github.com/Bhahlou/RaidOps.Front/commit/e9bf798d26cd4439f4963e42bac46a30478d0bc7))
+
 ## 1.0.0 (2026-07-05)
 
 

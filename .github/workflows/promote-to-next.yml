@@ -8,8 +8,31 @@ on:
     types: [published]
 
 jobs:
+  # release.target_commitish is the raw commit SHA, not a branch name — ask
+  # GitHub which branch(es) currently have that SHA as their tip. Split into
+  # its own job so "promote" below shows as a clean Skipped (not a Succeeded
+  # job full of no-op steps) whenever this release wasn't cut on dev.
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      is_dev: ${{ steps.check.outputs.is_dev }}
+    steps:
+      - name: Check this release was cut on dev
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.release.target_commitish }}
+        run: |
+          BRANCHES=$(gh api "repos/${{ github.repository }}/commits/$SHA/branches-where-head" --jq '.[].name')
+          if echo "$BRANCHES" | grep -qx "dev"; then
+            echo "is_dev=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_dev=false" >> "$GITHUB_OUTPUT"
+          fi
+
   promote:
-    if: github.event.release.target_commitish == 'dev'
+    needs: detect
+    if: needs.detect.outputs.is_dev == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -40,4 +63,5 @@ jobs:
               --title "chore: promote ${TAG} to next" \
               --body "Automated promotion of the release cut on \`dev\` (${TAG}) to \`next\` for acceptance testing.")
           fi
-          gh pr merge "$PR_URL" --auto --merge
+          # Repo is squash-only — a plain merge commit is rejected.
+          gh pr merge "$PR_URL" --auto --squash
