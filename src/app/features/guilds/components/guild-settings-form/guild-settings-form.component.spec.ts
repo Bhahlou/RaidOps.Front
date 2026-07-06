@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { FormRoot } from '@angular/forms/signals';
 import { of, Subject, throwError } from 'rxjs';
 
 import { GuildSettingsFormComponent, buildTimezoneOption } from './guild-settings-form.component';
@@ -369,6 +370,83 @@ describe('GuildSettingsFormComponent', () => {
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.submitting()).toBe(false);
+    });
+  });
+
+  // ── real <form> submission wiring ────────────────────────────────────────
+  //
+  // Every test above overrides the template to '', so none of them exercise the actual <form>
+  // element — which is exactly how a real bug slipped through: (ngSubmit) was left in the
+  // template after ReactiveFormsModule was removed, with nothing left to back it, so clicking
+  // submit fell through to the browser's native (page-reloading) form submission instead of
+  // ever calling the component. These tests render the real [formRoot] wrapper (not the full
+  // production template, to avoid dragging in mat-autocomplete/mat-button-toggle rendering) and
+  // dispatch a genuine DOM 'submit' event, the same way a user's click on the submit button does.
+
+  describe('real <form> submission wiring', () => {
+    const setupRealForm = () => {
+      settingsService = {
+        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
+        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
+        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
+      };
+      guildStore = {
+        loadSettings:  vi.fn().mockReturnValue(of(settings())),
+        patchSettings: vi.fn(),
+      };
+      officerThresholdStore = {
+        loadOfficerThreshold:  vi.fn().mockReturnValue(of(officerThreshold())),
+        patchOfficerThreshold: vi.fn(),
+      };
+      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
+      snackbar = { error: vi.fn(), success: vi.fn() };
+
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,  useValue: settingsService },
+          { provide: GuildStore,            useValue: guildStore },
+          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
+          { provide: AuthStore,             useValue: authStore },
+          { provide: SnackbarService,       useValue: snackbar },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, {
+        set: { template: `<form [formRoot]="settingsForm"><button type="submit">Save</button></form>`, imports: [FormRoot] },
+      });
+
+      fixture = TestBed.createComponent(GuildSettingsFormComponent);
+      fixture.componentRef.setInput('guildId', 'g1');
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    };
+
+    const dispatchSubmit = (): Event => {
+      const event = new Event('submit', { bubbles: true, cancelable: true });
+      fixture.nativeElement.querySelector('form')!.dispatchEvent(event);
+      return event;
+    };
+
+    it('prevents the native page submission and calls the backend when the form is valid', async () => {
+      setupRealForm();
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.minOfficerRoleId().value.set('r1');
+
+      const event = dispatchSubmit();
+      await fixture.whenStable();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(settingsService.updateSettings).toHaveBeenCalled();
+    });
+
+    it('prevents the native page submission but does not call the backend when the form is invalid', async () => {
+      setupRealForm();
+      // minOfficerRoleId left unset — required, so the form is invalid.
+
+      const event = dispatchSubmit();
+      await fixture.whenStable();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(settingsService.updateSettings).not.toHaveBeenCalled();
     });
   });
 });

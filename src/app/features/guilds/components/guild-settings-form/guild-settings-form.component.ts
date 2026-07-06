@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
-import { form, FormField, required, submit as submitForm } from '@angular/forms/signals';
+import { form, FormField, FormRoot, required, submit as submitForm } from '@angular/forms/signals';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,6 +54,7 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
   selector: 'app-guild-settings-form',
   imports: [
     FormField,
+    FormRoot,
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
@@ -89,13 +90,50 @@ export class GuildSettingsFormComponent implements OnInit {
     minOfficerRoleId: null,
   });
 
-  readonly settingsForm = form(this.#model, (schemaPath) => {
-    required(schemaPath.timezone);
-    required(schemaPath.minRosterRoleId, {
-      when: ({ valueOf }) => valueOf(schemaPath.rosterMode) === RosterMode.DiscordRoleOnly,
-    });
-    required(schemaPath.minOfficerRoleId);
-  });
+  readonly settingsForm = form(
+    this.#model,
+    (schemaPath) => {
+      required(schemaPath.timezone);
+      required(schemaPath.minRosterRoleId, {
+        when: ({ valueOf }) => valueOf(schemaPath.rosterMode) === RosterMode.DiscordRoleOnly,
+      });
+      required(schemaPath.minOfficerRoleId);
+    },
+    {
+      submission: {
+        action: async (field) => {
+          const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = field().value();
+          const settings: GuildSettings = {
+            timezone,
+            rosterMode,
+            minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
+          };
+          const officerThreshold: OfficerThreshold = { minOfficerRoleId };
+
+          try {
+            await firstValueFrom(
+              forkJoin([
+                this.#settingsService.updateSettings(this.guildId(), settings),
+                this.#settingsService.updateOfficerThreshold(this.guildId(), officerThreshold),
+              ]),
+            );
+          } catch {
+            this.#snackbar.error('errors.server');
+            return { kind: 'serverError', message: 'errors.server' };
+          }
+
+          this.#guildStore.patchSettings(this.guildId(), settings);
+          this.#officerThresholdStore.patchOfficerThreshold(this.guildId(), officerThreshold);
+          this.#snackbar.success('guildSettings.saveSuccess');
+          // Resyncs /me so the "Officer threshold not configured" notification clears immediately
+          // instead of lingering until the next reload/login.
+          this.#authStore.loadUser().subscribe();
+          this.saved.emit();
+          return undefined;
+        },
+      },
+    },
+  );
 
   readonly submitting = computed(() => this.settingsForm().submitting());
 
@@ -160,37 +198,13 @@ export class GuildSettingsFormComponent implements OnInit {
     this.settingsForm.timezone().value.set(event.option.value as string);
   }
 
+  /**
+   * The <form> uses [formRoot] to trigger submission from a real DOM submit event (see the
+   * template) — this method exists so the submission flow can also be triggered directly (used
+   * by this component's own tests). Both paths run the same pre-configured submission.action.
+   */
   async submit(): Promise<void> {
-    await submitForm(this.settingsForm, async (field) => {
-      const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = field().value();
-      const settings: GuildSettings = {
-        timezone,
-        rosterMode,
-        minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
-      };
-      const officerThreshold: OfficerThreshold = { minOfficerRoleId };
-
-      try {
-        await firstValueFrom(
-          forkJoin([
-            this.#settingsService.updateSettings(this.guildId(), settings),
-            this.#settingsService.updateOfficerThreshold(this.guildId(), officerThreshold),
-          ]),
-        );
-      } catch {
-        this.#snackbar.error('errors.server');
-        return { kind: 'serverError', message: 'errors.server' };
-      }
-
-      this.#guildStore.patchSettings(this.guildId(), settings);
-      this.#officerThresholdStore.patchOfficerThreshold(this.guildId(), officerThreshold);
-      this.#snackbar.success('guildSettings.saveSuccess');
-      // Resyncs /me so the "Officer threshold not configured" notification clears immediately
-      // instead of lingering until the next reload/login.
-      this.#authStore.loadUser().subscribe();
-      this.saved.emit();
-      return undefined;
-    });
+    await submitForm(this.settingsForm);
   }
 
   #loadRoles(): void {
