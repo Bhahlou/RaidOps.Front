@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.2...raidops-front-v1.0.3) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* squash-merge promotion PR and reduce workflow run noise ([#35](https://github.com/Bhahlou/RaidOps.Front/issues/35)) ([28a79e6](https://github.com/Bhahlou/RaidOps.Front/commit/28a79e66b89ff42b74f686cecac744b83965a942))
+
 ## [1.0.2](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.1...raidops-front-v1.0.2) (2026-07-06)
 
 
