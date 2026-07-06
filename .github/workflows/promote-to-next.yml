@@ -9,13 +9,28 @@ on:
 
 jobs:
   promote:
-    if: github.event.release.target_commitish == 'dev'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
+      # release.target_commitish is the raw commit SHA, not a branch name —
+      # ask GitHub which branch(es) currently have that SHA as their tip.
+      - name: Check this release was cut on dev
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.release.target_commitish }}
+        run: |
+          BRANCHES=$(gh api "repos/${{ github.repository }}/commits/$SHA/branches-where-head" --jq '.[].name')
+          if echo "$BRANCHES" | grep -qx "dev"; then
+            echo "is_dev=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_dev=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout dev
+        if: steps.check.outputs.is_dev == 'true'
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
         with:
           ref: dev
@@ -24,6 +39,7 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
       - name: Open promotion PR (dev → next) and auto-merge
+        if: steps.check.outputs.is_dev == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           TAG: ${{ github.event.release.tag_name }}
