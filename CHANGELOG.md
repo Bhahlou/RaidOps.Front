@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.5...raidops-front-v1.0.6) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* guard promote pattern & html entities decoding in discord notifications ([#43](https://github.com/Bhahlou/RaidOps.Front/issues/43)) ([c5c18e4](https://github.com/Bhahlou/RaidOps.Front/commit/c5c18e46a10e51b00c6b72ab51eb8d8796e694a9))
+
 ## [1.0.5](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.4...raidops-front-v1.0.5) (2026-07-06)
 
 
