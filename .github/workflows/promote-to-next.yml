@@ -1,0 +1,43 @@
+name: Promote to next
+
+# Automatic dev → next promotion: the moment a release is cut on dev (Release
+# PR merged), fast-forward next to that exact, already-tagged commit. No
+# manual PR click — the only human decision is merging the Release PR on dev.
+on:
+  release:
+    types: [published]
+
+jobs:
+  promote:
+    if: github.event.release.target_commitish == 'dev'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
+        with:
+          ref: dev
+          fetch-depth: 0
+          # PAT so the promotion PR triggers tests.yml and can be auto-merged.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+
+      - name: Open promotion PR (dev → next) and auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          git fetch origin next
+          if [ "$(git rev-list --count origin/next..HEAD)" -eq 0 ]; then
+            echo "next is already up to date with dev, nothing to promote."
+            exit 0
+          fi
+
+          PR_URL=$(gh pr list --head dev --base next --state open --json url -q '.[0].url')
+          if [ -z "$PR_URL" ]; then
+            PR_URL=$(gh pr create --base next --head dev \
+              --title "chore: promote ${TAG} to next" \
+              --body "Automated promotion of the release cut on \`dev\` (${TAG}) to \`next\` for acceptance testing.")
+          fi
+          gh pr merge "$PR_URL" --auto --merge
