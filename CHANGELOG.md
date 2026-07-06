@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.3...raidops-front-v1.0.4) (2026-07-06)
+
+
+### 🐛 Bug Fixes
+
+* show real release notes in the acceptance Discord notif ([#37](https://github.com/Bhahlou/RaidOps.Front/issues/37)) ([e4fe283](https://github.com/Bhahlou/RaidOps.Front/commit/e4fe28339d57f67ae0d681c215ff8bbdad59775b))
+
 ## [1.0.3](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.2...raidops-front-v1.0.3) (2026-07-06)
 
 
