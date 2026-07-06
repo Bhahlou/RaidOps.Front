@@ -1,0 +1,93 @@
+name: Deploy (acceptance)
+
+# Every push to next is an already-tagged snapshot promoted from dev (see
+# promote-to-next.yml) — always safe to (re)build the acceptance image.
+on:
+  push:
+    branches: [next]
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - '.release-please-manifest.json'
+      - 'package.json'
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4
+
+      - name: Log in to GHCR
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push :acceptance
+        id: build
+        run: |
+          IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}
+          MANIFEST_VERSION=$(jq -r '.["."]' .release-please-manifest.json)
+          # No sha suffix: next only ever receives whole, already-tagged cuts
+          # from dev, so this version string is always distinct and exact.
+          VERSION="v${MANIFEST_VERSION}-acceptance"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          docker build --build-arg BUILD_CONFIGURATION=acceptance --build-arg APP_VERSION="$VERSION" -t $IMAGE_NAME:acceptance .
+          docker push $IMAGE_NAME:acceptance
+
+      - name: Notify Discord (acceptance)
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_ACCEPTANCE_WEBHOOK_URL }}
+          FULL_REPO: ${{ github.repository }}
+          AUTHOR: ${{ github.actor }}
+          MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_URL: ${{ github.event.head_commit.url }}
+          VERSION: ${{ steps.build.outputs.version }}
+        run: |
+          # First line of the squash commit = the conventional PR title
+          DESC=$(echo "$MESSAGE" | head -n 1)
+          # Extract the PR number from the squash title "(#NN)" → link to the PR
+          # (fall back to the commit URL for a direct push without a PR)
+          PR_NUMBER=$(echo "$DESC" | grep -oE '#[0-9]+' | tail -1 | tr -d '#')
+          if [ -n "$PR_NUMBER" ]; then
+            LINK="https://github.com/$FULL_REPO/pull/$PR_NUMBER"
+          else
+            LINK="$COMMIT_URL"
+          fi
+
+          # Conventional commit type → emoji (mirrors release-please-config.json sections)
+          PREFIX=$(echo "$DESC" | grep -oE '^[a-z]+' || true)
+          case "$PREFIX" in
+            feat)     EMOJI="🚀" ;;
+            fix)      EMOJI="🐛" ;;
+            perf)     EMOJI="⚡" ;;
+            refactor) EMOJI="🔧" ;;
+            docs)     EMOJI="📚" ;;
+            test)     EMOJI="✅" ;;
+            build)    EMOJI="📦" ;;
+            ci)       EMOJI="🤖" ;;
+            chore)    EMOJI="🧹" ;;
+            *)        EMOJI="🔹" ;;
+          esac
+
+          # Strip the "type(scope)?: " prefix and trailing " (#NN)" PR reference
+          CLEAN_TITLE=$(echo "$DESC" | sed -E 's/^[a-z]+(\([^)]*\))?!?: //; s/ \(#[0-9]+\)$//')
+          DESCRIPTION="$EMOJI $CLEAN_TITLE"$'\n\n'"Click this notification title to get more detail of the change in PR."
+
+          curl -s -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "RaidOps frontend — $AUTHOR pushed a new version to acceptance: $VERSION" \
+              --arg desc "$DESCRIPTION" \
+              --arg url "$LINK" \
+              '{
+                embeds: [{
+                  title: $title,
+                  description: $desc,
+                  url: $url,
+                  color: 3447003,
+                  footer: { text: "Update is on its way to acceptance. Discord will notify when live." }
+                }]
+              }')"
