@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, input, model } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,7 +17,7 @@ import { formatDiscordColor } from '../../../../shared/utils/discord-color.util'
  */
 @Component({
   selector: 'app-role-threshold-picker',
-  imports: [MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
+  imports: [NgOptimizedImage, MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   templateUrl: './role-threshold-picker.component.html',
   styleUrl: './role-threshold-picker.component.scss',
 })

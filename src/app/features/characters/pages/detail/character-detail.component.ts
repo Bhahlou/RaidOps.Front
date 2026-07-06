@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -32,6 +33,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   selector: 'app-character-detail',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     MatCard,
     MatCardContent,
     MatButtonModule,

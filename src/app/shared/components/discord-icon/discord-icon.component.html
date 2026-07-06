@@ -3,6 +3,13 @@
     <mat-icon [style.font-size.px]="size()">account_circle</mat-icon>
   }
   @if (url) {
-    <img [src]="url" [alt]="'Discord icon'" [style.width.px]="size()" [style.height.px]="size()" />
+    <img
+      [ngSrc]="url"
+      [alt]="'Discord icon'"
+      [width]="size()"
+      [height]="size()"
+      [style.width.px]="size()"
+      [style.height.px]="size()"
+    />
   }
 </div>

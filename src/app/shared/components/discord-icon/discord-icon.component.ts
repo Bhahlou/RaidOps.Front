@@ -1,10 +1,11 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 
 @Component({
   selector: 'app-discord-icon',
-  imports: [MatIconModule],
+  imports: [NgOptimizedImage, MatIconModule],
   templateUrl: './discord-icon.component.html',
   styleUrl: './discord-icon.component.scss',
 })

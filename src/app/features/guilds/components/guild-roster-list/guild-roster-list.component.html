@@ -41,7 +41,7 @@
               (click)="toggleSpec(spec.specId)"
             >
               @if (spec.iconUrl) {
-                <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" />
+                <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="20" height="20" />
               }
             </button>
           }
@@ -139,7 +139,7 @@
           <td mat-cell *matCellDef="let member">
             <div class="character-cell">
               @if (member.avatarUrl) {
-                <img class="avatar-sm" [src]="member.avatarUrl" [alt]="member.characterName" />
+                <img class="avatar-sm" [ngSrc]="member.avatarUrl" [alt]="member.characterName" width="32" height="32" />
               } @else {
                 <app-wow-class-icon [classId]="member.classId" [className]="member.className" [size]="32" />
               }

@@ -28,7 +28,7 @@
                 (change)="toggleViable(state, spec.id)">
                 <span class="spec-label">
                   @if (spec.iconUrl) {
-                    <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
+                    <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="18" height="18" />
                   }
                   {{ 'specs.' + spec.id | transloco }}
                 </span>

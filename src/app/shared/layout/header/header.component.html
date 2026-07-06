@@ -1,6 +1,6 @@
 <mat-toolbar>
   <div routerLink="/" class="logo-wrapper">
-    <img [src]="envBranding.logoPath" alt="RaidOps Logo" class="logo" />
+    <img [ngSrc]="envBranding.logoPath" alt="RaidOps Logo" class="logo" width="40" height="40" priority />
     <span [style.color]="envBranding.accentColor">RaidOps</span>
     @if (envBranding.badgeLabel) {
       <span class="env-badge" [style.background-color]="envBranding.accentColor">

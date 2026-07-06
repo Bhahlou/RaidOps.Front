@@ -5,7 +5,7 @@
     <mat-card appearance="outlined" class="page-card">
       <div class="char-header">
         @if (char.avatarUrl) {
-          <img class="char-avatar" [src]="char.avatarUrl" [alt]="char.name" />
+          <img class="char-avatar" [ngSrc]="char.avatarUrl" [alt]="char.name" width="64" height="64" priority />
         } @else {
           <app-wow-class-icon class="char-avatar" [classId]="char.classId" [className]="char.className" [size]="64" />
         }
@@ -29,7 +29,7 @@
           }
           @if (canEditRaidSpecs()) {
             <button mat-stroked-button (click)="editRaidSpecs()">
-              <img class="action-icon" src="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" />
+              <img class="action-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="18" height="18" />
               {{ 'characters.card.editRaidSpecs' | transloco }}
             </button>
           }

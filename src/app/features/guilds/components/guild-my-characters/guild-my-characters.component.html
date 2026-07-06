@@ -25,7 +25,7 @@
           @for (char of myCharacters(); track char.id) {
             <li class="char-item">
               @if (char.avatarUrl) {
-                <img class="avatar-sm" [src]="char.avatarUrl" [alt]="char.name" />
+                <img class="avatar-sm" [ngSrc]="char.avatarUrl" [alt]="char.name" width="40" height="40" />
               } @else {
                 <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="40" />
               }
@@ -73,7 +73,7 @@
               @for (char of addableCharacters(); track char.id) {
                 <li class="char-item">
                   @if (char.avatarUrl) {
-                    <img class="avatar-sm" [src]="char.avatarUrl" [alt]="char.name" />
+                    <img class="avatar-sm" [ngSrc]="char.avatarUrl" [alt]="char.name" width="40" height="40" />
                   } @else {
                     <app-wow-class-icon [classId]="char.classId" [className]="char.className" [size]="40" />
                   }

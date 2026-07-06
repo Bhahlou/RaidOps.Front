@@ -3,7 +3,7 @@
     @for (spec of specs(); track spec.specId) {
       <div class="spec" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
         @if (spec.iconUrl) {
-          <img class="spec-icon" [src]="spec.iconUrl" [alt]="spec.name" loading="lazy" />
+          <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="28" height="28" />
         } @else {
           <span class="spec-name">{{ 'specs.' + spec.specId | transloco }}</span>
         }

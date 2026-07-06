@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
@@ -15,6 +16,7 @@ import { Character } from '../../models/character.model';
   selector: 'app-character-card',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterLink,
     WowClassIconComponent,
     WowFactionIconComponent,

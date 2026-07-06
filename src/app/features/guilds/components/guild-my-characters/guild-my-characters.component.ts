@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
@@ -22,6 +23,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   selector: 'app-guild-my-characters',
   standalone: true,
   imports: [
+    NgOptimizedImage,
     RouterLink,
     MatButton,
     MatIconButton,
