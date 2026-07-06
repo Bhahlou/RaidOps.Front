@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.0...raidops-front-v1.0.1) (2026-07-06)
+
+
+### 🔧 Refactoring
+
+* angular 22 migration ([#26](https://github.com/Bhahlou/RaidOps.Front/issues/26)) ([e9bf798](https://github.com/Bhahlou/RaidOps.Front/commit/e9bf798d26cd4439f4963e42bac46a30478d0bc7))
+
 ## 1.0.0 (2026-07-05)
 
 
