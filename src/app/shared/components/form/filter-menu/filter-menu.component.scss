@@ -1,0 +1,103 @@
+// Trigger — the shared global .icon-btn provides the box; this only adds the filter semantics.
+.filter-btn {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+
+  .material-icons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.filter-active {
+    color: var(--color-accent);
+  }
+}
+
+// Panel — deliberately mirrors .select-panel/.select-filter/.select-option in
+// select.component.scss so every searchable dropdown in the app reads as the same control;
+// change one, change the other.
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.filter-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+
+  .filter-search-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.filter-option {
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    outline: none;
+  }
+
+  &.filter-option--selected {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+}

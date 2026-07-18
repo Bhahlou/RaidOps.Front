@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { of, throwError } from 'rxjs';
 
 import { CharacterDetailComponent } from './character-detail.component';
@@ -54,7 +54,7 @@ const setup = (
     ),
   };
   const snackbarMock = { success: vi.fn(), error: vi.fn() };
-  const dialogMock = { open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }) };
+  const dialogMock = { open: vi.fn().mockReturnValue({ closed: of(undefined) }) };
 
   TestBed.configureTestingModule({
     imports: [CharacterDetailComponent],
@@ -75,7 +75,7 @@ const setup = (
       { provide: CharacterStore, useValue: storeMock },
       { provide: CharacterService, useValue: characterServiceMock },
       { provide: SnackbarService, useValue: snackbarMock },
-      { provide: MatDialog, useValue: dialogMock },
+      { provide: Dialog, useValue: dialogMock },
     ],
   }).overrideComponent(CharacterDetailComponent, { set: { template: '', imports: [] } });
 
@@ -295,7 +295,7 @@ describe('CharacterDetailComponent', () => {
 
     it('does not deactivate when the user cancels', () => {
       const { component, storeMock, dialogMock } = setup([makeChar()]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(false)) });
+      dialogMock.open.mockReturnValue({ closed: of(false) });
 
       component.deactivateCharacter();
 
@@ -305,7 +305,7 @@ describe('CharacterDetailComponent', () => {
     it('deactivates and navigates to /characters when confirmed', () => {
       const char = makeChar();
       const { component, storeMock, navigate, dialogMock } = setup([char]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      dialogMock.open.mockReturnValue({ closed: of(true) });
 
       component.deactivateCharacter();
 
@@ -315,7 +315,7 @@ describe('CharacterDetailComponent', () => {
 
     it('shows error snackbar when the store call fails after confirmation', () => {
       const { component, storeMock, snackbarMock, dialogMock } = setup([makeChar()]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      dialogMock.open.mockReturnValue({ closed: of(true) });
       storeMock.deactivateCharacter.mockReturnValue(throwError(() => new Error('fail')));
 
       component.deactivateCharacter();
@@ -347,7 +347,7 @@ describe('CharacterDetailComponent', () => {
 
     it('shows success when the dialog closes with success, without reloading (the store already patched locally)', () => {
       const { component, storeMock, snackbarMock, dialogMock } = setup([makeChar()]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ success: true }) });
 
       component.editRaidSpecs();
 
@@ -357,7 +357,7 @@ describe('CharacterDetailComponent', () => {
 
     it('shows error snackbar when the dialog closes with error', () => {
       const { component, snackbarMock, dialogMock } = setup([makeChar()]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ error: true }) });
 
       component.editRaidSpecs();
 
@@ -366,7 +366,7 @@ describe('CharacterDetailComponent', () => {
 
     it('does nothing extra when the dialog is cancelled', () => {
       const { component, snackbarMock, dialogMock } = setup([makeChar()]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      dialogMock.open.mockReturnValue({ closed: of(undefined) });
 
       component.editRaidSpecs();
 

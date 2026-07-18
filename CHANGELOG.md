@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.7](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.6...raidops-front-v1.0.7) (2026-07-18)
+
+
+### 🔧 Refactoring
+
+* replace Angular Material with hand-rolled components, make … ([#46](https://github.com/Bhahlou/RaidOps.Front/issues/46)) ([422a517](https://github.com/Bhahlou/RaidOps.Front/commit/422a5178fdfdf1504b39421ebed122f0289dd123))
+
 ## [1.0.6](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.5...raidops-front-v1.0.6) (2026-07-06)
 
 

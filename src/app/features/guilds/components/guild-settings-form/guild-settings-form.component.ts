@@ -1,13 +1,8 @@
 import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { form, FormField, FormRoot, required, submit as submitForm } from '@angular/forms/signals';
 import { firstValueFrom, forkJoin } from 'rxjs';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { FormFieldCardComponent } from '../../../../shared/components/form/form-field-card/form-field-card.component';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
 import { GuildSettings } from '../../models/guild-settings.model';
@@ -19,6 +14,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GuildStore } from '../../stores/guild.store';
 import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
 import { RoleThresholdPickerComponent } from '../role-threshold-picker/role-threshold-picker.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 
 interface TimezoneOption {
   id: string;
@@ -55,15 +51,11 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
   imports: [
     FormField,
     FormRoot,
-    MatFormFieldModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    MatButtonToggleModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
+    SelectComponent,
+    FormFieldCardComponent,
     TranslocoPipe,
     RoleThresholdPickerComponent,
+    ButtonComponent,
   ],
   templateUrl: './guild-settings-form.component.html',
   styleUrl: './guild-settings-form.component.scss',
@@ -137,10 +129,10 @@ export class GuildSettingsFormComponent implements OnInit {
 
   readonly submitting = computed(() => this.settingsForm().submitting());
 
-  readonly filteredTimezones = computed(() => {
-    const query = this.settingsForm.timezone().value().toLowerCase();
-    return ALL_TIMEZONE_OPTIONS.filter((tz) => tz.label.toLowerCase().includes(query));
-  });
+  readonly timezoneOptions: SelectOption<string>[] = ALL_TIMEZONE_OPTIONS.map((tz) => ({
+    value: tz.id,
+    label: tz.label,
+  }));
 
   readonly isDiscordRoleMode = computed(
     () => this.settingsForm.rosterMode().value() === RosterMode.DiscordRoleOnly,
@@ -152,9 +144,6 @@ export class GuildSettingsFormComponent implements OnInit {
    * Index 0 = most powerful (Admin), last index = least powerful.
    */
   readonly sortedRoles = computed(() => this.availableRoles());
-
-  readonly displayTimezone = (id: string): string =>
-    ALL_TIMEZONE_OPTIONS.find((tz) => tz.id === id)?.label ?? id;
 
   constructor() {
     // GuildStore/OfficerThresholdStore are httpResource()-backed and thus resolve asynchronously —
@@ -188,23 +177,14 @@ export class GuildSettingsFormComponent implements OnInit {
   }
 
   /**
-   * mat-button-toggle-group doesn't implement Signal Forms' FormValueControl (it only speaks the
-   * older ControlValueAccessor), so its value is wired manually instead of via [formField].
+   * The roster-mode toggle is a plain pair of buttons (not a FormValueControl), so its value is
+   * wired manually instead of via [formField].
    */
-  onRosterModeChange(event: MatButtonToggleChange): void {
-    this.settingsForm.rosterMode().value.set(event.value as RosterMode);
-    if (event.value !== RosterMode.DiscordRoleOnly) {
+  onRosterModeChange(mode: RosterMode): void {
+    this.settingsForm.rosterMode().value.set(mode);
+    if (mode !== RosterMode.DiscordRoleOnly) {
       this.settingsForm.minRosterRoleId().value.set(null);
     }
-  }
-
-  /**
-   * mat-autocomplete reports option selection through its own ControlValueAccessor hook, not a
-   * native input event, so [formField] alone (which only listens for native input/change events)
-   * never sees a value picked from the dropdown — only typed input. Bridged manually here.
-   */
-  onTimezoneSelected(event: MatAutocompleteSelectedEvent): void {
-    this.settingsForm.timezone().value.set(event.option.value as string);
   }
 
   /**

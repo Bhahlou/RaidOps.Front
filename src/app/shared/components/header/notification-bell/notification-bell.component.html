@@ -1,0 +1,19 @@
+<button
+  type="button"
+  class="icon-btn"
+  [cdkMenuTriggerFor]="notifMenu"
+  [attr.aria-label]="'notifications.title' | transloco"
+>
+  <span class="material-icons">notifications</span>
+  <app-count-badge [count]="count()" />
+</button>
+
+<ng-template #notifMenu>
+  <div class="menu-panel notification-menu-panel" cdkMenu>
+    @if (visibleNotifications().length > 0) {
+      <app-notification-list [notifications]="visibleNotifications()" (dismissed)="onDismiss($event)" />
+    } @else {
+      <p class="empty-message">{{ 'notifications.empty' | transloco }}</p>
+    }
+  </div>
+</ng-template>

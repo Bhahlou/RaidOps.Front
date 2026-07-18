@@ -1,0 +1,8 @@
+<fieldset class="form-field-card">
+  @if (label()) {
+    <legend class="form-field-card-label">{{ label() }}</legend>
+  }
+  <div class="form-field-card-content">
+    <ng-content />
+  </div>
+</fieldset>

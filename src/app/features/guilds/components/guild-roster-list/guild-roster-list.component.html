@@ -1,22 +1,19 @@
-<mat-card appearance="outlined" class="roster-list-card">
-  <mat-card-header>
-    <mat-card-title>{{ 'roster.title' | transloco }}</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
+<div class="roster-list-card">
+  <div class="roster-list-content">
     <div class="roster-toolbar">
-      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
-        <mat-icon matPrefix>search</mat-icon>
+      <div class="search-field">
+        <span class="material-icons search-icon">search</span>
         <input
           id="roster-search-input"
-          matInput
+          type="text"
           [value]="searchQuery()"
           (input)="setSearch($any($event.target).value)"
           [placeholder]="'roster.filters.searchPlaceholder' | transloco"
           [attr.aria-label]="'roster.filters.searchPlaceholder' | transloco"
         />
-      </mat-form-field>
+      </div>
 
-      <div class="toolbar-row">
+      <div class="toolbar-row toolbar-row--class-spec">
         <div class="filter-icons">
           @for (cls of availableClasses(); track cls.classId) {
             <button
@@ -61,40 +58,23 @@
           }
         </div>
 
-        <div class="date-range-filter">
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-date-range-input [rangePicker]="picker">
-              <input
-                matStartDate
-                id="roster-date-range-start"
-                [value]="dateRangeStart()"
-                (dateChange)="setDateRangeStart($event.value)"
-                [placeholder]="'roster.filters.dateFrom' | transloco"
-                [attr.aria-label]="'roster.filters.dateFrom' | transloco"
-              />
-              <input
-                matEndDate
-                id="roster-date-range-end"
-                [value]="dateRangeEnd()"
-                (dateChange)="setDateRangeEnd($event.value)"
-                [placeholder]="'roster.filters.dateTo' | transloco"
-                [attr.aria-label]="'roster.filters.dateTo' | transloco"
-              />
-            </mat-date-range-input>
-            <mat-datepicker-toggle matIconSuffix [for]="picker" />
-            <mat-date-range-picker #picker />
-          </mat-form-field>
-        </div>
+        <app-date-range-input
+          class="date-range-filter"
+          [start]="dateRangeStart()"
+          [end]="dateRangeEnd()"
+          [startAriaLabel]="'roster.filters.dateFrom' | transloco"
+          [endAriaLabel]="'roster.filters.dateTo' | transloco"
+          (startChange)="setDateRangeStart($event)"
+          (endChange)="setDateRangeEnd($event)"
+        />
 
         @if (hasActiveFilters()) {
-          <button
-            mat-icon-button
-            class="filter-btn filter-active"
-            [title]="'roster.filters.clearAll' | transloco"
+          <app-icon-button
+            icon="filter_alt_off"
+            [extraClass]="'filter-active'"
+            [ariaLabel]="'roster.filters.clearAll' | transloco"
             (click)="clearAllFilters()"
-          >
-            <mat-icon>filter_alt_off</mat-icon>
-          </button>
+          />
         }
       </div>
 
@@ -104,153 +84,192 @@
     </div>
 
     @if (isLoading()) {
-      <mat-spinner diameter="32" />
+      <span class="spinner roster-spinner"></span>
     } @else if (sortedMembers()!.length === 0) {
-      <p class="empty-hint">{{ (hasActiveFilters() ? 'roster.list.emptyFiltered' : 'roster.list.empty') | transloco }}</p>
+      <app-empty-hint>{{ (hasActiveFilters() ? 'roster.list.emptyFiltered' : 'roster.list.empty') | transloco }}</app-empty-hint>
     } @else {
-      <table mat-table [dataSource]="sortedMembers()!" class="roster-table">
-
-        <ng-container matColumnDef="player">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('player')">
-              {{ 'roster.list.columns.player' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('player')">
-                {{ sortIcon('player') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">
-            <div class="player-cell">
-              <app-discord-icon [id]="member.playerDiscordId" [hash]="member.playerAvatarHash" [type]="DiscordIconType.User" [size]="24" />
-              <span>{{ member.playerName ?? member.playerDiscordId }}</span>
-            </div>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="character">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('character')">
-              {{ 'roster.list.columns.character' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('character')">
-                {{ sortIcon('character') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">
-            <div class="character-cell">
-              @if (member.avatarUrl) {
-                <img class="avatar-sm" [ngSrc]="member.avatarUrl" [alt]="member.characterName" width="32" height="32" />
-              } @else {
-                <app-wow-class-icon [classId]="member.classId" [className]="member.className" [size]="32" />
-              }
-              <a class="character-name" [style.color]="member.classColor" [routerLink]="characterLink(member)">{{ member.characterName }}</a>
-            </div>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="class">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('class')">
-              {{ 'roster.list.columns.class' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('class')">
-                {{ sortIcon('class') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">
-            <app-wow-class-icon [classId]="member.classId" [className]="member.className" [size]="24" />
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="specs">
-          <th mat-header-cell *matHeaderCellDef>{{ 'roster.list.columns.specs' | transloco }}</th>
-          <td mat-cell *matCellDef="let member">
-            <app-character-raid-specs [specs]="member.raidSpecs" />
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="level">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('level')">
-              {{ 'roster.list.columns.level' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('level')">
-                {{ sortIcon('level') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">{{ member.level }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="rank">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('rank')">
-              {{ 'roster.list.columns.rank' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('rank')">
-                {{ sortIcon('rank') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">
-            @if (canEditRank(member)) {
-              <mat-select
-                class="rank-select rank-select--{{ member.characterRank.toLowerCase() }}"
-                panelClass="rank-select-panel"
-                [value]="member.characterRank"
-                [disabled]="updatingRankCharacterId() === member.characterId"
-                (selectionChange)="updateRank(member, $event.value)"
-              >
-                @for (rank of ranks; track rank) {
-                  <mat-option [value]="rank">{{ 'roster.list.rank.' + rank | transloco }}</mat-option>
-                }
-              </mat-select>
-            } @else {
-              <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
-                {{ 'roster.list.rank.' + member.characterRank | transloco }}
-              </span>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="joinedAt">
-          <th mat-header-cell *matHeaderCellDef>
-            <button class="col-header-label" (click)="toggleSort('joinedAt')">
-              {{ 'roster.list.columns.joined' | transloco }}
-              <mat-icon class="sort-icon" [class.sort-icon--active]="sortIcon('joinedAt')">
-                {{ sortIcon('joinedAt') ?? 'unfold_more' }}
-              </mat-icon>
-            </button>
-          </th>
-          <td mat-cell *matCellDef="let member">{{ formatDate(member.joinedAt) }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let member" class="actions-cell">
-            <button mat-icon-button [matMenuTriggerFor]="rowMenu" [title]="'roster.list.actions' | transloco">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #rowMenu="matMenu">
-              <a mat-menu-item [routerLink]="characterLink(member)">
-                <mat-icon>visibility</mat-icon>
-                {{ 'roster.list.viewCharacter' | transloco }}
-              </a>
-              @if (isOfficer()) {
+      <div class="roster-table-wrapper">
+      <table class="roster-table">
+        <thead>
+          <tr>
+            <th scope="col" class="col-expand"></th>
+            <th scope="col" class="col-player">
+              <button class="col-header-label" (click)="toggleSort('player')">
+                <span class="col-label">{{ 'roster.list.columns.player' | transloco }}</span>
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('player')">
+                  {{ sortIcon('player') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-character">
+              <button class="col-header-label" (click)="toggleSort('character')">
+                {{ 'roster.list.columns.character' | transloco }}
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('character')">
+                  {{ sortIcon('character') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-class">
+              <button class="col-header-label" (click)="toggleSort('class')">
+                <span class="col-label">{{ 'roster.list.columns.class' | transloco }}</span>
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('class')">
+                  {{ sortIcon('class') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-specs">{{ 'roster.list.columns.specs' | transloco }}</th>
+            <th scope="col" class="col-level col-detail">
+              <button class="col-header-label" (click)="toggleSort('level')">
+                {{ 'roster.list.columns.level' | transloco }}
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('level')">
+                  {{ sortIcon('level') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-rank">
+              <button class="col-header-label" (click)="toggleSort('rank')">
+                {{ 'roster.list.columns.rank' | transloco }}
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('rank')">
+                  {{ sortIcon('rank') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-joined col-detail">
+              <button class="col-header-label" (click)="toggleSort('joinedAt')">
+                {{ 'roster.list.columns.joined' | transloco }}
+                <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('joinedAt')">
+                  {{ sortIcon('joinedAt') ?? 'unfold_more' }}
+                </span>
+              </button>
+            </th>
+            <th scope="col" class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of sortedMembers()!; track member.characterId) {
+            <tr>
+              <td class="col-expand">
                 <button
-                  mat-menu-item
-                  [disabled]="kickingCharacterId() === member.characterId"
-                  (click)="kickMember(member)"
+                  type="button"
+                  class="icon-btn row-expand-btn"
+                  [class.row-expand-btn--expanded]="isRowExpanded(member.characterId)"
+                  (click)="toggleRowExpand(member.characterId)"
+                  [title]="'roster.list.expandRow' | transloco"
                 >
-                  <mat-icon>person_remove</mat-icon>
-                  {{ 'roster.list.kick' | transloco }}
+                  <span class="material-icons">chevron_right</span>
                 </button>
-              }
-            </mat-menu>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="columns"></tr>
-        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+              </td>
+              <td>
+                <div class="player-cell">
+                  <app-discord-icon [id]="member.playerDiscordId" [hash]="member.playerAvatarHash" [type]="DiscordIconType.User" [size]="24" />
+                  <span class="player-name">{{ member.playerName ?? member.playerDiscordId }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="character-cell">
+                  @if (member.avatarUrl) {
+                    <img class="avatar-sm char-avatar" [ngSrc]="member.avatarUrl" [alt]="member.characterName" width="28" height="28" />
+                  } @else {
+                    <app-wow-class-icon class="char-avatar" [classId]="member.classId" [className]="member.className" [size]="28" />
+                  }
+                  <a class="character-name" [style.color]="member.classColor" [routerLink]="characterLink(member)">{{ member.characterName }}</a>
+                </div>
+              </td>
+              <td class="col-class">
+                <app-wow-class-icon [classId]="member.classId" [className]="member.className" [size]="20" />
+              </td>
+              <td class="col-specs">
+                <app-character-raid-specs [specs]="member.raidSpecs" />
+              </td>
+              <td class="col-level col-detail">{{ member.level }}</td>
+              <td class="col-rank">
+                @if (canEditRank(member)) {
+                  <app-select
+                    class="rank-select rank-select--{{ member.characterRank.toLowerCase() }}"
+                    [options]="rankSelectOptions()"
+                    [value]="member.characterRank"
+                    (valueChange)="updateRank(member, $any($event))"
+                  />
+                } @else {
+                  <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
+                    {{ 'roster.list.rank.' + member.characterRank | transloco }}
+                  </span>
+                }
+              </td>
+              <td class="col-joined col-detail">{{ formatDate(member.joinedAt) }}</td>
+              <td class="actions-cell">
+                <button
+                  type="button"
+                  class="icon-btn"
+                  [cdkMenuTriggerFor]="rowMenu"
+                  [title]="'roster.list.actions' | transloco"
+                >
+                  <span class="material-icons">more_vert</span>
+                </button>
+                <ng-template #rowMenu>
+                  <div class="menu-panel" cdkMenu>
+                    <a class="menu-item" cdkMenuItem [routerLink]="characterLink(member)">
+                      <span class="material-icons">visibility</span>
+                      {{ 'roster.list.viewCharacter' | transloco }}
+                    </a>
+                    @if (isOfficer()) {
+                      <button
+                        type="button"
+                        class="menu-item menu-item--danger"
+                        cdkMenuItem
+                        [disabled]="kickingCharacterId() === member.characterId"
+                        (click)="kickMember(member)"
+                      >
+                        <span class="material-icons">person_remove</span>
+                        {{ 'roster.list.kick' | transloco }}
+                      </button>
+                    }
+                  </div>
+                </ng-template>
+              </td>
+            </tr>
+            @if (isRowExpanded(member.characterId)) {
+              <tr class="detail-row">
+                <!-- 6, not 9: this row only ever displays below 600px, where Niveau/Rejoint (and
+                     below 480px, Rang) are display: none and thus don't exist in the table grid.
+                     A colspan larger than the visible column count would create phantom columns
+                     that steal the flexible width from Personnage and shift the header when a row
+                     expands. Between 480 and 600px seven columns are visible and this UNDER-spans
+                     by one — harmless for layout, and invisible because the row background lives
+                     on the <tr>, which always paints the full table width. -->
+                <td colspan="6">
+                  <div class="detail-content">
+                    <div class="detail-field">
+                      <span class="detail-label">{{ 'roster.list.columns.level' | transloco }}</span>
+                      <span>{{ member.level }}</span>
+                    </div>
+                    <div class="detail-field detail-field--rank">
+                      <span class="detail-label">{{ 'roster.list.columns.rank' | transloco }}</span>
+                      @if (canEditRank(member)) {
+                        <app-select
+                          class="rank-select rank-select--{{ member.characterRank.toLowerCase() }}"
+                          [options]="rankSelectOptions()"
+                          [value]="member.characterRank"
+                          (valueChange)="updateRank(member, $any($event))"
+                        />
+                      } @else {
+                        <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
+                          {{ 'roster.list.rank.' + member.characterRank | transloco }}
+                        </span>
+                      }
+                    </div>
+                    <div class="detail-field">
+                      <span class="detail-label">{{ 'roster.list.columns.joined' | transloco }}</span>
+                      <span>{{ formatDate(member.joinedAt) }}</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
       </table>
+      </div>
     }
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>

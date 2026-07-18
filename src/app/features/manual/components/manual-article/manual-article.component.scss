@@ -2,11 +2,18 @@
   max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px 64px;
+
+  // Leaves room for the layout's absolutely-positioned "toc" toggle button so it doesn't
+  // overlap the h1 (see manual-layout.component.scss).
+  @media (max-width: 768px) {
+    padding: 56px 16px 48px;
+  }
 }
 
 .manual-article-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
   padding-bottom: 16px;
@@ -17,5 +24,9 @@
     color: var(--mat-sys-on-surface);
     font-size: 1.75rem;
     font-weight: 700;
+
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+    }
   }
 }

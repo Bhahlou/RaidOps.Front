@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
@@ -46,14 +46,14 @@ describe('GetStartedBnetStepComponent', () => {
       deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
     };
     snackbarMock = { success: vi.fn(), error: vi.fn() };
-    dialogMock = { open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }) };
+    dialogMock = { open: vi.fn().mockReturnValue({ closed: of(undefined) }) };
 
     TestBed.configureTestingModule({
       imports: [GetStartedBnetStepComponent],
       providers: [
         { provide: CharacterStore, useValue: storeMock },
         { provide: SnackbarService, useValue: snackbarMock },
-        { provide: MatDialog, useValue: dialogMock },
+        { provide: Dialog, useValue: dialogMock },
       ],
     });
     TestBed.overrideComponent(GetStartedBnetStepComponent, { set: { template: '', imports: [] } });
@@ -114,7 +114,7 @@ describe('GetStartedBnetStepComponent', () => {
       setup();
       const activatedChars = [{ ...mockChar, id: 1 }, { ...mockChar, id: 2 }];
       storeMock.loadCharacters.mockReturnValue(of(activatedChars));
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ success: true }) });
 
       component.onActivated({ activated: 2, activatedCharacterIds: [1, 2] });
 
@@ -128,7 +128,7 @@ describe('GetStartedBnetStepComponent', () => {
       setup();
       const activatedChars = [{ ...mockChar, id: 1 }, { ...mockChar, id: 2 }];
       storeMock.loadCharacters.mockReturnValue(of(activatedChars));
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      dialogMock.open.mockReturnValue({ closed: of(undefined) });
 
       component.onActivated({ activated: 2, activatedCharacterIds: [1, 2] });
 
@@ -141,7 +141,7 @@ describe('GetStartedBnetStepComponent', () => {
       setup();
       const activatedChars = [{ ...mockChar, id: 1 }];
       storeMock.loadCharacters.mockReturnValue(of(activatedChars));
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ error: true }) });
 
       component.onActivated({ activated: 1, activatedCharacterIds: [1] });
 

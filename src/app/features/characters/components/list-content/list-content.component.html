@@ -3,7 +3,7 @@
     <!-- progress bar handles loading feedback -->
   } @else if (!isBnetLinked()) {
     <div class="empty-state">
-      <mat-icon class="icon">videogame_asset</mat-icon>
+      <span class="material-icons icon">videogame_asset</span>
       <p class="title">{{ 'characters.bnet.notLinkedTitle' | transloco }}</p>
       <p class="desc">{{ 'characters.bnet.notLinkedDescription' | transloco }}</p>
       <app-bnet-link-button variant="large" (regionSelected)="linkBnet.emit($event)">
@@ -12,13 +12,12 @@
     </div>
   } @else if (characters().length === 0) {
     <div class="empty-state">
-      <mat-icon class="empty-icon">manage_accounts</mat-icon>
+      <span class="material-icons empty-icon">manage_accounts</span>
       <p class="empty-title">{{ 'characters.list.emptyTitle' | transloco }}</p>
       <p class="empty-desc">{{ 'characters.list.empty' | transloco }}</p>
-      <button mat-flat-button (click)="openImport.emit()">
-        <mat-icon>download</mat-icon>
+      <app-button variant="primary" icon="download" (click)="openImport.emit()">
         {{ 'characters.list.importButton' | transloco }}
-      </button>
+      </app-button>
     </div>
   } @else {
     <div class="char-sections">

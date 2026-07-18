@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
@@ -25,8 +25,8 @@ describe('SyncBnetDialogComponent', () => {
       providers: [
         { provide: WowBrancheService, useValue: { getAll: vi.fn().mockReturnValue(of([])) } },
         { provide: CharacterService, useValue: { syncCharacters: vi.fn() } },
-        { provide: MatDialogRef, useValue: { close: mockClose } },
-        { provide: MAT_DIALOG_DATA, useValue: { region: 'eu' } },
+        { provide: DialogRef, useValue: { close: mockClose } },
+        { provide: DIALOG_DATA, useValue: { region: 'eu' } },
       ],
     });
 

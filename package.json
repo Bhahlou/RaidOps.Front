@@ -1,6 +1,6 @@
 {
   "name": "raidops-front",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -17,7 +17,6 @@
     "@angular/compiler": "^22.0.5",
     "@angular/core": "^22.0.5",
     "@angular/forms": "^22.0.5",
-    "@angular/material": "^22.0.3",
     "@angular/platform-browser": "^22.0.5",
     "@angular/router": "^22.0.5",
     "@fontsource/inter": "^5.2.8",

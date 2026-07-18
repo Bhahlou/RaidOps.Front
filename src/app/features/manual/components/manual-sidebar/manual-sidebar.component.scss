@@ -6,6 +6,24 @@
   background: var(--mat-sys-surface-container-low);
   border-right: 1px solid var(--mat-sys-outline-variant);
   padding: 12px 0;
+
+  // Below this, the sidebar becomes a slide-in drawer opened via the layout's own toggle
+  // button — mirrors the main app sidenav's mobile pattern (sidenav.component.scss).
+  @media (max-width: 768px) {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    height: calc(100% - var(--navbar-height));
+    width: min(260px, 80vw);
+    transform: translateX(-100%);
+    transition: transform 250ms ease;
+    z-index: 200;
+
+    &.is-open {
+      transform: translateX(0);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+  }
 }
 
 .back-link {
@@ -23,7 +41,7 @@
   color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
 
-  mat-icon {
+  .material-icons {
     font-size: 18px;
     width: 18px;
     height: 18px;

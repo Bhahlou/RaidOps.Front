@@ -1,6 +1,6 @@
 @if (isResolving()) {
   <div class="get-started-loading">
-    <mat-spinner [diameter]="40" />
+    <span class="spinner loading-spinner"></span>
   </div>
 } @else {
   <div class="get-started-container">
@@ -9,39 +9,34 @@
       [title]="'getStarted.title' | transloco"
       [subtitle]="'getStarted.subtitle' | transloco"
     >
-      <mat-stepper [selectedIndex]="stepIndex()" linear class="get-started-stepper">
+      <app-stepper-header
+        class="get-started-stepper"
+        [activeIndex]="stepIndex()"
+        [steps]="[
+          { label: 'getStarted.steps.discord' | transloco, completed: isAuthenticated() },
+          { label: 'getStarted.steps.guild' | transloco, completed: isGuildStepDone() },
+          { label: 'getStarted.steps.bnet' | transloco, completed: isBnetStepDone() },
+          { label: 'getStarted.steps.link' | transloco, completed: isLinkStepDone() },
+        ]"
+      />
 
-        <mat-step [label]="'getStarted.steps.discord' | transloco" [completed]="isAuthenticated()" [editable]="false">
-          @if (!isAuthenticated()) {
-            <p class="step-desc">{{ 'getStarted.discordStep.description' | transloco }}</p>
-            <div class="discord-button-row">
-              <button mat-flat-button class="discord-button" (click)="signup()">
-                <app-discord-brand-icon [size]="20" />
-                {{ 'getStarted.discordStep.cta' | transloco }}
-              </button>
-            </div>
-          }
-        </mat-step>
-
-        <mat-step [label]="'getStarted.steps.guild' | transloco" [completed]="isGuildStepDone()">
-          <ng-template matStepContent>
-            <app-get-started-guild-step (continue)="continuePastGuildStep()" />
-          </ng-template>
-        </mat-step>
-
-        <mat-step [label]="'getStarted.steps.bnet' | transloco" [completed]="isBnetStepDone()">
-          <ng-template matStepContent>
-            <app-get-started-bnet-step />
-          </ng-template>
-        </mat-step>
-
-        <mat-step [label]="'getStarted.steps.link' | transloco" [completed]="isLinkStepDone()">
-          <ng-template matStepContent>
-            <app-get-started-link-step />
-          </ng-template>
-        </mat-step>
-
-      </mat-stepper>
+      @if (stepIndex() === 0) {
+        @if (!isAuthenticated()) {
+          <p class="step-desc">{{ 'getStarted.discordStep.description' | transloco }}</p>
+          <div class="discord-button-row">
+            <app-button variant="primary" [extraClass]="'discord-button'" (click)="signup()">
+              <app-discord-brand-icon [size]="20" />
+              {{ 'getStarted.discordStep.cta' | transloco }}
+            </app-button>
+          </div>
+        }
+      } @else if (stepIndex() === 1) {
+        <app-get-started-guild-step (continue)="continuePastGuildStep()" />
+      } @else if (stepIndex() === 2) {
+        <app-get-started-bnet-step />
+      } @else if (stepIndex() === 3) {
+        <app-get-started-link-step />
+      }
     </app-icon-card>
   </div>
 }

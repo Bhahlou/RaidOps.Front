@@ -4,9 +4,13 @@
   padding: 80px 0;
 }
 
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+}
+
 .get-started-container {
-  margin: 32px auto;
-  padding: 0 16px;
+  margin: 5px auto;
 }
 
 .step-desc {
@@ -20,14 +24,9 @@
   justify-content: center;
 }
 
-.discord-button {
-  // mat-flat-button renders as .mat-mdc-unelevated-button, which reads the "filled" button
-  // tokens — not --mat-flat-button-* (that namespace doesn't exist) or --mdc-filled-button-*
-  // (legacy MDC name, not what this M3 mat.theme() setup wires up).
-  --mat-button-filled-container-color: #5865f2;
-  --mat-button-filled-label-text-color: #fff;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+// app-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .discord-button {
+  background: #5865f2;
+  color: #fff;
 }

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { of, throwError } from 'rxjs';
 
 import { SetRaidSpecsDialogComponent, SetRaidSpecsDialogData } from './set-raid-specs-dialog.component';
@@ -64,8 +64,8 @@ describe('SetRaidSpecsDialogComponent', () => {
       imports: [SetRaidSpecsDialogComponent],
       providers: [
         { provide: CharacterStore, useValue: storeMock },
-        { provide: MatDialogRef, useValue: { close: mockClose } },
-        { provide: MAT_DIALOG_DATA, useValue: { characters, mode } satisfies SetRaidSpecsDialogData },
+        { provide: DialogRef, useValue: { close: mockClose } },
+        { provide: DIALOG_DATA, useValue: { characters, mode } satisfies SetRaidSpecsDialogData },
       ],
     });
     TestBed.overrideComponent(SetRaidSpecsDialogComponent, { set: { template: '', imports: [] } });

@@ -1,14 +1,13 @@
 import { Location } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ChangelogStore } from './stores/changelog.store';
 import { ChangelogEntry, ChangelogEntryType } from './models/changelog-entry.model';
 
 @Component({
   selector: 'app-changelog',
-  imports: [RouterLink, MatIconModule, TranslocoPipe],
+  imports: [RouterLink, TranslocoPipe],
   templateUrl: './changelog.component.html',
   styleUrl: './changelog.component.scss',
 })

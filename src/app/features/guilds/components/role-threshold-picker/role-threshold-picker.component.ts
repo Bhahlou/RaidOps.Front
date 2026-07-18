@@ -1,8 +1,7 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, input, model } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CdkListbox, CdkOption } from '@angular/cdk/listbox';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
 import { formatDiscordColor } from '../../../../shared/utils/discord-color.util';
@@ -17,7 +16,7 @@ import { formatDiscordColor } from '../../../../shared/utils/discord-color.util'
  */
 @Component({
   selector: 'app-role-threshold-picker',
-  imports: [NgOptimizedImage, MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
+  imports: [NgOptimizedImage, CdkListbox, CdkOption, TranslocoPipe],
   templateUrl: './role-threshold-picker.component.html',
   styleUrl: './role-threshold-picker.component.scss',
 })
@@ -26,6 +25,17 @@ export class RoleThresholdPickerComponent implements FormValueControl<string | n
   readonly loading = input(false);
 
   readonly value = model<string | null>(null);
+
+  /**
+   * One-way into cdkListbox — purely so cdkOption reports correct aria-selected/keyboard-active
+   * state. Selection changes flow the other way, through select() below: our "threshold" click
+   * semantics (click again to clear) don't match a plain single-select listbox's own behavior,
+   * so cdkListboxValueChange is intentionally not wired up.
+   */
+  readonly listboxValue = computed<string[]>(() => {
+    const current = this.value();
+    return current === null ? [] : [current];
+  });
 
   isIncluded(role: DiscordRole): boolean {
     const thresholdId = this.value();

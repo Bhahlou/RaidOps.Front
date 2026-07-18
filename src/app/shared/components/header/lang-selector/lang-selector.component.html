@@ -1,0 +1,14 @@
+<button class="icon-btn lang-button" [cdkMenuTriggerFor]="langMenu">
+  <span class="fi fi-{{ langFlags[activeLang] ?? activeLang }}"></span>
+</button>
+
+<ng-template #langMenu>
+  <div class="menu-panel" cdkMenu>
+    @for (lang of availableLangs; track lang) {
+      <button type="button" class="menu-item" cdkMenuItem [class.active-lang]="lang === activeLang" (click)="setLang(lang)">
+        <span class="fi fi-{{ langFlags[lang] ?? lang }} menu-flag"></span>
+        {{ langLabels[lang] ?? lang.toUpperCase() }}
+      </button>
+    }
+  </div>
+</ng-template>

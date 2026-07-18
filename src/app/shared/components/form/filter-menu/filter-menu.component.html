@@ -1,0 +1,53 @@
+<button
+  type="button"
+  class="icon-btn filter-btn"
+  [class.filter-active]="selected() !== undefined"
+  [cdkMenuTriggerFor]="panel"
+  (opened)="onOpened()"
+  [title]="triggerTitle()"
+>
+  <span class="material-icons">filter_list</span>
+</button>
+
+<ng-template #panel>
+  <div class="filter-panel" cdkMenu>
+    <!-- stopPropagation keeps typing in the search box from triggering CdkMenu's typeahead -->
+    <div class="filter-search" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <span class="material-icons filter-search-icon">search</span>
+      <input
+        #searchInput
+        type="text"
+        [attr.aria-label]="searchAriaLabel()"
+        [placeholder]="searchPlaceholder()"
+        [value]="query()"
+        (input)="query.set(searchInput.value)"
+      />
+    </div>
+    <ul class="filter-options">
+      <li>
+        <button
+          type="button"
+          class="filter-option"
+          cdkMenuItem
+          [class.filter-option--selected]="selected() === undefined"
+          (click)="select(undefined)"
+        >
+          {{ allLabel() }}
+        </button>
+      </li>
+      @for (opt of filteredOptions(); track opt.value) {
+        <li>
+          <button
+            type="button"
+            class="filter-option"
+            cdkMenuItem
+            [class.filter-option--selected]="selected() === opt.value"
+            (click)="select(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+</ng-template>

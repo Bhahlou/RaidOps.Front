@@ -1,6 +1,9 @@
 import { RoadmapItem, RoadmapItemStatus, RoadmapSection } from '../models/roadmap-section.model';
 
-export function item(key: string, status: RoadmapItemStatus = RoadmapItemStatus.Planned): RoadmapItem {
+export function item(
+  key: string,
+  status: RoadmapItemStatus = RoadmapItemStatus.Planned,
+): RoadmapItem {
   return {
     id: key,
     titleKey: `roadmap.items.${key}.title`,
@@ -65,10 +68,10 @@ export const ROADMAP_SECTIONS: RoadmapSection[] = [
     item('characterDeletion'),
   ]),
   section('technical', [
-    item('angular22Migration'),
-    item('securityHardening'),
-    item('responsiveness'),
-    item('designPolish'),
+    done('angular22Migration'),
+    done('securityHardening'),
+    done('responsiveness'),
+    done('designPolish'),
   ]),
   section('raidLogs', [item('warcraftLogsIntegration'), item('bossPerformanceTracking')]),
 ];

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { DialogRef } from '@angular/cdk/dialog';
 
 import { ConfirmDeactivateDialogComponent } from './confirm-deactivate-dialog.component';
 
@@ -12,7 +12,7 @@ describe('ConfirmDeactivateDialogComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ConfirmDeactivateDialogComponent],
-      providers: [{ provide: MatDialogRef, useValue: { close: mockClose } }],
+      providers: [{ provide: DialogRef, useValue: { close: mockClose } }],
     });
     TestBed.overrideComponent(ConfirmDeactivateDialogComponent, { set: { template: '', imports: [] } });
 

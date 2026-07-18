@@ -13,21 +13,22 @@
           @for (guild of registeredGuilds(); track guild.id) {
             <li class="guild-item">
               <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" [size]="32" />
-              <span class="guild-name">{{ guild.name }}</span>
-              <span class="access-badge" [class.access-badge--roster]="guild.accessLevel !== GuildAccessLevel.Public">
-                {{ (guild.accessLevel === GuildAccessLevel.Public
-                  ? 'getStarted.guildStep.registered.publicOnly'
-                  : 'getStarted.guildStep.registered.rosterReady') | transloco }}
-              </span>
+              <div class="guild-text">
+                <span class="guild-name">{{ guild.name }}</span>
+                <span class="access-badge" [class.access-badge--roster]="guild.accessLevel !== GuildAccessLevel.Public">
+                  {{ (guild.accessLevel === GuildAccessLevel.Public
+                    ? 'getStarted.guildStep.registered.publicOnly'
+                    : 'getStarted.guildStep.registered.rosterReady') | transloco }}
+                </span>
+              </div>
             </li>
           }
         </ul>
 
         <div class="continue-row">
-          <button mat-flat-button (click)="continue.emit()">
+          <app-button variant="primary" icon="arrow_forward" [iconPosition]="'end'" (click)="continue.emit()">
             {{ 'getStarted.guildStep.continue' | transloco }}
-            <mat-icon iconPositionEnd>arrow_forward</mat-icon>
-          </button>
+          </app-button>
         </div>
       </app-icon-card>
     }
@@ -43,9 +44,9 @@
             <li class="guild-item">
               <app-discord-icon [id]="guild.id" [hash]="guild.iconHash" [type]="DiscordIconType.Guild" [size]="32" />
               <span class="guild-name">{{ guild.name }}</span>
-              <button mat-flat-button (click)="inviteBot(guild.id)">
+              <app-button variant="primary" (click)="inviteBot(guild.id)">
                 {{ 'getStarted.guildStep.admin.action' | transloco }}
-              </button>
+              </app-button>
             </li>
           }
         </ul>

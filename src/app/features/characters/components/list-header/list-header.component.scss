@@ -2,40 +2,96 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
 
-  button[mat-stroked-button],
-  button[mat-flat-button] {
+// Import button + BNet chip, shown as-is above the breakpoint.
+.actions-wide {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .btn {
     height: 36px;
   }
 
-  .bnet-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 36px;
-    padding: 0 12px 0 10px;
-    border-radius: 20px;
-    border: none;
-    background: #0062c8;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #ffffff;
-    box-shadow: 0 2px 10px -2px rgba(0, 98, 200, 0.45);
+  // Below this, the two grouped into the "more" menu instead (see .actions-narrow-trigger).
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
 
-    .logo {
-      display: block;
-      flex-shrink: 0;
-      width: 15px;
-      height: 15px;
-      opacity: 0.9;
-    }
+.bnet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 10px;
+  border-radius: 20px;
+  border: none;
+  background: #0062c8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+  box-shadow: 0 2px 10px -2px rgba(0, 98, 200, 0.45);
 
-    .flag {
-      display: block;
-      flex-shrink: 0;
-      width: 18px;
-      height: 14px;
-      border-radius: 2px;
-    }
+  .logo {
+    display: block;
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    opacity: 0.9;
+  }
+
+  .flag {
+    display: block;
+    flex-shrink: 0;
+    width: 18px;
+    height: 14px;
+    border-radius: 2px;
+  }
+}
+
+// "more" menu trigger, only shown below the breakpoint — .actions-wide covers everything above it.
+.actions-narrow-trigger {
+  display: none;
+
+  @media (max-width: 640px) {
+    display: flex;
+  }
+}
+
+// Non-interactive status row at the top of the "more" menu — just tells you which account is
+// linked, kept visually distinct from the menu-item buttons below it.
+.menu-bnet-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+
+  strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .logo {
+    display: block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+  }
+
+  .flag {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 12px;
+    border-radius: 2px;
+    opacity: 0.85;
   }
 }

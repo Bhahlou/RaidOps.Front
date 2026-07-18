@@ -1,15 +1,14 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../core/stores/auth.store';
 import { AuthService } from '../../core/services/auth.service';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { CharacterStore } from '../characters/stores/character.store';
-import { IconCardComponent } from '../../shared/components/icon-card/icon-card.component';
-import { DiscordBrandIconComponent } from '../../shared/components/discord-brand-icon/discord-brand-icon.component';
+import { IconCardComponent } from '../../shared/components/layout/icon-card/icon-card.component';
+import { DiscordBrandIconComponent } from '../../shared/components/icons/discord-brand-icon/discord-brand-icon.component';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { StepperHeaderComponent } from '../../shared/components/layout/stepper-header/stepper-header.component';
 import { GetStartedGuildStepComponent } from './components/get-started-guild-step/get-started-guild-step.component';
 import { GetStartedBnetStepComponent } from './components/get-started-bnet-step/get-started-bnet-step.component';
 import { GetStartedLinkStepComponent } from './components/get-started-link-step/get-started-link-step.component';
@@ -27,15 +26,14 @@ import { GetStartedLinkStepComponent } from './components/get-started-link-step/
 @Component({
   selector: 'app-get-started',
   imports: [
-    MatStepperModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
     TranslocoPipe,
     IconCardComponent,
     DiscordBrandIconComponent,
+    StepperHeaderComponent,
     GetStartedGuildStepComponent,
     GetStartedBnetStepComponent,
     GetStartedLinkStepComponent,
+    ButtonComponent,
   ],
   templateUrl: './get-started.component.html',
   styleUrl: './get-started.component.scss',
