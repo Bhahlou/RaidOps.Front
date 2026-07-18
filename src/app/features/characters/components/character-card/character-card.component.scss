@@ -2,30 +2,20 @@
   display: contents;
 }
 
-// mat-menu-item spaces .mat-icon via a targeted margin rule, not a generic flex gap —
-// app-bnet-icon's SVG needs the same margin since it isn't a .mat-icon, and ::ng-deep is
-// required since the <svg> lives inside app-bnet-icon's own template. Anchored on
-// .resync-menu-item (not :host): mat-menu renders in a CDK overlay portal outside this
-// host's DOM subtree, so a :host-ancestor selector would never match — but the button
-// and its projected content stay together as a unit when the panel is relocated, so
-// anchoring on the button itself still works. A bare ::ng-deep with no anchor would
-// compile to a fully global selector and leak this margin onto every app-bnet-icon
-// in the app (list-header's bnet-chip, bnet-link-button, …).
-.resync-menu-item ::ng-deep app-bnet-icon svg {
-  margin-right: 16px;
-}
-
 .menu-icon {
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  margin-right: 16px;
   object-fit: cover;
 }
 
 // ── Card shell ─────────────────────────────────────────────────────────────────
 
-.card {
+// Named .character-card, not .card — the global .card utility class (styles.scss) is a flex
+// COLUMN by default; this one needs to be a row, and relying on local specificity to override
+// just display/align-items while silently inheriting flex-direction: column from the global rule
+// for whatever this component forgets to override is exactly the trap that broke this layout.
+.character-card {
   display: flex;
   align-items: center;
   gap: 12px;

@@ -1,5 +1,21 @@
 <div class="manual-layout">
-  <app-manual-sidebar />
+  <div class="manual-mobile-toolbar">
+    <button type="button" class="manual-toolbar-btn manual-back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+    </button>
+
+    <button type="button" class="manual-toolbar-btn manual-toc-toggle" (click)="isSidebarOpen.set(true)">
+      <span class="material-icons">menu</span>
+      {{ 'manual.toc' | transloco }}
+    </button>
+  </div>
+
+  <app-manual-sidebar [isOpen]="isSidebarOpen()" (closeRequested)="isSidebarOpen.set(false)" />
+
+  @if (isSidebarOpen()) {
+    <div class="manual-sidebar-backdrop" (click)="isSidebarOpen.set(false)"></div>
+  }
+
   <div class="manual-content">
     <router-outlet />
   </div>

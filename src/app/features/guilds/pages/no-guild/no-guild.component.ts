@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { IconCardComponent } from '../../../../shared/components/layout/icon-card/icon-card.component';
 
 @Component({
   selector: 'app-no-guild',
-  imports: [MatIconModule, TranslocoPipe, IconCardComponent],
+  imports: [TranslocoPipe, IconCardComponent],
   templateUrl: './no-guild.component.html',
   styleUrl: './no-guild.component.scss',
 })

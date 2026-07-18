@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
-import { LoadingBarComponent } from '../../components/loading-bar/loading-bar.component';
 import { SidenavComponent } from '../sidenav/sidenav.component';
 import { AuthStore } from '../../../core/stores/auth.store';
+import { LoadingBarComponent } from '../../components/feedback/loading-bar/loading-bar.component';
 
 @Component({
   selector: 'app-page-layout',

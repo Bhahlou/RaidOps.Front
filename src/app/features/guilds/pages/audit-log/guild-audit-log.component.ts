@@ -1,18 +1,19 @@
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormField, MatSuffix } from '@angular/material/form-field';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
+import { DateRangeInputComponent } from '../../../../shared/components/form/date-range-input/date-range-input.component';
+import {
+  FilterMenuComponent,
+  FilterOption,
+} from '../../../../shared/components/form/filter-menu/filter-menu.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import {
   CLASS_COLORS,
   WowClassIconComponent,
-} from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
+} from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { formatDiscordColor } from '../../../../shared/utils/discord-color.util';
 import { injectGuildContext } from '../../inject-guild-context';
@@ -58,20 +59,14 @@ interface CharacterChangeDisplay {
   imports: [
     NgOptimizedImage,
     NgTemplateOutlet,
-    MatIcon,
-    MatButton,
-    MatIconButton,
-    MatDatepickerModule,
-    MatFormField,
-    MatSuffix,
-    MatMenu,
-    MatMenuItem,
-    MatMenuTrigger,
-    MatProgressSpinner,
     TranslocoPipe,
+    FilterMenuComponent,
     PageHeaderComponent,
     DiscordIconComponent,
+    DateRangeInputComponent,
     WowClassIconComponent,
+    ButtonComponent,
+    IconButtonComponent,
   ],
   templateUrl: './guild-audit-log.component.html',
   styleUrl: './guild-audit-log.component.scss',
@@ -102,12 +97,6 @@ export class GuildAuditLogComponent {
   readonly dateRangeStart = signal<Date | null>(null);
   readonly dateRangeEnd = signal<Date | null>(null);
 
-  /** Narrows the option list shown in each filter's searchable menu — does not touch the table. */
-  readonly categorySearch = signal('');
-  readonly actionSearch = signal('');
-  readonly actorSearch = signal('');
-  readonly changeSearch = signal('');
-
   readonly #sortColumn = signal<SortColumn | null>(null);
   readonly #sortDirection = signal<SortDirection>('asc');
 
@@ -119,12 +108,9 @@ export class GuildAuditLogComponent {
     return this.categories.filter((c) => present.has(c));
   });
 
-  readonly filteredCategoryOptions = computed(() => {
-    const q = this.categorySearch().toLowerCase();
-    return this.availableCategories().filter((c) =>
-      this.categoryLabel(c).toLowerCase().includes(q),
-    );
-  });
+  readonly categoryFilterOptions = computed<FilterOption<GuildAuditCategory>[]>(() =>
+    this.availableCategories().map((c) => ({ value: c, label: this.categoryLabel(c) })),
+  );
 
   /** Action types actually present among the loaded entries — keeps the filter menu relevant. */
   readonly availableActionTypes = computed(() => {
@@ -132,10 +118,9 @@ export class GuildAuditLogComponent {
     return this.actionTypes.filter((a) => present.has(a));
   });
 
-  readonly filteredActionOptions = computed(() => {
-    const q = this.actionSearch().toLowerCase();
-    return this.availableActionTypes().filter((a) => this.actionLabel(a).toLowerCase().includes(q));
-  });
+  readonly actionFilterOptions = computed<FilterOption<GuildAuditAction>[]>(() =>
+    this.availableActionTypes().map((a) => ({ value: a, label: this.actionLabel(a) })),
+  );
 
   /** Distinct actors among the loaded entries, for the searchable actor filter. */
   readonly availableActors = computed(() => {
@@ -151,10 +136,9 @@ export class GuildAuditLogComponent {
     return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  readonly filteredActorOptions = computed(() => {
-    const q = this.actorSearch().toLowerCase();
-    return this.availableActors().filter((a) => a.name.toLowerCase().includes(q));
-  });
+  readonly actorFilterOptions = computed<FilterOption<string>[]>(() =>
+    this.availableActors().map((a) => ({ value: a.id, label: a.name })),
+  );
 
   /** Distinct "before / after" summaries among the loaded entries, for the searchable change filter. */
   readonly availableChanges = computed(() => {
@@ -162,10 +146,9 @@ export class GuildAuditLogComponent {
     return [...values].sort((a, b) => a.localeCompare(b));
   });
 
-  readonly filteredChangeOptions = computed(() => {
-    const q = this.changeSearch().toLowerCase();
-    return this.availableChanges().filter((c) => c.toLowerCase().includes(q));
-  });
+  readonly changeFilterOptions = computed<FilterOption<string>[]>(() =>
+    this.availableChanges().map((c) => ({ value: c, label: c })),
+  );
 
   /**
    * Loaded entries, filtered then sorted. `action` and `category` are filtered server-side (see
@@ -213,10 +196,6 @@ export class GuildAuditLogComponent {
       this.selectedCategory.set(undefined);
       this.selectedActorId.set(undefined);
       this.selectedChange.set(undefined);
-      this.categorySearch.set('');
-      this.actionSearch.set('');
-      this.actorSearch.set('');
-      this.changeSearch.set('');
       this.dateRangeStart.set(null);
       this.dateRangeEnd.set(null);
       this.#store.load(id).subscribe();

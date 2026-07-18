@@ -1,0 +1,61 @@
+<fieldset class="select-fieldset" [class.select-fieldset--open]="isOpen()">
+  @if (label()) {
+    <legend class="select-field-label">{{ label() }}</legend>
+  }
+  <button
+    #triggerButton
+    type="button"
+    class="select-trigger"
+    [id]="inputId()"
+    [disabled]="disabled()"
+    cdkOverlayOrigin
+    #origin="cdkOverlayOrigin"
+    (click)="toggle()"
+    [attr.aria-expanded]="isOpen()"
+  >
+    <span class="select-value" [class.select-value--placeholder]="!selectedLabel()">
+      {{ selectedLabel() || placeholder() }}
+    </span>
+    <span class="material-icons select-chevron">expand_more</span>
+  </button>
+</fieldset>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="dropdownPositions"
+  [cdkConnectedOverlayWidth]="triggerWidth()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()"
+>
+  <div class="select-panel" (keydown)="onPanelKeydown($event)">
+    @if (filterable()) {
+      <div class="select-filter">
+        <span class="material-icons select-filter-icon">search</span>
+        <input
+          type="text"
+          class="select-filter-input"
+          [attr.aria-label]="filterAriaLabel()"
+          [ngModel]="filterQuery()"
+          (ngModelChange)="filterQuery.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+    }
+    <ul
+      class="select-list"
+      cdkListbox
+      [cdkListboxValue]="listboxValue()"
+      (cdkListboxValueChange)="onListboxValueChange($any($event))"
+    >
+      @for (opt of filteredOptions(); track opt.value) {
+        <li class="select-option" [cdkOption]="opt.value">{{ opt.label }}</li>
+      } @empty {
+        <li class="select-empty">—</li>
+      }
+    </ul>
+  </div>
+</ng-template>

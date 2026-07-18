@@ -1,16 +1,62 @@
-::ng-deep .my-chars-card .mat-mdc-card-header {
+.my-chars-card .card-header {
   justify-content: space-between;
   align-items: center;
+  // The shared .card-header only has top padding (16px 20px 0) — fine when content follows right
+  // below it, but here the add button was reading as glued to the header's bottom edge.
+  padding-bottom: 12px;
 }
 
-.add-btn {
-  background-color: var(--mat-sys-primary);
+.expand-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  // Without this, the title's own content width is the flex-basis and it never shrinks below
+  // it — pushing the add button (the header's other flex child) past the card's right edge.
+  flex: 1;
+  min-width: 0;
+  margin-left: -4px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 
-  ::ng-deep mat-icon { color: #000; }
+  // Smaller than the default 1rem .card-title — this is a collapsible section header, not page
+  // content. Left free to wrap onto two lines rather than nowrap + ellipsis: the header's height
+  // can grow to fit it, but truncating "Mes personnages dans cette guilde" down to a few words
+  // loses more than a taller header costs.
+  .card-title {
+    min-width: 0;
+    font-size: 0.875rem;
+  }
+}
 
-  &:hover,
-  &.active {
-    background-color: color-mix(in srgb, var(--mat-sys-primary) 85%, black);
+.expand-chevron {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-secondary);
+  transition: transform 0.15s ease;
+
+  &--expanded {
+    transform: rotate(90deg);
+  }
+
+  // Only meaningful below the breakpoint where .card-content actually collapses (see there) —
+  // above it, this card is always the plain, always-expanded sidebar it always was.
+  @media (min-width: 900px) {
+    display: none;
+  }
+}
+
+.card-content {
+  &--collapsed {
+    display: none;
+
+    @media (min-width: 900px) {
+      display: block;
+    }
   }
 }
 
@@ -25,6 +71,11 @@
 
 .char-item {
   display: flex;
+  // Lets the rank select + trailing button drop to a second line when the row is too narrow for
+  // everything — which line breaks where is driven by .char-main's flex-basis floor below, not by
+  // a breakpoint, so it adapts to wherever this card lands (stacked full-width on mobile, or the
+  // ~300px sidebar column next to the roster table).
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
@@ -39,6 +90,20 @@
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+// Groups the avatar with the name/guild/specs so they can never be split across wrap lines — the
+// avatar alone on one line with the text below looked broken. The 250px basis is the wrap
+// trigger: 40px avatar + ~140px name/guild + ~70px for two spec icons. When the row can't give
+// this block 250px alongside the select and trailing button, those wrap to a second line instead
+// of cropping the name down to "B..". Purely a floor — grow: 1 still absorbs all slack on wide
+// rows exactly as before.
+.char-main {
+  flex: 1 1 250px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .char-info {
@@ -78,21 +143,18 @@
 .rank-select {
   width: 82px;
   flex-shrink: 0;
+  font-size: 0.8rem;
+  // Right-aligns the select + trailing button when they've wrapped onto their own line (see
+  // .char-item). A no-op on single-line rows: .char-info's grow already absorbs all the slack,
+  // leaving this auto margin nothing to expand into.
+  margin-left: auto;
 
-  ::ng-deep .mat-mdc-select-trigger {
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    background: rgba(255, 255, 255, 0.08);
-    font-size: 0.8rem;
-  }
-}
-
-.leave-btn {
-  color: var(--mat-sys-on-surface-variant);
-  flex-shrink: 0;
-
-  &:hover { color: #f44336; }
+  // Recolors the shared select's displayed value per rank via a CSS custom property it reads
+  // internally (select.component.scss) — no ::ng-deep needed since custom properties cascade
+  // through component boundaries regardless of view encapsulation.
+  &--main { --select-value-color: var(--color-accent); }
+  &--split { --select-value-color: var(--color-text-primary); }
+  &--alt { --select-value-color: var(--color-text-muted); }
 }
 
 .add-section {
@@ -103,8 +165,27 @@
   }
 }
 
-.empty-hint {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin: 0;
+// app-icon-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .add-btn {
+  background-color: var(--mat-sys-primary);
+
+  .material-icons { color: #000; }
+
+  &:hover,
+  &.active {
+    background-color: color-mix(in srgb, var(--mat-sys-primary) 85%, black);
+  }
+}
+
+:host ::ng-deep .leave-btn {
+  &:hover {
+    color: #f44336;
+  }
+}
+
+.chars-spinner {
+  width: 32px;
+  height: 32px;
+  margin: 24px auto;
 }

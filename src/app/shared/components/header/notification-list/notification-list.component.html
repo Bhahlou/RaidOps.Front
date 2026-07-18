@@ -1,0 +1,18 @@
+@for (notification of notifications(); track notification.type + notification.guildId) {
+  <div class="notification-row">
+    <span class="material-icons notification-icon">info</span>
+    <div class="notification-body">
+      <span class="notification-message">
+        {{ messageKey(notification) | transloco: { guildName: notification.guildName } }}
+      </span>
+      <div class="notification-actions">
+        <app-button variant="text" [route]="link(notification)">
+          {{ 'notifications.viewLink' | transloco }}
+        </app-button>
+        <app-button variant="text" [extraClass]="'dismiss-button'" (click)="dismiss(notification)">
+          {{ 'notifications.dismiss' | transloco }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

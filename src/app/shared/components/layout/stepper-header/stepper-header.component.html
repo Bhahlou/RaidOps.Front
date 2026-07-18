@@ -1,0 +1,17 @@
+<div class="stepper-header">
+  @for (step of steps(); track $index) {
+    <div class="stepper-step" [class.stepper-step--active]="$index === activeIndex()">
+      <div class="stepper-circle" [class.stepper-circle--completed]="step.completed">
+        @if (step.completed) {
+          <span class="material-icons">check</span>
+        } @else {
+          {{ $index + 1 }}
+        }
+      </div>
+      <span class="stepper-label">{{ step.label }}</span>
+    </div>
+    @if (!$last) {
+      <div class="stepper-connector" [class.stepper-connector--completed]="step.completed"></div>
+    }
+  }
+</div>

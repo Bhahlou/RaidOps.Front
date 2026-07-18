@@ -1,36 +1,35 @@
-<h2 mat-dialog-title>{{ 'characters.import.title' | transloco }}</h2>
+<h2 class="dialog-title">{{ 'characters.import.title' | transloco }}</h2>
 
-<mat-dialog-content>
+<div class="dialog-content">
   <app-character-activation-panel
     (activated)="dialogRef.close($event)"
     (activateError)="dialogRef.close({ error: true })"
     (openSyncRequested)="dialogRef.close({ openSync: true })"
   />
-</mat-dialog-content>
+</div>
 
-<mat-dialog-actions>
+<div class="dialog-actions">
   <div class="actions-left">
-    <button mat-stroked-button (click)="panel().openSync()" [disabled]="panel().isActivating()">
-      <mat-icon>sync</mat-icon>
+    <app-button variant="stroked" icon="sync" (click)="panel().openSync()" [disabled]="panel().isActivating()">
       {{ 'characters.bnet.syncButton' | transloco }}
-    </button>
+    </app-button>
     <span class="sync-hint">{{ 'characters.import.syncHint' | transloco }}</span>
   </div>
   <div class="actions-right">
-    <button mat-button mat-dialog-close [disabled]="panel().isActivating()">
+    <app-button variant="text" (click)="dialogRef.close()" [disabled]="panel().isActivating()">
       {{ 'characters.import.cancel' | transloco }}
-    </button>
+    </app-button>
     @if (panel().loadState() === 'idle' && !panel().allAlreadyActive() && panel().characters().length > 0) {
-      <button
-        mat-flat-button
+      <app-button
+        variant="primary"
         [disabled]="panel().selectedCount() === 0 || panel().isActivating()"
         (click)="panel().activate()">
         @if (panel().isActivating()) {
-          <mat-spinner [diameter]="16" />
+          <span class="spinner import-spinner"></span>
         } @else {
           {{ 'characters.import.importButton' | transloco : { count: panel().selectedCount() } }}
         }
-      </button>
+      </app-button>
     }
   </div>
-</mat-dialog-actions>
+</div>

@@ -1,32 +1,36 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { BnetAccount } from '../../models/bnet-account.model';
-import { BnetLinkButtonComponent } from '../../../../shared/components/bnet-link-button/bnet-link-button.component';
-import { BnetIconComponent } from '../../../../shared/components/bnet-icon/bnet-icon.component';
+import { BnetLinkButtonComponent } from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
 import {
   PageHeaderComponent,
   BreadcrumbItem,
-} from '../../../../shared/components/page-header/page-header.component';
+} from '../../../../shared/components/layout/page-header/page-header.component';
 import { REGION_FLAGS } from '../../../../shared/constants/bnet-regions';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 
 /**
  * Header bar for the characters list page.
- * Displays the breadcrumb (with the manual "?" link), the BNet account chip when linked, and action buttons.
+ * Displays the breadcrumb (with the manual "?" link), the import button and BNet account chip
+ * on wide screens, and a "more" menu grouping the same on narrow ones (see .actions-wide /
+ * .actions-narrow-trigger in the stylesheet — both render, CSS picks one per breakpoint).
  */
 @Component({
   selector: 'app-character-list-header',
   standalone: true,
   imports: [
-    MatButtonModule,
-    MatIconModule,
     TranslocoPipe,
     BnetLinkButtonComponent,
+    ButtonComponent,
     BnetIconComponent,
     PageHeaderComponent,
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
   ],
   templateUrl: './list-header.component.html',
   styleUrl: './list-header.component.scss',

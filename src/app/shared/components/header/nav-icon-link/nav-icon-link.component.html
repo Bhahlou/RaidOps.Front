@@ -1,0 +1,13 @@
+<a
+  class="icon-btn"
+  [routerLink]="route()"
+  routerLinkActive="nav-icon-link-active"
+  (click)="onClick($event)"
+  [attr.aria-label]="label()"
+  [appTooltip]="label()"
+>
+  <span class="material-icons">{{ icon() }}</span>
+  @if (badgeCount(); as count) {
+    <app-count-badge [count]="count" />
+  }
+</a>

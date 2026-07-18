@@ -1,14 +1,11 @@
 import { Component, computed, OnInit, inject, output, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { CdkAccordion, CdkAccordionItem } from '@angular/cdk/accordion';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
-import { WowFactionIconComponent } from '../../../../shared/components/wow-faction-icon/wow-faction-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { WowFactionIconComponent } from '../../../../shared/components/icons/wow-faction-icon/wow-faction-icon.component';
+import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
+import { DialogStateComponent } from '../../../../shared/components/feedback/dialog-state/dialog-state.component';
 import { CharacterService } from '../../services/character.service';
 import { SyncedCharacter } from '../../models/synced-character.model';
 
@@ -34,16 +31,14 @@ interface BranchGroup {
   selector: 'app-character-activation-panel',
   standalone: true,
   imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule,
-    MatExpansionModule,
-    MatCheckboxModule,
+    CdkAccordion,
+    CdkAccordionItem,
     TranslocoPipe,
     WowClassIconComponent,
     WowFactionIconComponent,
+    CheckboxComponent,
+    IconButtonComponent,
+    DialogStateComponent,
   ],
   templateUrl: './character-activation-panel.component.html',
   styleUrl: './character-activation-panel.component.scss',

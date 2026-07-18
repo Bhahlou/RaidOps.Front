@@ -89,4 +89,18 @@ describe('ManualSidebarComponent', () => {
       expect(back).toHaveBeenCalledOnce();
     });
   });
+
+  // ── onArticleClick ───────────────────────────────────────────────────────
+
+  describe('onArticleClick', () => {
+    it('emits closeRequested', () => {
+      const component = setup();
+      let emitted = false;
+      component.closeRequested.subscribe(() => { emitted = true; });
+
+      component.onArticleClick();
+
+      expect(emitted).toBe(true);
+    });
+  });
 });

@@ -6,7 +6,7 @@
 }
 
 .page-card {
-  margin: 24px;
+  margin-top: 10px;
 }
 
 .char-header {
@@ -19,13 +19,19 @@
 
 .char-actions {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.char-actions-wide {
+  display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
 
-  mat-icon,
+  .material-icons,
   .action-icon {
     margin-right: 4px;
   }
@@ -36,10 +42,42 @@
     margin-right: 4px;
   }
 
-  &__danger {
-    color: var(--mat-sys-error) !important;
-    border-color: var(--mat-sys-error) !important;
+  // Below this, the three buttons no longer fit next to the character name without wrapping
+  // awkwardly — group them into the "more" menu instead (see .char-actions-narrow-trigger).
+  @media (max-width: 700px) {
+    display: none;
   }
+}
+
+// "more" menu trigger, only shown below the breakpoint — .char-actions-wide covers everything
+// above it.
+.char-actions-narrow-trigger {
+  display: none;
+
+  @media (max-width: 700px) {
+    display: flex;
+  }
+}
+
+.menu-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+// Same reasoning as app-bnet-icon's svg above — app-button's native <button> renders inside its
+// own template, past this component's view encapsulation boundary.
+:host ::ng-deep .char-actions__danger {
+  color: var(--mat-sys-error) !important;
+  border-color: var(--mat-sys-error) !important;
+}
+
+// Filled Battle.net blue (same brand color as app-bnet-link-button) instead of the accent orange,
+// so the resync action reads as "this talks to Battle.net" at a glance.
+:host ::ng-deep .btn-bnet {
+  background: #0062c8;
+  color: #ffffff;
 }
 
 .action-icon {
@@ -71,6 +109,13 @@
   grid-template-columns: 2fr 2fr 1fr;
   gap: 16px;
   align-items: start;
+
+  // Below this, three columns squeeze each card too narrow to be worth it — stack instead of
+  // fighting for width. These are always-relevant panels (not optional detail), so a plain stack
+  // keeps everything visible without adding the extra click an accordion would cost.
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .char-name-row {

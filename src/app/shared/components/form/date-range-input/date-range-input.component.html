@@ -1,0 +1,15 @@
+<input
+  type="date"
+  class="date-input"
+  [value]="dateInputValue(start())"
+  (change)="onStartInput($any($event.target).value)"
+  [attr.aria-label]="startAriaLabel()"
+/>
+<span class="date-range-sep">–</span>
+<input
+  type="date"
+  class="date-input"
+  [value]="dateInputValue(end())"
+  (change)="onEndInput($any($event.target).value)"
+  [attr.aria-label]="endAriaLabel()"
+/>

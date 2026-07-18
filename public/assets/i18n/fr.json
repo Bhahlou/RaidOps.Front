@@ -3,10 +3,12 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "language": "Langue",
-    "help": "Aide"
+    "help": "Aide",
+    "toggleNav": "Ouvrir/fermer le menu"
   },
   "manual": {
     "back": "Retour",
+    "toc": "Sommaire",
     "category": {
       "welcome": "Bienvenue",
       "account": "Compte",
@@ -57,6 +59,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "uiRefresh": {
+        "title": "Un thème visuel plus cohérent, et l'app utilisable sur mobile/tablette",
+        "description": "Nouveaux composants d'interface (boutons, cases à cocher, menus, tableaux…) avec un rendu plus homogène. Les écrans denses comme le roster ou le journal d'audit s'adaptent maintenant aux petits écrans en passant en vue carte."
+      },
       "whatsNew": {
         "title": "Une page Nouveautés pour suivre les évolutions",
         "description": "L'icône 📣 dans le header liste les fonctionnalités ajoutées à RaidOps au fil du temps, avec un badge quand il y a du nouveau à voir."
@@ -107,6 +113,7 @@
     "pageTitle": "Roadmap",
     "intro": "Ce qui est prévu ou en réflexion pour la suite de RaidOps. Aucun ordre ni date garantis — juste de quoi se projeter sur la direction du projet.",
     "inProgress": "En cours",
+    "completed": "Terminé",
     "status": {
       "done": "Terminé",
       "planned": "Prévu"
@@ -317,17 +324,16 @@
     "timezone": {
       "label": "Fuseau horaire",
       "placeholder": "ex. Europe/Paris",
-      "required": "Le fuseau horaire est requis."
+      "required": "Le fuseau horaire est requis.",
+      "hint": "Ce réglage permet de régler le fuseau horaire de la guilde pour les raids ou les absences."
     },
     "rosterMode": {
       "label": "Accès au roster",
       "open": "Ouvert à tous",
       "discordRoleOnly": "Rôle Discord requis",
-      "hintOpen": "N'importe quel membre authentifié peut rejoindre le roster.",
-      "hintRole": "Les membres ayant ce rôle ou un rôle plus élevé dans la hiérarchie Discord peuvent rejoindre le roster."
+      "hint": "Ce réglage définit qui peut rejoindre votre roster : n'importe qui sur votre discord, ou un rôle minimum."
     },
     "roles": {
-      "label": "Seuil d'accès au roster",
       "loading": "Chargement des rôles…",
       "empty": "Aucun rôle assignable trouvé sur ce serveur.",
       "hint": "Clique sur un rôle pour définir le seuil minimum. Ce rôle et tous les rôles au-dessus donnent accès au roster.",
@@ -466,7 +472,6 @@
     }
   },
   "roster": {
-    "title": "Roster",
     "addCharacter": "Ajouter un personnage",
     "addPanel": {
       "title": "Mes personnages disponibles",
@@ -495,6 +500,7 @@
         "Alt": "Alt"
       },
       "actions": "Actions",
+      "expandRow": "Afficher niveau, rang et date d'entrée",
       "viewCharacter": "Voir le personnage",
       "kick": "Éjecter de la guilde",
       "kickSuccess": "Personnage retiré du roster de la guilde.",
@@ -556,6 +562,7 @@
   "characters": {
     "bnet": {
       "linkButton": "Lier Battle.net",
+      "connectedAs": "Connecté :",
       "notLinkedTitle": "Lie ton compte Battle.net",
       "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement.",
       "linkedSuccess": "Compte Battle.net lié avec succès !",
@@ -570,7 +577,8 @@
       "title": "Personnages",
       "emptyTitle": "Aucun personnage importé",
       "empty": "RaidOps connait maintenant tes personnages, mais tu n'en as encore importé aucun. Clique sur le bouton ci-dessous pour importer tes personnages depuis Battle.net.",
-      "importButton": "Importer les personnages"
+      "importButton": "Importer les personnages",
+      "actionsMenu": "Actions"
     },
     "import": {
       "title": "Importer des personnages",
@@ -599,6 +607,7 @@
       "resync": "Resynchroniser depuis BNet",
       "deactivate": "Désactiver de RaidOps",
       "editRaidSpecs": "Configurer les spés viables",
+      "actionsMenu": "Actions",
       "resyncSuccess": "Personnage resynchronisé !",
       "resyncError": "Erreur lors de la resynchronisation. Réessaie.",
       "deactivateError": "Erreur lors de la désactivation. Réessaie.",

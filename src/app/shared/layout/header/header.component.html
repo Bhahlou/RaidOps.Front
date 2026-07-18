@@ -1,6 +1,15 @@
-<mat-toolbar>
+<header class="toolbar">
+  @if (isAuthenticated()) {
+    <app-icon-button
+      icon="menu"
+      [extraClass]="'sidenav-toggle'"
+      (click)="sidenavService.toggle()"
+      [ariaLabel]="'header.toggleNav' | transloco"
+    />
+  }
+
   <div routerLink="/" class="logo-wrapper">
-    <img [ngSrc]="envBranding.logoPath" alt="RaidOps Logo" class="logo" width="40" height="40" priority />
+    <img [ngSrc]="envBranding.logoPath" alt="RaidOps Logo" class="logo" width="30" height="30" priority />
     <span [style.color]="envBranding.accentColor">RaidOps</span>
     @if (envBranding.badgeLabel) {
       <span class="env-badge" [style.background-color]="envBranding.accentColor">
@@ -11,38 +20,16 @@
 
   <span class="spacer"></span>
 
-  <a
-    mat-icon-button
-    routerLink="/manual"
-    routerLinkActive="header-icon-active"
-    (click)="onHelpClick($event)"
-    [attr.aria-label]="'header.help' | transloco"
-    [matTooltip]="'header.help' | transloco"
-  >
-    <mat-icon>help</mat-icon>
-  </a>
+  <app-nav-icon-link route="/manual" icon="help" [label]="'header.help' | transloco" />
 
-  <a
-    mat-icon-button
-    routerLink="/changelog"
-    routerLinkActive="header-icon-active"
-    (click)="onChangelogClick($event)"
-    [attr.aria-label]="'changelog.pageTitle' | transloco"
-    [matTooltip]="'changelog.pageTitle' | transloco"
-  >
-    <mat-icon [matBadge]="unseenChangelogCount() || null" matBadgeColor="warn"> campaign </mat-icon>
-  </a>
+  <app-nav-icon-link
+    route="/changelog"
+    icon="campaign"
+    [label]="'changelog.pageTitle' | transloco"
+    [badgeCount]="unseenChangelogCount()"
+  />
 
-  <a
-    mat-icon-button
-    routerLink="/roadmap"
-    routerLinkActive="header-icon-active"
-    (click)="onRoadmapClick($event)"
-    [attr.aria-label]="'roadmap.pageTitle' | transloco"
-    [matTooltip]="'roadmap.pageTitle' | transloco"
-  >
-    <mat-icon>signpost</mat-icon>
-  </a>
+  <app-nav-icon-link route="/roadmap" icon="signpost" [label]="'roadmap.pageTitle' | transloco" />
 
   @if (isAuthenticated()) {
     <app-notification-bell />
@@ -50,7 +37,7 @@
 
   <app-lang-selector />
 
-  <div class="user-trigger" [matMenuTriggerFor]="userMenu">
+  <div class="user-trigger" [cdkMenuTriggerFor]="userMenu">
     @if (user()?.name) {
       <span class="user-name">{{ user()?.name }}</span>
     }
@@ -59,23 +46,26 @@
         [type]="iconType"
         [id]="$safeNavigationMigration(user()?.discordId)!"
         [hash]="$safeNavigationMigration(user()?.avatarHash)"
+        [size]="28"
       />
     } @else {
-      <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+      <span class="material-icons user-avatar-icon">account_circle</span>
     }
   </div>
 
-  <mat-menu #userMenu="matMenu">
-    @if (isAuthenticated()) {
-      <button mat-menu-item (click)="onLogoutClick()">
-        <mat-icon>logout</mat-icon>
-        {{ 'header.logout' | transloco }}
-      </button>
-    } @else {
-      <button mat-menu-item (click)="onLoginClick()">
-        <mat-icon>login</mat-icon>
-        {{ 'header.login' | transloco }}
-      </button>
-    }
-  </mat-menu>
-</mat-toolbar>
+  <ng-template #userMenu>
+    <div class="menu-panel" cdkMenu>
+      @if (isAuthenticated()) {
+        <button type="button" class="menu-item" cdkMenuItem (click)="onLogoutClick()">
+          <span class="material-icons">logout</span>
+          {{ 'header.logout' | transloco }}
+        </button>
+      } @else {
+        <button type="button" class="menu-item" cdkMenuItem (click)="onLoginClick()">
+          <span class="material-icons">login</span>
+          {{ 'header.login' | transloco }}
+        </button>
+      }
+    </div>
+  </ng-template>
+</header>

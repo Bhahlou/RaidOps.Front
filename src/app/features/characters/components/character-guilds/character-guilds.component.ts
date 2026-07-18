@@ -1,15 +1,14 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
+import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterStore } from '../../stores/character.store';
 import { Character } from '../../models/character.model';
@@ -20,19 +19,13 @@ import { CharacterRank } from '../../../guilds/models/character-rank.enum';
   standalone: true,
   imports: [
     RouterLink,
-    MatButton,
-    MatIconButton,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
-    MatIcon,
-    MatOption,
-    MatSelect,
-    MatProgressSpinner,
+    SelectComponent,
     TranslocoPipe,
     DiscordIconComponent,
     WowClassIconComponent,
+    ButtonComponent,
+    IconButtonComponent,
+    EmptyHintComponent,
   ],
   templateUrl: './character-guilds.component.html',
   styleUrl: './character-guilds.component.scss',
@@ -49,6 +42,10 @@ export class CharacterGuildsComponent implements OnInit {
   readonly DiscordIconType = DiscordIconType;
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
+
+  readonly rankSelectOptions = computed<SelectOption<CharacterRank>[]>(() =>
+    this.ranks.map((r) => ({ value: r, label: this.rankLabel(r) })),
+  );
 
   // ── Derived from the character input ─────────────────────────────────────
 

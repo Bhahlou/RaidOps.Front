@@ -1,12 +1,12 @@
-<h2 mat-dialog-title>{{ 'characters.sync.title' | transloco }}</h2>
+<h2 class="dialog-title">{{ 'characters.sync.title' | transloco }}</h2>
 
-<mat-dialog-content>
+<div class="dialog-content">
   <app-bnet-sync-panel [region]="data.region" (synced)="onSynced()" />
-</mat-dialog-content>
+</div>
 
-<mat-dialog-actions align="end">
+<div class="dialog-actions">
   @if (panel().step() === 'error') {
-    <button mat-button (click)="panel().retry()">{{ 'characters.sync.retry' | transloco }}</button>
+    <app-button variant="text" (click)="panel().retry()">{{ 'characters.sync.retry' | transloco }}</app-button>
   }
-  <button mat-button mat-dialog-close>{{ 'characters.import.cancel' | transloco }}</button>
-</mat-dialog-actions>
+  <app-button variant="text" (click)="dialogRef.close()">{{ 'characters.import.cancel' | transloco }}</app-button>
+</div>

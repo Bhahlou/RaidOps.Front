@@ -1,0 +1,15 @@
+<div class="avatar-wrapper" [style.width.px]="size()" [style.height.px]="size()">
+  @if (!url) {
+    <span class="material-icons" [style.font-size.px]="size()">account_circle</span>
+  }
+  @if (url) {
+    <img
+      [ngSrc]="url"
+      [alt]="'Discord icon'"
+      [width]="size()"
+      [height]="size()"
+      [style.width.px]="size()"
+      [style.height.px]="size()"
+    />
+  }
+</div>

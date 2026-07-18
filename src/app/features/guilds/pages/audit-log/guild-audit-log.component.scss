@@ -1,3 +1,25 @@
+// All breakpoints in this file are @container queries against this host, not viewport media
+// queries: the sidenav rail (and its 768px drawer breakpoint) sits between the viewport width
+// and the width this page actually gets — container queries measure the real slot.
+// Responsive tiers:
+//   > 1000px — full table: five columns, the date-range picker inline in the time header. Its
+//              two inputs stack vertically at every tier (see app-date-range-input below) —
+//              side by side they measured ~290px, double the column's own content. Below this
+//              boundary the change column still truncated with real-world content (validated
+//              empirically), even with the picker stacked.
+//   ≤ 1000px — the header re-wraps as a toolbar of the same sort/filter controls; the date
+//              picker (sort icon included) sits right-aligned at the toolbar's end and drops
+//              to its own line only when the chips stop leaving it room — automatic via flex
+//              wrap (~660px with the French labels, ~700px with the German ones, the widest).
+//   640–1000 — two-line cards: actor | action | category | time on the first line (subgrid
+//              keeps those aligned across cards), then the change wrapping freely on a
+//              full-width second line where it can never truncate.
+//   < 640px  — three-line cards: actor + time / action + category / change.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .guild-page {
   display: flex;
   flex-direction: column;
@@ -6,7 +28,7 @@
 }
 
 .audit-log-content {
-  padding: 40px 48px;
+  padding: 5px 4px;
 }
 
 .subtitle {
@@ -36,6 +58,19 @@
   }
 }
 
+// ── Spinners ─────────────────────────────────────────────────────────────────
+// .spinner (border/animation) is global (src/styles.scss); sizing lives here.
+
+.audit-log-spinner {
+  width: 32px;
+  height: 32px;
+}
+
+.load-more-spinner {
+  width: 20px;
+  height: 20px;
+}
+
 // A single grid spans the whole table, so column widths are computed across every row.
 // Each <li> below is a subgrid (not its own independent grid) so it shares those tracks —
 // without this, each row would auto-size its minmax(.., auto) columns from its own
@@ -48,15 +83,33 @@
   // The time column is fixed (not minmax(.., auto)) — it holds the icon-only sort button plus
   // the date-range picker, and resolving "auto" through a subgrid for a flex container with a
   // flex:1 child is fragile; a fixed width sidesteps that intrinsic-sizing path entirely.
-  grid-template-columns: minmax(120px, auto) minmax(90px, auto) minmax(130px, auto) 1fr 300px;
+  // 170px fits the stacked picker (sort icon + one ~130px locale-formatted date input wide)
+  // and the widest cell dates; the clear button wraps under the inputs when a range is active
+  // (.date-range-filter wraps) instead of poking past the table edge.
+  grid-template-columns: minmax(120px, auto) minmax(90px, auto) minmax(130px, auto) 1fr 170px;
   column-gap: 16px;
+
+  // Two-line tier: the change leaves the tracks for a full-width second line inside each row,
+  // so only the first-line columns remain — actor | action | category | time. fit-content()
+  // caps (instead of minmax(.., auto)) stop one long username from inflating its whole track;
+  // action takes whatever is left and ellipsizes.
+  @container (min-width: 641px) and (max-width: 1000px) {
+    grid-template-columns: fit-content(220px) minmax(0, 1fr) fit-content(130px) auto;
+    column-gap: 12px;
+  }
+
+  // Card tier: rows lay themselves out (see the .audit-log-row overrides below), but the
+  // shared tracks would otherwise still impose their combined minimum on the list.
+  @container (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .audit-log-row {
   display: grid;
+  // No explicit column-gap: subgrid inherits whichever gap the table's active tier defines.
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
-  column-gap: 16px;
   border-bottom: 1px solid var(--mat-sys-outline);
 
   > * {
@@ -82,6 +135,124 @@
   letter-spacing: 0.02em;
   color: var(--mat-sys-on-surface-variant);
   border-bottom: 1px solid var(--mat-sys-outline);
+}
+
+// Below the full tier there are no columns left to head — the header re-wraps as a toolbar of
+// the same sort/filter controls.
+@container (max-width: 1000px) {
+  .audit-log-row--header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 16px;
+
+    > * {
+      padding: 4px 0;
+    }
+
+    // Right-aligned at the toolbar's end — visually near the time column it filters — and,
+    // being the last flex item on a wrapping line, it drops to a line of its own automatically
+    // exactly when the chips stop leaving it room (no hard breakpoint to maintain).
+    .col-time {
+      margin-left: auto;
+    }
+  }
+}
+
+// Two-line tier — actor | action | category | time on the first line (still subgridded, so
+// those columns align across cards), then the change wraps freely on a full-width second line
+// instead of being squeezed into a fifth column.
+@container (min-width: 641px) and (max-width: 1000px) {
+  .audit-log-row:not(.audit-log-row--header) {
+    row-gap: 2px;
+    padding: 8px 4px;
+
+    // The card's own padding above frames the content — the per-cell row padding (and the
+    // first/last-child edge padding) would just double it up inside the card.
+    > * {
+      padding: 0;
+    }
+
+    .col-actor {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    .col-action {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    // Muted metadata at the line's end, not a second piece of prose competing with the action.
+    .col-category {
+      grid-row: 1;
+      grid-column: 3;
+      font-size: 0.8rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    .col-time {
+      grid-row: 1;
+      grid-column: 4;
+    }
+
+    .col-change {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+// Card tier — each entry lays out as a three-line card: who + when on the first line, what
+// happened (action) + where (category) on the second, then the change itself.
+@container (max-width: 640px) {
+  .audit-log-row:not(.audit-log-row--header) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 10px 4px;
+
+    // Same reasoning as the two-line tier: the card's padding frames the content.
+    > * {
+      padding: 0;
+    }
+
+    .col-actor {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    .col-time {
+      grid-row: 1;
+      grid-column: 2;
+      justify-self: end;
+    }
+
+    .col-action {
+      grid-row: 2;
+      grid-column: 1;
+      white-space: normal;
+    }
+
+    // Mirrors the time cell's position and muted styling — a metadata tag on the line's end,
+    // not a second piece of prose competing with the action label.
+    .col-category {
+      grid-row: 2;
+      grid-column: 2;
+      justify-self: end;
+      font-size: 0.8rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    .col-change {
+      grid-row: 3;
+      grid-column: 1 / -1;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
 }
 
 .col-header {
@@ -125,6 +296,15 @@
   &.sort-icon--active {
     opacity: 1;
   }
+
+  // Invisible (opacity: 0) still reserves 16px on every header, and the hover that reveals it
+  // doesn't exist on touch — below the full tier, drop it from layout unless it's the active
+  // sort column (same trade as the roster table).
+  @container (max-width: 1000px) {
+    &:not(.sort-icon--active) {
+      display: none;
+    }
+  }
 }
 
 // Date column header has no text label — the date-range picker is explicit on its own.
@@ -142,75 +322,49 @@
   &:hover .sort-icon {
     opacity: 1;
   }
-}
 
-.filter-btn {
-  // Resize via the MDC state-layer token rather than width/height directly — MDC computes
-  // its own internal padding from this token, which is what keeps the icon centered.
-  --mdc-icon-button-state-layer-size: 28px;
-  color: var(--mat-sys-on-surface-variant);
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &.filter-active {
-    color: var(--mat-sys-primary);
-  }
-}
-
-.active-filter {
-  color: var(--mat-sys-primary);
-}
-
-.filter-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  min-width: 220px;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-
-  mat-icon {
-    color: var(--mat-sys-on-surface-variant);
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-
-  input {
-    flex: 1;
-    min-width: 0;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--mat-sys-on-surface);
-    font: inherit;
-
-    &::placeholder {
-      color: var(--mat-sys-on-surface-variant);
+  // Time has no text label — this icon IS the sort control, so it's exempt from the toolbar
+  // tiers' "hide inactive sort icons" rule above, and stays visible (no hover on touch).
+  @container (max-width: 1000px) {
+    .sort-icon {
+      display: block;
+      opacity: 1;
     }
   }
 }
 
-.filter-options {
-  max-height: 280px;
-  overflow-y: auto;
-}
+// Filter dropdowns are the shared app-filter-menu component — trigger and panel styling
+// (matching app-select's panel) live there, not here.
 
 .date-range-filter {
   display: flex;
+  // The full tier's 170px time track only budgets for the stacked inputs — when a range is
+  // active, the clear button wraps under them instead of poking past the table edge and
+  // summoning a horizontal scrollbar.
+  flex-wrap: wrap;
   align-items: center;
   gap: 2px;
   flex: 1;
   min-width: 0;
+}
 
-  mat-form-field {
-    width: 100%;
+// The two date inputs stack vertically at every tier — side by side the picker measured
+// ~290px, roughly double what the time column's own content needs, and that footprint alone
+// dictated the whole table's breakpoints (see the tier comment at the top).
+app-date-range-input {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+
+  // The separator only means something between side-by-side inputs. It and the inputs render
+  // behind the child's view encapsulation boundary — ::ng-deep is the pragmatic way to still
+  // reach them (same pattern as .load-more-btn below).
+  ::ng-deep .date-range-sep {
+    display: none;
+  }
+
+  ::ng-deep .date-input {
+    min-width: 0;
   }
 }
 
@@ -301,14 +455,19 @@
   white-space: nowrap;
 }
 
-.no-match-message {
+// Scoped under .audit-log-row so it outweighs the card tiers' `> * { padding: 0 }` reset
+// (same specificity, later in the file).
+.audit-log-row .no-match-message {
   grid-column: 1 / -1;
   justify-content: center;
   padding: 24px 0;
   color: var(--mat-sys-on-surface-variant);
 }
 
-.load-more-btn {
+// app-button's native <button>/<a> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here (same
+// pattern already used in character-card.component.scss for a projected child's SVG).
+:host ::ng-deep .load-more-btn {
   margin-top: 16px;
   align-self: center;
 }

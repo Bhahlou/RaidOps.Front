@@ -94,6 +94,32 @@ describe('GuildMyCharactersComponent', () => {
     });
   });
 
+  // ── toggleExpand ──────────────────────────────────────────────────────────
+
+  describe('toggleExpand', () => {
+    it('flips isExpanded', () => {
+      const { component } = setup();
+
+      component.toggleExpand();
+      expect(component.isExpanded()).toBe(true);
+
+      component.toggleExpand();
+      expect(component.isExpanded()).toBe(false);
+    });
+  });
+
+  // ── rankSelectOptions ─────────────────────────────────────────────────────
+
+  it('rankSelectOptions maps every rank to its value/label pair', () => {
+    const { component } = setup();
+
+    expect(component.rankSelectOptions()).toEqual([
+      { value: CharacterRank.Main, label: 'Main' },
+      { value: CharacterRank.Split, label: 'Split' },
+      { value: CharacterRank.Alt, label: 'Alt' },
+    ]);
+  });
+
   // ── myCharacters / addableCharacters ─────────────────────────────────────
 
   describe('myCharacters', () => {

@@ -1,11 +1,10 @@
 import { Component, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterService } from '../../services/character.service';
 import { Branch } from '../../../../shared/models/branch.model';
 import { environment } from '../../../../../environments/environment';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
+import { DialogStateComponent } from '../../../../shared/components/feedback/dialog-state/dialog-state.component';
 
 export type BnetSyncStep = 'branches' | 'authenticating' | 'syncing' | 'error';
 
@@ -17,7 +16,7 @@ export type BnetSyncStep = 'branches' | 'authenticating' | 'syncing' | 'error';
 @Component({
   selector: 'app-bnet-sync-panel',
   standalone: true,
-  imports: [MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
+  imports: [TranslocoPipe, DialogStateComponent],
   templateUrl: './bnet-sync-panel.component.html',
   styleUrl: './bnet-sync-panel.component.scss',
 })

@@ -2,7 +2,7 @@
   <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'getting-started', article: 'character-detail' }" />
 
   @if (character(); as char) {
-    <mat-card appearance="outlined" class="page-card">
+    <div class="card page-card">
       <div class="char-header">
         @if (char.avatarUrl) {
           <img class="char-avatar" [ngSrc]="char.avatarUrl" [alt]="char.name" width="64" height="64" priority />
@@ -21,28 +21,40 @@
         </div>
 
         <div class="char-actions">
-          @if (isOwner()) {
-            <button mat-stroked-button (click)="resyncCharacter()">
-              <app-bnet-icon [size]="18" />
-              {{ 'characters.card.resync' | transloco }}
-            </button>
-          }
-          @if (canEditRaidSpecs()) {
-            <button mat-stroked-button (click)="editRaidSpecs()">
-              <img class="action-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="18" height="18" />
-              {{ 'characters.card.editRaidSpecs' | transloco }}
-            </button>
-          }
-          @if (isOwner()) {
-            <button mat-stroked-button class="char-actions__danger" (click)="deactivateCharacter()">
-              <mat-icon>person_remove</mat-icon>
-              {{ 'characters.card.deactivate' | transloco }}
+          <div class="char-actions-wide">
+            @if (isOwner()) {
+              <app-button variant="primary" [extraClass]="'btn-bnet'" (click)="resyncCharacter()">
+                <app-bnet-icon [size]="18" />
+                {{ 'characters.card.resync' | transloco }}
+              </app-button>
+            }
+            @if (canEditRaidSpecs()) {
+              <app-button variant="stroked" (click)="editRaidSpecs()">
+                <img class="action-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="18" height="18" />
+                {{ 'characters.card.editRaidSpecs' | transloco }}
+              </app-button>
+            }
+            @if (isOwner()) {
+              <app-button variant="stroked" [extraClass]="'char-actions__danger'" icon="person_remove" (click)="deactivateCharacter()">
+                {{ 'characters.card.deactivate' | transloco }}
+              </app-button>
+            }
+          </div>
+
+          @if (isOwner() || canEditRaidSpecs()) {
+            <button
+              type="button"
+              class="icon-btn char-actions-narrow-trigger"
+              [cdkMenuTriggerFor]="actionsMenu"
+              [attr.aria-label]="'characters.card.actionsMenu' | transloco"
+            >
+              <span class="material-icons">more_vert</span>
             </button>
           }
         </div>
       </div>
 
-      <mat-card-content>
+      <div class="card-content">
         <div class="detail-layout">
           <app-character-gear [characterId]="char.id" />
           <app-character-bis-list [characterId]="char.id" />
@@ -50,7 +62,30 @@
             <app-character-guilds [character]="char" />
           }
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
   }
 </div>
+
+<ng-template #actionsMenu>
+  <div class="menu-panel" cdkMenu>
+    @if (isOwner()) {
+      <button type="button" class="menu-item" cdkMenuItem (click)="resyncCharacter()">
+        <app-bnet-icon [size]="18" />
+        <span>{{ 'characters.card.resync' | transloco }}</span>
+      </button>
+    }
+    @if (canEditRaidSpecs()) {
+      <button type="button" class="menu-item" cdkMenuItem (click)="editRaidSpecs()">
+        <img class="menu-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="20" height="20" />
+        <span>{{ 'characters.card.editRaidSpecs' | transloco }}</span>
+      </button>
+    }
+    @if (isOwner()) {
+      <button type="button" class="menu-item menu-item--danger" cdkMenuItem (click)="deactivateCharacter()">
+        <span class="material-icons">person_remove</span>
+        <span>{{ 'characters.card.deactivate' | transloco }}</span>
+      </button>
+    }
+  </div>
+</ng-template>

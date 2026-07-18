@@ -1,31 +1,56 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--navbar-height);
+  padding: 0 16px;
+  position: relative;
+  z-index: 2;
+  background: var(--color-bg-elevated);
+  color: var(--color-accent);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+// app-icon-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .sidenav-toggle {
+  margin-right: 8px;
+
+  // Desktop keeps the sidenav's existing hover-to-expand interaction — the toggle only exists
+  // for the mobile drawer mode (see sidenav.component.scss's own matching breakpoint).
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
 .logo-wrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
 
   .logo {
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     margin-right: 10px;
   }
 
   .env-badge {
-    color: var(--mat-sys-surface);
+    color: var(--color-bg-primary);
     font-size: 0.75rem;
     font-weight: 600;
     padding: 2px 6px;
     margin-left: 1rem;
     text-transform: uppercase;
     border-radius: 4px;
+
+    @media (max-width: 440px) {
+      display: none;
+    }
   }
 }
 
 .spacer {
   flex: 1 1 auto;
-}
-
-.header-icon-active {
-  color: var(--mat-sys-primary);
 }
 
 .user-trigger {
@@ -35,8 +60,12 @@
   cursor: pointer;
   padding: 4px;
 
-  &:has(.user-name) {
-    padding-left: 12px;
+  // .user-name is display:none (not removed) below 460px, so :has() alone would still match —
+  // gate on viewport too, or the trigger keeps the wider padding meant for the now-hidden text.
+  @media (min-width: 461px) {
+    &:has(.user-name) {
+      padding-left: 12px;
+    }
   }
   border-radius: 28px;
   transition: background 150ms ease;
@@ -48,16 +77,20 @@
   .user-name {
     font-size: 1.1rem;
     font-weight: 500;
-    color: var(--mat-sys-on-surface);
+    color: var(--color-text-primary);
+
+    @media (max-width: 460px) {
+      display: none;
+    }
   }
 
   .user-avatar-icon {
-    font-size: 36px;
-    width: 36px;
-    height: 36px;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--mat-sys-primary);
+    color: var(--color-accent);
   }
 }

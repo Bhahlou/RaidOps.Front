@@ -5,9 +5,20 @@
 
 .page-content {
   height: 100%;
-  overflow: auto;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  // Reserve the scrollbar's width on both edges — otherwise it only ever eats into the right
+  // side when content is tall enough to scroll, making everything inside look off-center.
+  scrollbar-gutter: stable both-edges;
 
   &.with-sidenav {
     margin-left: var(--sidebar-rail-width);
+
+    // Sidenav is a fixed-position drawer below this breakpoint (out of flow), so the rail's
+    // reserved margin would just be dead space.
+    @media (max-width: 768px) {
+      margin-left: 0;
+    }
   }
 }

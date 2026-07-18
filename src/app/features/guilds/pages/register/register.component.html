@@ -4,7 +4,7 @@
 
   @if (loading()) {
     <div class="loading-state">
-      <mat-spinner diameter="40" />
+      <span class="spinner loading-spinner"></span>
     </div>
   } @else if (guild(); as guild) {
 
@@ -19,31 +19,30 @@
       </div>
 
       <!-- Stepper -->
-      <mat-stepper [selectedIndex]="stepIndex()" linear class="register-stepper">
+      <app-stepper-header
+        class="register-stepper"
+        [activeIndex]="stepIndex()"
+        [steps]="[
+          { label: 'register.steps.invite' | transloco, completed: guild.isRegistered },
+          { label: 'register.steps.settings' | transloco, completed: false },
+        ]"
+      />
 
+      @if (stepIndex() === 0) {
         <!-- Step 1 — Invite bot -->
-        <mat-step
-          [label]="'register.steps.invite' | transloco"
-          [completed]="guild.isRegistered"
-        >
-          <p class="description" [innerHTML]="'register.description' | transloco"></p>
-          <div class="action">
-            <button mat-flat-button color="primary" (click)="initiateRegistration()">
-              <mat-icon>add_circle</mat-icon>
-              {{ 'register.cta' | transloco }}
-            </button>
-          </div>
-        </mat-step>
-
+        <p class="description" [innerHTML]="'register.description' | transloco"></p>
+        <div class="action">
+          <app-button variant="primary" icon="add_circle" (click)="initiateRegistration()">
+            {{ 'register.cta' | transloco }}
+          </app-button>
+        </div>
+      } @else {
         <!-- Step 2 — Settings -->
-        <mat-step [label]="'register.steps.settings' | transloco">
-          <app-guild-settings-form
-            [guildId]="guild.id"
-            (saved)="onSettingsSaved()"
-          />
-        </mat-step>
-
-      </mat-stepper>
+        <app-guild-settings-form
+          [guildId]="guild.id"
+          (saved)="onSettingsSaved()"
+        />
+      }
 
     </app-icon-card>
 

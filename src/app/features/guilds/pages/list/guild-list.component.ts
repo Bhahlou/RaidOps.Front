@@ -1,29 +1,20 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { UserGuild } from '../../../../core/models/user-guild.model';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { IconCardComponent } from '../../../../shared/components/layout/icon-card/icon-card.component';
 import {
   PageHeaderComponent,
   BreadcrumbItem,
-} from '../../../../shared/components/page-header/page-header.component';
+} from '../../../../shared/components/layout/page-header/page-header.component';
 
 @Component({
   selector: 'app-guild-list',
-  imports: [
-    RouterLink,
-    MatButtonModule,
-    MatTableModule,
-    DiscordIconComponent,
-    TranslocoPipe,
-    IconCardComponent,
-    PageHeaderComponent,
-  ],
+  imports: [DiscordIconComponent, TranslocoPipe, IconCardComponent, PageHeaderComponent, ButtonComponent],
   templateUrl: './guild-list.component.html',
   styleUrl: './guild-list.component.scss',
 })
@@ -75,5 +66,4 @@ export class GuildListComponent implements OnInit {
   );
 
   readonly DiscordIconType = DiscordIconType;
-  readonly columns = ['icon', 'name', 'action'];
 }

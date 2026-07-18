@@ -1,5 +1,5 @@
 import { ChangelogEntry, ChangelogEntryType } from '../models/changelog-entry.model';
-import { ManualLink } from '../../../shared/components/page-header/page-header.component';
+import { ManualLink } from '../../../shared/components/layout/page-header/page-header.component';
 
 /** Every current entry is a Feature — `titleKey`/`descriptionKey` follow `changelog.entries.<key>.*`. */
 export function feature(
@@ -18,8 +18,20 @@ export function feature(
   };
 }
 
+/** A fix or small improvement — no manual link, `titleKey`/`descriptionKey` follow the same `changelog.entries.<key>.*` shape as {@link feature}. */
+export function fix(id: string, date: string, key: string): ChangelogEntry {
+  return {
+    id,
+    date: new Date(date),
+    type: ChangelogEntryType.Fix,
+    titleKey: `changelog.entries.${key}.title`,
+    descriptionKey: `changelog.entries.${key}.description`,
+  };
+}
+
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  fix('2026-07-18-ui-refresh', '2026-07-18', 'uiRefresh'),
   feature('2026-07-05-whats-new', '2026-07-05', 'whatsNew', {
     category: 'account',
     article: 'whats-new',

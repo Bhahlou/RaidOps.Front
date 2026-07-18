@@ -2,20 +2,15 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatPrefix, MatSuffix } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
-import { MatInput } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { Dialog } from '@angular/cdk/dialog';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { DateRangeInputComponent } from '../../../../shared/components/form/date-range-input/date-range-input.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
+import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { GuildAccessLevel, hasGuildAccess } from '../../../../core/models/guild-access-level.enum';
 import { AuthStore } from '../../../../core/stores/auth.store';
@@ -51,26 +46,17 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   imports: [
     NgOptimizedImage,
     RouterLink,
-    MatIconButton,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
-    MatDatepickerModule,
-    MatFormField,
-    MatSuffix,
-    MatPrefix,
-    MatIcon,
-    MatInput,
-    MatMenuModule,
-    MatOption,
-    MatSelect,
-    MatProgressSpinner,
-    MatTableModule,
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
+    SelectComponent,
+    DateRangeInputComponent,
     TranslocoPipe,
     WowClassIconComponent,
     DiscordIconComponent,
     CharacterRaidSpecsComponent,
+    IconButtonComponent,
+    EmptyHintComponent,
   ],
   templateUrl: './guild-roster-list.component.html',
   styleUrl: './guild-roster-list.component.scss',
@@ -83,21 +69,18 @@ export class GuildRosterListComponent {
   readonly #transloco = inject(TranslocoService);
   readonly #authStore = inject(AuthStore);
   readonly #snackbar = inject(SnackbarService);
-  readonly #dialog = inject(MatDialog);
+  readonly #dialog = inject(Dialog);
 
   readonly DiscordIconType = DiscordIconType;
   readonly ranks = RANK_ORDER;
 
-  readonly columns = [
-    'player',
-    'character',
-    'class',
-    'specs',
-    'level',
-    'rank',
-    'joinedAt',
-    'actions',
-  ];
+  readonly rankSelectOptions = computed<SelectOption<CharacterRank>[]>(() => {
+    this.#transloco.activeLang(); // depend on language changes so labels stay in sync
+    return RANK_ORDER.map((rank) => ({
+      value: rank,
+      label: this.#transloco.translate(`roster.list.rank.${rank}`),
+    }));
+  });
 
   readonly isLoading = this.#store.isLoading;
 
@@ -110,6 +93,9 @@ export class GuildRosterListComponent {
   readonly kickingCharacterId = this.#characterStore.leavingCharacterId;
 
   readonly searchQuery = signal('');
+
+  /** Rows with their Niveau/Rang/Rejoint detail expanded — narrow-viewport layout only. */
+  readonly #expandedRowIds = signal<Set<number>>(new Set());
 
   // ── Filters ───────────────────────────────────────────────────────────────
 
@@ -287,6 +273,14 @@ export class GuildRosterListComponent {
     this.searchQuery.set(value);
   }
 
+  toggleRowExpand(characterId: number): void {
+    this.#expandedRowIds.update((ids) => toggleInSet(ids, characterId));
+  }
+
+  isRowExpanded(characterId: number): boolean {
+    return this.#expandedRowIds().has(characterId);
+  }
+
   /** Formats a timestamp using the app's current language, not a hardcoded locale. */
   formatDate(joinedAt: string): string {
     return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), { dateStyle: 'medium' }).format(
@@ -316,13 +310,12 @@ export class GuildRosterListComponent {
 
   kickMember(member: GuildRosterMember): void {
     this.#dialog
-      .open(ConfirmKickDialogComponent, {
+      .open<boolean>(ConfirmKickDialogComponent, {
         width: '420px',
         maxWidth: '95vw',
         data: { characterName: member.characterName },
       })
-      .afterClosed()
-      .subscribe((confirmed: boolean) => {
+      .closed.subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.#characterStore.leaveGuild(member.characterId, this.guildId()).subscribe({
