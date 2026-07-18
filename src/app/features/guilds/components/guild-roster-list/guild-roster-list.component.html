@@ -212,7 +212,7 @@
                       <span class="material-icons">visibility</span>
                       {{ 'roster.list.viewCharacter' | transloco }}
                     </a>
-                    @if (isOfficer()) {
+                    @if (member.canExclude) {
                       <button
                         type="button"
                         class="menu-item menu-item--danger"
