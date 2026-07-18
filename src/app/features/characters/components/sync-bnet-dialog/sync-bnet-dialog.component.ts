@@ -1,7 +1,7 @@
 import { Component, inject, viewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { BnetSyncPanelComponent } from '../bnet-sync-panel/bnet-sync-panel.component';
 
 export interface SyncBnetDialogData {
@@ -12,12 +12,12 @@ export interface SyncBnetDialogData {
 @Component({
   selector: 'app-sync-bnet-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, TranslocoPipe, BnetSyncPanelComponent],
+  imports: [TranslocoPipe, ButtonComponent, BnetSyncPanelComponent],
   templateUrl: './sync-bnet-dialog.component.html',
 })
 export class SyncBnetDialogComponent {
-  readonly dialogRef = inject(MatDialogRef<SyncBnetDialogComponent>);
-  readonly data = inject<SyncBnetDialogData>(MAT_DIALOG_DATA);
+  readonly dialogRef = inject(DialogRef<{ synced: boolean } | undefined>);
+  readonly data = inject<SyncBnetDialogData>(DIALOG_DATA);
 
   readonly panel = viewChild.required(BnetSyncPanelComponent);
 

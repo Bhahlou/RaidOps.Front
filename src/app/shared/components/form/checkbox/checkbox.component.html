@@ -1,0 +1,14 @@
+<label class="checkbox" [class.checkbox--disabled]="disabled()">
+  <input
+    #nativeInput
+    type="checkbox"
+    class="checkbox-input"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    (change)="onChange($event)"
+  />
+  <span class="checkbox-box">
+    <span class="material-icons checkbox-icon">check</span>
+  </span>
+  <span class="checkbox-label"><ng-content /></span>
+</label>

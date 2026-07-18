@@ -355,15 +355,17 @@ describe('GuildAuditLogComponent', () => {
       expect(component.availableActors()).toEqual([{ id: 'a1', name: 'a1' }]);
     });
 
-    it('filteredActorOptions narrows availableActors by actorSearch', () => {
+    it('actorFilterOptions maps availableActors to filter-menu options', () => {
       const component = setup();
       store.entries.set([
         entry({ id: 1, actorDiscordId: 'a1', actorUsername: 'Arthas' }),
         entry({ id: 2, actorDiscordId: 'a2', actorUsername: 'Zaza' }),
       ]);
-      component.actorSearch.set('art');
 
-      expect(component.filteredActorOptions()).toEqual([{ id: 'a1', name: 'Arthas' }]);
+      expect(component.actorFilterOptions()).toEqual([
+        { value: 'a1', label: 'Arthas' },
+        { value: 'a2', label: 'Zaza' },
+      ]);
     });
 
     it('availableCategories only lists categories actually present among loaded entries', () => {
@@ -373,15 +375,13 @@ describe('GuildAuditLogComponent', () => {
       expect(component.availableCategories()).toEqual([GuildAuditCategory.Roster]);
     });
 
-    it('filteredCategoryOptions narrows availableCategories by categorySearch', () => {
+    it('categoryFilterOptions maps availableCategories to labeled filter-menu options', () => {
       const component = setup();
-      store.entries.set([
-        entry({ category: GuildAuditCategory.Roster }),
-        entry({ category: GuildAuditCategory.Settings }),
-      ]);
-      component.categorySearch.set('roster');
+      store.entries.set([entry({ category: GuildAuditCategory.Roster })]);
 
-      expect(component.filteredCategoryOptions()).toEqual([GuildAuditCategory.Roster]);
+      expect(component.categoryFilterOptions()).toEqual([
+        { value: GuildAuditCategory.Roster, label: component.categoryLabel(GuildAuditCategory.Roster) },
+      ]);
     });
 
     it('availableActionTypes only lists action types actually present among loaded entries', () => {
@@ -391,15 +391,13 @@ describe('GuildAuditLogComponent', () => {
       expect(component.availableActionTypes()).toEqual([GuildAuditAction.MemberJoined]);
     });
 
-    it('filteredActionOptions narrows availableActionTypes by actionSearch', () => {
+    it('actionFilterOptions maps availableActionTypes to labeled filter-menu options', () => {
       const component = setup();
-      store.entries.set([
-        entry({ actionType: GuildAuditAction.MemberJoined }),
-        entry({ actionType: GuildAuditAction.MemberLeft }),
-      ]);
-      component.actionSearch.set('joined');
+      store.entries.set([entry({ actionType: GuildAuditAction.MemberJoined })]);
 
-      expect(component.filteredActionOptions()).toEqual([GuildAuditAction.MemberJoined]);
+      expect(component.actionFilterOptions()).toEqual([
+        { value: GuildAuditAction.MemberJoined, label: component.actionLabel(GuildAuditAction.MemberJoined) },
+      ]);
     });
 
     it('availableChanges lists distinct rendered change summaries, sorted', () => {
@@ -413,15 +411,17 @@ describe('GuildAuditLogComponent', () => {
       expect(component.availableChanges()).toEqual(['Arthas', 'Zaza']);
     });
 
-    it('filteredChangeOptions narrows availableChanges by changeSearch', () => {
+    it('changeFilterOptions maps availableChanges to filter-menu options', () => {
       const component = setup();
       store.entries.set([
         entry({ id: 1, actionType: GuildAuditAction.MemberJoined, variables: { characterName: 'Arthas' } }),
         entry({ id: 2, actionType: GuildAuditAction.MemberJoined, variables: { characterName: 'Zaza' } }),
       ]);
-      component.changeSearch.set('art');
 
-      expect(component.filteredChangeOptions()).toEqual(['Arthas']);
+      expect(component.changeFilterOptions()).toEqual([
+        { value: 'Arthas', label: 'Arthas' },
+        { value: 'Zaza', label: 'Zaza' },
+      ]);
     });
   });
 

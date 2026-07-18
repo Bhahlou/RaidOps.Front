@@ -1,17 +1,16 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { forkJoin } from 'rxjs';
 import { CharacterStore } from '../../stores/character.store';
 import { Spec } from '../../../../shared/models/spec.model';
 import { Character } from '../../models/character.model';
 import { CharacterSpec } from '../../models/character-spec.model';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { DialogStateComponent } from '../../../../shared/components/feedback/dialog-state/dialog-state.component';
 
 export interface SetRaidSpecsDialogData {
   characters: Character[];
@@ -38,21 +37,19 @@ type LoadState = 'loading' | 'idle' | 'error' | 'submitting';
   standalone: true,
   imports: [
     NgOptimizedImage,
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
+    CheckboxComponent,
     TranslocoPipe,
     WowClassIconComponent,
+    ButtonComponent,
+    DialogStateComponent,
   ],
   templateUrl: './set-raid-specs-dialog.component.html',
   styleUrl: './set-raid-specs-dialog.component.scss',
 })
 export class SetRaidSpecsDialogComponent implements OnInit {
   readonly #characterStore = inject(CharacterStore);
-  readonly #dialogRef = inject(MatDialogRef<SetRaidSpecsDialogComponent>);
-  readonly #data = inject<SetRaidSpecsDialogData>(MAT_DIALOG_DATA);
+  readonly #dialogRef = inject(DialogRef<{ success?: boolean; error?: boolean } | undefined>);
+  readonly #data = inject<SetRaidSpecsDialogData>(DIALOG_DATA);
 
   readonly loadState = signal<LoadState>('loading');
   readonly characterStates = signal<CharacterSpecsState[]>([]);

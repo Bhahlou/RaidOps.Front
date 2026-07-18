@@ -1,7 +1,21 @@
+:host {
+  display: block;
+}
+
 .step-loading {
   display: flex;
   justify-content: center;
   padding: 40px 0;
+}
+
+.step-spinner {
+  width: 36px;
+  height: 36px;
+}
+
+.import-btn-spinner {
+  width: 16px;
+  height: 16px;
 }
 
 .step-desc {
@@ -21,4 +35,26 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
+
+  // Below this, side by side leaves each button too little width for its label — stack instead.
+  @media (max-width: 420px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    // align-items: stretch alone doesn't reach the actual <button>/<a> — that's rendered inside
+    // app-button's own template (inline-flex, sized to content), past this component's view
+    // encapsulation boundary. Force it explicitly so both buttons match the full row width.
+    ::ng-deep app-button .btn {
+      width: 100%;
+    }
+  }
+}
+
+// app-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here. Filled
+// Battle.net blue (same brand color as app-bnet-link-button) instead of the accent orange, so the
+// button reads as "this syncs with Battle.net" at a glance.
+:host ::ng-deep .sync-btn-bnet {
+  background: #0062c8;
+  color: #ffffff;
 }

@@ -1,6 +1,6 @@
 import { Component, computed } from '@angular/core';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
 import { injectGuildContext } from '../../inject-guild-context';
 
 @Component({

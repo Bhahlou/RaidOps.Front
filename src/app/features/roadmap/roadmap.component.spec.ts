@@ -89,4 +89,39 @@ describe('RoadmapComponent', () => {
       expect(component.doneCount(section)).toBe(0);
     });
   });
+
+  // ── isComplete ────────────────────────────────────────────────────────────
+
+  describe('isComplete', () => {
+    const buildSection = (statuses: RoadmapItemStatus[]): RoadmapSection => ({
+      id: 'test-section',
+      titleKey: 'roadmap.section.test.title',
+      items: statuses.map((status, i) => ({
+        id: `item-${i}`,
+        titleKey: `roadmap.items.item-${i}.title`,
+        descriptionKey: `roadmap.items.item-${i}.description`,
+        status,
+      })),
+    });
+
+    it('is true when every item is Done', () => {
+      const component = setup();
+      const section = buildSection([RoadmapItemStatus.Done, RoadmapItemStatus.Done]);
+
+      expect(component.isComplete(section)).toBe(true);
+    });
+
+    it('is false when at least one item is still Planned', () => {
+      const component = setup();
+      const section = buildSection([RoadmapItemStatus.Done, RoadmapItemStatus.Planned]);
+
+      expect(component.isComplete(section)).toBe(false);
+    });
+
+    it('is false when the section has no items', () => {
+      const component = setup();
+
+      expect(component.isComplete(buildSection([]))).toBe(false);
+    });
+  });
 });

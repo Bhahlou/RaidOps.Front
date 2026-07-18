@@ -1,30 +1,3 @@
-.dialog-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 40px 0;
-  color: var(--mat-sys-on-surface-variant);
-
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-    opacity: 0.6;
-  }
-
-  p {
-    margin: 0;
-    font-size: 14px;
-  }
-
-  &--error {
-    color: var(--mat-sys-error);
-    mat-icon { opacity: 1; }
-  }
-}
-
 .step-desc {
   margin: 0 0 20px;
   font-size: 13px;
@@ -35,6 +8,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+
+  // Below this, two columns leave too little width for the branch name to render unclipped
+  // (see .branch-name's ellipsis) — stack instead of truncating "Classic" mid-word.
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .branch-card {
@@ -75,6 +54,16 @@
     opacity: 0.42;
     transition: opacity 0.2s ease;
     border-radius: inherit;
+
+    // Text sits directly on top of this image at a crop/position we don't control per-card, so
+    // its background can't be trusted to stay dark enough behind .branch-card__content — a fixed
+    // scrim (not tied to the image itself) keeps the text readable no matter what's underneath.
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.1) 75%);
+    }
   }
 
   &__content {
@@ -105,6 +94,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .branch-expansion {

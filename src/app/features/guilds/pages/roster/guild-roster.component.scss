@@ -9,6 +9,24 @@
   display: grid;
   grid-template-columns: 3fr 1fr;
   gap: 16px;
-  padding: 24px;
+  padding: 4px;
   align-items: start;
+
+  // Without this, a grid item's automatic minimum size is based on its content (same trap as any
+  // flex item) — either card's own content can then force its track (and the whole card with it)
+  // wider than the viewport, regardless of any internal responsive fix inside that component.
+  .col-main,
+  .col-side {
+    min-width: 0;
+  }
+
+  // Below this, .col-side (an expandable card above this width — see guild-my-characters'
+  // .expand-toggle) moves above the roster list instead of squeezing into a 1fr sidebar column.
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+
+    .col-side {
+      order: -1;
+    }
+  }
 }

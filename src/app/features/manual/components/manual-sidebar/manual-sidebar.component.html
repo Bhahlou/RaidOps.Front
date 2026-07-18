@@ -1,6 +1,6 @@
-<nav class="manual-sidebar">
+<nav class="manual-sidebar" [class.is-open]="isOpen()">
   <button class="back-link" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
+    <span class="material-icons">arrow_back</span>
     {{ 'manual.back' | transloco }}
   </button>
 
@@ -10,12 +10,12 @@
         @if (category.icon === 'discord') {
           <app-discord-brand-icon class="section-icon" [size]="20" />
         } @else {
-          <mat-icon class="section-icon">{{ category.icon }}</mat-icon>
+          <span class="material-icons section-icon">{{ category.icon }}</span>
         }
         <span class="section-name">{{ category.labelKey | transloco }}</span>
-        <mat-icon class="section-chevron">
+        <span class="material-icons section-chevron">
           {{ openCategoryIds().has(category.id) ? 'expand_less' : 'expand_more' }}
-        </mat-icon>
+        </span>
       </button>
 
       @if (openCategoryIds().has(category.id)) {
@@ -24,6 +24,7 @@
             class="sidebar-item"
             [routerLink]="['/manual', category.id, article.id]"
             routerLinkActive="active-link"
+            (click)="onArticleClick()"
           >
             {{ article.labelKey | transloco }}
           </a>

@@ -1,35 +1,31 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatStepperModule } from '@angular/material/stepper';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { UserGuild } from '../../../../core/models/user-guild.model';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { IconCardComponent } from '../../../../shared/components/layout/icon-card/icon-card.component';
+import { StepperHeaderComponent } from '../../../../shared/components/layout/stepper-header/stepper-header.component';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
 import {
   PageHeaderComponent,
   BreadcrumbItem,
-} from '../../../../shared/components/page-header/page-header.component';
+} from '../../../../shared/components/layout/page-header/page-header.component';
 
 @Component({
   selector: 'app-register',
   imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatStepperModule,
     DiscordIconComponent,
     GuildSettingsFormComponent,
+    StepperHeaderComponent,
     TranslocoPipe,
     IconCardComponent,
     PageHeaderComponent,
+    ButtonComponent,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',

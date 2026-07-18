@@ -1,4 +1,4 @@
-import { feature, CHANGELOG_ENTRIES } from './changelog-entries.data';
+import { feature, fix, CHANGELOG_ENTRIES } from './changelog-entries.data';
 import { ChangelogEntryType } from '../models/changelog-entry.model';
 
 describe('feature', () => {
@@ -22,6 +22,27 @@ describe('feature', () => {
 
     expect(entry.titleKey).toBe('changelog.entries.roster.title');
     expect(entry.descriptionKey).toBe('changelog.entries.roster.description');
+  });
+});
+
+describe('fix', () => {
+  it('builds a Fix-type entry with the given id and parsed date, and no manualLink', () => {
+    const entry = fix('some-id', '2026-01-15', 'someKey');
+
+    expect(entry).toEqual({
+      id: 'some-id',
+      date: new Date('2026-01-15'),
+      type: ChangelogEntryType.Fix,
+      titleKey: 'changelog.entries.someKey.title',
+      descriptionKey: 'changelog.entries.someKey.description',
+    });
+  });
+
+  it('derives titleKey and descriptionKey from the same key', () => {
+    const entry = fix('id', '2026-01-01', 'uiRefresh');
+
+    expect(entry.titleKey).toBe('changelog.entries.uiRefresh.title');
+    expect(entry.descriptionKey).toBe('changelog.entries.uiRefresh.description');
   });
 });
 

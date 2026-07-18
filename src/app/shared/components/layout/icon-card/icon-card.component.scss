@@ -1,0 +1,47 @@
+// This custom element has no display rule of its own otherwise, so it defaults to the browser's
+// inline for unknown elements — inconsistent box-model behavior for a block-level (flex) child
+// like .card. Declaring it explicitly also lets min-width: 0 do its job when this component sits
+// inside a flex row that needs to shrink it below its content's natural size.
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.card-header {
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+// .card-title/.card-subtitle are global row-flex items by default (shared with other cards'
+// icon+title+action headers) — group them in their own column here instead, so they stack
+// instead of fighting the icon for space in the same row.
+.card-header-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.card-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--mat-sys-primary);
+  opacity: 0.7;
+}
+
+.card-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}

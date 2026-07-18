@@ -1,0 +1,45 @@
+.notification-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-text-primary);
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+}
+
+.notification-icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notification-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notification-message {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.notification-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: -0.75rem;
+}
+
+// app-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .dismiss-button {
+  color: var(--color-text-muted);
+}

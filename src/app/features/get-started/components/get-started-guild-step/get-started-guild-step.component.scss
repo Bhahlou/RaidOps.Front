@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .guild-step {
   display: flex;
   flex-direction: column;
@@ -33,6 +37,17 @@
   @media (max-width: 960px) {
     flex-direction: column;
     align-items: stretch;
+
+    // align-items: stretch alone isn't enough here: with flex-direction: column, width is the
+    // cross axis, and a stretched item's automatic minimum size can still come from its content
+    // and win over the stretch target — min-width: 0 only overrides that for the main axis (the
+    // row-mode setup above). Pin width explicitly so content can never push these wider than the
+    // row itself, whatever is inside them.
+    > app-icon-card,
+    > .settings-card {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 }
 
@@ -58,14 +73,38 @@
   padding: 8px 0;
 }
 
+// Icon sits next to this whole block (not just the name), so align-items: center on .guild-item
+// centers it against the name+badge stack's full height once they wrap onto two lines below.
+.guild-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+
+  // Below this, name + badge no longer fit on one line without the badge forcing an overflow
+  // (badge text can't wrap on its own — see .access-badge) — stack them instead.
+  @media (max-width: 440px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
 .guild-name {
   flex: 1;
+  min-width: 0;
   font-size: 14px;
   font-weight: 500;
   color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .access-badge {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;

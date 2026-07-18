@@ -1,19 +1,17 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { GuildEligibility } from '../../../../features/guilds/models/guild-eligibility.model';
 import { CharacterRank } from '../../../guilds/models/character-rank.enum';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
+import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 /**
@@ -24,15 +22,13 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 @Component({
   selector: 'app-get-started-link-step',
   imports: [
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatOptionModule,
     TranslocoPipe,
     DiscordIconComponent,
     WowClassIconComponent,
+    CheckboxComponent,
+    SelectComponent,
+    ButtonComponent,
+    EmptyHintComponent,
   ],
   templateUrl: './get-started-link-step.component.html',
   styleUrl: './get-started-link-step.component.scss',
@@ -45,6 +41,10 @@ export class GetStartedLinkStepComponent {
   readonly DiscordIconType = DiscordIconType;
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
+  readonly rankSelectOptions: SelectOption<CharacterRank>[] = this.ranks.map((rank) => ({
+    value: rank,
+    label: rank,
+  }));
 
   readonly isLoading = this.#characterStore.isEligibleBulkLoading;
   readonly guilds = this.#characterStore.eligibleGuildsBulk;

@@ -1,18 +1,17 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
-import { WowFactionIconComponent } from '../../../../shared/components/wow-faction-icon/wow-faction-icon.component';
-import { BnetIconComponent } from '../../../../shared/components/bnet-icon/bnet-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { WowFactionIconComponent } from '../../../../shared/components/icons/wow-faction-icon/wow-faction-icon.component';
+import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import {
   PageHeaderComponent,
   BreadcrumbItem,
-} from '../../../../shared/components/page-header/page-header.component';
+} from '../../../../shared/components/layout/page-header/page-header.component';
 import { CharacterStore } from '../../stores/character.store';
 import { CharacterService } from '../../services/character.service';
 import { CharacterDetail } from '../../models/character-detail.model';
@@ -34,19 +33,19 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   standalone: true,
   imports: [
     NgOptimizedImage,
-    MatCard,
-    MatCardContent,
-    MatButtonModule,
-    MatIcon,
     TranslocoPipe,
     WowClassIconComponent,
     WowFactionIconComponent,
     BnetIconComponent,
+    ButtonComponent,
     PageHeaderComponent,
     CharacterGuildsComponent,
     CharacterGearComponent,
     CharacterBisListComponent,
     CharacterRaidSpecsComponent,
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
   ],
   templateUrl: './character-detail.component.html',
   styleUrl: './character-detail.component.scss',
@@ -57,7 +56,7 @@ export class CharacterDetailComponent implements OnInit {
   readonly #characterStore = inject(CharacterStore);
   readonly #characterService = inject(CharacterService);
   readonly #authStore = inject(AuthStore);
-  readonly #dialog = inject(MatDialog);
+  readonly #dialog = inject(Dialog);
   readonly #snackbar = inject(SnackbarService);
 
   readonly #branch = this.#route.snapshot.paramMap.get('branch') ?? '';
@@ -125,12 +124,12 @@ export class CharacterDetailComponent implements OnInit {
     const id = this.character()?.id;
     if (id === undefined) return;
 
-    const dialogRef = this.#dialog.open(ConfirmDeactivateDialogComponent, {
+    const dialogRef = this.#dialog.open<boolean>(ConfirmDeactivateDialogComponent, {
       width: '420px',
       maxWidth: '95vw',
     });
 
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+    dialogRef.closed.subscribe((confirmed) => {
       if (!confirmed) return;
       this.#characterStore.deactivateCharacter(id).subscribe({
         next: () => this.#router.navigate(['/characters']),
@@ -144,14 +143,13 @@ export class CharacterDetailComponent implements OnInit {
     if (!char) return;
 
     this.#dialog
-      .open(SetRaidSpecsDialogComponent, {
+      .open<{ success?: boolean; error?: boolean } | undefined>(SetRaidSpecsDialogComponent, {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '85vh',
         data: { characters: [char], mode: 'edit' } satisfies SetRaidSpecsDialogData,
       })
-      .afterClosed()
-      .subscribe((result?: { success?: boolean; error?: boolean }) => {
+      .closed.subscribe((result) => {
         if (result?.success) {
           this.#snackbar.success('characters.raidSpecs.submitSuccess');
         } else if (result?.error) {

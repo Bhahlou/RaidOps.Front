@@ -22,6 +22,22 @@ describe('RoleThresholdPickerComponent', () => {
     fixture.detectChanges();
   };
 
+  // ── listboxValue ──────────────────────────────────────────────────────────
+
+  describe('listboxValue', () => {
+    it('is an empty array when no threshold is set', () => {
+      setup([role('r1')], null);
+
+      expect(component.listboxValue()).toEqual([]);
+    });
+
+    it('wraps the current threshold id in a single-element array', () => {
+      setup([role('r1'), role('r2')], 'r2');
+
+      expect(component.listboxValue()).toEqual(['r2']);
+    });
+  });
+
   // ── isIncluded ────────────────────────────────────────────────────────────
 
   describe('isIncluded', () => {

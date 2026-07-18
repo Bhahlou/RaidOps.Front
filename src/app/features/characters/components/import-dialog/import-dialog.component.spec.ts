@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { DialogRef } from '@angular/cdk/dialog';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
@@ -26,7 +26,7 @@ describe('ImportDialogComponent', () => {
           provide: CharacterService,
           useValue: { getSyncedCharacters: vi.fn().mockReturnValue(of([])), activateCharacters: vi.fn() },
         },
-        { provide: MatDialogRef, useValue: { close: mockClose } },
+        { provide: DialogRef, useValue: { close: mockClose } },
       ],
     });
 

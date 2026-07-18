@@ -29,7 +29,7 @@
   color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
 
-  mat-icon {
+  .material-icons {
     font-size: 18px;
     width: 18px;
     height: 18px;
@@ -53,6 +53,14 @@
     border: 1px solid var(--mat-sys-primary);
     border-radius: 14px;
     background: var(--mat-sys-surface-container-low);
+  }
+
+  // A section where every item is Done — subtler than --active since it's not asking for
+  // attention, just confirming the whole theme shipped.
+  &.roadmap-section--complete {
+    padding: 16px 16px 20px;
+    border: 1px solid var(--mat-sys-tertiary);
+    border-radius: 14px;
   }
 }
 
@@ -87,6 +95,11 @@
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
+
+  &.section-badge--complete {
+    color: var(--mat-sys-on-tertiary-container);
+    background: var(--mat-sys-tertiary-container);
+  }
 }
 
 .item-grid {

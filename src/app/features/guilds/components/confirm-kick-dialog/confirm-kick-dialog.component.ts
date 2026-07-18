@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 
 export interface ConfirmKickDialogData {
   characterName: string;
@@ -11,13 +11,13 @@ export interface ConfirmKickDialogData {
 @Component({
   selector: 'app-confirm-kick-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, TranslocoPipe],
+  imports: [TranslocoPipe, ButtonComponent],
   templateUrl: './confirm-kick-dialog.component.html',
   styleUrl: './confirm-kick-dialog.component.scss',
 })
 export class ConfirmKickDialogComponent {
-  readonly #dialogRef = inject(MatDialogRef<ConfirmKickDialogComponent>);
-  readonly data = inject<ConfirmKickDialogData>(MAT_DIALOG_DATA);
+  readonly #dialogRef = inject(DialogRef<boolean>);
+  readonly data = inject<ConfirmKickDialogData>(DIALOG_DATA);
 
   confirm(): void {
     this.#dialogRef.close(true);

@@ -1,8 +1,5 @@
-mat-dialog-actions {
-  display: flex;
+.dialog-actions {
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 24px;
 }
 
 .actions-left {
@@ -25,4 +22,9 @@ mat-dialog-actions {
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.8;
+}
+
+.import-spinner {
+  width: 16px;
+  height: 16px;
 }

@@ -1,8 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { BnetLinkButtonComponent } from '../../../../shared/components/bnet-link-button/bnet-link-button.component';
+import { BnetLinkButtonComponent } from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { CharacterCardComponent } from '../character-card/character-card.component';
 import { Character } from '../../models/character.model';
 import { BranchGroup } from '../../models/branch-group.model';
@@ -14,13 +13,7 @@ import { BranchGroup } from '../../models/branch-group.model';
 @Component({
   selector: 'app-character-list-content',
   standalone: true,
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    TranslocoPipe,
-    BnetLinkButtonComponent,
-    CharacterCardComponent,
-  ],
+  imports: [TranslocoPipe, BnetLinkButtonComponent, ButtonComponent, CharacterCardComponent],
   templateUrl: './list-content.component.html',
   styleUrl: './list-content.component.scss',
 })

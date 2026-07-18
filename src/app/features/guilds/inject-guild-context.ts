@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
-import { BreadcrumbItem } from '../../shared/components/page-header/page-header.component';
+import { BreadcrumbItem } from '../../shared/components/layout/page-header/page-header.component';
 import { AuthStore } from '../../core/stores/auth.store';
 import { DiscordIconType } from '../../shared/models/discord-icon-type.enum';
 

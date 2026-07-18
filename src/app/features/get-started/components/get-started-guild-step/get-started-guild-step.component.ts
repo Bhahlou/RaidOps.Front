@@ -1,13 +1,12 @@
 import { Component, computed, inject, output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { UserGuild } from '../../../../core/models/user-guild.model';
 import { GuildAccessLevel } from '../../../../core/models/guild-access-level.enum';
-import { DiscordIconComponent } from '../../../../shared/components/discord-icon/discord-icon.component';
+import { DiscordIconComponent } from '../../../../shared/components/icons/discord-icon/discord-icon.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
-import { IconCardComponent } from '../../../../shared/components/icon-card/icon-card.component';
+import { IconCardComponent } from '../../../../shared/components/layout/icon-card/icon-card.component';
 import { GuildSettingsFormComponent } from '../../../guilds/components/guild-settings-form/guild-settings-form.component';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
@@ -26,12 +25,11 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-get-started-guild-step',
   imports: [
-    MatButtonModule,
-    MatIconModule,
     DiscordIconComponent,
     IconCardComponent,
     GuildSettingsFormComponent,
     TranslocoPipe,
+    ButtonComponent,
   ],
   templateUrl: './get-started-guild-step.component.html',
   styleUrl: './get-started-guild-step.component.scss',

@@ -1,0 +1,19 @@
+.lang-button {
+  .fi {
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    display: block;
+  }
+}
+
+.menu-flag {
+  width: 20px;
+  height: 15px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.active-lang {
+  color: var(--mat-sys-primary);
+}

@@ -1,0 +1,20 @@
+<button
+  class="bnet-btn"
+  [class.bnet-btn--large]="variant() === 'large'"
+  [cdkMenuTriggerFor]="regionMenu"
+>
+  <app-bnet-icon class="bnet-btn__logo" [size]="16" />
+  <ng-content />
+  <span class="material-icons bnet-btn__chevron">expand_more</span>
+</button>
+
+<ng-template #regionMenu>
+  <div class="menu-panel" cdkMenu>
+    @for (r of regions; track r) {
+      <button type="button" class="menu-item" cdkMenuItem (click)="regionSelected.emit(r)">
+        <span class="fi fi-{{ regionFlags[r] }} region-flag"></span>
+        {{ r | uppercase }}
+      </button>
+    }
+  </div>
+</ng-template>

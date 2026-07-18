@@ -4,34 +4,9 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.dialog-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 40px 0;
-  color: var(--mat-sys-on-surface-variant);
-
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-    opacity: 0.6;
-  }
-
-  p {
-    margin: 0;
-    font-size: 14px;
-  }
-
-  &--error {
-    color: var(--mat-sys-error);
-
-    mat-icon {
-      opacity: 1;
-    }
-  }
+.raid-specs-spinner-sm {
+  width: 16px;
+  height: 16px;
 }
 
 .character-section {
@@ -97,7 +72,7 @@
   border-radius: 6px;
   opacity: 0.6;
 
-  mat-icon {
+  .material-icons {
     font-size: 16px;
     width: 16px;
     height: 16px;
