@@ -29,6 +29,7 @@ const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
   raidSpecs: [{ specId: 1, name: 'Frost', iconUrl: null, isMain: true }],
   characterRank: CharacterRank.Main,
   joinedAt: '2026-01-01T00:00:00Z',
+  canExclude: true,
   ...overrides,
 });
 
