@@ -20,7 +20,7 @@
             <div class="spec-row">
               <app-checkbox
                 [checked]="isViable(state, spec.id)"
-                (change)="toggleViable(state, spec.id)">
+                (checkedChange)="toggleViable(state, spec.id)">
                 <span class="spec-label">
                   @if (spec.iconUrl) {
                     <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="18" height="18" />

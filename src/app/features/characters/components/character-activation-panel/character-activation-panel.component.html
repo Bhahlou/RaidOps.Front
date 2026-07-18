@@ -68,7 +68,7 @@
                           <app-checkbox
                             [checked]="isRealmAllSelected(realm)"
                             [indeterminate]="isRealmIndeterminate(realm)"
-                            (change)="toggleAllInRealm(realm)"
+                            (checkedChange)="toggleAllInRealm(realm)"
                             (click)="$event.stopPropagation()"
                             (keydown)="$event.stopPropagation()"
                           />
@@ -91,7 +91,7 @@
                                   [disabled]="char.isActive"
                                   (click)="$event.stopPropagation()"
                                   (keydown)="$event.stopPropagation()"
-                                  (change)="toggleCharacter(char)"
+                                  (checkedChange)="toggleCharacter(char)"
                                 />
                                 <app-wow-class-icon [classId]="char.classId" [className]="char.className" />
                                 <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>

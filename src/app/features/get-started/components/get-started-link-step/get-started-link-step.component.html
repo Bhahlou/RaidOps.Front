@@ -29,7 +29,7 @@
               <li class="character-item">
                 <app-checkbox
                   [checked]="isChecked(guild.guildId, char.id)"
-                  (change)="toggle(guild.guildId, char.id, $event)"
+                  (checkedChange)="toggle(guild.guildId, char.id, $event)"
                 />
                 <app-wow-class-icon class="class-icon" [classId]="char.classId" [className]="char.className" [size]="20" />
                 <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>

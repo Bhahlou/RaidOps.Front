@@ -26,7 +26,7 @@ describe('CheckboxComponent', () => {
   it('onChange emits the native checkbox checked state', () => {
     const component = setup();
     let emitted: boolean | undefined;
-    component.change.subscribe((v: boolean) => { emitted = v; });
+    component.checkedChange.subscribe((v: boolean) => { emitted = v; });
 
     component.onChange({ target: { checked: true } } as unknown as Event);
 

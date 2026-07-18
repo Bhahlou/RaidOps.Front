@@ -17,7 +17,7 @@ export class CheckboxComponent {
   readonly indeterminate = input(false);
   readonly disabled = input(false);
 
-  readonly change = output<boolean>();
+  readonly checkedChange = output<boolean>();
 
   private readonly nativeInput = viewChild<ElementRef<HTMLInputElement>>('nativeInput');
 
@@ -29,6 +29,6 @@ export class CheckboxComponent {
   }
 
   onChange(event: Event): void {
-    this.change.emit((event.target as HTMLInputElement).checked);
+    this.checkedChange.emit((event.target as HTMLInputElement).checked);
   }
 }

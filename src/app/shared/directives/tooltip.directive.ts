@@ -24,7 +24,7 @@ const POSITIONS: ConnectedPosition[] = [
   },
 })
 export class TooltipDirective implements OnDestroy {
-  readonly appTooltip = input('', { alias: 'appTooltip' });
+  readonly appTooltip = input('');
 
   readonly #elementRef = inject(ElementRef);
   readonly #overlay = inject(Overlay);
