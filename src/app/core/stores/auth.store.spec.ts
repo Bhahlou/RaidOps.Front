@@ -7,7 +7,7 @@ import { NotificationService } from '../services/notification.service';
 import { NotificationType } from '../models/notification.model';
 import { User } from '../models/user.model';
 
-const SESSION_KEY = 'raidops_user';
+const STORAGE_KEY = 'raidops_user';
 
 const mockUser: User = {
   discordId: '123',
@@ -34,7 +34,7 @@ describe('AuthStore', () => {
   };
 
   beforeEach(() => {
-    sessionStorage.clear();
+    localStorage.clear();
     getMe = vi.fn().mockReturnValue(of(mockUser));
     refresh = vi.fn().mockReturnValue(of(undefined));
     logout = vi.fn().mockReturnValue(of(undefined));
@@ -44,14 +44,14 @@ describe('AuthStore', () => {
   // ── Constructor ───────────────────────────────────────────────────────────
 
   describe('constructor', () => {
-    it('starts with user=null when sessionStorage is empty', () => {
+    it('starts with user=null when localStorage is empty', () => {
       const store = setup();
       expect(store.user()).toBeNull();
       expect(store.isAuthenticated()).toBe(false);
     });
 
-    it('restores user from sessionStorage when valid JSON is stored', () => {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockUser));
+    it('restores user from localStorage when valid JSON is stored', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
 
       const store = setup();
 
@@ -59,26 +59,39 @@ describe('AuthStore', () => {
       expect(store.isAuthenticated()).toBe(true);
     });
 
-    it('clears sessionStorage when stored value is not valid JSON', () => {
-      sessionStorage.setItem(SESSION_KEY, 'not-json{{{');
+    it('clears localStorage when stored value is not valid JSON', () => {
+      localStorage.setItem(STORAGE_KEY, 'not-json{{{');
 
       const store = setup();
 
       expect(store.user()).toBeNull();
-      expect(sessionStorage.getItem(SESSION_KEY)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    });
+
+    it('persists across a new session — a fresh instance restores the user cached by a previous one', () => {
+      const firstSessionStore = setup();
+      firstSessionStore.loadUser().subscribe();
+
+      // Simulate the browser being closed and reopened: sessionStorage would be wiped, but
+      // localStorage — and a brand new AuthStore instance reading from it — is not.
+      TestBed.resetTestingModule();
+      const secondSessionStore = setup();
+
+      expect(secondSessionStore.user()).toEqual(mockUser);
+      expect(secondSessionStore.isAuthenticated()).toBe(true);
     });
   });
 
   // ── loadUser ──────────────────────────────────────────────────────────────
 
   describe('loadUser', () => {
-    it('updates the user signal and persists to sessionStorage on success', () => {
+    it('updates the user signal and persists to localStorage on success', () => {
       const store = setup();
 
       store.loadUser().subscribe();
 
       expect(store.user()).toEqual(mockUser);
-      expect(JSON.parse(sessionStorage.getItem(SESSION_KEY)!)).toEqual(mockUser);
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual(mockUser);
     });
 
     it('propagates errors without updating state', () => {
@@ -141,14 +154,14 @@ describe('AuthStore', () => {
   // ── logout ────────────────────────────────────────────────────────────────
 
   describe('logout', () => {
-    it('clears the user signal and sessionStorage on success', () => {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockUser));
+    it('clears the user signal and localStorage on success', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
       const store = setup();
 
       store.logout().subscribe();
 
       expect(store.user()).toBeNull();
-      expect(sessionStorage.getItem(SESSION_KEY)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
     });
   });
 
@@ -187,7 +200,7 @@ describe('AuthStore', () => {
       expect(dismiss).toHaveBeenCalledWith(NotificationType.OfficerThresholdNotConfigured, 'g1');
     });
 
-    it('removes only the matching notification from the user signal and sessionStorage', () => {
+    it('removes only the matching notification from the user signal and localStorage', () => {
       getMe.mockReturnValue(of({ ...mockUser, notifications: [notificationA, notificationB] }));
       const store = setup();
       store.loadUser().subscribe();
@@ -195,7 +208,7 @@ describe('AuthStore', () => {
       store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
 
       expect(store.notifications()).toEqual([notificationB]);
-      expect(JSON.parse(sessionStorage.getItem(SESSION_KEY)!).notifications).toEqual([notificationB]);
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).notifications).toEqual([notificationB]);
     });
 
     it('does nothing when there is no user', () => {
