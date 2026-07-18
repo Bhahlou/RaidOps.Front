@@ -6,7 +6,8 @@ import { AuthStore } from '../stores/auth.store';
 /**
  * Protects routes that require an authenticated user.
  *
- * - If the user signal is already populated (sessionStorage restored on startup) → allow immediately.
+ * - If the user signal is already populated (localStorage restored on startup, or the header's
+ *   silent bootstrap check already resolved) → allow immediately.
  * - Otherwise tries to load the user from the API (valid cookie = silent success).
  * - On failure → redirects to /home.
  */

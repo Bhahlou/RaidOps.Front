@@ -237,6 +237,16 @@ src/app/
 
 ---
 
+## Conventions PR / commit
+
+- **Ne jamais tronquer le titre d'une PR à 70 caractères dans ce repo.** Le squash-merge GitHub
+  utilise le titre de la PR comme sujet du commit final sur `dev`, et release-please génère le
+  changelog directement depuis ce message de commit. Un titre tronqué (ex: `...make …`) finit
+  tel quel, ellipsis inclus, dans le CHANGELOG public livré aux utilisateurs. Toujours écrire le
+  titre complet, même long.
+
+---
+
 ## Prochaines étapes
 
 1. **Header component** — Logo + nom app (en cours)
