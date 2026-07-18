@@ -1,4 +1,12 @@
-::ng-deep .guilds-card .mat-mdc-card-header {
+// This card can end up quite narrow well before the viewport itself is narrow (it's the 1fr
+// column in .detail-layout's 2fr/2fr/1fr split) — container queries measure the slot actually
+// available to the card instead of the viewport, which media queries can't see.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+.guilds-card .card-header {
   justify-content: space-between;
   align-items: center;
 }
@@ -9,10 +17,12 @@
   gap: 8px;
 }
 
-.add-btn {
+// app-icon-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .add-btn {
   background-color: var(--mat-sys-primary);
 
-  ::ng-deep mat-icon { color: #000; }
+  .material-icons { color: #000; }
 
   &:hover,
   &.active {
@@ -37,13 +47,49 @@
   background: var(--color-bg-tertiary);
   border-radius: 6px;
   border: 1px solid var(--color-border-subtle);
+
+  // Wrapping unconditionally would stack the controls under the name almost all the time, since
+  // the card itself is usually the narrow one here (see :host above). Only stack once the card's
+  // own width is genuinely tight; otherwise let the name just ellipsize tighter instead.
+  @container (max-width: 480px) {
+    flex-wrap: wrap;
+  }
+}
+
+// Icon + name — shrinks first (name ellipsizes) to make room for .membership-controls, which
+// never shrinks itself.
+.membership-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+// Rank select + action button — never shrunk (flex-shrink: 0 below), so it stays a fixed-width
+// unit that either sits at the end of the row, or (below 480px, see .membership-item) wraps onto
+// its own full-width line instead of squeezing the button's nowrap label.
+.membership-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+
+  @container (max-width: 480px) {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .guild-name {
   flex: 1;
+  min-width: 0;
   font-weight: 500;
   text-decoration: none;
   color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &:hover {
     text-decoration: underline;
@@ -53,20 +99,21 @@
 .rank-select {
   width: 82px;
   flex-shrink: 0;
-
-  ::ng-deep .mat-mdc-select-trigger {
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    background: rgba(255, 255, 255, 0.08);
-    font-size: 0.8rem;
-  }
+  font-size: 0.8rem;
 }
 
-.leave-btn {
+:host ::ng-deep .leave-btn {
   &:hover {
     color: #f44336;
   }
+}
+
+// app-button's native <button> renders inside its own template, past this component's view
+// encapsulation boundary. flex-shrink: 0 since its label is nowrap (global .btn) — without this
+// it gets squeezed below its own text's width instead of .membership-controls wrapping as a whole
+// (see .membership-item's flex-wrap).
+:host ::ng-deep .join-btn {
+  flex-shrink: 0;
 }
 
 .eligible-panel {
@@ -77,8 +124,8 @@
   }
 }
 
-.empty-hint {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin: 0;
+.eligible-spinner {
+  width: 24px;
+  height: 24px;
+  margin: 12px auto;
 }

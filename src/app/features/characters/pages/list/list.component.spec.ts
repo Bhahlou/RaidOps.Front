@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { signal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 
@@ -55,7 +55,7 @@ describe('CharacterListComponent', () => {
     };
     snackbarMock = { success: vi.fn(), error: vi.fn() };
     dialogMock = {
-      open: vi.fn().mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) }),
+      open: vi.fn().mockReturnValue({ closed: of(undefined) }),
     };
 
     TestBed.configureTestingModule({
@@ -63,7 +63,7 @@ describe('CharacterListComponent', () => {
       providers: [
         { provide: CharacterStore, useValue: storeMock },
         { provide: SnackbarService, useValue: snackbarMock },
-        { provide: MatDialog, useValue: dialogMock },
+        { provide: Dialog, useValue: dialogMock },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: routeGet } } } },
       ],
     });
@@ -153,21 +153,21 @@ describe('CharacterListComponent', () => {
 
     it('calls store.deactivateCharacter when user confirms', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      dialogMock.open.mockReturnValue({ closed: of(true) });
       component.deactivateCharacter(1);
       expect(storeMock.deactivateCharacter).toHaveBeenCalledWith(1);
     });
 
     it('does not call store.deactivateCharacter when user cancels', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(false)) });
+      dialogMock.open.mockReturnValue({ closed: of(false) });
       component.deactivateCharacter(1);
       expect(storeMock.deactivateCharacter).not.toHaveBeenCalled();
     });
 
     it('shows error snackbar when store call fails after confirmation', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(true)) });
+      dialogMock.open.mockReturnValue({ closed: of(true) });
       storeMock.deactivateCharacter.mockReturnValue(throwError(() => new Error('fail')));
       component.deactivateCharacter(1);
       expect(snackbarMock.error).toHaveBeenCalledWith('characters.card.deactivateError');
@@ -184,7 +184,7 @@ describe('CharacterListComponent', () => {
     it('shows error snackbar when result.error is true', () => {
       setup();
       dialogMock.open.mockReturnValue({
-        afterClosed: vi.fn().mockReturnValue(of({ error: true, activated: 0 })),
+        closed: of({ error: true, activated: 0 }),
       });
       component.openImportDialog();
       expect(snackbarMock.error).toHaveBeenCalledWith('characters.import.importError');
@@ -194,8 +194,8 @@ describe('CharacterListComponent', () => {
       setup();
       // First open returns openSync result; second open (sync dialog) returns undefined
       dialogMock.open
-        .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ openSync: true })) })
-        .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+        .mockReturnValueOnce({ closed: of({ openSync: true }) })
+        .mockReturnValueOnce({ closed: of(undefined) });
       component.openImportDialog();
       // Sync dialog was opened as a follow-up
       expect(dialogMock.open).toHaveBeenCalledTimes(2);
@@ -203,7 +203,7 @@ describe('CharacterListComponent', () => {
 
     it('does nothing when nothing was activated and there is no error', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ activated: 0 })) });
+      dialogMock.open.mockReturnValue({ closed: of({ activated: 0 }) });
 
       component.openImportDialog();
 
@@ -221,8 +221,8 @@ describe('CharacterListComponent', () => {
         setup();
         storeMock.loadCharacters.mockReturnValue(of(activatedChars));
         dialogMock.open
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+          .mockReturnValueOnce({ closed: of({ activated: 2, activatedCharacterIds: [1, 2] }) })
+          .mockReturnValueOnce({ closed: of({ success: true }) });
 
         component.openImportDialog();
 
@@ -235,8 +235,8 @@ describe('CharacterListComponent', () => {
         setup();
         storeMock.loadCharacters.mockReturnValue(of(activatedChars));
         dialogMock.open
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+          .mockReturnValueOnce({ closed: of({ activated: 2, activatedCharacterIds: [1, 2] }) })
+          .mockReturnValueOnce({ closed: of({ success: true }) });
 
         component.openImportDialog();
 
@@ -248,8 +248,8 @@ describe('CharacterListComponent', () => {
         setup();
         storeMock.loadCharacters.mockReturnValue(of(activatedChars));
         dialogMock.open
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+          .mockReturnValueOnce({ closed: of({ activated: 2, activatedCharacterIds: [1, 2] }) })
+          .mockReturnValueOnce({ closed: of(undefined) });
 
         component.openImportDialog();
 
@@ -262,8 +262,8 @@ describe('CharacterListComponent', () => {
         setup();
         storeMock.loadCharacters.mockReturnValue(of(activatedChars));
         dialogMock.open
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ activated: 2, activatedCharacterIds: [1, 2] })) })
-          .mockReturnValueOnce({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+          .mockReturnValueOnce({ closed: of({ activated: 2, activatedCharacterIds: [1, 2] }) })
+          .mockReturnValueOnce({ closed: of({ error: true }) });
 
         component.openImportDialog();
 
@@ -283,7 +283,7 @@ describe('CharacterListComponent', () => {
     it('opens the raid-specs dialog for the matching character', () => {
       setup();
       storeMock.characterList.set([mockChar]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      dialogMock.open.mockReturnValue({ closed: of(undefined) });
 
       component.editRaidSpecs(1);
 
@@ -294,7 +294,7 @@ describe('CharacterListComponent', () => {
     it('shows success when the dialog closes with success, without reloading (the store already patched locally)', () => {
       setup();
       storeMock.characterList.set([mockChar]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ success: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ success: true }) });
 
       component.editRaidSpecs(1);
 
@@ -305,7 +305,7 @@ describe('CharacterListComponent', () => {
     it('shows error and does not roll back when the dialog closes with error', () => {
       setup();
       storeMock.characterList.set([mockChar]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ error: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ error: true }) });
 
       component.editRaidSpecs(1);
 
@@ -316,7 +316,7 @@ describe('CharacterListComponent', () => {
     it('does nothing extra when the dialog is cancelled', () => {
       setup();
       storeMock.characterList.set([mockChar]);
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      dialogMock.open.mockReturnValue({ closed: of(undefined) });
 
       component.editRaidSpecs(1);
 
@@ -353,7 +353,7 @@ describe('CharacterListComponent', () => {
   describe('sync dialog result handling', () => {
     it('does nothing when dialog closes without a result', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of(undefined)) });
+      dialogMock.open.mockReturnValue({ closed: of(undefined) });
       component.linkBnet('eu');
       expect(snackbarMock.success).not.toHaveBeenCalled();
       expect(storeMock.loadCharacters).not.toHaveBeenCalled();
@@ -361,14 +361,14 @@ describe('CharacterListComponent', () => {
 
     it('does nothing when dialog closes with synced=false', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: false })) });
+      dialogMock.open.mockReturnValue({ closed: of({ synced: false }) });
       component.linkBnet('eu');
       expect(snackbarMock.success).not.toHaveBeenCalled();
     });
 
     it('shows syncSuccess snackbar and force-reloads characters when synced=true', () => {
       setup();
-      dialogMock.open.mockReturnValue({ afterClosed: vi.fn().mockReturnValue(of({ synced: true })) });
+      dialogMock.open.mockReturnValue({ closed: of({ synced: true }) });
       component.linkBnet('eu');
       expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.syncSuccess');
       expect(storeMock.loadCharacters).toHaveBeenCalledWith(true);

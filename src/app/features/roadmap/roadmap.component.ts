@@ -1,14 +1,13 @@
 import { Location } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { TooltipDirective } from '../../shared/directives/tooltip.directive';
 import { ROADMAP_SECTIONS } from './data/roadmap-sections.data';
 import { RoadmapItemStatus, RoadmapSection } from './models/roadmap-section.model';
 
 @Component({
   selector: 'app-roadmap',
-  imports: [MatIconModule, MatTooltipModule, TranslocoPipe],
+  imports: [TooltipDirective, TranslocoPipe],
   templateUrl: './roadmap.component.html',
   styleUrl: './roadmap.component.scss',
 })
@@ -24,5 +23,9 @@ export class RoadmapComponent {
 
   doneCount(section: RoadmapSection): number {
     return section.items.filter((i) => i.status === RoadmapItemStatus.Done).length;
+  }
+
+  isComplete(section: RoadmapSection): boolean {
+    return section.items.length > 0 && this.doneCount(section) === section.items.length;
   }
 }

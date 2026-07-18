@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+
+  &--success {
+    border-left: 4px solid #66bb6a;
+  }
+  &--error {
+    border-left: 4px solid #ef5350;
+  }
+  &--info {
+    border-left: 4px solid var(--color-accent);
+  }
+}

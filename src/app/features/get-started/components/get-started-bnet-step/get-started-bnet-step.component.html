@@ -1,12 +1,12 @@
 @if (isBnetLoading() || isCharactersLoading()) {
   <div class="step-loading">
-    <mat-spinner [diameter]="36" />
+    <span class="spinner step-spinner"></span>
   </div>
 
 } @else if (linkingRegion()) {
   <app-bnet-sync-panel [region]="linkingRegion()!" (synced)="onSynced()" />
   @if (syncPanel()?.step() === 'error') {
-    <button mat-button (click)="syncPanel()!.retry()">{{ 'characters.sync.retry' | transloco }}</button>
+    <app-button variant="text" (click)="syncPanel()!.retry()">{{ 'characters.sync.retry' | transloco }}</app-button>
   }
 
 } @else if (!isBnetLinked()) {
@@ -25,22 +25,26 @@
   />
 
   <div class="step-actions">
-    <button mat-stroked-button (click)="activationPanel()!.openSync()" [disabled]="activationPanel()!.isActivating()">
-      <mat-icon>sync</mat-icon>
+    <app-button
+      variant="primary"
+      [extraClass]="'sync-btn-bnet'"
+      (click)="activationPanel()!.openSync()"
+      [disabled]="activationPanel()!.isActivating()">
+      <app-bnet-icon [size]="16" />
       {{ 'characters.bnet.syncButton' | transloco }}
-    </button>
+    </app-button>
 
     @if (activationPanel()!.loadState() === 'idle' && !activationPanel()!.allAlreadyActive() && activationPanel()!.characters().length > 0) {
-      <button
-        mat-flat-button
+      <app-button
+        variant="primary"
         [disabled]="activationPanel()!.selectedCount() === 0 || activationPanel()!.isActivating()"
         (click)="activationPanel()!.activate()">
         @if (activationPanel()!.isActivating()) {
-          <mat-spinner [diameter]="16" />
+          <span class="spinner import-btn-spinner"></span>
         } @else {
           {{ 'characters.import.importButton' | transloco : { count: activationPanel()!.selectedCount() } }}
         }
-      </button>
+      </app-button>
     }
   </div>
 }

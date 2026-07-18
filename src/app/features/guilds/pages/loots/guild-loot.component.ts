@@ -1,6 +1,6 @@
 import { Component, computed } from '@angular/core';
-import { UnderConstructionComponent } from '../../../../shared/components/under-construction/under-construction.component';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { UnderConstructionComponent } from '../../../../shared/components/feedback/under-construction/under-construction.component';
+import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
 import { injectGuildContext } from '../../inject-guild-context';
 
 @Component({

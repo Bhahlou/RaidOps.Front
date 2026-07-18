@@ -1,28 +1,24 @@
 import { Component, inject, viewChild } from '@angular/core';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { CharacterActivationPanelComponent } from '../character-activation-panel/character-activation-panel.component';
+
+export type ImportDialogResult =
+  | { activated: number; activatedCharacterIds: number[] }
+  | { error: true }
+  | { openSync: true };
 
 /** Thin dialog shell around {@link CharacterActivationPanelComponent} — owns only dialog-specific chrome (title, action buttons that drive the panel). */
 @Component({
   selector: 'app-import-dialog',
   standalone: true,
-  imports: [
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    TranslocoPipe,
-    CharacterActivationPanelComponent,
-  ],
+  imports: [TranslocoPipe, ButtonComponent, CharacterActivationPanelComponent],
   templateUrl: './import-dialog.component.html',
   styleUrl: './import-dialog.component.scss',
 })
 export class ImportDialogComponent {
-  readonly dialogRef = inject(MatDialogRef<ImportDialogComponent>);
+  readonly dialogRef = inject(DialogRef<ImportDialogResult | undefined>);
 
   readonly panel = viewChild.required(CharacterActivationPanelComponent);
 }

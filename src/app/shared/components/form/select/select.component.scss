@@ -1,0 +1,170 @@
+// A real <fieldset>/<legend> pair — the browser renders a genuine gap in the border sized to
+// the legend's own content, so unlike the previous absolute-position + background-mask
+// approach, there's no label width to measure and no background color to match against
+// whatever happens to be behind the field. This is the same trick mat-form-field's outline
+// appearance uses under the hood (Material just does it with JS-measured div segments instead
+// of native fieldset/legend).
+.select-fieldset {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &.select-fieldset--open {
+    border-color: var(--color-accent);
+  }
+
+  &:has(.select-trigger:disabled) {
+    opacity: 0.5;
+
+    &:hover {
+      border-color: var(--color-border);
+    }
+  }
+}
+
+legend.select-field-label {
+  margin-left: 6px;
+  padding: 0 4px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  // Lets a parent set a custom property on the host (e.g. `.rank-select--main { --select-value-color: ... }`)
+  // to recolor the displayed value without reaching into this component's template via ::ng-deep.
+  color: var(--select-value-color, var(--color-text-primary));
+
+  &.select-value--placeholder {
+    color: var(--color-text-muted);
+  }
+}
+
+.select-chevron {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 0.12s ease;
+
+  .select-trigger--open & {
+    transform: rotate(180deg);
+  }
+}
+
+// Portaled via CDK overlay, but Angular's view encapsulation still scopes this correctly
+// since the ng-template belongs to this component's compiled view.
+.select-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  margin-top: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.select-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+}
+
+.select-filter-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.select-filter-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.select-option {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  list-style: none;
+
+  &:hover,
+  &.cdk-option-active {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  &[aria-selected='true'] {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+}
+
+.select-empty {
+  padding: 6px 10px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  list-style: none;
+}

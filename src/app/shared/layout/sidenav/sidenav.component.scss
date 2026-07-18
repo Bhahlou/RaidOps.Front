@@ -22,6 +22,34 @@
     width: var(--sidebar-width);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
   }
+
+  // Below this, hover has no touch equivalent — the rail becomes a slide-in drawer instead,
+  // opened via the header's hamburger button (SidenavService) rather than mouseenter/leave.
+  @media (max-width: 768px) {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    height: calc(100% - var(--navbar-height));
+    width: var(--sidebar-width);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 250ms ease;
+    box-shadow: none;
+    z-index: 200;
+
+    &.is-expanded {
+      width: var(--sidebar-width);
+      transform: translateX(0);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+.sidenav-backdrop {
+  position: fixed;
+  inset: var(--navbar-height) 0 0 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
 }
 
 // ── Section header (account & guild toggles) ──────────────────────────────────
@@ -32,8 +60,8 @@
   gap: 12px;
   width: 100%;
   height: 56px;
-  // Centers the 36px avatar in 64px rail: (64 - 36) / 2 = 14px
-  padding: 0 14px;
+  // Centers the 36px avatar in 54px rail: (54 - 36) / 2 = 9px
+  padding: 0 9px;
   background: none;
   border: none;
   cursor: pointer;
@@ -85,8 +113,8 @@
   align-items: center;
   gap: 12px;
   height: 44px;
-  // Centers the 24px icon in 64px rail: (64 - 24) / 2 = 20px
-  padding: 0 20px;
+  // Centers the 24px icon in 54px rail: (54 - 24) / 2 = 15px
+  padding: 0 15px;
   text-decoration: none;
   color: var(--mat-sys-on-surface-variant);
   white-space: nowrap;

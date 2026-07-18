@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 
 import { ConfirmKickDialogComponent, ConfirmKickDialogData } from './confirm-kick-dialog.component';
 
@@ -14,8 +14,8 @@ describe('ConfirmKickDialogComponent', () => {
     TestBed.configureTestingModule({
       imports: [ConfirmKickDialogComponent],
       providers: [
-        { provide: MatDialogRef, useValue: { close: mockClose } },
-        { provide: MAT_DIALOG_DATA, useValue: data },
+        { provide: DialogRef, useValue: { close: mockClose } },
+        { provide: DIALOG_DATA, useValue: data },
       ],
     });
     TestBed.overrideComponent(ConfirmKickDialogComponent, { set: { template: '', imports: [] } });

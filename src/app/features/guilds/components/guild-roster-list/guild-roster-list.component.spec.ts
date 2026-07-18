@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
@@ -49,7 +49,11 @@ describe('GuildRosterListComponent', () => {
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
   let authStore: { user: ReturnType<typeof signal> };
-  let transloco: { getActiveLang: ReturnType<typeof vi.fn> };
+  let transloco: {
+    getActiveLang: ReturnType<typeof vi.fn>;
+    activeLang: ReturnType<typeof signal>;
+    translate: ReturnType<typeof vi.fn>;
+  };
   let fixture: ComponentFixture<GuildRosterListComponent>;
 
   const setup = (
@@ -57,6 +61,7 @@ describe('GuildRosterListComponent', () => {
     userGuilds: { id: string; accessLevel: GuildAccessLevel }[] = [],
     discordId = 'viewer-1',
     confirmKick = true,
+    loggedOut = false,
   ) => {
     store = {
       isLoading: signal(false),
@@ -72,9 +77,17 @@ describe('GuildRosterListComponent', () => {
       leavingCharacterId: signal<number | null>(null),
     };
     snackbar = { success: vi.fn(), error: vi.fn() };
-    dialog = { open: vi.fn().mockReturnValue({ afterClosed: () => of(confirmKick) }) };
-    authStore = { user: signal({ discordId, name: 'Viewer', avatarHash: null, guilds: userGuilds }) };
-    transloco = { getActiveLang: vi.fn(() => 'fr') };
+    dialog = { open: vi.fn().mockReturnValue({ closed: of(confirmKick) }) };
+    authStore = {
+      user: signal(
+        loggedOut ? null : { discordId, name: 'Viewer', avatarHash: null, guilds: userGuilds },
+      ),
+    };
+    transloco = {
+      getActiveLang: vi.fn(() => 'fr'),
+      activeLang: signal('fr'),
+      translate: vi.fn((key: string) => key),
+    };
 
     TestBed.configureTestingModule({
       imports: [GuildRosterListComponent],
@@ -82,7 +95,7 @@ describe('GuildRosterListComponent', () => {
         { provide: GuildRosterStore, useValue: store },
         { provide: CharacterStore, useValue: characterStore },
         { provide: SnackbarService, useValue: snackbar },
-        { provide: MatDialog, useValue: dialog },
+        { provide: Dialog, useValue: dialog },
         { provide: AuthStore, useValue: authStore },
         { provide: TranslocoService, useValue: transloco },
       ],
@@ -131,6 +144,43 @@ describe('GuildRosterListComponent', () => {
       const component = setup('g1', [{ id: 'g1', accessLevel: GuildAccessLevel.Officer }]);
       expect(component.isOfficer()).toBe(true);
     });
+
+    it('is false when logged out (no user)', () => {
+      const component = setup('g1', [], 'viewer-1', true, true);
+      expect(component.isOfficer()).toBe(false);
+    });
+  });
+
+  describe('rankSelectOptions', () => {
+    it('maps every rank to a value/translated-label pair', () => {
+      const component = setup();
+
+      const options = component.rankSelectOptions();
+
+      expect(options).toEqual([
+        { value: CharacterRank.Main, label: `roster.list.rank.${CharacterRank.Main}` },
+        { value: CharacterRank.Split, label: `roster.list.rank.${CharacterRank.Split}` },
+        { value: CharacterRank.Alt, label: `roster.list.rank.${CharacterRank.Alt}` },
+      ]);
+      expect(transloco.translate).toHaveBeenCalled();
+    });
+  });
+
+  describe('toggleRowExpand / isRowExpanded', () => {
+    it('starts collapsed', () => {
+      const component = setup();
+      expect(component.isRowExpanded(1)).toBe(false);
+    });
+
+    it('expands then collapses a row', () => {
+      const component = setup();
+
+      component.toggleRowExpand(1);
+      expect(component.isRowExpanded(1)).toBe(true);
+
+      component.toggleRowExpand(1);
+      expect(component.isRowExpanded(1)).toBe(false);
+    });
   });
 
   describe('characterLink', () => {
@@ -154,6 +204,11 @@ describe('GuildRosterListComponent', () => {
 
     it('is false for a plain roster viewer on someone else\'s character', () => {
       const component = setup('g1', [{ id: 'g1', accessLevel: GuildAccessLevel.Roster }], 'viewer-1');
+      expect(component.canEditRank(member({ playerDiscordId: 'owner-1' }))).toBe(false);
+    });
+
+    it('is false when logged out (no user)', () => {
+      const component = setup('g1', [], 'viewer-1', true, true);
       expect(component.canEditRank(member({ playerDiscordId: 'owner-1' }))).toBe(false);
     });
   });

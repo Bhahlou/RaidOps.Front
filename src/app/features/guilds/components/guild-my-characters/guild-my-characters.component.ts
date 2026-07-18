@@ -2,13 +2,12 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
+import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
+import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CharacterRaidSpecsComponent } from '../../../characters/components/character-raid-specs/character-raid-specs.component';
@@ -25,19 +24,13 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   imports: [
     NgOptimizedImage,
     RouterLink,
-    MatButton,
-    MatIconButton,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
-    MatIcon,
-    MatProgressSpinner,
-    MatSelect,
-    MatOption,
+    SelectComponent,
     TranslocoPipe,
     WowClassIconComponent,
     CharacterRaidSpecsComponent,
+    ButtonComponent,
+    IconButtonComponent,
+    EmptyHintComponent,
   ],
   templateUrl: './guild-my-characters.component.html',
   styleUrl: './guild-my-characters.component.scss',
@@ -51,6 +44,10 @@ export class GuildMyCharactersComponent {
 
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
+
+  readonly rankSelectOptions = computed<SelectOption<CharacterRank>[]>(() =>
+    this.ranks.map((r) => ({ value: r, label: this.rankLabel(r) })),
+  );
 
   // ── Store projections ─────────────────────────────────────────────────────
 
@@ -76,6 +73,9 @@ export class GuildMyCharactersComponent {
 
   readonly showAddPanel = signal(false);
 
+  /** Narrow-viewport only (see .expand-toggle in the stylesheet) — always expanded above it. */
+  readonly isExpanded = signal(false);
+
   /** Rank selected per character in the add panel, defaults to Main. */
   readonly #rankSelections = signal(new Map<number, CharacterRank>());
 
@@ -97,6 +97,10 @@ export class GuildMyCharactersComponent {
 
   toggleAddPanel(): void {
     this.showAddPanel.update((v) => !v);
+  }
+
+  toggleExpand(): void {
+    this.isExpanded.update((v) => !v);
   }
 
   getRankSelection(charId: number): CharacterRank {

@@ -1,4 +1,4 @@
-import { ManualLink } from '../../../shared/components/page-header/page-header.component';
+import { ManualLink } from '../../../shared/components/layout/page-header/page-header.component';
 
 export enum ChangelogEntryType {
   Feature = 'Feature',

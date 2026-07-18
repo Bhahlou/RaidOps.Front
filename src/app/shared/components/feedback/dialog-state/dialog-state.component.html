@@ -1,0 +1,10 @@
+<div class="dialog-state" [class.dialog-state--error]="variant() === 'error'">
+  @if (variant() === 'loading') {
+    <span class="spinner dialog-state__spinner"></span>
+  } @else if (icon()) {
+    <span class="material-icons">{{ icon() }}</span>
+  }
+  @if (message()) {
+    <p>{{ message() }}</p>
+  }
+</div>

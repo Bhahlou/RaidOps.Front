@@ -1,88 +1,74 @@
 <form [formRoot]="settingsForm" class="settings-form">
 
   <!-- Timezone -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>{{ 'guildSettings.timezone.label' | transloco }}</mat-label>
-    <input
-      id="guild-settings-timezone-input"
-      matInput
-      [formField]="settingsForm.timezone"
-      [matAutocomplete]="tzAuto"
+  <app-form-field-card class="full-width" [label]="'guildSettings.timezone.label' | transloco">
+    <p class="field-hint">{{ 'guildSettings.timezone.hint' | transloco }}</p>
+    <app-select
+      [inputId]="'guild-settings-timezone-input'"
+      [options]="timezoneOptions"
+      [filterable]="true"
+      [filterAriaLabel]="'guildSettings.timezone.label' | transloco"
       [placeholder]="'guildSettings.timezone.placeholder' | transloco"
-      [attr.aria-label]="'guildSettings.timezone.label' | transloco"
+      [formField]="settingsForm.timezone"
     />
-    <mat-autocomplete
-      #tzAuto
-      autoActiveFirstOption
-      [displayWith]="displayTimezone"
-      (optionSelected)="onTimezoneSelected($event)"
-    >
-      @for (tz of filteredTimezones(); track tz.id) {
-        <mat-option [value]="tz.id">{{ tz.label }}</mat-option>
-      }
-    </mat-autocomplete>
     @if (settingsForm.timezone().invalid()) {
-      <mat-error>{{ 'guildSettings.timezone.required' | transloco }}</mat-error>
+      <small class="field-error">{{ 'guildSettings.timezone.required' | transloco }}</small>
     }
-  </mat-form-field>
+  </app-form-field-card>
 
-  <!-- Roster mode -->
-  <div class="field-group">
-    <p class="field-label">{{ 'guildSettings.rosterMode.label' | transloco }}</p>
-    <mat-button-toggle-group
-      [value]="settingsForm.rosterMode().value()"
-      (change)="onRosterModeChange($event)"
-      class="roster-toggle"
-    >
-      <mat-button-toggle [value]="RosterMode.Open">
-        <mat-icon>public</mat-icon>
+  <!-- Roster access: toggle + (when Discord-role-gated) its role threshold picker, all one setting -->
+  <app-form-field-card [label]="'guildSettings.rosterMode.label' | transloco">
+    <p class="field-hint">{{ 'guildSettings.rosterMode.hint' | transloco }}</p>
+    <div class="roster-toggle">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="settingsForm.rosterMode().value() === RosterMode.Open"
+        (click)="onRosterModeChange(RosterMode.Open)"
+      >
+        <span class="material-icons toggle-icon">public</span>
         {{ 'guildSettings.rosterMode.open' | transloco }}
-      </mat-button-toggle>
-      <mat-button-toggle [value]="RosterMode.DiscordRoleOnly">
-        <mat-icon>shield</mat-icon>
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="settingsForm.rosterMode().value() === RosterMode.DiscordRoleOnly"
+        (click)="onRosterModeChange(RosterMode.DiscordRoleOnly)"
+      >
+        <span class="material-icons toggle-icon">shield</span>
         {{ 'guildSettings.rosterMode.discordRoleOnly' | transloco }}
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-    <p class="field-hint">
-      {{ (isDiscordRoleMode() ? 'guildSettings.rosterMode.hintRole' : 'guildSettings.rosterMode.hintOpen') | transloco }}
-    </p>
-  </div>
-
-  <!-- Roster role threshold (only when DiscordRoleOnly) -->
-  @if (isDiscordRoleMode()) {
-    <div class="field-group roles-section">
-      <p class="field-label">{{ 'guildSettings.roles.label' | transloco }}</p>
+      </button>
+    </div>
+    @if (isDiscordRoleMode()) {
       <p class="field-hint">{{ 'guildSettings.roles.hint' | transloco }}</p>
       <app-role-threshold-picker
         [roles]="sortedRoles()"
         [loading]="rolesLoading()"
         [formField]="settingsForm.minRosterRoleId"
       />
-    </div>
-  }
+    }
+  </app-form-field-card>
 
   <!-- Officer access threshold -->
-  <div class="field-group roles-section">
-    <p class="field-label">{{ 'guildSettings.officerThreshold.label' | transloco }}</p>
+  <app-form-field-card [label]="'guildSettings.officerThreshold.label' | transloco">
     <p class="field-hint">{{ 'guildSettings.officerThreshold.hint' | transloco }}</p>
     <app-role-threshold-picker
       [roles]="sortedRoles()"
       [loading]="rolesLoading()"
       [formField]="settingsForm.minOfficerRoleId"
     />
-  </div>
+  </app-form-field-card>
 
   <!-- Submit -->
   <div class="form-actions">
-    <button
-      mat-flat-button
-      color="primary"
-      type="submit"
+    <app-button
+      variant="primary"
+      [type]="'submit'"
+      icon="check_circle"
       [disabled]="settingsForm().invalid() || submitting()"
     >
-      <mat-icon>check_circle</mat-icon>
       {{ 'guildSettings.save' | transloco }}
-    </button>
+    </app-button>
   </div>
 
 </form>

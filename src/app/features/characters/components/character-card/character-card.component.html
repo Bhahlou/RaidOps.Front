@@ -1,4 +1,4 @@
-<article class="card" [routerLink]="charRoute()">
+<article class="character-card" [routerLink]="charRoute()">
   <div class="card-avatar">
     @if (character().avatarUrl) {
       <img
@@ -35,28 +35,31 @@
 
   <div class="card-right">
     <button
-      mat-icon-button
-      [matMenuTriggerFor]="cardMenu"
+      type="button"
+      class="icon-btn"
+      [cdkMenuTriggerFor]="cardMenu"
       (click)="$event.stopPropagation()"
     >
-      <mat-icon>more_vert</mat-icon>
+      <span class="material-icons">more_vert</span>
     </button>
 
     <span class="char-level">{{ character().level }}</span>
   </div>
 </article>
 
-<mat-menu #cardMenu="matMenu">
-  <button mat-menu-item class="resync-menu-item" (click)="resync.emit()">
-    <app-bnet-icon [size]="18" />
-    <span>{{ 'characters.card.resync' | transloco }}</span>
-  </button>
-  <button mat-menu-item (click)="editRaidSpecs.emit()">
-    <img class="menu-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="20" height="20" />
-    <span>{{ 'characters.card.editRaidSpecs' | transloco }}</span>
-  </button>
-  <button mat-menu-item class="menu-item--danger" (click)="deactivate.emit()">
-    <mat-icon>person_remove</mat-icon>
-    <span>{{ 'characters.card.deactivate' | transloco }}</span>
-  </button>
-</mat-menu>
+<ng-template #cardMenu>
+  <div class="menu-panel" cdkMenu>
+    <button type="button" class="menu-item resync-menu-item" cdkMenuItem (click)="resync.emit()">
+      <app-bnet-icon [size]="18" />
+      <span>{{ 'characters.card.resync' | transloco }}</span>
+    </button>
+    <button type="button" class="menu-item" cdkMenuItem (click)="editRaidSpecs.emit()">
+      <img class="menu-icon" ngSrc="https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="20" height="20" />
+      <span>{{ 'characters.card.editRaidSpecs' | transloco }}</span>
+    </button>
+    <button type="button" class="menu-item menu-item--danger" cdkMenuItem (click)="deactivate.emit()">
+      <span class="material-icons">person_remove</span>
+      <span>{{ 'characters.card.deactivate' | transloco }}</span>
+    </button>
+  </div>
+</ng-template>

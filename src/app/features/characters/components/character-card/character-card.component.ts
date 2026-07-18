@@ -1,13 +1,11 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatIconButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WowClassIconComponent } from '../../../../shared/components/wow-class-icon/wow-class-icon.component';
-import { WowFactionIconComponent } from '../../../../shared/components/wow-faction-icon/wow-faction-icon.component';
-import { BnetIconComponent } from '../../../../shared/components/bnet-icon/bnet-icon.component';
+import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
+import { WowFactionIconComponent } from '../../../../shared/components/icons/wow-faction-icon/wow-faction-icon.component';
+import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
 import { CharacterRaidSpecsComponent } from '../character-raid-specs/character-raid-specs.component';
 import { Character } from '../../models/character.model';
 
@@ -22,11 +20,9 @@ import { Character } from '../../models/character.model';
     WowFactionIconComponent,
     BnetIconComponent,
     CharacterRaidSpecsComponent,
-    MatIconButton,
-    MatIcon,
-    MatMenu,
-    MatMenuItem,
-    MatMenuTrigger,
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
     TranslocoPipe,
   ],
   templateUrl: './character-card.component.html',

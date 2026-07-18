@@ -1,115 +1,118 @@
 @if (loadState() === 'loading') {
-  <div class="dialog-state">
-    <mat-spinner [diameter]="36" />
-  </div>
+  <app-dialog-state variant="loading" />
 
 } @else if (loadState() === 'error') {
-  <div class="dialog-state dialog-state--error">
-    <mat-icon>error_outline</mat-icon>
-    <p>{{ 'characters.import.fetchError' | transloco }}</p>
-  </div>
+  <app-dialog-state variant="error" icon="error_outline" [message]="'characters.import.fetchError' | transloco" />
 
 } @else if (characters().length === 0) {
-  <div class="dialog-state">
-    <mat-icon>sync_alt</mat-icon>
-    <p>{{ 'characters.import.noSyncedChars' | transloco }}</p>
-  </div>
+  <app-dialog-state icon="sync_alt" [message]="'characters.import.noSyncedChars' | transloco" />
 
 } @else if (allAlreadyActive()) {
-  <div class="dialog-state">
-    <mat-icon>check_circle_outline</mat-icon>
-    <p>{{ 'characters.import.allActive' | transloco }}</p>
-  </div>
+  <app-dialog-state icon="check_circle_outline" [message]="'characters.import.allActive' | transloco" />
 
 } @else {
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>{{ 'characters.import.searchLabel' | transloco }}</mat-label>
-    <mat-icon matPrefix>search</mat-icon>
-    <input matInput #searchInput
+  <div class="search-field">
+    <span class="material-icons search-icon">search</span>
+    <input
+      #searchInput
+      type="text"
       id="character-search-input"
       [attr.aria-label]="'characters.import.searchLabel' | transloco"
       [placeholder]="'characters.import.searchPlaceholder' | transloco"
       [value]="searchQuery()"
-      (input)="searchQuery.set(searchInput.value)" />
+      (input)="searchQuery.set(searchInput.value)"
+    />
     @if (searchQuery()) {
-      <button matSuffix mat-icon-button (click)="searchQuery.set(''); searchInput.value = ''">
-        <mat-icon>close</mat-icon>
-      </button>
+      <app-icon-button icon="close" (click)="searchQuery.set(''); searchInput.value = ''" />
     }
-  </mat-form-field>
+  </div>
 
   <div class="results-scroll">
     @if (filteredBranchGroups().length === 0) {
-      <div class="dialog-state">
-        <mat-icon>manage_search</mat-icon>
-        <p>{{ 'characters.import.noResults' | transloco }}</p>
-      </div>
+      <app-dialog-state icon="manage_search" [message]="'characters.import.noResults' | transloco" />
     } @else {
       <!-- Level 1: Branch -->
-      <mat-accordion multi>
+      <div cdkAccordion [multi]="true">
         @for (branch of filteredBranchGroups(); track branch.branchName) {
-          <mat-expansion-panel
+          <div
+            cdkAccordionItem
+            #branchItem="cdkAccordionItem"
+            class="expansion-panel"
             [expanded]="isBranchExpanded(branch.branchName)"
             (opened)="toggleBranchPanel(branch.branchName, true)"
-            (closed)="toggleBranchPanel(branch.branchName, false)">
-            <mat-expansion-panel-header>
-              <mat-panel-title class="branch-header">
+            (closed)="toggleBranchPanel(branch.branchName, false)"
+          >
+            <button type="button" class="expansion-header" (click)="branchItem.toggle()">
+              <span class="material-icons expansion-chevron" [class.expansion-chevron--expanded]="branchItem.expanded">expand_more</span>
+              <span class="branch-header">
                 <span class="branch-label">{{ branch.branchName }}</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+              </span>
+            </button>
 
-            <!-- Level 2: Realm -->
-            <mat-accordion multi class="realm-accordion">
-              @for (realm of branch.realms; track realm.realmName) {
-                <mat-expansion-panel
-                  [expanded]="isRealmExpanded(branch.branchName, realm.realmName)"
-                  (opened)="toggleRealmPanel(branch.branchName, realm.realmName, true)"
-                  (closed)="toggleRealmPanel(branch.branchName, realm.realmName, false)">
-                  <mat-expansion-panel-header>
-                    <mat-panel-title class="realm-header">
-                      <mat-checkbox
-                        [checked]="isRealmAllSelected(realm)"
-                        [indeterminate]="isRealmIndeterminate(realm)"
-                        (change)="toggleAllInRealm(realm)"
-                        (click)="$event.stopPropagation()"
-                        (keydown)="$event.stopPropagation()">
-                      </mat-checkbox>
-                      <span>{{ realm.realmName }}</span>
-                      <span class="realm-count">{{ realm.characters.length }}</span>
-                    </mat-panel-title>
-                  </mat-expansion-panel-header>
-
-                  <div class="char-list">
-                    @for (char of realm.characters; track char.id) {
-                      <button
-                        class="char-row"
-                        [class.char-row--imported]="char.isActive"
-                        (click)="toggleCharacter(char)"
-                        (keydown.enter)="toggleCharacter(char)">
-                        <mat-checkbox
-                          [checked]="isSelected(char.id)"
-                          [disabled]="char.isActive"
-                          (click)="$event.stopPropagation()"
-                          (keydown)="$event.stopPropagation()"
-                          (change)="toggleCharacter(char)">
-                        </mat-checkbox>
-                        <app-wow-class-icon [classId]="char.classId" [className]="char.className" />
-                        <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
-                        <span class="char-level">{{ char.level }}</span>
-                        <app-wow-faction-icon [faction]="char.faction" />
-                        @if (char.isActive) {
-                          <span class="already-imported-badge">{{ 'characters.import.alreadyActive' | transloco }}</span>
-                        }
+            @if (branchItem.expanded) {
+              <div class="expansion-body">
+                <!-- Level 2: Realm -->
+                <div cdkAccordion [multi]="true" class="realm-accordion">
+                  @for (realm of branch.realms; track realm.realmName) {
+                    <div
+                      cdkAccordionItem
+                      #realmItem="cdkAccordionItem"
+                      class="expansion-panel"
+                      [expanded]="isRealmExpanded(branch.branchName, realm.realmName)"
+                      (opened)="toggleRealmPanel(branch.branchName, realm.realmName, true)"
+                      (closed)="toggleRealmPanel(branch.branchName, realm.realmName, false)"
+                    >
+                      <button type="button" class="expansion-header" (click)="realmItem.toggle()">
+                        <span class="material-icons expansion-chevron" [class.expansion-chevron--expanded]="realmItem.expanded">expand_more</span>
+                        <span class="realm-header">
+                          <app-checkbox
+                            [checked]="isRealmAllSelected(realm)"
+                            [indeterminate]="isRealmIndeterminate(realm)"
+                            (change)="toggleAllInRealm(realm)"
+                            (click)="$event.stopPropagation()"
+                            (keydown)="$event.stopPropagation()"
+                          />
+                          <span>{{ realm.realmName }}</span>
+                          <span class="realm-count">{{ realm.characters.length }}</span>
+                        </span>
                       </button>
-                    }
-                  </div>
-                </mat-expansion-panel>
-              }
-            </mat-accordion>
 
-          </mat-expansion-panel>
+                      @if (realmItem.expanded) {
+                        <div class="expansion-body">
+                          <div class="char-list">
+                            @for (char of realm.characters; track char.id) {
+                              <button
+                                class="char-row"
+                                [class.char-row--imported]="char.isActive"
+                                (click)="toggleCharacter(char)"
+                                (keydown.enter)="toggleCharacter(char)">
+                                <app-checkbox
+                                  [checked]="isSelected(char.id)"
+                                  [disabled]="char.isActive"
+                                  (click)="$event.stopPropagation()"
+                                  (keydown)="$event.stopPropagation()"
+                                  (change)="toggleCharacter(char)"
+                                />
+                                <app-wow-class-icon [classId]="char.classId" [className]="char.className" />
+                                <span class="char-name" [style.color]="char.classColor">{{ char.name }}</span>
+                                <span class="char-level">{{ char.level }}</span>
+                                <app-wow-faction-icon [faction]="char.faction" />
+                                @if (char.isActive) {
+                                  <span class="already-imported-badge">{{ 'characters.import.alreadyActive' | transloco }}</span>
+                                }
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
         }
-      </mat-accordion>
+      </div>
     }
   </div>
 }

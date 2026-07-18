@@ -89,6 +89,18 @@ describe('CharacterGuildsComponent', () => {
     expect(setup().component).toBeTruthy();
   });
 
+  // ── rankSelectOptions ────────────────────────────────────────────────────
+
+  it('rankSelectOptions maps every rank to its value/label pair', () => {
+    const { component } = setup();
+
+    expect(component.rankSelectOptions()).toEqual([
+      { value: CharacterRank.Main, label: 'Main' },
+      { value: CharacterRank.Split, label: 'Split' },
+      { value: CharacterRank.Alt, label: 'Alt' },
+    ]);
+  });
+
   // ── memberships ───────────────────────────────────────────────────────────
 
   it('memberships reads guildMemberships directly off the character input', () => {

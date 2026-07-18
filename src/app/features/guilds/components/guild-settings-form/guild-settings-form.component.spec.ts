@@ -1,12 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { By } from '@angular/platform-browser';
-import {
-  MatAutocomplete,
-  MatAutocompleteModule,
-  MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
-import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormField, FormRoot } from '@angular/forms/signals';
 import { of, Subject, throwError } from 'rxjs';
 
@@ -35,9 +28,6 @@ const officerThreshold = (overrides?: Partial<OfficerThreshold>): OfficerThresho
   minOfficerRoleId: null,
   ...overrides,
 });
-
-const toggleChange = (value: RosterMode): MatButtonToggleChange =>
-  ({ value }) as MatButtonToggleChange;
 
 describe('buildTimezoneOption', () => {
   it('falls back to the raw timezone id as the label when Intl.DateTimeFormat rejects it', () => {
@@ -199,26 +189,6 @@ describe('GuildSettingsFormComponent', () => {
     });
   });
 
-  // ── filteredTimezones ─────────────────────────────────────────────────────
-
-  describe('filteredTimezones', () => {
-    it('returns options that match the current timezone input', () => {
-      setup();
-      fixture.detectChanges();
-      component.settingsForm.timezone().value.set('Europe/Paris');
-
-      expect(component.filteredTimezones().some(tz => tz.id === 'Europe/Paris')).toBe(true);
-    });
-
-    it('returns an empty array when no timezone matches', () => {
-      setup();
-      fixture.detectChanges();
-      component.settingsForm.timezone().value.set('ZZZ_NOT_REAL');
-
-      expect(component.filteredTimezones()).toEqual([]);
-    });
-  });
-
   // ── onRosterModeChange ────────────────────────────────────────────────────
 
   describe('onRosterModeChange', () => {
@@ -227,7 +197,7 @@ describe('GuildSettingsFormComponent', () => {
       fixture.detectChanges();
       component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.onRosterModeChange(toggleChange(RosterMode.Open));
+      component.onRosterModeChange(RosterMode.Open);
 
       expect(component.settingsForm.minRosterRoleId().value()).toBeNull();
     });
@@ -237,7 +207,7 @@ describe('GuildSettingsFormComponent', () => {
       fixture.detectChanges();
       component.settingsForm.minRosterRoleId().value.set('r1');
 
-      component.onRosterModeChange(toggleChange(RosterMode.DiscordRoleOnly));
+      component.onRosterModeChange(RosterMode.DiscordRoleOnly);
 
       expect(component.settingsForm.minRosterRoleId().value()).toBe('r1');
       expect(component.settingsForm.rosterMode().value()).toBe(RosterMode.DiscordRoleOnly);
@@ -252,20 +222,6 @@ describe('GuildSettingsFormComponent', () => {
       component.availableRoles.set([role('r1'), role('r2'), role('r3')]);
 
       expect(component.sortedRoles()).toEqual([role('r1'), role('r2'), role('r3')]);
-    });
-  });
-
-  // ── displayTimezone ───────────────────────────────────────────────────────
-
-  describe('displayTimezone', () => {
-    it('returns the formatted label for a known timezone id', () => {
-      setup();
-      expect(component.displayTimezone('Europe/Paris')).toContain('Europe/Paris');
-    });
-
-    it('returns the id itself when the timezone is not in the list', () => {
-      setup();
-      expect(component.displayTimezone('Nowhere/Place')).toBe('Nowhere/Place');
     });
   });
 
@@ -471,90 +427,15 @@ describe('GuildSettingsFormComponent', () => {
     });
   });
 
-  // ── real mat-autocomplete wiring ─────────────────────────────────────────
+  // ── real roster-mode toggle wiring ───────────────────────────────────────
   //
-  // Same rationale as above: (optionSelected) is a manual bridge (mat-autocomplete reports a
-  // clicked option through its own ControlValueAccessor hook, not a native input event, so
-  // [formField] alone never sees it — see onTimezoneSelected's own doc comment). No test above
-  // renders the real <mat-autocomplete>, so nothing has ever proven the template actually wires
-  // (optionSelected) to onTimezoneSelected. Emitting on the real MatAutocomplete/MatOption
-  // instances (found via the real, rendered template) exercises that exact wiring without needing
-  // to drive the CDK overlay panel itself, which is Material's own already-tested concern.
+  // The roster-mode toggle is a plain pair of buttons, not a FormValueControl, so it's wired
+  // manually via (click) — see onRosterModeChange's own doc comment. No test above renders the
+  // real toggle buttons, so nothing has proven the template actually wires a click to
+  // onRosterModeChange. Clicking the real rendered button exercises the actual DOM path a user
+  // takes, rather than calling the method directly.
 
-  describe('real mat-autocomplete wiring', () => {
-    const setupRealAutocomplete = () => {
-      settingsService = {
-        getDiscordRoles:        vi.fn().mockReturnValue(of([])),
-        updateSettings:         vi.fn().mockReturnValue(of(undefined)),
-        updateOfficerThreshold: vi.fn().mockReturnValue(of(undefined)),
-      };
-      guildStore = {
-        settings:      signal<GuildSettings | null>(null),
-        loadSettings:  vi.fn(),
-        patchSettings: vi.fn(),
-      };
-      officerThresholdStore = {
-        officerThreshold:      signal<OfficerThreshold | null>(null),
-        loadOfficerThreshold:  vi.fn(),
-        patchOfficerThreshold: vi.fn(),
-      };
-      authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
-      snackbar = { error: vi.fn(), success: vi.fn() };
-
-      TestBed.configureTestingModule({
-        imports: [GuildSettingsFormComponent],
-        providers: [
-          { provide: GuildSettingsService,  useValue: settingsService },
-          { provide: GuildStore,            useValue: guildStore },
-          { provide: OfficerThresholdStore, useValue: officerThresholdStore },
-          { provide: AuthStore,             useValue: authStore },
-          { provide: SnackbarService,       useValue: snackbar },
-        ],
-      }).overrideComponent(GuildSettingsFormComponent, {
-        set: {
-          template: `
-            <input [formField]="settingsForm.timezone" [matAutocomplete]="tzAuto" />
-            <mat-autocomplete #tzAuto (optionSelected)="onTimezoneSelected($event)">
-              <mat-option value="Europe/Paris">Europe/Paris</mat-option>
-            </mat-autocomplete>
-          `,
-          imports: [FormField, MatAutocompleteModule],
-        },
-      });
-
-      fixture = TestBed.createComponent(GuildSettingsFormComponent);
-      fixture.componentRef.setInput('guildId', 'g1');
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    };
-
-    it('updates the timezone field when an option is selected from the dropdown', () => {
-      setupRealAutocomplete();
-      // Set to something other than the option's own value first — the field's initial value
-      // defaults to the test machine's local timezone, which could coincidentally already be
-      // 'Europe/Paris' and make the assertion below pass even if the binding were broken.
-      component.settingsForm.timezone().value.set('Not/TheRightZone');
-      const autocomplete = fixture.debugElement.query(By.directive(MatAutocomplete))
-        .componentInstance as MatAutocomplete;
-      // <mat-option> only mounts into the DOM once the overlay panel is actually open, but
-      // MatAutocomplete's @ContentChildren captures it as soon as it's projected either way.
-      const option = autocomplete.options.first;
-
-      autocomplete.optionSelected.emit({ option, source: autocomplete } as MatAutocompleteSelectedEvent);
-
-      expect(component.settingsForm.timezone().value()).toBe('Europe/Paris');
-    });
-  });
-
-  // ── real mat-button-toggle-group wiring ──────────────────────────────────
-  //
-  // Same rationale again: mat-button-toggle-group doesn't implement Signal Forms'
-  // FormValueControl (see onRosterModeChange's doc comment), so it's wired manually via (change).
-  // No test above renders the real <mat-button-toggle-group>, so nothing has proven the template
-  // wires that event to onRosterModeChange. Clicking the real rendered toggle button (not
-  // synthesizing a MatButtonToggleChange by hand) exercises the actual DOM path a user takes.
-
-  describe('real mat-button-toggle-group wiring', () => {
+  describe('real roster-mode toggle wiring', () => {
     const setupRealToggle = () => {
       settingsService = {
         getDiscordRoles:        vi.fn().mockReturnValue(of([])),
@@ -586,15 +467,10 @@ describe('GuildSettingsFormComponent', () => {
       }).overrideComponent(GuildSettingsFormComponent, {
         set: {
           template: `
-            <mat-button-toggle-group
-              [value]="settingsForm.rosterMode().value()"
-              (change)="onRosterModeChange($event)"
-            >
-              <mat-button-toggle [value]="RosterMode.Open">Open</mat-button-toggle>
-              <mat-button-toggle [value]="RosterMode.DiscordRoleOnly">Discord</mat-button-toggle>
-            </mat-button-toggle-group>
+            <button type="button" (click)="onRosterModeChange(RosterMode.Open)">Open</button>
+            <button type="button" (click)="onRosterModeChange(RosterMode.DiscordRoleOnly)">Discord</button>
           `,
-          imports: [MatButtonToggleModule],
+          imports: [],
         },
       });
 

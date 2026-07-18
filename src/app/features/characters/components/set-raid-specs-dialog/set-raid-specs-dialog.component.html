@@ -1,17 +1,12 @@
-<h2 mat-dialog-title>{{ 'characters.raidSpecs.title' | transloco }}</h2>
+<h2 class="dialog-title">{{ 'characters.raidSpecs.title' | transloco }}</h2>
 
-<mat-dialog-content>
+<div class="dialog-content">
   <p class="dialog-description">{{ 'characters.raidSpecs.description' | transloco }}</p>
 
   @if (loadState() === 'loading') {
-    <div class="dialog-state">
-      <mat-spinner [diameter]="36" />
-    </div>
+    <app-dialog-state variant="loading" />
   } @else if (loadState() === 'error') {
-    <div class="dialog-state dialog-state--error">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ 'characters.import.fetchError' | transloco }}</p>
-    </div>
+    <app-dialog-state variant="error" icon="error_outline" [message]="'characters.import.fetchError' | transloco" />
   } @else {
     @for (state of characterStates(); track state.character.id) {
       <div class="character-section">
@@ -23,7 +18,7 @@
         <div class="spec-list">
           @for (spec of state.availableSpecs; track spec.id) {
             <div class="spec-row">
-              <mat-checkbox
+              <app-checkbox
                 [checked]="isViable(state, spec.id)"
                 (change)="toggleViable(state, spec.id)">
                 <span class="spec-label">
@@ -32,14 +27,14 @@
                   }
                   {{ 'specs.' + spec.id | transloco }}
                 </span>
-              </mat-checkbox>
+              </app-checkbox>
               @if (isViable(state, spec.id)) {
                 <button
                   type="button"
                   class="main-toggle"
                   [class.main-toggle--active]="isMain(state, spec.id)"
                   (click)="setMain(state, spec.id)">
-                  <mat-icon>{{ isMain(state, spec.id) ? 'star' : 'star_border' }}</mat-icon>
+                  <span class="material-icons">{{ isMain(state, spec.id) ? 'star' : 'star_border' }}</span>
                   {{ 'characters.raidSpecs.mainBadge' | transloco }}
                 </button>
               }
@@ -49,20 +44,20 @@
       </div>
     }
   }
-</mat-dialog-content>
+</div>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()" [disabled]="loadState() === 'submitting'">
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()" [disabled]="loadState() === 'submitting'">
     {{ 'characters.raidSpecs.cancel' | transloco }}
-  </button>
-  <button
-    mat-flat-button
+  </app-button>
+  <app-button
+    variant="primary"
     [disabled]="!canSubmit() || loadState() === 'submitting'"
     (click)="submit()">
     @if (loadState() === 'submitting') {
-      <mat-spinner [diameter]="16" />
+      <span class="spinner raid-specs-spinner-sm"></span>
     } @else {
       {{ 'characters.raidSpecs.submit' | transloco }}
     }
-  </button>
-</mat-dialog-actions>
+  </app-button>
+</div>

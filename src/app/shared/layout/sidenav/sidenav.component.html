@@ -1,8 +1,13 @@
+@if (sidenavService.isMobileOpen()) {
+  <div class="sidenav-backdrop" (click)="sidenavService.close()"></div>
+}
+
 <nav
   class="sidenav"
   [class.is-expanded]="isExpanded()"
-  (mouseenter)="isExpanded.set(true)"
-  (mouseleave)="isExpanded.set(false)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  (click)="onNavClick($event)"
 >
   @if (isAuthenticated()) {
     <!-- Section : Mon compte -->
@@ -17,23 +22,23 @@
         </div>
         <span class="sidenav-label section-name">{{ user()?.name }}</span>
         @if (isExpanded()) {
-          <mat-icon class="section-chevron">
+          <span class="material-icons section-chevron">
             {{ isAccountOpen() ? 'expand_less' : 'expand_more' }}
-          </mat-icon>
+          </span>
         }
       </button>
 
       @if (isAccountOpen()) {
         <a class="sidenav-item" routerLink="/characters" routerLinkActive="active-link">
-          <mat-icon class="item-icon">people</mat-icon>
+          <span class="material-icons item-icon">people</span>
           <span class="sidenav-label">{{ 'sidenav.account.characters' | transloco }}</span>
         </a>
         <a class="sidenav-item" routerLink="/gear-planner" routerLinkActive="active-link">
-          <mat-icon class="item-icon">shield</mat-icon>
+          <span class="material-icons item-icon">shield</span>
           <span class="sidenav-label">{{ 'sidenav.account.equipment' | transloco }}</span>
         </a>
         <a class="sidenav-item" routerLink="/guilds" [class.active-link]="isGuildsActive()">
-          <mat-icon class="item-icon">groups</mat-icon>
+          <span class="material-icons item-icon">groups</span>
           <span class="sidenav-label">{{ 'sidenav.guilds' | transloco }}</span>
         </a>
       }
@@ -50,9 +55,9 @@
           </div>
           <span class="sidenav-label section-name">{{ guild.name }}</span>
           @if (isExpanded()) {
-            <mat-icon class="section-chevron">
+            <span class="material-icons section-chevron">
               {{ openGuildIds().has(guild.id) ? 'expand_less' : 'expand_more' }}
-            </mat-icon>
+            </span>
           }
         </button>
 
@@ -62,7 +67,7 @@
             [routerLink]="['/guilds', guild.id, 'dashboard']"
             routerLinkActive="active-link"
           >
-            <mat-icon class="item-icon">home</mat-icon>
+            <span class="material-icons item-icon">home</span>
             <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
           </a>
           @if (hasRosterAccess(guild)) {
@@ -71,7 +76,7 @@
               [routerLink]="['/guilds', guild.id, 'calendar']"
               routerLinkActive="active-link"
             >
-              <mat-icon class="item-icon">calendar_month</mat-icon>
+              <span class="material-icons item-icon">calendar_month</span>
               <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
             </a>
             <a
@@ -79,7 +84,7 @@
               [routerLink]="['/guilds', guild.id, 'roster']"
               routerLinkActive="active-link"
             >
-              <mat-icon class="item-icon">groups</mat-icon>
+              <span class="material-icons item-icon">groups</span>
               <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
             </a>
             <a
@@ -87,7 +92,7 @@
               [routerLink]="['/guilds', guild.id, 'loot']"
               routerLinkActive="active-link"
             >
-              <mat-icon class="item-icon">diamond</mat-icon>
+              <span class="material-icons item-icon">diamond</span>
               <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
             </a>
           }
@@ -98,7 +103,7 @@
               [routerLink]="['/guilds', guild.id, 'settings']"
               routerLinkActive="active-link"
             >
-              <mat-icon class="item-icon">settings</mat-icon>
+              <span class="material-icons item-icon">settings</span>
               <span class="sidenav-label">{{ 'sidenav.guild.settings' | transloco }}</span>
             </a>
             <a
@@ -106,7 +111,7 @@
               [routerLink]="['/guilds', guild.id, 'audit-log']"
               routerLinkActive="active-link"
             >
-              <mat-icon class="item-icon">history</mat-icon>
+              <span class="material-icons item-icon">history</span>
               <span class="sidenav-label">{{ 'sidenav.guild.auditLog' | transloco }}</span>
             </a>
           }

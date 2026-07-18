@@ -1,12 +1,11 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Dialog } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterStore } from '../../../characters/stores/character.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { BnetLinkButtonComponent } from '../../../../shared/components/bnet-link-button/bnet-link-button.component';
+import { BnetLinkButtonComponent } from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
+import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
 import { BnetSyncPanelComponent } from '../../../characters/components/bnet-sync-panel/bnet-sync-panel.component';
 import { CharacterActivationPanelComponent } from '../../../characters/components/character-activation-panel/character-activation-panel.component';
 import {
@@ -24,11 +23,10 @@ import {
 @Component({
   selector: 'app-get-started-bnet-step',
   imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
     TranslocoPipe,
+    ButtonComponent,
     BnetLinkButtonComponent,
+    BnetIconComponent,
     BnetSyncPanelComponent,
     CharacterActivationPanelComponent,
   ],
@@ -38,7 +36,7 @@ import {
 export class GetStartedBnetStepComponent {
   readonly #characterStore = inject(CharacterStore);
   readonly #snackbar = inject(SnackbarService);
-  readonly #dialog = inject(MatDialog);
+  readonly #dialog = inject(Dialog);
 
   readonly isBnetLoading = this.#characterStore.isBnetLoading;
   readonly isBnetLinked = this.#characterStore.isBnetLinked;
@@ -85,14 +83,13 @@ export class GetStartedBnetStepComponent {
       const activated = characters.filter((c) => characterIds.includes(c.id));
 
       this.#dialog
-        .open(SetRaidSpecsDialogComponent, {
+        .open<{ success?: boolean; error?: boolean } | undefined>(SetRaidSpecsDialogComponent, {
           width: '560px',
           maxWidth: '95vw',
           maxHeight: '85vh',
           data: { characters: activated, mode: 'activate' } satisfies SetRaidSpecsDialogData,
         })
-        .afterClosed()
-        .subscribe((result?: { success?: boolean }) => {
+        .closed.subscribe((result) => {
           if (result?.success) {
             this.#snackbar.success('characters.import.importSuccess');
           } else {

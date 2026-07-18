@@ -1,47 +1,45 @@
 // ── Dialog states (loading / error / empty) ─────────────────────────────────
 
-.dialog-state {
+// ── Search field ─────────────────────────────────────────────────────────────
+
+.search-field {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 40px 0;
-  color: var(--mat-sys-on-surface-variant);
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  transition: border-color 0.12s ease;
 
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-    opacity: 0.6;
+  &:hover,
+  &:focus-within {
+    border-color: var(--color-accent);
   }
 
-  p {
-    margin: 0;
-    font-size: 14px;
-  }
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
 
-  &--error {
-    color: var(--mat-sys-error);
-
-    mat-icon {
-      opacity: 1;
+    &:focus {
+      outline: none;
     }
   }
 }
 
-// ── Search field ─────────────────────────────────────────────────────────────
-
-.search-field {
-  width: 100%;
-  margin-bottom: 8px;
-
-  // Compact height
-  .mat-mdc-form-field-infix {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    min-height: unset !important;
-  }
+.search-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 // ── Results ──────────────────────────────────────────────────────────────────
@@ -56,49 +54,60 @@
 
 // ── Accordion panels ─────────────────────────────────────────────────────────
 
-// Differentiate realm header from character rows without ::ng-deep on global tokens.
-:host ::ng-deep {
-  .mat-expansion-panel {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: 1px solid var(--mat-sys-outline-variant);
-    border-radius: 8px !important;
-    margin-bottom: 6px;
+.expansion-panel {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  margin-bottom: 6px;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .mat-expansion-panel-header {
-      background: var(--mat-sys-surface-container-high) !important;
-      border-radius: 8px 8px 0 0;
-
-      &.mat-expanded {
-        border-radius: 8px 8px 0 0;
-      }
-      &:not(.mat-expanded) {
-        border-radius: 8px;
-      }
-
-      &:hover {
-        background: var(--mat-sys-surface-container-highest) !important;
-      }
-    }
-
-    .mat-expansion-panel-body {
-      padding: 4px 0 4px;
-      background: var(--mat-sys-surface-container-low);
-      border-radius: 0 0 8px 8px;
-    }
+  &:last-child {
+    margin-bottom: 0;
   }
+}
+
+.expansion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-bg-tertiary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}
+
+.expansion-chevron {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 0.12s ease;
+
+  &--expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.expansion-body {
+  padding: 4px 0;
+  background: var(--color-bg-secondary);
+  border-radius: 0 0 8px 8px;
 }
 
 // ── Branch + Realm headers ────────────────────────────────────────────────────
 
 .branch-header {
+  flex: 1;
   font-weight: 700;
   font-size: 14px;
-  color: var(--mat-sys-on-surface);
+  color: var(--color-text-primary);
 }
 
 .branch-label {
@@ -106,20 +115,21 @@
 }
 
 .realm-accordion {
-  margin: 4px 0;
+  margin: 4px 12px;
 }
 
 .realm-header {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
   font-weight: 600;
 }
 
 .realm-count {
   font-size: 11px;
   font-weight: 500;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--color-text-secondary);
   margin-left: 2px;
 }
 
@@ -132,11 +142,11 @@
 
 .char-row {
   display: grid;
-  // checkbox (40px = full ripple zone) | class icon | name | level | faction icon | badge
-  grid-template-columns: 40px 24px 1fr 32px 20px auto;
+  // checkbox | class icon | name | level | faction icon | badge
+  grid-template-columns: 24px 24px 1fr 32px 20px auto;
   gap: 10px;
   align-items: center;
-  padding: 6px 4px;
+  padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.1s;
@@ -149,7 +159,7 @@
   text-align: left;
 
   &:hover {
-    background: var(--mat-sys-surface-container-highest);
+    background: var(--color-bg-elevated);
   }
 
   &--imported {
@@ -165,7 +175,7 @@
 .char-name {
   font-size: 14px;
   font-weight: 500;
-  color: var(--mat-sys-on-surface);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -173,14 +183,14 @@
 
 .char-level {
   font-size: 13px;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--color-text-secondary);
   text-align: right;
 }
 
 .already-imported-badge {
   font-size: 10px;
   font-weight: 500;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--color-text-secondary);
   white-space: nowrap;
   opacity: 0.7;
 }

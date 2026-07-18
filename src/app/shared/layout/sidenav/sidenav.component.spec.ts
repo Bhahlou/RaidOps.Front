@@ -4,6 +4,7 @@ import { signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { SidenavComponent } from './sidenav.component';
+import { SidenavService } from '../../../core/services/sidenav.service';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { User } from '../../../core/models/user.model';
 import { UserGuild } from '../../../core/models/user-guild.model';
@@ -186,6 +187,54 @@ describe('SidenavComponent', () => {
     it('is true for an Officer-tier guild', () => {
       const component = setup();
       expect(component.hasRosterAccess(makeGuild({ accessLevel: GuildAccessLevel.Officer }))).toBe(true);
+    });
+  });
+
+  // ── mouse hover ───────────────────────────────────────────────────────────
+
+  describe('onMouseEnter / onMouseLeave', () => {
+    it('onMouseEnter expands the sidenav', () => {
+      const component = setup();
+
+      component.onMouseEnter();
+
+      expect(component.isExpanded()).toBe(true);
+    });
+
+    it('onMouseLeave collapses the sidenav again', () => {
+      const component = setup();
+      component.onMouseEnter();
+
+      component.onMouseLeave();
+
+      expect(component.isExpanded()).toBe(false);
+    });
+  });
+
+  // ── onNavClick ────────────────────────────────────────────────────────────
+
+  describe('onNavClick', () => {
+    it('closes the mobile drawer when a nav link was clicked', () => {
+      const component = setup();
+      const closeSpy = vi.spyOn(TestBed.inject(SidenavService), 'close');
+      const link = document.createElement('a');
+      link.className = 'sidenav-item';
+      const child = document.createElement('span');
+      link.appendChild(child);
+
+      component.onNavClick({ target: child } as unknown as Event);
+
+      expect(closeSpy).toHaveBeenCalled();
+    });
+
+    it('does nothing when the click target is outside a nav link', () => {
+      const component = setup();
+      const closeSpy = vi.spyOn(TestBed.inject(SidenavService), 'close');
+      const div = document.createElement('div');
+
+      component.onNavClick({ target: div } as unknown as Event);
+
+      expect(closeSpy).not.toHaveBeenCalled();
     });
   });
 

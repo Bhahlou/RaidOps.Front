@@ -1,13 +1,21 @@
+:host {
+  display: block;
+}
+
 .step-loading {
   display: flex;
   justify-content: center;
   padding: 40px 0;
 }
 
-.empty-hint {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin: 0 0 16px;
+.step-spinner {
+  width: 36px;
+  height: 36px;
+}
+
+.join-btn-spinner {
+  width: 16px;
+  height: 16px;
 }
 
 .guild-list {
@@ -17,9 +25,7 @@
 }
 
 .guild-card {
-  ::ng-deep .mat-mdc-card-header {
-    align-items: center;
-    gap: 10px;
+  .card-header {
     padding-bottom: 8px;
   }
 }
@@ -46,19 +52,25 @@
 
 .char-name {
   flex: 1;
+  min-width: 0;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rank-select {
   width: 82px;
   flex-shrink: 0;
+  font-size: 0.8rem;
+}
 
-  ::ng-deep .mat-mdc-select-trigger {
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    background: rgba(255, 255, 255, 0.08);
-    font-size: 0.8rem;
+// Redundant with .char-name's own class color below this width — drop it to leave more room for
+// the name before it has to ellipsis, and for the rank select (which must always show its full
+// label, never icon-only — picking a rank has to be unambiguous).
+@media (max-width: 420px) {
+  .class-icon {
+    display: none;
   }
 }
 

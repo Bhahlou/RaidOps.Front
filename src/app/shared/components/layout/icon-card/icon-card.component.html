@@ -1,0 +1,21 @@
+<div class="card" [class.card--raised]="appearance() === 'raised'">
+  <div class="card-header">
+    <div class="icon-wrapper">
+      @if (iconSrc(); as src) {
+        <img [ngSrc]="src" alt="" class="card-icon-img" width="40" height="40" />
+      } @else {
+        <span class="material-icons card-icon">{{ icon() }}</span>
+      }
+    </div>
+    <div class="card-header-text">
+      <div class="card-title">{{ title() }}</div>
+      @if (subtitle()) {
+        <div class="card-subtitle">{{ subtitle() }}</div>
+      }
+    </div>
+  </div>
+
+  <div class="card-content">
+    <ng-content />
+  </div>
+</div>

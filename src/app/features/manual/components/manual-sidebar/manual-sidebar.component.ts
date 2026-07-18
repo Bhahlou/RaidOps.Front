@@ -1,20 +1,23 @@
 import { Location } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ManualStore } from '../../stores/manual.store';
-import { DiscordBrandIconComponent } from '../../../../shared/components/discord-brand-icon/discord-brand-icon.component';
+import { DiscordBrandIconComponent } from '../../../../shared/components/icons/discord-brand-icon/discord-brand-icon.component';
 
 @Component({
   selector: 'app-manual-sidebar',
-  imports: [RouterLink, RouterLinkActive, MatIconModule, TranslocoPipe, DiscordBrandIconComponent],
+  imports: [RouterLink, RouterLinkActive, TranslocoPipe, DiscordBrandIconComponent],
   templateUrl: './manual-sidebar.component.html',
   styleUrl: './manual-sidebar.component.scss',
 })
 export class ManualSidebarComponent {
   readonly #manualStore = inject(ManualStore);
   readonly #location = inject(Location);
+
+  /** Mobile drawer open state — irrelevant on desktop, where the sidebar is always visible. */
+  readonly isOpen = input(false);
+  readonly closeRequested = output<void>();
 
   readonly categories = this.#manualStore.categories;
 
@@ -33,5 +36,10 @@ export class ManualSidebarComponent {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  }
+
+  /** Following a link closes the mobile drawer — desktop ignores the emit (isOpen stays false). */
+  onArticleClick(): void {
+    this.closeRequested.emit();
   }
 }

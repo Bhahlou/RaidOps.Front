@@ -1,14 +1,14 @@
-<h2 mat-dialog-title>{{ 'characters.card.deactivateConfirm.title' | transloco }}</h2>
+<h2 class="dialog-title">{{ 'characters.card.deactivateConfirm.title' | transloco }}</h2>
 
-<mat-dialog-content>
+<div class="dialog-content">
   <p>{{ 'characters.card.deactivateConfirm.body' | transloco }}</p>
-</mat-dialog-content>
+</div>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()">
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">
     {{ 'characters.card.deactivateConfirm.cancel' | transloco }}
-  </button>
-  <button mat-flat-button class="btn-danger" (click)="confirm()">
+  </app-button>
+  <app-button variant="danger" (click)="confirm()">
     {{ 'characters.card.deactivateConfirm.confirm' | transloco }}
-  </button>
-</mat-dialog-actions>
+  </app-button>
+</div>

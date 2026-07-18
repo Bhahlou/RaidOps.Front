@@ -1,15 +1,16 @@
 @if (loading()) {
   <div class="roles-loading">
-    <mat-spinner diameter="24" />
+    <span class="spinner"></span>
     <span>{{ 'guildSettings.roles.loading' | transloco }}</span>
   </div>
 } @else if (roles().length > 0) {
   <div class="roles-list-wrapper">
-    <div class="roles-list">
+    <div class="roles-list" cdkListbox [cdkListboxValue]="listboxValue()">
       @for (role of roles(); track role.id; let last = $last) {
         <button
           type="button"
           class="role-row"
+          [cdkOption]="role.id"
           [class.is-included]="isIncluded(role)"
           [class.is-threshold]="isThreshold(role)"
           [class.is-excluded]="isExcluded(role)"
@@ -18,7 +19,7 @@
         >
           <span class="role-row-indicator">
             @if (isIncluded(role)) {
-              <mat-icon class="check-icon">check_circle</mat-icon>
+              <span class="material-icons check-icon">check_circle</span>
             } @else if (roleIconUrl(role); as iconUrl) {
               <img class="role-icon" [ngSrc]="iconUrl" alt="" width="18" height="18" />
             } @else if (roleColor(role); as color) {

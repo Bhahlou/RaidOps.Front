@@ -1,5 +1,37 @@
+// All breakpoints in this file are @container queries against this host, not viewport media
+// queries: the page lays this component out next to the my-characters card (3fr 1fr) above 900px
+// viewport, so viewport width says nothing about the width actually available to the table —
+// e.g. a 1000px viewport leaves this component ~540px. Container queries measure the real slot.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .roster-list-card {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  padding: 16px 20px;
+  overflow: hidden;
+
+  @container (max-width: 600px) {
+    padding: 12px 8px;
+  }
+}
+
+// Without this, the table's wide intrinsic content (8 columns) sets the automatic minimum size
+// for this flex item (roster-list-card is a flex column), inflating the whole card wider than the
+// viewport and dragging the toolbar/search field along with it — .roster-table-wrapper below is
+// what should scroll, not this.
+.roster-list-content {
+  min-width: 0;
+}
+
+.roster-table-wrapper {
+  overflow-x: auto;
 }
 
 // ── Toolbar (search + filters, merged into the roster card) ────────────────
@@ -14,7 +46,42 @@
 }
 
 .search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.search-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 .toolbar-row {
@@ -22,6 +89,19 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+// Below this, classes and specs each get their own row instead of an unpredictable wrap mid-group
+// (and the divider between them stops meaning anything once they're stacked).
+@container (max-width: 600px) {
+  .toolbar-row--class-spec {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .toolbar-divider {
+      display: none;
+    }
+  }
 }
 
 .toolbar-divider {
@@ -34,6 +114,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+
+  // There can be a lot of these (one per class/spec in the guild) — half the gap buys real room
+  // back once they're wrapping onto their own row anyway.
+  @container (max-width: 600px) {
+    gap: 3px;
+  }
 }
 
 .icon-filter-btn {
@@ -47,50 +133,167 @@
   border: 2px solid transparent;
   background: var(--color-bg-tertiary);
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.7;
   transition: opacity 0.1s ease, border-color 0.1s ease;
 
   &:hover {
-    opacity: 0.8;
+    opacity: 0.9;
   }
 
   &.active {
     opacity: 1;
-    border-color: #4caf50;
+    border-color: var(--color-accent);
   }
 }
 
 .date-range-filter {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-left: auto;
   flex-shrink: 0;
-
-  mat-form-field {
-    width: 220px;
-  }
 }
 
-.filter-btn {
-  --mdc-icon-button-state-layer-size: 28px;
-  color: var(--mat-sys-on-surface-variant);
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.1s ease, color 0.1s ease;
 
-  mat-icon {
+  &:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  .material-icons {
     font-size: 18px;
     width: 18px;
     height: 18px;
   }
-
-  &.filter-active {
-    color: var(--mat-sys-primary);
-  }
 }
 
+// Responsive tiers for the table (container widths — the component's real slot, see :host):
+//   > 780px — full table: player names, character portraits, hover sort icons, roomy padding.
+//             780 − 40px card padding = the ~740px the full set of columns actually needs.
+//   600–780 — compact table: every column is back (no expandable), but the player shows as
+//             avatar-only, the character portrait drops, and density tightens — that's what
+//             makes all eight data columns fit in ~560px where the full version needs ~740px.
+//   < 600px — minimal table: Niveau/Rang/Rejoint move into an expandable detail row behind a
+//             chevron column, with fixed layout and weighted widths (see below). Within this
+//             tier, Rang comes back as a real column from 480px up (see .col-rank) — it's the
+//             interactive column, and Classe/Specs were otherwise swimming in leftover space.
 .roster-table {
   width: 100%;
   background: transparent;
+  // Browsers ignore border-* set directly on <tr> in the default border-collapse: separate
+  // mode — collapse is required for the row divider below to actually render.
+  border-collapse: collapse;
+
+  // In auto layout (the default), a column's `width` is only a hint — the browser still widens it
+  // to fit its header text if that's wider (e.g. "Joueur" + its sort icon, vs. the single 24px
+  // avatar actually shown below 600px). That's what kept leaving a gap no padding tweak could
+  // close. Fixed layout makes the widths below authoritative; Personnage (no width set) gets
+  // whatever's left. Only scoped to narrow — desktop already fits fine with auto layout, and this
+  // set of pixel widths only adds up sanely now that Niveau/Rang/Rejoint are out of the row.
+  //
+  // Each fixed width must fit its cell's actual content (padding included): in fixed layout a
+  // too-narrow column doesn't grow, its content just bleeds right — over the next cells and, on
+  // the last column, past the table edge, which is what was producing a horizontal scrollbar next
+  // to acres of blank space. Avatar 24 + 2/3 padding = 29; actions button 28 + 6 padding = 34.
+  //
+  // Only the framing columns (chevron, avatar, actions) get pixel widths. Classe and Specs are
+  // left auto on purpose: fixed layout divides the remaining space EQUALLY between auto columns,
+  // which spreads the slack evenly across the row instead of dumping it all into one giant gap
+  // after the character name. Classe/Specs contents are centered (below) so their share of slack
+  // splits both sides of the icons.
+  //
+  // Personnage gets a guaranteed 40% rather than an equal share: a strict three-way split gave it
+  // as little as ~100px on small viewports, truncating names while the two icon columns sat on
+  // unused slack. WoW caps character names at 12 chars (~100px here), so 40% keeps full names on
+  // any viewport down to ~340px.
+  @container (max-width: 600px) {
+    table-layout: fixed;
+
+    .col-expand { width: 22px; }
+    .col-player { width: 30px; }
+    .col-character { width: 40%; }
+    // Rank select 82 + 6px cell padding — only rendered from 480px up (see .col-rank below).
+    .col-rank { width: 88px; }
+    .col-actions { width: 34px; }
+  }
+
+  // Compact-tier rules shared by both narrow tiers (container < 780px).
+  @container (max-width: 780px) {
+    // These columns show a lone icon here — their text headers ("Joueur", "Classe") can't fit
+    // and were clipping mid-word into the next header. Empty headers, like expand/actions.
+    .col-player .col-label,
+    .col-class .col-label {
+      display: none;
+    }
+
+    th.col-specs {
+      text-align: center;
+    }
+
+    // The class header label is a flex button, which shrink-wraps its content instead of filling
+    // the th — auto margins center the box itself (it only shows the sort icon in compact mode,
+    // the text label is hidden).
+    th.col-class .col-header-label {
+      margin: 0 auto;
+    }
+
+    // app-wow-class-icon renders a display: block <img> behind view encapsulation (its :host is
+    // display: contents) — text-align can't center a block, and ::ng-deep is needed to reach it.
+    td.col-class ::ng-deep img {
+      margin: 0 auto;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-subtle);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  tbody td {
+    padding: 6px 8px;
+    font-size: 0.8125rem;
+
+    // 8px each side × 8-9 columns adds up to real width on its own — this is what was still
+    // leaving too little for Personnage even after shrinking every column.
+    @container (max-width: 780px) {
+      padding: 6px 3px;
+    }
+  }
+
+  thead th {
+    padding: 0 8px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-align: left;
+
+    // Shrinks alongside the trimmed player/character cells, so headers don't end up wider than
+    // the columns they're labeling. overflow: hidden matters below 600px where table-layout is
+    // fixed — without it, a header label wider than its column bleeds visually into the next one
+    // instead of just clipping (e.g. "Joueur" running into "Personnage").
+    @container (max-width: 780px) {
+      font-size: 0.6875rem;
+      padding: 0 3px 6px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
 }
 
 .player-cell,
@@ -98,11 +301,131 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+}
+
+.player-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Trims before falling back to the table's own horizontal scroll: in both compact tiers, keep
+// just the Discord avatar (player identity is still visible via the icon/tooltip) and drop the
+// redundant character portrait/class icon (the colored name plus the Class column already carry
+// that info). The ~180px this frees is precisely what lets all eight data columns fit at 600px.
+@container (max-width: 780px) {
+  .player-name,
+  .char-avatar {
+    display: none;
+  }
+}
+
+// Niveau/Rejoint move into the expandable .detail-row below this width — Joueur, Personnage,
+// Classe and Specs are the ones worth scanning a roster at a glance, the rest is a tap away.
+.col-detail {
+  @container (max-width: 600px) {
+    display: none;
+  }
+}
+
+// Rang holds on longer than the other two detail columns: it's the interactive one (officers
+// switch Main/Split/Alt from it) and its 88px still fit down to 480px. Below that it joins the
+// expandable detail row (.detail-field--rank shows there instead).
+.col-rank {
+  @container (max-width: 479px) {
+    display: none;
+  }
+}
+
+// Only the Discord avatar shows here below 780px (.player-name is hidden above) — the fixed
+// width only applies below 600px (fixed-layout block above); just the padding tweak lives here.
+.col-player {
+  @container (max-width: 780px) {
+    padding-left: 2px;
+  }
+}
+
+// Chevron toggle for .detail-row — only meaningful (and shown) once .col-detail is hidden.
+.col-expand {
+  display: none;
+  // Tighter than the default 6px 8px cell padding — this is just an icon button, it doesn't need
+  // as much breathing room, and the default right padding was reading as a gap before Joueur.
+  padding: 6px 0 6px 2px;
+
+  @container (max-width: 600px) {
+    display: table-cell;
+  }
+}
+
+// Overrides the shared .icon-btn's 28px box — that's wider than the chevron glyph itself, and
+// centering it inside left visible space before the icon that no cell-padding change could close.
+.row-expand-btn {
+  width: 20px;
+  height: 20px;
+
+  .material-icons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.15s ease;
+  }
+
+  &--expanded .material-icons {
+    transform: rotate(90deg);
+  }
+}
+
+// Belt and suspenders: .row-expand-btn only renders below 600px, so this can't normally be
+// triggered above it — but if the viewport grows while a row is expanded, .col-detail's columns
+// come back and this would just be a redundant repeat of the same three fields.
+.detail-row {
+  display: none;
+  // Background on the row, not the cell: between 480 and 600px the cell's colspan (6) under-spans
+  // the seven visible columns, and a row background paints the full table width regardless of how
+  // far the cell reaches — no visible notch where the spanned area stops.
+  background: var(--color-bg-tertiary);
+
+  @container (max-width: 600px) {
+    display: table-row;
+  }
+
+  td {
+    padding: 10px 12px;
+  }
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// The rank column is back in the row from 480px up (see .col-rank) — don't repeat it here.
+.detail-field--rank {
+  @container (min-width: 480px) {
+    display: none;
+  }
+}
+
+.detail-label {
+  min-width: 90px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .avatar-sm {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
@@ -110,7 +433,7 @@
 
 .character-name {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,6 +450,27 @@
   border-radius: 4px;
 }
 
+// app-character-raid-specs renders its own template past this component's view encapsulation
+// boundary — ::ng-deep is the pragmatic way to still reach it from here, scoped to this table's
+// Specs column so character-card/character-detail's own 28px default is untouched elsewhere.
+// Matches the Class column's 20px icon so the row reads as one consistent size, not two.
+td.col-specs ::ng-deep .spec {
+  width: 20px !important;
+  height: 20px !important;
+  border-width: 1px !important;
+}
+
+// Centered to match the header and split the column's share of slack on both sides of the icons
+// (the column has no fixed width — see the equal-division note on the fixed-layout block above).
+// Wrapping keeps a spec-heavy character (4 — Druids) on a second line instead of bleeding over
+// the actions column on the narrowest viewports.
+@container (max-width: 780px) {
+  td.col-specs ::ng-deep .char-specs {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
 .col-header-label {
   display: flex;
   align-items: center;
@@ -140,7 +484,7 @@
   cursor: pointer;
 
   &:hover {
-    color: var(--mat-sys-on-surface);
+    color: var(--color-text-primary);
 
     .sort-icon {
       opacity: 1;
@@ -159,6 +503,16 @@
   &.sort-icon--active {
     opacity: 1;
   }
+
+  // Invisible (opacity: 0) still reserves its 16px box on every header — below this, that's
+  // wasted width on every single column (16px × 6 sortable headers ≈ 96px) just to support a
+  // hover state touch devices don't even have. Drop it from layout entirely unless it's the
+  // active sort column (still visible then).
+  @container (max-width: 780px) {
+    &:not(.sort-icon--active) {
+      display: none;
+    }
+  }
 }
 
 .rank-badge {
@@ -176,20 +530,17 @@
 }
 
 .rank-select {
+  display: inline-block;
   width: 82px;
   flex-shrink: 0;
+  font-size: 0.8rem;
 
-  ::ng-deep .mat-mdc-select-trigger {
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    background: rgba(255, 255, 255, 0.08);
-    font-size: 0.8rem;
-  }
-
-  &--main ::ng-deep .mat-mdc-select-value { color: var(--color-accent); }
-  &--split ::ng-deep .mat-mdc-select-value { color: var(--color-text-primary); }
-  &--alt ::ng-deep .mat-mdc-select-value { color: var(--color-text-muted); }
+  // Recolors the shared select's displayed value per rank via a CSS custom property it reads
+  // internally (select.component.scss) — no ::ng-deep needed since custom properties cascade
+  // through component boundaries regardless of view encapsulation.
+  &--main { --select-value-color: var(--color-accent); }
+  &--split { --select-value-color: var(--color-text-primary); }
+  &--alt { --select-value-color: var(--color-text-muted); }
 }
 
 .actions-cell {
@@ -199,17 +550,17 @@
 
 .rank-filter-btn {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.7;
   border: 2px solid transparent;
   transition: opacity 0.1s ease, border-color 0.1s ease;
 
   &:hover {
-    opacity: 0.8;
+    opacity: 0.9;
   }
 
   &.active {
     opacity: 1;
-    border-color: #4caf50;
+    border-color: var(--color-accent);
   }
 }
 
@@ -217,11 +568,31 @@
   margin: 0;
   padding-left: 8px;
   font-size: 0.8rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
-.empty-hint {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin: 0;
+
+// ── Spinner ──────────────────────────────────────────────────────────────────
+
+.spinner {
+  display: block;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  animation: roster-spin 0.6s linear infinite;
 }
+
+.roster-spinner {
+  width: 32px;
+  height: 32px;
+  margin: 24px auto;
+}
+
+@keyframes roster-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Row menu ─────────────────────────────────────────────────────────────────
+// .menu-panel/.menu-item/.menu-item--danger are global (src/styles.scss).

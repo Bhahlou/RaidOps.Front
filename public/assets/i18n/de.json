@@ -3,10 +3,12 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "language": "Sprache",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "toggleNav": "Navigationsmenü öffnen/schließen"
   },
   "manual": {
     "back": "Zurück",
+    "toc": "Inhalt",
     "category": {
       "welcome": "Willkommen",
       "account": "Konto",
@@ -57,6 +59,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "uiRefresh": {
+        "title": "Ein einheitlicheres Erscheinungsbild, und die App funktioniert jetzt auf Mobilgeräten/Tablets",
+        "description": "Neue Oberflächenkomponenten (Buttons, Checkboxen, Menüs, Tabellen…) mit einem einheitlicheren Erscheinungsbild. Dichte Ansichten wie das Roster oder das Audit-Log passen sich jetzt kleinen Bildschirmen an, indem sie zu einer Kartenansicht wechseln."
+      },
       "whatsNew": {
         "title": "Eine Neuigkeiten-Seite, um Updates zu verfolgen",
         "description": "Das 📣-Symbol im Header listet die Funktionen auf, die im Laufe der Zeit zu RaidOps hinzugefügt wurden, mit einem Badge, wenn es etwas Neues zu sehen gibt."
@@ -107,6 +113,7 @@
     "pageTitle": "Roadmap",
     "intro": "Was für RaidOps als Nächstes geplant ist oder überlegt wird. Ohne garantierte Reihenfolge oder Termine — nur ein Überblick über die Richtung des Projekts.",
     "inProgress": "In Arbeit",
+    "completed": "Abgeschlossen",
     "status": {
       "done": "Erledigt",
       "planned": "Geplant"
@@ -317,17 +324,16 @@
     "timezone": {
       "label": "Zeitzone",
       "placeholder": "z. B. Europe/Paris",
-      "required": "Die Zeitzone ist erforderlich."
+      "required": "Die Zeitzone ist erforderlich.",
+      "hint": "Diese Einstellung legt die Zeitzone der Gilde für Raids und Abwesenheiten fest."
     },
     "rosterMode": {
       "label": "Roster-Zugriff",
       "open": "Für alle offen",
       "discordRoleOnly": "Discord-Rolle erforderlich",
-      "hintOpen": "Jedes authentifizierte Mitglied kann dem Roster beitreten.",
-      "hintRole": "Mitglieder mit dieser Rolle oder einer höheren Rolle in der Discord-Hierarchie können dem Roster beitreten."
+      "hint": "Diese Einstellung legt fest, wer deinem Roster beitreten kann: jeder auf deinem Discord oder eine Mindestrolle."
     },
     "roles": {
-      "label": "Roster-Zugriffsschwelle",
       "loading": "Rollen werden geladen…",
       "empty": "Keine zuweisbaren Rollen auf diesem Server gefunden.",
       "hint": "Klicke auf eine Rolle, um die Mindestschwelle festzulegen. Diese Rolle und alle Rollen darüber erhalten Zugriff auf den Roster.",
@@ -466,7 +472,6 @@
     }
   },
   "roster": {
-    "title": "Roster",
     "addCharacter": "Charakter hinzufügen",
     "addPanel": {
       "title": "Meine verfügbaren Charaktere",
@@ -495,6 +500,7 @@
         "Alt": "Alt"
       },
       "actions": "Aktionen",
+      "expandRow": "Level, Rang und Beitrittsdatum anzeigen",
       "viewCharacter": "Charakter ansehen",
       "kick": "Aus der Gilde entfernen",
       "kickSuccess": "Charakter aus dem Gilden-Roster entfernt.",
@@ -556,6 +562,7 @@
   "characters": {
     "bnet": {
       "linkButton": "Battle.net verknüpfen",
+      "connectedAs": "Verbunden:",
       "notLinkedTitle": "Verknüpfe dein Battle.net-Konto",
       "notLinkedDescription": "Um sicherzustellen, dass jeder in RaidOps erstellte Charakter seinem rechtmäßigen Besitzer gehört, synchronisieren wir Charaktere mit Battle.net-Konten. Durch das Verknüpfen deines Battle.net-Kontos kannst du deine Charaktere einfach importieren und synchronisieren.",
       "linkedSuccess": "Battle.net-Konto erfolgreich verknüpft!",
@@ -570,7 +577,8 @@
       "title": "Charaktere",
       "emptyTitle": "Noch keine Charaktere",
       "empty": "RaidOps kennt nun deine Charaktere, aber du hast noch keinen importiert. Klicke auf die Schaltfläche unten, um deine Charaktere von Battle.net zu importieren.",
-      "importButton": "Charaktere importieren"
+      "importButton": "Charaktere importieren",
+      "actionsMenu": "Aktionen"
     },
     "import": {
       "title": "Charaktere importieren",
@@ -599,6 +607,7 @@
       "resync": "Von Battle.net neu synchronisieren",
       "deactivate": "Von RaidOps deaktivieren",
       "editRaidSpecs": "Raidtaugliche Spezialisierungen konfigurieren",
+      "actionsMenu": "Aktionen",
       "resyncSuccess": "Charakter neu synchronisiert!",
       "resyncError": "Fehler bei der Neusynchronisierung. Bitte versuche es erneut.",
       "deactivateError": "Fehler bei der Deaktivierung. Bitte versuche es erneut.",

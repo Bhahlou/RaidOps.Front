@@ -3,9 +3,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ManualStore } from '../../stores/manual.store';
-import { AccessLevelBadgeComponent } from '../../../../shared/components/access-level-badge/access-level-badge.component';
-import { RequiresAuthBadgeComponent } from '../../../../shared/components/requires-auth-badge/requires-auth-badge.component';
-import { MarkdownRendererComponent } from '../../../../shared/components/markdown-renderer/markdown-renderer.component';
+import { AccessLevelBadgeComponent } from '../../../../shared/components/badges/access-level-badge/access-level-badge.component';
+import { RequiresAuthBadgeComponent } from '../../../../shared/components/badges/requires-auth-badge/requires-auth-badge.component';
+import { MarkdownRendererComponent } from '../../../../shared/components/layout/markdown-renderer/markdown-renderer.component';
 
 @Component({
   selector: 'app-manual-article',

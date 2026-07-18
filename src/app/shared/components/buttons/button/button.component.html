@@ -1,0 +1,19 @@
+<ng-template #content>
+  @if (icon() && iconPosition() === 'start') {
+    <span class="material-icons">{{ icon() }}</span>
+  }
+  <ng-content />
+  @if (icon() && iconPosition() === 'end') {
+    <span class="material-icons">{{ icon() }}</span>
+  }
+</ng-template>
+
+@if (route()) {
+  <a [class]="classes()" [routerLink]="disabled() ? null : route()" [attr.aria-disabled]="disabled() || null">
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <button [type]="type()" [class]="classes()" [disabled]="disabled()">
+    <ng-container [ngTemplateOutlet]="content" />
+  </button>
+}

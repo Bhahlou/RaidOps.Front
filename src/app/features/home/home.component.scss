@@ -22,57 +22,81 @@
   align-items: center;
   text-align: center;
   gap: 1.75rem;
-}
 
-.hero__eyebrow {
-  display: inline-flex;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--mat-sys-primary);
-  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
-  border-radius: 100px;
-  padding: 0.3rem 1rem;
-  background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+  &__title {
+    display: flex;
+    flex-direction: column;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: 0;
+    gap: 0.08em;
 
-  @media (max-width: 900px) {
-    align-self: center;
+    &-line {
+      color: var(--mat-sys-on-surface);
+    }
+
+    &-accent {
+      background: linear-gradient(120deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px color-mix(in srgb, var(--mat-sys-primary) 25%, transparent));
+    }
+  }
+
+  &__tagline {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--mat-sys-on-surface-variant);
+    max-width: 400px;
+    margin: 0;
+  }
+
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+
+    // Two columns of feature cards squeeze this row until it has nowhere left to shrink —
+    // stack the badges instead of fighting for the remaining width.
+    @media (max-width: 1300px) {
+      flex-direction: column;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      color: var(--mat-sys-on-surface-variant);
+
+      .material-icons {
+        font-size: 13px;
+        height: 13px;
+        width: 13px;
+        color: var(--mat-sys-tertiary);
+      }
+    }
+
+    &-sep {
+      color: var(--mat-sys-outline-variant);
+      font-size: 0.7rem;
+      line-height: 1;
+
+      // Meaningless once badges are stacked instead of inline.
+      @media (max-width: 1300px) {
+        display: none;
+      }
+    }
   }
 }
 
-.hero__title {
-  display: flex;
-  flex-direction: column;
-  font-size: clamp(2.25rem, 4vw, 3.25rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  margin: 0;
-  gap: 0.08em;
-}
-
-.hero__title-line {
-  color: var(--mat-sys-on-surface);
-}
-
-.hero__title-accent {
-  background: linear-gradient(120deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 80%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 40px color-mix(in srgb, var(--mat-sys-primary) 25%, transparent));
-}
-
-.hero__tagline {
-  font-size: 1rem;
-  line-height: 1.65;
-  color: var(--mat-sys-on-surface-variant);
-  max-width: 400px;
-  margin: 0;
-}
-
-.hero__btn-cta {
+// app-button's native <button>/<a> renders inside its own template, past this component's view
+// encapsulation boundary — ::ng-deep is the pragmatic way to still reach it from here.
+:host ::ng-deep .hero__btn-cta {
   border-radius: 100px !important;
   padding: 0 1.5rem !important;
   height: 48px !important;
@@ -91,40 +115,32 @@
   }
 }
 
-.hero__badges {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  flex-wrap: wrap;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  color: var(--mat-sys-on-surface-variant);
-
-  mat-icon {
-    font-size: 13px;
-    height: 13px;
-    width: 13px;
-    color: var(--mat-sys-tertiary);
-  }
-}
-
-.hero__badges-sep {
-  color: var(--mat-sys-outline-variant);
-  font-size: 0.7rem;
-  line-height: 1;
-}
-
 // ── Features (right) ──────────────────────────────────────────────────────────
 
-.features__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.875rem;
+.features {
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+
+    // Below this, two columns leave each card too little width to breathe while still sharing
+    // the row with the hero — this is what was forcing the whole page to stop shrinking cleanly
+    // (had to overflow instead) well before .home-layout itself stacks at 900px.
+    @media (max-width: 1000px) {
+      grid-template-columns: 1fr;
+    }
+
+    // Once .home-layout stacks (<900px), the grid gets the full viewport width back instead of
+    // sharing it with the hero column, so two cards fit comfortably again.
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    // ...until the viewport itself gets too narrow for two columns, full width or not.
+    @media (max-width: 750px) {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
 .feature-card {
@@ -146,51 +162,51 @@
     background: color-mix(in srgb, var(--mat-sys-surface-container-high) 85%, transparent);
     transform: translateY(-2px);
   }
-}
 
-.feature-card__icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
-  flex-shrink: 0;
+  &__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+    flex-shrink: 0;
 
-  mat-icon {
-    color: var(--mat-sys-primary);
-    font-size: 20px;
+    .material-icons {
+      color: var(--mat-sys-primary);
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__svg {
     width: 20px;
     height: 20px;
+    color: var(--mat-sys-primary);
+    flex-shrink: 0;
   }
-}
 
-.feature-card__svg {
-  width: 20px;
-  height: 20px;
-  color: var(--mat-sys-primary);
-  flex-shrink: 0;
-}
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
 
-.feature-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
+  &__title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--mat-sys-on-surface);
+    letter-spacing: -0.01em;
+  }
 
-.feature-card__title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--mat-sys-on-surface);
-  letter-spacing: -0.01em;
-}
-
-.feature-card__desc {
-  font-size: 0.75rem;
-  line-height: 1.6;
-  color: var(--mat-sys-on-surface-variant);
-  margin: 0;
+  &__desc {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--mat-sys-on-surface-variant);
+    margin: 0;
+  }
 }
