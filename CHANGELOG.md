@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.7...raidops-front-v1.1.0) (2026-07-19)
+
+
+### 🚀 Features
+
+* persist auth session across browser restarts ([#49](https://github.com/Bhahlou/RaidOps.Front/issues/49)) ([4fdcab0](https://github.com/Bhahlou/RaidOps.Front/commit/4fdcab00e06dfa1f67e05e594584d482fb38d9ad))
+* support linking multiple Battle.net accounts per user ([#52](https://github.com/Bhahlou/RaidOps.Front/issues/52)) ([7fe278c](https://github.com/Bhahlou/RaidOps.Front/commit/7fe278cbf52205763fe2a2e8f36aa5a00cc0a91f))
+
+
+### 🐛 Bug Fixes
+
+* gate roster exclude button on backend CanExclude, not just officer ([#51](https://github.com/Bhahlou/RaidOps.Front/issues/51)) ([5b93e9c](https://github.com/Bhahlou/RaidOps.Front/commit/5b93e9cedbeef2dd294cc548e8ca16642ec83870))
+
 ## [1.0.7](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.6...raidops-front-v1.0.7) (2026-07-18)
 
 

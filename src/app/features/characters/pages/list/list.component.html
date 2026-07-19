@@ -2,8 +2,9 @@
   <app-character-list-header
     [isBnetLoading]="isBnetLoading()"
     [isBnetLinked]="isBnetLinked()"
-    [bnetAccount]="bnetAccount() ?? null"
+    [bnetAccounts]="bnetAccounts() ?? []"
     (linkBnet)="linkBnet($event)"
+    (addAnotherAccount)="addAnotherAccount($event)"
     (openImport)="openImportDialog()"
   />
 

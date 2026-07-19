@@ -28,7 +28,7 @@ describe('GetStartedBnetStepComponent', () => {
   let storeMock: {
     isBnetLoading: ReturnType<typeof signal<boolean>>;
     isBnetLinked: ReturnType<typeof signal<boolean>>;
-    bnetAccount: ReturnType<typeof signal<BnetAccount | null | undefined>>;
+    bnetAccounts: ReturnType<typeof signal<BnetAccount[] | undefined>>;
     isCharactersLoading: ReturnType<typeof signal<boolean>>;
     loadCharacters: ReturnType<typeof vi.fn>;
     deactivateCharacter: ReturnType<typeof vi.fn>;
@@ -40,7 +40,7 @@ describe('GetStartedBnetStepComponent', () => {
     storeMock = {
       isBnetLoading: signal(false),
       isBnetLinked: signal(true),
-      bnetAccount: signal(mockAccount),
+      bnetAccounts: signal([mockAccount]),
       isCharactersLoading: signal(false),
       loadCharacters: vi.fn().mockReturnValue(of([])),
       deactivateCharacter: vi.fn().mockReturnValue(of({ message: 'ok' })),
@@ -61,35 +61,75 @@ describe('GetStartedBnetStepComponent', () => {
   };
 
   describe('linkBnet', () => {
-    it('sets linkingRegion to the chosen region', () => {
+    it('sets linkingRegion to the chosen region and clears isAddingAnotherAccount', () => {
       setup();
+      component.isAddingAnotherAccount.set(true);
       component.linkBnet('eu');
       expect(component.linkingRegion()).toBe('eu');
+      expect(component.isAddingAnotherAccount()).toBe(false);
+    });
+  });
+
+  describe('addAnotherAccount', () => {
+    it('sets linkingRegion to the chosen region and sets isAddingAnotherAccount', () => {
+      setup();
+      component.addAnotherAccount('us');
+      expect(component.linkingRegion()).toBe('us');
+      expect(component.isAddingAnotherAccount()).toBe(true);
     });
   });
 
   describe('onSynced', () => {
-    it('clears linkingRegion, shows success snackbar and force-reloads characters', () => {
+    it('clears linkingRegion and isAddingAnotherAccount, shows success snackbar on a success outcome', () => {
       setup();
-      component.linkBnet('eu');
-      component.onSynced();
+      component.addAnotherAccount('eu');
+      component.onSynced({ outcome: 'success' });
 
       expect(component.linkingRegion()).toBeNull();
+      expect(component.isAddingAnotherAccount()).toBe(false);
       expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.syncSuccess');
-      expect(storeMock.loadCharacters).toHaveBeenCalledWith(true);
+    });
+
+    it('shows an error snackbar and keeps linkingRegion set on accountAlreadyLinked', () => {
+      setup();
+      component.addAnotherAccount('eu');
+      component.onSynced({ outcome: 'accountAlreadyLinked' });
+
+      expect(component.linkingRegion()).toBe('eu');
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.accounts.accountAlreadyLinked');
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+    });
+
+    it('resets the sync panel back to the branch grid on accountAlreadyLinked when it is available', () => {
+      setup();
+      const resetSpy = vi.fn();
+      (component as unknown as { syncPanel: () => { reset: () => void } }).syncPanel = () => ({ reset: resetSpy });
+
+      component.addAnotherAccount('eu');
+      component.onSynced({ outcome: 'accountAlreadyLinked' });
+
+      expect(resetSpy).toHaveBeenCalled();
     });
   });
 
   describe('onOpenSyncRequested', () => {
-    it('sets linkingRegion to the already-linked account region', () => {
+    it('sets linkingRegion to the first already-linked account region', () => {
       setup();
       component.onOpenSyncRequested();
       expect(component.linkingRegion()).toBe('eu');
+      expect(component.isAddingAnotherAccount()).toBe(false);
     });
 
     it('sets linkingRegion to null when no account is linked', () => {
       setup();
-      storeMock.bnetAccount.set(null);
+      storeMock.bnetAccounts.set([]);
+      component.onOpenSyncRequested();
+      expect(component.linkingRegion()).toBeNull();
+    });
+
+    it('sets linkingRegion to null when bnetAccounts has not loaded yet (undefined)', () => {
+      setup();
+      storeMock.bnetAccounts.set(undefined);
       component.onOpenSyncRequested();
       expect(component.linkingRegion()).toBeNull();
     });

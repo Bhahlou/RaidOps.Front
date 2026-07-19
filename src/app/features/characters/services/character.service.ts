@@ -9,7 +9,7 @@ import { BnetAccount } from '../models/bnet-account.model';
 
 /** Response envelope for {@link CharacterService.getCharacters}. */
 export interface GetCharactersResponse {
-  bnetAccount: BnetAccount | null;
+  bnetAccounts: BnetAccount[];
   characters: Character[];
 }
 

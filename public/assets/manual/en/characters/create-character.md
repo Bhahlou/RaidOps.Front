@@ -47,3 +47,25 @@ For every newly imported character, RaidOps opens the **Raid-viable specs** dial
 Once done, your characters show up under **Characters** and you can use them to join a guild.
 
 ![imported characters](/assets/manual/en/characters/created-characters.png)
+
+### 5. Link a second Battle.net account
+
+Play on more than one Battle.net account? You can link them all to your RaidOps account and import characters from each.
+
+From **Characters**, click **Add another account** next to your battletag (grouped into the **⋮** menu on mobile).
+
+![Add another Battle.net account](/assets/manual/en/characters/bnet-add-another-account.png)
+
+A Battle.net window opens and automatically signs you out of the currently linked account, then prompts you to sign back in — sign in with the other account you want to add. RaidOps then walks through the same steps as a first link (branch selection, sync, import).
+
+> If RaidOps doesn't detect a new account by the end of the process, you signed back in with the same account that was already linked — make sure you actually authenticated with the other Battle.net account in the window, then try again.
+
+Once linked, each account shows up by its own battletag in the menu — they stay independent, each with its own characters.
+
+### 6. Unlink a Battle.net account
+
+From the same menu, choose **Unlink** on the account you want to remove, then confirm.
+
+![Unlink a Battle.net account](/assets/manual/en/characters/bnet-unlink-confirm.png)
+
+> **Warning** — unlinking an account permanently deletes every character sourced from it, along with their history in any affected guilds. This isn't a simple deactivation: the action can't be undone.

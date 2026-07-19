@@ -1,7 +1,9 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Dialog } from '@angular/cdk/dialog';
 import { catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { CharacterService } from '../services/character.service';
+import { BnetService } from '../../../shared/services/bnet.service';
 import { BnetAccount } from '../models/bnet-account.model';
 import { Character } from '../models/character.model';
 import { CharacterSpec } from '../models/character-spec.model';
@@ -11,6 +13,11 @@ import { GuildMembershipService } from '../../guilds/services/guild-membership.s
 import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
 import { GuildEligibility } from '../../guilds/models/guild-eligibility.model';
 import { CharacterRank } from '../../guilds/models/character-rank.enum';
+import { SnackbarService } from '../../../core/services/snackbar.service';
+import {
+  ConfirmUnlinkBnetDialogComponent,
+  ConfirmUnlinkBnetDialogData,
+} from '../components/confirm-unlink-bnet-dialog/confirm-unlink-bnet-dialog.component';
 
 /**
  * Backend ResponseDetail codes (see RaidOps.Service's ResponseDetail) for joinGuild/updateRank/
@@ -33,25 +40,28 @@ const MEMBERSHIP_ERROR_KEYS: Record<string, string> = {
  *
  * BNet account lifecycle:
  *  - `undefined` — not yet fetched
- *  - `null`      — fetched, no account linked
- *  - `BnetAccount` — fetched, account linked
+ *  - `[]`        — fetched, no account linked
+ *  - `BnetAccount[]` — fetched, one or more accounts linked
  */
 @Service()
 export class CharacterStore {
   readonly #characterService = inject(CharacterService);
+  readonly #bnetService = inject(BnetService);
+  readonly #dialog = inject(Dialog);
+  readonly #snackbar = inject(SnackbarService);
   readonly #specService = inject(SpecService);
   readonly #membershipService = inject(GuildMembershipService);
 
-  readonly #bnetAccount = signal<BnetAccount | null | undefined>(undefined);
+  readonly #bnetAccounts = signal<BnetAccount[] | undefined>(undefined);
 
-  /** The linked Battle.net account. `undefined` before first load; `null` if not linked. */
-  readonly bnetAccount = this.#bnetAccount.asReadonly();
+  /** The linked Battle.net accounts. `undefined` before first load; `[]` if none linked. */
+  readonly bnetAccounts = this.#bnetAccounts.asReadonly();
 
-  /** True while the BNet account hasn't been fetched yet. */
-  readonly isBnetLoading = computed(() => this.#bnetAccount() === undefined);
+  /** True while the BNet accounts haven't been fetched yet. */
+  readonly isBnetLoading = computed(() => this.#bnetAccounts() === undefined);
 
-  /** True once fetched and an account is present. */
-  readonly isBnetLinked = computed(() => this.#bnetAccount() != null);
+  /** True once fetched and at least one account is present. */
+  readonly isBnetLinked = computed(() => (this.#bnetAccounts()?.length ?? 0) > 0);
 
   // ── Characters ────────────────────────────────────────────────────────────
 
@@ -79,12 +89,44 @@ export class CharacterStore {
 
     this.#characters.set(undefined); // reset to loading state
     return this.#characterService.getCharacters().pipe(
-      tap(({ bnetAccount, characters }) => {
-        this.#bnetAccount.set(bnetAccount);
+      tap(({ bnetAccounts, characters }) => {
+        this.#bnetAccounts.set(bnetAccounts);
         this.#characters.set(characters);
       }),
       map(({ characters }) => characters),
     );
+  }
+
+  /**
+   * Opens a confirmation dialog for the given account; if confirmed, unlinks it (this hard-deletes
+   * every character sourced from it — see the backend's cascade delete), reloads the character
+   * list, and shows a success/error snackbar. Emits `true` if unlinked, `false` if cancelled or
+   * the request failed.
+   */
+  confirmAndUnlinkBnetAccount(account: BnetAccount): Observable<boolean> {
+    return this.#dialog
+      .open<boolean>(ConfirmUnlinkBnetDialogComponent, {
+        width: '420px',
+        maxWidth: '95vw',
+        data: { battleTag: account.battleTag } satisfies ConfirmUnlinkBnetDialogData,
+      })
+      .closed.pipe(
+        switchMap((confirmed) => {
+          if (!confirmed) return of(false);
+
+          return this.#bnetService.unlinkBnetAccount(account.bnetId).pipe(
+            switchMap(() => this.loadCharacters(true)),
+            map(() => {
+              this.#snackbar.success('characters.bnet.accounts.unlinkSuccess');
+              return true;
+            }),
+            catchError(() => {
+              this.#snackbar.error('characters.bnet.accounts.unlinkError');
+              return of(false);
+            }),
+          );
+        }),
+      );
   }
 
   /** Sets the character as inactive in RaidOps and removes it from the local list. */

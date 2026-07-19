@@ -59,6 +59,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "bnetMultiAccount": {
+        "title": "Lier plusieurs comptes Battle.net",
+        "description": "Un même compte RaidOps peut désormais lier plusieurs comptes Battle.net et importer les personnages de chacun — pratique si tu joues sur plusieurs comptes Blizzard."
+      },
       "uiRefresh": {
         "title": "Un thème visuel plus cohérent, et l'app utilisable sur mobile/tablette",
         "description": "Nouveaux composants d'interface (boutons, cases à cocher, menus, tableaux…) avec un rendu plus homogène. Les écrans denses comme le roster ou le journal d'audit s'adaptent maintenant aux petits écrans en passant en vue carte."
@@ -571,7 +575,19 @@
       "linkErrorBnet": "Battle.net est inaccessible pour le moment. Réessaie plus tard.",
       "popupBlocked": "Autorise les popups pour importer tes personnages.",
       "syncButton": "Synchroniser BNet",
-      "syncSuccess": "Personnages synchronisés avec succès !"
+      "syncSuccess": "Personnages synchronisés avec succès !",
+      "accounts": {
+        "title": "Comptes Battle.net liés",
+        "unlink": "Délier",
+        "unlinkConfirmTitle": "Délier définitivement ce compte Battle.net ?",
+        "unlinkConfirmBody": "Les personnages importés depuis {{ battleTag }} seront définitivement supprimés de RaidOps, ainsi que leurs spés, leur historique et leur appartenance aux rosters de guilde — cette action est irréversible.",
+        "unlinkConfirmAction": "Délier",
+        "unlinkSuccess": "Compte Battle.net délié.",
+        "unlinkError": "Impossible de délier ce compte. Réessaie.",
+        "addAnother": "Ajouter un autre compte",
+        "refresh": "Rafraîchir",
+        "accountAlreadyLinked": "Ce compte Battle.net est déjà lié — vérifie que tu es bien reconnecté avec l'autre compte sur battle.net, y compris dans tes autres onglets ouverts."
+      }
     },
     "list": {
       "title": "Personnages",

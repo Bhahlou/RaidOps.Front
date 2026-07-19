@@ -2,6 +2,7 @@
   class="bnet-btn"
   [class.bnet-btn--large]="variant() === 'large'"
   [cdkMenuTriggerFor]="regionMenu"
+  [cdkMenuPosition]="menuPosition()"
 >
   <app-bnet-icon class="bnet-btn__logo" [size]="16" />
   <ng-content />
