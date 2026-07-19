@@ -31,8 +31,11 @@
   background: #0062c8;
   font-size: 0.875rem;
   font-weight: 500;
+  font-family: inherit;
   color: #ffffff;
   box-shadow: 0 2px 10px -2px rgba(0, 98, 200, 0.45);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
 
   .logo {
     display: block;
@@ -49,6 +52,23 @@
     height: 14px;
     border-radius: 2px;
   }
+
+  .chip-chevron {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 1;
+    margin-left: -2px;
+    opacity: 0.8;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #0057b3;
+    box-shadow: 0 2px 10px -2px rgba(0, 98, 200, 0.6);
+  }
 }
 
 // "more" menu trigger, only shown below the breakpoint — .actions-wide covers everything above it.
@@ -60,30 +80,37 @@
   }
 }
 
-// Non-interactive status row at the top of the "more" menu — just tells you which account is
-// linked, kept visually distinct from the menu-item buttons below it.
-.menu-bnet-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px 10px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--color-border-subtle);
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
+// "more" menu: section label above the linked-accounts rows, and a divider separating them
+// from the import action — same content as .actions-wide, condensed into the single menu.
+.menu-section-label {
+  padding: 6px 10px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
 
-  strong {
-    font-weight: 600;
-    color: var(--color-text-primary);
-  }
+.menu-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--color-border-subtle);
+}
 
+.menu-item {
   .logo {
     display: block;
     flex-shrink: 0;
     width: 14px;
     height: 14px;
-    opacity: 0.7;
+    opacity: 0.8;
+  }
+
+  .menu-item__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .flag {
@@ -94,4 +121,20 @@
     border-radius: 2px;
     opacity: 0.85;
   }
+
+  // Always visible — signals the row opens a submenu (the "Délier" action) rather than acting
+  // directly, since a bare tap has no hover state to reveal an action on touch devices.
+  .account-chevron {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    opacity: 0.6;
+  }
+}
+
+app-bnet-link-button {
+  display: block;
+  margin: 6px 4px 2px;
 }

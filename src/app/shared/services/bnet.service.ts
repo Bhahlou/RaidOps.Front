@@ -1,26 +1,16 @@
 import { inject, Service } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
-import { BnetAccount } from '../../features/characters/models/bnet-account.model';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+/** Thin HTTP interface for Battle.net account endpoints — called only by CharacterStore. */
 @Service()
 export class BnetService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl + '/bnet';
 
-  /**
-   * Returns the linked Battle.net account, or `null` if none has been linked yet (404).
-   * Other HTTP errors are propagated as-is.
-   */
-  getBnetAccount(): Observable<BnetAccount | null> {
-    return this.#http.get<BnetAccount>(`${this.#api}/account`).pipe(
-      catchError((err: unknown) => {
-        if (err instanceof HttpErrorResponse && err.status === 404) {
-          return of(null);
-        }
-        throw err;
-      }),
-    );
+  /** Unlinks a Battle.net account and deletes any characters synced from it (backend cascade). */
+  unlinkBnetAccount(bnetId: string): Observable<void> {
+    return this.#http.delete<void>(`${this.#api}/accounts/${bnetId}`);
   }
 }

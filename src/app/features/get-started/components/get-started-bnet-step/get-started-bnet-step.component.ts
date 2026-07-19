@@ -6,7 +6,8 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { BnetLinkButtonComponent } from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
-import { BnetSyncPanelComponent } from '../../../characters/components/bnet-sync-panel/bnet-sync-panel.component';
+import { BnetSyncPanelComponent, BnetSyncResult } from '../../../characters/components/bnet-sync-panel/bnet-sync-panel.component';
+import { BnetLinkedAccountsComponent } from '../../../characters/components/bnet-linked-accounts/bnet-linked-accounts.component';
 import { CharacterActivationPanelComponent } from '../../../characters/components/character-activation-panel/character-activation-panel.component';
 import {
   SetRaidSpecsDialogComponent,
@@ -28,6 +29,7 @@ import {
     BnetLinkButtonComponent,
     BnetIconComponent,
     BnetSyncPanelComponent,
+    BnetLinkedAccountsComponent,
     CharacterActivationPanelComponent,
   ],
   templateUrl: './get-started-bnet-step.component.html',
@@ -45,22 +47,40 @@ export class GetStartedBnetStepComponent {
   /** Region picked to (re)link BNet — non-null while the sync panel should be shown. */
   readonly linkingRegion = signal<string | null>(null);
 
+  /** True only when the panel was opened via "Ajouter un autre compte" — see BnetSyncPanelComponent.startInAddAnotherMode. */
+  readonly isAddingAnotherAccount = signal(false);
+
   readonly syncPanel = viewChild(BnetSyncPanelComponent);
   readonly activationPanel = viewChild(CharacterActivationPanelComponent);
 
+  /** First-time link, from the "Lier Battle.net" CTA — never an add-another attempt. */
   linkBnet(region: string): void {
+    this.isAddingAnotherAccount.set(false);
     this.linkingRegion.set(region);
   }
 
-  onSynced(): void {
-    this.linkingRegion.set(null);
-    this.#snackbar.success('characters.bnet.syncSuccess');
-    this.#characterStore.loadCharacters(true).subscribe();
+  /** "Ajouter un autre compte" from the linked-accounts panel — routes through the account-switch guide. */
+  addAnotherAccount(region: string): void {
+    this.isAddingAnotherAccount.set(true);
+    this.linkingRegion.set(region);
   }
 
-  /** Re-sync requested from the activation panel — reuse the already-linked account's region. */
+  onSynced({ outcome }: BnetSyncResult): void {
+    if (outcome === 'accountAlreadyLinked') {
+      this.#snackbar.error('characters.bnet.accounts.accountAlreadyLinked');
+      this.syncPanel()?.reset();
+      return;
+    }
+
+    this.linkingRegion.set(null);
+    this.isAddingAnotherAccount.set(false);
+    this.#snackbar.success('characters.bnet.syncSuccess');
+  }
+
+  /** Re-sync requested from the activation panel — reuse the first already-linked account's region. */
   onOpenSyncRequested(): void {
-    this.linkingRegion.set(this.#characterStore.bnetAccount()?.region ?? null);
+    this.isAddingAnotherAccount.set(false);
+    this.linkingRegion.set(this.#characterStore.bnetAccounts()?.[0]?.region ?? null);
   }
 
   onActivated(result: { activated: number; activatedCharacterIds: number[] }): void {

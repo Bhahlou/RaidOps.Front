@@ -1,11 +1,13 @@
 .dialog-actions {
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .actions-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .actions-right {
@@ -22,6 +24,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.8;
+}
+
+// Narrow dialogs (phone-width): the sync button + hint + cancel + import buttons no longer fit
+// on one row without wrapping — the import button was getting pushed off-screen entirely instead
+// of dropping to a second line. Stack the two groups and drop the decorative hint text.
+@media (max-width: 480px) {
+  .actions-left,
+  .actions-right {
+    width: 100%;
+  }
+
+  .actions-right {
+    justify-content: flex-end;
+  }
+
+  .sync-hint {
+    display: none;
+  }
 }
 
 .import-spinner {

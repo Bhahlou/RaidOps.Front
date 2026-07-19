@@ -1,11 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Dialog } from '@angular/cdk/dialog';
 import { of, Subject, throwError } from 'rxjs';
 
 import { CharacterStore } from './character.store';
 import { CharacterService, GetCharactersResponse } from '../services/character.service';
+import { BnetService } from '../../../shared/services/bnet.service';
 import { SpecService } from '../../../shared/services/spec.service';
 import { GuildMembershipService } from '../../guilds/services/guild-membership.service';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 import { Character } from '../models/character.model';
 import { GuildMembership } from '../../guilds/models/guild-membership.model';
 import { EligibleGuild } from '../../guilds/models/eligible-guild.model';
@@ -51,8 +54,8 @@ const mockAccount: BnetAccount = {
   tokenExpiry: '2025-12-31T00:00:00Z',
 };
 
-const envelope = (characters: Character[], bnetAccount: BnetAccount | null = null): GetCharactersResponse => ({
-  bnetAccount,
+const envelope = (characters: Character[], bnetAccounts: BnetAccount[] = []): GetCharactersResponse => ({
+  bnetAccounts,
   characters,
 });
 
@@ -64,6 +67,7 @@ describe('CharacterStore', () => {
     resyncCharacter: ReturnType<typeof vi.fn>;
     setRaidSpecs: ReturnType<typeof vi.fn>;
   };
+  let bnetService: { unlinkBnetAccount: ReturnType<typeof vi.fn> };
   let specService: { getAll: ReturnType<typeof vi.fn> };
   let membershipService: {
     getEligibleGuilds: ReturnType<typeof vi.fn>;
@@ -72,6 +76,8 @@ describe('CharacterStore', () => {
     updateRank: ReturnType<typeof vi.fn>;
     leaveGuild: ReturnType<typeof vi.fn>;
   };
+  let dialogMock: { open: ReturnType<typeof vi.fn> };
+  let snackbarMock: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     charService = {
@@ -80,6 +86,7 @@ describe('CharacterStore', () => {
       resyncCharacter: vi.fn(),
       setRaidSpecs: vi.fn(),
     };
+    bnetService = { unlinkBnetAccount: vi.fn() };
     specService = { getAll: vi.fn() };
     membershipService = {
       getEligibleGuilds: vi.fn().mockReturnValue(of([])),
@@ -88,13 +95,18 @@ describe('CharacterStore', () => {
       updateRank: vi.fn().mockReturnValue(of({ message: 'ok' })),
       leaveGuild: vi.fn().mockReturnValue(of({ message: 'ok' })),
     };
+    dialogMock = { open: vi.fn() };
+    snackbarMock = { success: vi.fn(), error: vi.fn() };
 
     TestBed.configureTestingModule({
       providers: [
         CharacterStore,
         { provide: CharacterService, useValue: charService },
+        { provide: BnetService, useValue: bnetService },
         { provide: SpecService, useValue: specService },
         { provide: GuildMembershipService, useValue: membershipService },
+        { provide: Dialog, useValue: dialogMock },
+        { provide: SnackbarService, useValue: snackbarMock },
       ],
     });
 
@@ -102,8 +114,8 @@ describe('CharacterStore', () => {
   });
 
   describe('initial state', () => {
-    it('bnetAccount is undefined before first load', () => {
-      expect(store.bnetAccount()).toBeUndefined();
+    it('bnetAccounts is undefined before first load', () => {
+      expect(store.bnetAccounts()).toBeUndefined();
     });
 
     it('isBnetLoading is true initially', () => {
@@ -137,23 +149,23 @@ describe('CharacterStore', () => {
   });
 
   describe('loadCharacters', () => {
-    it('populates the character list and bnet account, and clears loading state', () => {
+    it('populates the character list and bnet accounts, and clears loading state', () => {
       const chars = [makeChar(1), makeChar(2)];
-      charService.getCharacters.mockReturnValue(of(envelope(chars, mockAccount)));
+      charService.getCharacters.mockReturnValue(of(envelope(chars, [mockAccount])));
       store.loadCharacters().subscribe();
 
       expect(store.characters()).toEqual(chars);
       expect(store.characterList()).toEqual(chars);
       expect(store.isCharactersLoading()).toBe(false);
-      expect(store.bnetAccount()).toEqual(mockAccount);
+      expect(store.bnetAccounts()).toEqual([mockAccount]);
       expect(store.isBnetLinked()).toBe(true);
     });
 
-    it('sets bnetAccount to null when no account is linked', () => {
-      charService.getCharacters.mockReturnValue(of(envelope([], null)));
+    it('sets bnetAccounts to [] when no account is linked', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([], [])));
       store.loadCharacters().subscribe();
 
-      expect(store.bnetAccount()).toBeNull();
+      expect(store.bnetAccounts()).toEqual([]);
       expect(store.isBnetLinked()).toBe(false);
     });
 
@@ -175,6 +187,58 @@ describe('CharacterStore', () => {
 
       expect(charService.getCharacters).toHaveBeenCalledTimes(2);
       expect(store.characterList()).toHaveLength(2);
+    });
+  });
+
+  describe('confirmAndUnlinkBnetAccount', () => {
+    it('opens the confirmation dialog with the account battleTag', () => {
+      dialogMock.open.mockReturnValue({ closed: of(false) });
+      store.confirmAndUnlinkBnetAccount(mockAccount).subscribe();
+
+      expect(dialogMock.open).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ data: { battleTag: mockAccount.battleTag } }),
+      );
+    });
+
+    it('does nothing and emits false when the dialog is cancelled', () => {
+      dialogMock.open.mockReturnValue({ closed: of(false) });
+      let result: boolean | undefined;
+      store.confirmAndUnlinkBnetAccount(mockAccount).subscribe((r) => (result = r));
+
+      expect(result).toBe(false);
+      expect(bnetService.unlinkBnetAccount).not.toHaveBeenCalled();
+      expect(snackbarMock.success).not.toHaveBeenCalled();
+    });
+
+    it('unlinks, reloads the character list, shows a success snackbar and emits true when confirmed', () => {
+      charService.getCharacters.mockReturnValue(of(envelope([makeChar(1)], [mockAccount])));
+      store.loadCharacters().subscribe();
+      charService.getCharacters.mockClear();
+      charService.getCharacters.mockReturnValue(of(envelope([])));
+
+      dialogMock.open.mockReturnValue({ closed: of(true) });
+      bnetService.unlinkBnetAccount.mockReturnValue(of(undefined));
+
+      let result: boolean | undefined;
+      store.confirmAndUnlinkBnetAccount(mockAccount).subscribe((r) => (result = r));
+
+      expect(bnetService.unlinkBnetAccount).toHaveBeenCalledWith(mockAccount.bnetId);
+      expect(charService.getCharacters).toHaveBeenCalledTimes(1);
+      expect(store.bnetAccounts()).toEqual([]);
+      expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.accounts.unlinkSuccess');
+      expect(result).toBe(true);
+    });
+
+    it('shows an error snackbar and emits false when the unlink call fails', () => {
+      dialogMock.open.mockReturnValue({ closed: of(true) });
+      bnetService.unlinkBnetAccount.mockReturnValue(throwError(() => new Error('fail')));
+
+      let result: boolean | undefined;
+      store.confirmAndUnlinkBnetAccount(mockAccount).subscribe((r) => (result = r));
+
+      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.accounts.unlinkError');
+      expect(result).toBe(false);
     });
   });
 

@@ -29,7 +29,7 @@ describe('CharacterListComponent', () => {
   let storeMock: {
     isBnetLoading: ReturnType<typeof signal<boolean>>;
     isBnetLinked: ReturnType<typeof signal<boolean>>;
-    bnetAccount: ReturnType<typeof signal<BnetAccount | null | undefined>>;
+    bnetAccounts: ReturnType<typeof signal<BnetAccount[] | undefined>>;
     isCharactersLoading: ReturnType<typeof signal<boolean>>;
     characterList: ReturnType<typeof signal<Character[]>>;
     loadCharacters: ReturnType<typeof vi.fn>;
@@ -40,13 +40,13 @@ describe('CharacterListComponent', () => {
   let dialogMock: { open: ReturnType<typeof vi.fn> };
   let routeGet: ReturnType<typeof vi.fn>;
 
-  const setup = (errorParam: string | null = null, accountToEmit: BnetAccount | null = mockAccount) => {
+  const setup = (errorParam: string | null = null, accountsToEmit: BnetAccount[] = [mockAccount]) => {
     routeGet = vi.fn().mockReturnValue(errorParam);
 
     storeMock = {
       isBnetLoading: signal(false),
       isBnetLinked: signal(true),
-      bnetAccount: signal(accountToEmit),
+      bnetAccounts: signal(accountsToEmit),
       isCharactersLoading: signal(false),
       characterList: signal([]),
       loadCharacters: vi.fn().mockReturnValue(of([])),
@@ -72,49 +72,19 @@ describe('CharacterListComponent', () => {
   };
 
   describe('ngOnInit', () => {
-    it('shows a BNet error snackbar when error query param is present', () => {
+    it.each([
+      ['BnetApiError', 'characters.bnet.linkErrorBnet'],
+      ['InvalidState', 'characters.bnet.linkErrorSession'],
+      ['StateMismatch', 'characters.bnet.linkErrorSession'],
+      ['Unauthorized', 'characters.bnet.linkErrorSession'],
+      ['SomethingElse', 'characters.bnet.linkError'],
+    ])('shows the matching error snackbar for error=%s', (errorParam, expectedKey) => {
       vi.useFakeTimers();
-      setup('BnetApiError');
+      setup(errorParam);
       component.ngOnInit();
 
       vi.advanceTimersByTime(200);
-      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorBnet');
-      vi.useRealTimers();
-    });
-
-    it('shows session error snackbar for InvalidState', () => {
-      vi.useFakeTimers();
-      setup('InvalidState');
-      component.ngOnInit();
-      vi.advanceTimersByTime(200);
-      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
-      vi.useRealTimers();
-    });
-
-    it('shows session error snackbar for StateMismatch', () => {
-      vi.useFakeTimers();
-      setup('StateMismatch');
-      component.ngOnInit();
-      vi.advanceTimersByTime(200);
-      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
-      vi.useRealTimers();
-    });
-
-    it('shows session error snackbar for Unauthorized', () => {
-      vi.useFakeTimers();
-      setup('Unauthorized');
-      component.ngOnInit();
-      vi.advanceTimersByTime(200);
-      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkErrorSession');
-      vi.useRealTimers();
-    });
-
-    it('shows generic error snackbar for unknown error codes', () => {
-      vi.useFakeTimers();
-      setup('SomethingElse');
-      component.ngOnInit();
-      vi.advanceTimersByTime(200);
-      expect(snackbarMock.error).toHaveBeenCalledWith('characters.bnet.linkError');
+      expect(snackbarMock.error).toHaveBeenCalledWith(expectedKey);
       vi.useRealTimers();
     });
 
@@ -327,51 +297,69 @@ describe('CharacterListComponent', () => {
   });
 
   describe('linkBnet', () => {
-    it('opens the sync dialog with the given region', () => {
+    it('opens the sync dialog with the given region and addingAnother unset', () => {
       setup();
       component.linkBnet('eu');
-      expect(dialogMock.open).toHaveBeenCalled();
+      expect(dialogMock.open).toHaveBeenCalledWith(expect.anything(),
+        expect.objectContaining({ data: { region: 'eu', addingAnother: false } }));
+    });
+  });
+
+  describe('addAnotherAccount', () => {
+    it('opens the sync dialog straight into add-another mode', () => {
+      setup();
+      component.addAnotherAccount('us');
+      expect(dialogMock.open).toHaveBeenCalledWith(expect.anything(),
+        expect.objectContaining({ data: { region: 'us', addingAnother: true } }));
     });
   });
 
   describe('openSyncDialog', () => {
     it('does nothing when no BNet account is linked (region is undefined)', () => {
-      setup(null, null);
-      storeMock.bnetAccount.set(null);
+      setup(null, []);
       component.openSyncDialog();
       expect(dialogMock.open).not.toHaveBeenCalled();
     });
 
-    it('opens the sync dialog when account is linked', () => {
-      setup();
-      storeMock.bnetAccount.set(mockAccount);
+    it('opens the sync dialog using the first linked account region', () => {
+      setup(null, [mockAccount]);
       component.openSyncDialog();
       expect(dialogMock.open).toHaveBeenCalled();
     });
+
+    it('does nothing when bnetAccounts has not loaded yet (undefined)', () => {
+      setup(null, []);
+      storeMock.bnetAccounts.set(undefined);
+      component.openSyncDialog();
+      expect(dialogMock.open).not.toHaveBeenCalled();
+    });
   });
 
+  // SyncBnetDialogComponent shows its own snackbar and closes with `true` only on a successful
+  // sync (see sync-bnet-dialog.component.spec.ts) — list.component's only job on close is to
+  // chain into character selection.
   describe('sync dialog result handling', () => {
-    it('does nothing when dialog closes without a result', () => {
+    it('does nothing when dialog closes without a result (cancelled)', () => {
       setup();
       dialogMock.open.mockReturnValue({ closed: of(undefined) });
       component.linkBnet('eu');
-      expect(snackbarMock.success).not.toHaveBeenCalled();
-      expect(storeMock.loadCharacters).not.toHaveBeenCalled();
+      expect(dialogMock.open).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing when dialog closes with synced=false', () => {
+    it('does nothing when dialog closes with false', () => {
       setup();
-      dialogMock.open.mockReturnValue({ closed: of({ synced: false }) });
+      dialogMock.open.mockReturnValue({ closed: of(false) });
       component.linkBnet('eu');
-      expect(snackbarMock.success).not.toHaveBeenCalled();
+      expect(dialogMock.open).toHaveBeenCalledTimes(1);
     });
 
-    it('shows syncSuccess snackbar and force-reloads characters when synced=true', () => {
+    it('opens the import dialog when the sync dialog closes with true', () => {
       setup();
-      dialogMock.open.mockReturnValue({ closed: of({ synced: true }) });
+      dialogMock.open
+        .mockReturnValueOnce({ closed: of(true) }) // sync dialog
+        .mockReturnValueOnce({ closed: of(undefined) }); // chained import dialog
       component.linkBnet('eu');
-      expect(snackbarMock.success).toHaveBeenCalledWith('characters.bnet.syncSuccess');
-      expect(storeMock.loadCharacters).toHaveBeenCalledWith(true);
+      expect(dialogMock.open).toHaveBeenCalledTimes(2);
     });
   });
 });

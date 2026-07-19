@@ -19,4 +19,6 @@ export interface GuildRosterMember {
   raidSpecs: CharacterSpec[];
   characterRank: CharacterRank;
   joinedAt: string;
+  /** Whether the current user is allowed to exclude this character from the roster. */
+  canExclude: boolean;
 }

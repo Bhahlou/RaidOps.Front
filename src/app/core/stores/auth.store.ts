@@ -5,7 +5,7 @@ import { NotificationService } from '../services/notification.service';
 import { NotificationType } from '../models/notification.model';
 import { User } from '../models/user.model';
 
-const SESSION_KEY = 'raidops_user';
+const STORAGE_KEY = 'raidops_user';
 
 @Service()
 export class AuthStore {
@@ -21,12 +21,12 @@ export class AuthStore {
   #refresh$: Observable<void> | null = null;
 
   constructor() {
-    const stored = sessionStorage.getItem(SESSION_KEY);
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         this.#user.set(JSON.parse(stored) as User);
       } catch {
-        sessionStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
   }
@@ -35,7 +35,7 @@ export class AuthStore {
     return this.#authService.getMe().pipe(
       tap((user) => {
         this.#user.set(user);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
       }),
     );
   }
@@ -62,7 +62,7 @@ export class AuthStore {
     return this.#authService.logout().pipe(
       tap(() => {
         this.#user.set(null);
-        sessionStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(STORAGE_KEY);
       }),
     );
   }
@@ -84,7 +84,7 @@ export class AuthStore {
           ),
         };
         this.#user.set(updated);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       }),
     );
   }

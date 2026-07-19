@@ -44,3 +44,25 @@ Pour chaque personnage nouvellement importé, RaidOps ouvre la fenêtre **Spés 
 
 Une fois cette étape terminée, tes personnages apparaissent dans **Personnages** et tu peux les utiliser pour rejoindre une guilde.
 ![personnages importés](/assets/manual/fr/characters/created-characters.png)
+
+### 5. Lier un second compte Battle.net
+
+Tu joues sur plusieurs comptes Battle.net ? Tu peux tous les lier à ton compte RaidOps et importer les personnages de chacun.
+
+Depuis **Personnages**, clique sur **Ajouter un autre compte** à côté de ton battletag (regroupé dans le menu **⋮** sur mobile).
+
+![Ajouter un autre compte Battle.net](/assets/manual/fr/characters/bnet-add-another-account.png)
+
+Une fenêtre Battle.net s'ouvre et te déconnecte automatiquement du compte actuellement lié, avant de te proposer de te reconnecter — connecte-toi avec l'autre compte que tu veux ajouter. RaidOps enchaîne ensuite les mêmes étapes que pour un premier lien (choix de branche, synchronisation, import).
+
+> Si RaidOps ne détecte aucun nouveau compte à la fin du processus, c'est que tu t'es reconnecté avec le même compte que celui déjà lié — vérifie que tu t'es bien authentifié avec l'autre compte Battle.net dans la fenêtre, puis réessaie.
+
+Une fois liés, tes comptes apparaissent chacun par leur battletag dans le menu — ils restent indépendants, avec leurs propres personnages.
+
+### 6. Délier un compte Battle.net
+
+Depuis ce même menu, choisis **Délier** sur le compte à retirer, puis confirme.
+
+![Délier un compte Battle.net](/assets/manual/fr/characters/bnet-unlink-confirm.png)
+
+> **Attention** — délier un compte supprime définitivement tous les personnages qui en proviennent, ainsi que leur historique dans les guildes concernées. Ce n'est pas une simple désactivation : l'action est irréversible.
