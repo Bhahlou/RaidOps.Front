@@ -1,0 +1,39 @@
+@if ((accounts()?.length ?? 0) > 0) {
+<div class="linked-accounts">
+  <div class="linked-accounts__header">
+    <span class="linked-accounts__title">{{ 'characters.bnet.accounts.title' | transloco }}</span>
+    <button
+      type="button"
+      class="icon-btn"
+      [disabled]="isRefreshing()"
+      [attr.aria-label]="'characters.bnet.accounts.refresh' | transloco"
+      (click)="refresh()"
+    >
+      <span class="material-icons" [class.spin]="isRefreshing()">refresh</span>
+    </button>
+  </div>
+
+  <ul class="linked-accounts__list">
+    @for (account of accounts() ?? []; track account.bnetId) {
+      <li class="linked-account">
+        <app-bnet-icon class="logo" [size]="14" />
+        <span class="battle-tag">{{ account.battleTag }}</span>
+        <span class="fi fi-{{ regionFlags[account.region] }} flag"></span>
+        <button
+          type="button"
+          class="icon-btn unlink-btn"
+          [disabled]="unlinkingBnetId() === account.bnetId"
+          [attr.aria-label]="'characters.bnet.accounts.unlink' | transloco"
+          (click)="unlink(account)"
+        >
+          <span class="material-icons">link_off</span>
+        </button>
+      </li>
+    }
+  </ul>
+
+  <app-bnet-link-button (regionSelected)="addAnother.emit($event)">
+    {{ 'characters.bnet.accounts.addAnother' | transloco }}
+  </app-bnet-link-button>
+</div>
+}

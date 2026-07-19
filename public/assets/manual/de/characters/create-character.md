@@ -47,3 +47,25 @@ Für jeden neu importierten Charakter öffnet RaidOps das Fenster **Raidtauglich
 Sobald das erledigt ist, erscheinen deine Charaktere unter **Charaktere**, und du kannst sie nutzen, um einer Gilde beizutreten.
 
 ![importierte Charaktere](/assets/manual/de/characters/created-characters.png)
+
+### 5. Ein zweites Battle.net-Konto verknüpfen
+
+Spielst du auf mehreren Battle.net-Konten? Du kannst sie alle mit deinem RaidOps-Konto verknüpfen und Charaktere aus jedem importieren.
+
+Klicke auf **Charaktere** neben deinem Battletag auf **Weiteres Konto hinzufügen** (auf Mobilgeräten im **⋮**-Menü zusammengefasst).
+
+![Weiteres Battle.net-Konto hinzufügen](/assets/manual/de/characters/bnet-add-another-account.png)
+
+Ein Battle.net-Fenster öffnet sich und meldet dich automatisch vom aktuell verknüpften Konto ab, bevor es dich bittet, dich erneut anzumelden — melde dich mit dem anderen Konto an, das du hinzufügen möchtest. RaidOps durchläuft anschließend dieselben Schritte wie bei der ersten Verknüpfung (Versionsauswahl, Synchronisierung, Import).
+
+> Erkennt RaidOps am Ende des Vorgangs kein neues Konto, hast du dich erneut mit dem bereits verknüpften Konto angemeldet — stelle sicher, dass du dich im Fenster wirklich mit dem anderen Battle.net-Konto authentifiziert hast, und versuche es erneut.
+
+Sind die Konten verknüpft, erscheint jedes einzeln mit seinem eigenen Battletag im Menü — sie bleiben unabhängig voneinander, jedes mit eigenen Charakteren.
+
+### 6. Ein Battle.net-Konto trennen
+
+Wähle im selben Menü **Trennen** beim Konto, das du entfernen möchtest, und bestätige.
+
+![Battle.net-Konto trennen](/assets/manual/de/characters/bnet-unlink-confirm.png)
+
+> **Achtung** — das Trennen eines Kontos löscht alle Charaktere, die von ihm stammen, dauerhaft, zusammen mit ihrer Historie in betroffenen Gilden. Das ist keine einfache Deaktivierung: Diese Aktion kann nicht rückgängig gemacht werden.

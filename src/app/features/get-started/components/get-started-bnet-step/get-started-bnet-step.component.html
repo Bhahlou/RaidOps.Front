@@ -4,9 +4,13 @@
   </div>
 
 } @else if (linkingRegion()) {
-  <app-bnet-sync-panel [region]="linkingRegion()!" (synced)="onSynced()" />
+  <app-bnet-sync-panel
+    [region]="linkingRegion()!"
+    [startInAddAnotherMode]="isAddingAnotherAccount()"
+    (synced)="onSynced($event)"
+  />
   @if (syncPanel()?.step() === 'error') {
-    <app-button variant="text" (click)="syncPanel()!.retry()">{{ 'characters.sync.retry' | transloco }}</app-button>
+    <app-button variant="text" (click)="syncPanel()!.reset()">{{ 'characters.sync.retry' | transloco }}</app-button>
   }
 
 } @else if (!isBnetLinked()) {
@@ -18,6 +22,8 @@
   </div>
 
 } @else {
+  <app-bnet-linked-accounts (addAnother)="addAnotherAccount($event)" />
+
   <app-character-activation-panel
     (activated)="onActivated($event)"
     (activateError)="onActivateError()"

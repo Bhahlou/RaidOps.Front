@@ -59,6 +59,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "bnetMultiAccount": {
+        "title": "Mehrere Battle.net-Konten verknüpfen",
+        "description": "Ein RaidOps-Konto kann jetzt mehrere Battle.net-Konten verknüpfen und Charaktere aus jedem importieren — praktisch, wenn du auf mehreren Blizzard-Konten spielst."
+      },
       "uiRefresh": {
         "title": "Ein einheitlicheres Erscheinungsbild, und die App funktioniert jetzt auf Mobilgeräten/Tablets",
         "description": "Neue Oberflächenkomponenten (Buttons, Checkboxen, Menüs, Tabellen…) mit einem einheitlicheren Erscheinungsbild. Dichte Ansichten wie das Roster oder das Audit-Log passen sich jetzt kleinen Bildschirmen an, indem sie zu einer Kartenansicht wechseln."
@@ -562,7 +566,6 @@
   "characters": {
     "bnet": {
       "linkButton": "Battle.net verknüpfen",
-      "connectedAs": "Verbunden:",
       "notLinkedTitle": "Verknüpfe dein Battle.net-Konto",
       "notLinkedDescription": "Um sicherzustellen, dass jeder in RaidOps erstellte Charakter seinem rechtmäßigen Besitzer gehört, synchronisieren wir Charaktere mit Battle.net-Konten. Durch das Verknüpfen deines Battle.net-Kontos kannst du deine Charaktere einfach importieren und synchronisieren.",
       "linkedSuccess": "Battle.net-Konto erfolgreich verknüpft!",
@@ -571,7 +574,19 @@
       "linkErrorBnet": "Battle.net ist derzeit nicht verfügbar. Bitte versuche es später erneut.",
       "popupBlocked": "Erlaube Popups, um deine Charaktere zu importieren.",
       "syncButton": "BNet synchronisieren",
-      "syncSuccess": "Charaktere erfolgreich synchronisiert!"
+      "syncSuccess": "Charaktere erfolgreich synchronisiert!",
+      "accounts": {
+        "title": "Verknüpfte Battle.net-Konten",
+        "unlink": "Trennen",
+        "unlinkConfirmTitle": "Dieses Battle.net-Konto endgültig trennen?",
+        "unlinkConfirmBody": "Charaktere, die von {{ battleTag }} importiert wurden, werden zusammen mit ihren Spezialisierungen, ihrer Historie und ihrer Gilden-Roster-Mitgliedschaft endgültig aus RaidOps gelöscht — diese Aktion kann nicht rückgängig gemacht werden.",
+        "unlinkConfirmAction": "Trennen",
+        "unlinkSuccess": "Battle.net-Konto getrennt.",
+        "unlinkError": "Konto konnte nicht getrennt werden. Versuche es erneut.",
+        "addAnother": "Weiteres Konto hinzufügen",
+        "refresh": "Aktualisieren",
+        "accountAlreadyLinked": "Dieses Battle.net-Konto ist bereits verknüpft — stelle sicher, dass du auf battle.net mit dem anderen Konto angemeldet bist, auch in anderen offenen Tabs."
+      }
     },
     "list": {
       "title": "Charaktere",

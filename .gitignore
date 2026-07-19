@@ -15,6 +15,9 @@ localhost-key.pem
 npm-debug.log
 yarn-error.log
 
+# Persistent Playwright driver for manual/changelog screenshots — never a repo dependency
+/.playwright-driver
+
 # IDEs and editors
 .idea/
 .project
