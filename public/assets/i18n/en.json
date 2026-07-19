@@ -59,6 +59,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "bnetMultiAccount": {
+        "title": "Link multiple Battle.net accounts",
+        "description": "A single RaidOps account can now link several Battle.net accounts and import characters from each — handy if you play on more than one Blizzard account."
+      },
       "uiRefresh": {
         "title": "A more consistent look, and the app now works on mobile/tablet",
         "description": "New interface components (buttons, checkboxes, menus, tables…) with a more uniform look. Dense screens like the roster or audit log now adapt to small screens by switching to a card view."
@@ -562,7 +566,6 @@
   "characters": {
     "bnet": {
       "linkButton": "Link Battle.net",
-      "connectedAs": "Connected:",
       "notLinkedTitle": "Link your Battle.net account",
       "notLinkedDescription": "To ensure that each character created in RaidOps belongs to its rightful owner, we synchronize characters with Battle.net accounts. By linking your Battle.net account, you can easily import and sync your characters.",
       "linkedSuccess": "Battle.net account linked successfully!",
@@ -571,7 +574,19 @@
       "linkErrorBnet": "Battle.net is currently unavailable. Please try again later.",
       "popupBlocked": "Allow popups to import your characters.",
       "syncButton": "Sync Battle.net",
-      "syncSuccess": "Characters synced successfully!"
+      "syncSuccess": "Characters synced successfully!",
+      "accounts": {
+        "title": "Linked Battle.net accounts",
+        "unlink": "Unlink",
+        "unlinkConfirmTitle": "Permanently unlink this Battle.net account?",
+        "unlinkConfirmBody": "Characters imported from {{ battleTag }} will be permanently deleted from RaidOps, along with their specs, history, and guild roster memberships — this action can't be undone.",
+        "unlinkConfirmAction": "Unlink",
+        "unlinkSuccess": "Battle.net account unlinked.",
+        "unlinkError": "Couldn't unlink this account. Try again.",
+        "addAnother": "Add another account",
+        "refresh": "Refresh",
+        "accountAlreadyLinked": "This Battle.net account is already linked — make sure you're logged in with the other account on battle.net, including in any other open tabs."
+      }
     },
     "list": {
       "title": "Characters",

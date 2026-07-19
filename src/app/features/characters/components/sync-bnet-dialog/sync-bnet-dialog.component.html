@@ -1,12 +1,16 @@
 <h2 class="dialog-title">{{ 'characters.sync.title' | transloco }}</h2>
 
 <div class="dialog-content">
-  <app-bnet-sync-panel [region]="data.region" (synced)="onSynced()" />
+  <app-bnet-sync-panel
+    [region]="region"
+    [startInAddAnotherMode]="startInAddAnotherMode"
+    (synced)="onSynced($event)"
+  />
 </div>
 
 <div class="dialog-actions">
   @if (panel().step() === 'error') {
-    <app-button variant="text" (click)="panel().retry()">{{ 'characters.sync.retry' | transloco }}</app-button>
+    <app-button variant="text" (click)="panel().reset()">{{ 'characters.sync.retry' | transloco }}</app-button>
   }
   <app-button variant="text" (click)="dialogRef.close()">{{ 'characters.import.cancel' | transloco }}</app-button>
 </div>

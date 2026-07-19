@@ -36,7 +36,7 @@ export class CharacterListComponent implements OnInit {
 
   readonly isBnetLoading = this.#store.isBnetLoading;
   readonly isBnetLinked = this.#store.isBnetLinked;
-  readonly bnetAccount = this.#store.bnetAccount;
+  readonly bnetAccounts = this.#store.bnetAccounts;
   readonly isCharactersLoading = this.#store.isCharactersLoading;
   readonly characters = this.#store.characterList;
 
@@ -52,9 +52,14 @@ export class CharacterListComponent implements OnInit {
     this.#openSyncDialog(region);
   }
 
-  /** Opens the sync dialog using the region from the already-linked BNet account. */
+  /** "Ajouter un autre compte" from the header — opens the dialog straight into add-another mode. */
+  addAnotherAccount(region: string): void {
+    this.#openSyncDialog(region, true);
+  }
+
+  /** Opens the sync dialog, defaulting to the first already-linked BNet account's region. */
   openSyncDialog(): void {
-    const region = this.bnetAccount()?.region;
+    const region = this.bnetAccounts()?.[0]?.region;
     if (!region) return;
     this.#openSyncDialog(region);
   }
@@ -151,17 +156,18 @@ export class CharacterListComponent implements OnInit {
     );
   }
 
-  #openSyncDialog(region: string): void {
-    const dialogRef = this.#dialog.open<{ synced: boolean } | undefined>(SyncBnetDialogComponent, {
+  // SyncBnetDialogComponent shows its own snackbar and closes with `true` on a successful sync
+  // (staying open on the branch grid instead for a mismatched-account error) — chain straight into
+  // character selection so the user lands on freshly-synced characters instead of the bare page.
+  #openSyncDialog(region: string, addingAnother = false): void {
+    const dialogRef = this.#dialog.open<boolean | undefined>(SyncBnetDialogComponent, {
       width: '680px',
       maxWidth: '95vw',
-      data: { region } satisfies SyncBnetDialogData,
+      data: { region, addingAnother } satisfies SyncBnetDialogData,
     });
 
-    dialogRef.closed.subscribe((result) => {
-      if (!result?.synced) return;
-      this.#snackbar.success('characters.bnet.syncSuccess');
-      this.#store.loadCharacters(true).subscribe();
+    dialogRef.closed.subscribe((synced) => {
+      if (synced) this.openImportDialog();
     });
   }
 

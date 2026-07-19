@@ -1,16 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 
 import { ListHeaderComponent } from './list-header.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
+import { CharacterStore } from '../../stores/character.store';
 import { User } from '../../../../core/models/user.model';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
+import { BnetAccount } from '../../models/bnet-account.model';
 
 describe('ListHeaderComponent', () => {
+  let storeMock: { confirmAndUnlinkBnetAccount: ReturnType<typeof vi.fn> };
+
   const setup = (user: User | null) => {
+    storeMock = { confirmAndUnlinkBnetAccount: vi.fn().mockReturnValue(of(true)) };
+
     TestBed.configureTestingModule({
       imports: [ListHeaderComponent],
-      providers: [{ provide: AuthStore, useValue: { user: signal(user) } }],
+      providers: [
+        { provide: AuthStore, useValue: { user: signal(user) } },
+        { provide: CharacterStore, useValue: storeMock },
+      ],
     });
     TestBed.overrideComponent(ListHeaderComponent, { set: { template: '', imports: [] } });
     const fixture = TestBed.createComponent(ListHeaderComponent);
@@ -26,6 +36,19 @@ describe('ListHeaderComponent', () => {
   it('exposes REGION_FLAGS for all four regions', () => {
     const flags = setup(null).regionFlags;
     expect(Object.keys(flags).sort()).toEqual(['eu', 'kr', 'tw', 'us']);
+  });
+
+  // ── unlink ────────────────────────────────────────────────────────────────
+
+  describe('unlink', () => {
+    it('delegates to the store', () => {
+      const account: BnetAccount = { bnetId: '1', battleTag: 'Bhahlou#1234', region: 'eu', tokenExpiry: '2026-01-01T00:00:00Z' };
+      const component = setup(null);
+
+      component.unlink(account);
+
+      expect(storeMock.confirmAndUnlinkBnetAccount).toHaveBeenCalledWith(account);
+    });
   });
 
   // ── breadcrumbs ───────────────────────────────────────────────────────────

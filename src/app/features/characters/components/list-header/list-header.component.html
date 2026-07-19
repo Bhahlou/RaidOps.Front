@@ -6,11 +6,34 @@
           <app-button variant="primary" icon="download" (click)="openImport.emit()">
             {{ 'characters.list.importButton' | transloco }}
           </app-button>
-          <div class="bnet-chip">
-            <app-bnet-icon class="logo" [size]="15" />
-            <span>{{ bnetAccount()!.battleTag }}</span>
-            <span class="fi fi-{{ regionFlags[bnetAccount()!.region] }} flag"></span>
-          </div>
+
+          @for (account of bnetAccounts(); track account.bnetId) {
+            <button
+              type="button"
+              class="bnet-chip"
+              [cdkMenuTriggerFor]="chipMenu"
+              [cdkMenuPosition]="endAlignedMenuPosition"
+              [attr.aria-label]="account.battleTag"
+            >
+              <app-bnet-icon class="logo" [size]="15" />
+              <span>{{ account.battleTag }}</span>
+              <span class="fi fi-{{ regionFlags[account.region] }} flag"></span>
+              <span class="material-icons chip-chevron">expand_more</span>
+            </button>
+
+            <ng-template #chipMenu>
+              <div class="menu-panel" cdkMenu>
+                <button type="button" class="menu-item menu-item--danger" cdkMenuItem (click)="unlink(account)">
+                  <span class="material-icons">link_off</span>
+                  {{ 'characters.bnet.accounts.unlink' | transloco }}
+                </button>
+              </div>
+            </ng-template>
+          }
+
+          <app-bnet-link-button menuAlign="end" (regionSelected)="addAnotherAccount.emit($event)">
+            {{ 'characters.bnet.accounts.addAnother' | transloco }}
+          </app-bnet-link-button>
         </div>
         <button
           type="button"
@@ -21,7 +44,7 @@
           <span class="material-icons">more_vert</span>
         </button>
       } @else {
-        <app-bnet-link-button (regionSelected)="linkBnet.emit($event)">
+        <app-bnet-link-button menuAlign="end" (regionSelected)="linkBnet.emit($event)">
           {{ 'characters.bnet.linkButton' | transloco }}
         </app-bnet-link-button>
       }
@@ -31,15 +54,41 @@
 
 <ng-template #actionsMenu>
   <div class="menu-panel" cdkMenu>
-    <div class="menu-bnet-status">
-      <app-bnet-icon class="logo" [size]="14" />
-      <span>{{ 'characters.bnet.connectedAs' | transloco }}</span>
-      <strong>{{ bnetAccount()!.battleTag }}</strong>
-      <span class="fi fi-{{ regionFlags[bnetAccount()!.region] }} flag"></span>
-    </div>
     <button type="button" class="menu-item" cdkMenuItem (click)="openImport.emit()">
       <span class="material-icons">download</span>
       {{ 'characters.list.importButton' | transloco }}
     </button>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-section-label">{{ 'characters.bnet.accounts.title' | transloco }}</div>
+    @for (account of bnetAccounts(); track account.bnetId) {
+      <button
+        type="button"
+        class="menu-item"
+        cdkMenuItem
+        [cdkMenuTriggerFor]="accountMenu"
+        [cdkMenuPosition]="endAlignedMenuPosition"
+        [attr.aria-label]="account.battleTag"
+      >
+        <app-bnet-icon class="logo" [size]="14" />
+        <span class="menu-item__label">{{ account.battleTag }}</span>
+        <span class="fi fi-{{ regionFlags[account.region] }} flag"></span>
+        <span class="material-icons account-chevron">chevron_right</span>
+      </button>
+
+      <ng-template #accountMenu>
+        <div class="menu-panel" cdkMenu>
+          <button type="button" class="menu-item menu-item--danger" cdkMenuItem (click)="unlink(account)">
+            <span class="material-icons">link_off</span>
+            {{ 'characters.bnet.accounts.unlink' | transloco }}
+          </button>
+        </div>
+      </ng-template>
+    }
+
+    <app-bnet-link-button menuAlign="end" (regionSelected)="addAnotherAccount.emit($event)">
+      {{ 'characters.bnet.accounts.addAnother' | transloco }}
+    </app-bnet-link-button>
   </div>
 </ng-template>

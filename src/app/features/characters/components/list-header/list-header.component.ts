@@ -1,8 +1,13 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { ConnectedPosition } from '@angular/cdk/overlay';
 import { BnetAccount } from '../../models/bnet-account.model';
-import { BnetLinkButtonComponent } from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
+import { CharacterStore } from '../../stores/character.store';
+import {
+  BnetLinkButtonComponent,
+  BnetRegion,
+} from '../../../../shared/components/buttons/bnet-link-button/bnet-link-button.component';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { BnetIconComponent } from '../../../../shared/components/icons/bnet-icon/bnet-icon.component';
 import {
@@ -37,15 +42,32 @@ import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enu
 })
 export class ListHeaderComponent {
   readonly #authStore = inject(AuthStore);
+  readonly #store = inject(CharacterStore);
 
   readonly isBnetLoading = input.required<boolean>();
   readonly isBnetLinked = input.required<boolean>();
-  readonly bnetAccount = input<BnetAccount | null>(null);
+  readonly bnetAccounts = input<BnetAccount[]>([]);
 
+  /** First-time link, from the "Lier Battle.net" CTA. */
   readonly linkBnet = output<string>();
+  /** "Ajouter un autre compte" — a region picked while at least one account is already linked. */
+  readonly addAnotherAccount = output<BnetRegion>();
   readonly openImport = output<void>();
 
   readonly regionFlags = REGION_FLAGS;
+
+  // Right-anchored: these triggers (the account chips, and their unlink submenu in the mobile
+  // "more" menu) sit near the right edge of the page, so the default left-anchored menu position
+  // overflows past them. Aligns the menu's right edge with the trigger's right edge instead,
+  // opening downward (falling back to upward if there's no room below).
+  readonly endAlignedMenuPosition: ConnectedPosition[] = [
+    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
+    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom' },
+  ];
+
+  unlink(account: BnetAccount): void {
+    this.#store.confirmAndUnlinkBnetAccount(account).subscribe();
+  }
 
   readonly breadcrumbs = computed((): BreadcrumbItem[] => {
     const user = this.#authStore.user();

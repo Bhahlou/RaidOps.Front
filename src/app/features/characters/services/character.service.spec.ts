@@ -43,9 +43,9 @@ describe('CharacterService', () => {
   afterEach(() => controller.verify());
 
   describe('getCharacters', () => {
-    it('sends GET /characters and returns the bnetAccount + characters envelope', () => {
+    it('sends GET /characters and returns the bnetAccounts + characters envelope', () => {
       const account: BnetAccount = { bnetId: '1', battleTag: 'Test#0001', region: 'eu', tokenExpiry: '2026-01-01T00:00:00Z' };
-      const envelope: GetCharactersResponse = { bnetAccount: account, characters: [makeChar(1)] };
+      const envelope: GetCharactersResponse = { bnetAccounts: [account], characters: [makeChar(1)] };
 
       let result: GetCharactersResponse | undefined;
       service.getCharacters().subscribe(r => { result = r; });

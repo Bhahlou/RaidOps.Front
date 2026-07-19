@@ -1,0 +1,14 @@
+<h2 class="dialog-title">{{ 'characters.bnet.accounts.unlinkConfirmTitle' | transloco }}</h2>
+
+<div class="dialog-content">
+  <p>{{ 'characters.bnet.accounts.unlinkConfirmBody' | transloco: { battleTag: data.battleTag } }}</p>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">
+    {{ 'characters.import.cancel' | transloco }}
+  </app-button>
+  <app-button variant="danger" (click)="confirm()">
+    {{ 'characters.bnet.accounts.unlinkConfirmAction' | transloco }}
+  </app-button>
+</div>
