@@ -1,0 +1,178 @@
+// Flex column so .dialog-content (the only part that can grow arbitrarily tall — the cycle-day
+// list) is the one area that scrolls, while the title and Cancel/Save stay pinned in view
+// regardless of window height — a fixed max-height on .cycle-rows alone can't guarantee that,
+// since it doesn't know how much room is actually left on the user's screen.
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  padding: 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  // No min-width: the overlay pane's own width (see openPatternDialog's `min(960px, 95vw)`)
+  // already drives sizing — a fixed floor here previously forced horizontal overflow on any
+  // phone narrower than 480px, regardless of what the pane itself was sized to.
+  width: 100%;
+  max-width: 90vw;
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+}
+
+.dialog-title {
+  flex-shrink: 0;
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  // Keeps the scrollbar (when one appears) from sitting flush against the row borders.
+  padding-right: 4px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.mode-tab {
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &.active {
+    color: var(--color-text-primary);
+    border-bottom-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  &:hover:not(.active) {
+    color: var(--color-text-primary);
+  }
+}
+
+.mode-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.cycle-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cycle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.cycle-row-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 90px;
+  text-transform: capitalize;
+}
+
+.field-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.text-input,
+.number-input,
+.date-input,
+.time-input {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// Only the native date/time picker popup needs this — forcing it on plain text/number inputs has
+// no visual effect on the field itself but can make Chrome's autocomplete-suggestions dropdown
+// (browser-remembered past values for this field) render with a stray light border.
+.date-input,
+.time-input {
+  color-scheme: dark;
+}
+
+.status-options {
+  display: flex;
+  gap: 12px;
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+
+  input[type='radio'] {
+    accent-color: var(--color-accent);
+  }
+}
+
+.time-bounds {
+  display: flex;
+  gap: 8px;
+}
+
+.reason-input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  flex-shrink: 0;
+}

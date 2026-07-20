@@ -6,6 +6,10 @@
     "help": "Help",
     "toggleNav": "Toggle navigation menu"
   },
+  "confirmDialog": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
   "manual": {
     "back": "Back",
     "toc": "Contents",
@@ -48,6 +52,9 @@
       },
       "auditLog": {
         "title": "Audit log"
+      },
+      "calendar": {
+        "title": "The calendar"
       }
     }
   },
@@ -59,6 +66,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "calendar": {
+        "title": "A calendar to declare your absences and recurring patterns",
+        "description": "Declare one-off absences/lateness (single date or range, reason, partial time bounds) or a recurring pattern (weekly, or a 5x8-style shift rotation) — changes are never retroactive on days that have already passed."
+      },
       "bnetMultiAccount": {
         "title": "Link multiple Battle.net accounts",
         "description": "A single RaidOps account can now link several Battle.net accounts and import characters from each — handy if you play on more than one Blizzard account."
@@ -380,7 +391,8 @@
     "categories": {
       "Guild": "Guild",
       "Settings": "Settings",
-      "Roster": "Roster"
+      "Roster": "Roster",
+      "Availability": "Availability"
     },
     "settingsFields": {
       "timezone": "Timezone",
@@ -395,7 +407,12 @@
       "MemberLeft": "Member left",
       "MemberExcluded": "Member excluded",
       "MemberRankUpdated": "Rank updated",
-      "OfficerThresholdUpdated": "Officer threshold updated"
+      "OfficerThresholdUpdated": "Officer threshold updated",
+      "AvailabilityExceptionDeclared": "Absence/lateness declared",
+      "AvailabilityExceptionDeleted": "Absence/lateness deleted",
+      "RecurringAvailabilityPatternCreated": "Recurring pattern added",
+      "RecurringAvailabilityPatternUpdated": "Recurring pattern edited",
+      "RecurringAvailabilityPatternStopped": "Recurring pattern stopped"
     }
   },
   "noGuild": {
@@ -519,6 +536,73 @@
       "dateTo": "To",
       "clear": "Clear",
       "clearAll": "Clear all filters"
+    }
+  },
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "declareException": "Declare absence/lateness",
+    "status": {
+      "absent": "Absent",
+      "partial": "Partial",
+      "available": "Available",
+      "availableOverride": "Exceptionally present"
+    },
+    "time": {
+      "from": "from {{time}}",
+      "until": "until {{time}}"
+    },
+    "exceptionDialog": {
+      "title": "Declare an absence or lateness",
+      "editTitle": "Edit this declaration",
+      "dateRange": "Date(s)",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "status": "Status",
+      "availableFrom": "Available from",
+      "availableUntil": "Available until",
+      "reason": "Reason (optional)",
+      "removeDay": "Remove this day",
+      "saveSuccess": "Availability exception saved.",
+      "removeDaySuccess": "Day removed from the declaration.",
+      "invalidRange": "The end date must be on or after the start date."
+    },
+    "exceptions": {
+      "panelTitle": "One-off",
+      "empty": "No exception declared yet.",
+      "deleteSuccess": "Declaration deleted.",
+      "pastLocked": "Past declarations are locked and can no longer be changed."
+    },
+    "patternDialog": {
+      "panelTitle": "Recurring",
+      "addPattern": "Add pattern",
+      "empty": "No recurring pattern declared yet.",
+      "unnamed": "Unnamed pattern",
+      "cycleSummary": "Every {{days}} days",
+      "editTitle": "Edit recurring pattern",
+      "createTitle": "New recurring pattern",
+      "modeWeekly": "Weekly",
+      "modeAdvanced": "Advanced (custom cycle)",
+      "weeklyHint": "Click a day to cycle through Available / Absent / Partial.",
+      "advancedHint": "One slot per day of the cycle — click a day to cycle through Available / Absent / Partial.",
+      "editEffectiveHint": "Changes apply from today onward — past days keep the previous version.",
+      "dayNumber": "Day {{n}}",
+      "label": "Name (optional)",
+      "cycleLengthDays": "Cycle length (days)",
+      "anchorDate": "Anchor date",
+      "stopPattern": "Stop from today",
+      "stopConfirmTitle": "Stop this recurring pattern?",
+      "stopConfirmMessage": "\"{{label}}\" will stop applying from today onward. Past days keep exactly what this pattern resolved to before.",
+      "saveSuccess": "Recurring pattern saved.",
+      "deleteSuccess": "Recurring pattern stopped.",
+      "invalidPattern": "Check the cycle length and day offsets."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "home": {

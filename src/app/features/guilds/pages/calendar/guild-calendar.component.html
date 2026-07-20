@@ -1,5 +1,86 @@
 <div class="guild-page">
-  <app-page-header [items]="breadcrumbs()" />
-  <app-under-construction />
-</div>
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'calendar' }" />
 
+  <div class="calendar-page">
+    <section class="calendar-panel">
+      <header class="month-header">
+        <div class="month-nav">
+          <app-icon-button icon="chevron_left" [ariaLabel]="'calendar.previousMonth' | transloco" (click)="prevMonth()" />
+          <span class="month-label">{{ monthLabel() }}</span>
+          <app-icon-button icon="chevron_right" [ariaLabel]="'calendar.nextMonth' | transloco" (click)="nextMonth()" />
+        </div>
+        <div class="month-actions">
+          <app-button variant="stroked" icon="today" (click)="goToday()">{{ 'calendar.today' | transloco }}</app-button>
+          <app-button variant="stroked" icon="repeat" (click)="openPatternDialog(null)">
+            {{ 'calendar.patternDialog.addPattern' | transloco }}
+          </app-button>
+          <app-button variant="primary" icon="event_busy" (click)="openExceptionDialog()">
+            {{ 'calendar.declareException' | transloco }}
+          </app-button>
+        </div>
+      </header>
+
+      <app-availability-calendar-grid [days]="calendarDays()" (dayClick)="openExceptionDialog($event)" />
+    </section>
+
+    <section class="declarations-panel">
+      <div class="declarations-section">
+        <h3>{{ 'calendar.exceptions.panelTitle' | transloco }}</h3>
+
+        @if (exceptions().length === 0) {
+          <app-empty-hint>{{ 'calendar.exceptions.empty' | transloco }}</app-empty-hint>
+        } @else {
+          <ul class="declaration-list">
+            @for (exception of exceptions(); track exception.id) {
+              <li class="declaration-item">
+                <div class="declaration-info">
+                  <span class="declaration-label">{{ exceptionRangeLabel(exception) }}</span>
+                  <span class="declaration-meta">{{ exceptionDetailLabel(exception) }}</span>
+                </div>
+                <div class="declaration-actions">
+                  <app-icon-button
+                    icon="edit"
+                    [ariaLabel]="(isExceptionEditLocked(exception) ? 'calendar.exceptions.pastLocked' : 'calendar.actions.edit') | transloco"
+                    [disabled]="isExceptionEditLocked(exception)"
+                    (click)="editException(exception)"
+                  />
+                  <app-icon-button
+                    icon="delete"
+                    [ariaLabel]="(isExceptionDeleteLocked(exception) ? 'calendar.exceptions.pastLocked' : 'calendar.actions.delete') | transloco"
+                    [disabled]="isExceptionDeleteLocked(exception)"
+                    (click)="deleteException(exception)"
+                  />
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="declarations-section">
+        <h3>{{ 'calendar.patternDialog.panelTitle' | transloco }}</h3>
+
+        @if (patterns().length === 0) {
+          <app-empty-hint>{{ 'calendar.patternDialog.empty' | transloco }}</app-empty-hint>
+        } @else {
+          <ul class="declaration-list">
+            @for (pattern of patterns(); track pattern.id) {
+              <li class="declaration-item">
+                <div class="declaration-info">
+                  <span class="declaration-label">{{ pattern.label || ('calendar.patternDialog.unnamed' | transloco) }}</span>
+                  <span class="declaration-meta">
+                    {{ 'calendar.patternDialog.cycleSummary' | transloco: { days: pattern.cycleLengthDays } }}
+                  </span>
+                </div>
+                <div class="declaration-actions">
+                  <app-icon-button icon="edit" [ariaLabel]="'calendar.actions.edit' | transloco" (click)="openPatternDialog(pattern)" />
+                  <app-icon-button icon="delete" [ariaLabel]="'calendar.patternDialog.stopPattern' | transloco" (click)="deletePattern(pattern)" />
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+  </div>
+</div>

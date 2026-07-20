@@ -1,0 +1,24 @@
+<div class="calendar-grid">
+  <div class="weekday-header">
+    @for (label of weekdayLabels(); track label) {
+      <span class="weekday-label">{{ label }}</span>
+    }
+  </div>
+
+  <div class="days-grid">
+    @for (day of days(); track day.iso) {
+      <button
+        type="button"
+        class="day-cell {{ statusClass(day) }}"
+        [class.out-of-month]="!day.inCurrentMonth"
+        [class.today]="day.isToday"
+        (click)="onDayClick(day)"
+      >
+        <span class="day-number">{{ dayLabel(day) }}</span>
+        @if (detailLabel(day)) {
+          <span class="day-detail" [title]="detailLabel(day)">{{ detailLabel(day) }}</span>
+        }
+      </button>
+    }
+  </div>
+</div>

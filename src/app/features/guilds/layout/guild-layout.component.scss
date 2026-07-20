@@ -1,0 +1,9 @@
+// The router-outlet's routed page becomes a plain (default `display: inline`) child of this host,
+// so without this the page's own `height: 100%` (e.g. guild-calendar's `.guild-page`) has no real
+// height to resolve against and silently collapses to its content's height instead of filling the
+// viewport — most pages hide this by having content taller than the viewport anyway, but a page
+// with deliberately short content (the calendar grid) then leaves dead space below it.
+:host {
+  display: block;
+  height: 100%;
+}
