@@ -1,0 +1,139 @@
+<h2 class="dialog-title">
+  {{ (isEditMode ? 'calendar.patternDialog.editTitle' : 'calendar.patternDialog.createTitle') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <div class="mode-tabs">
+    <button type="button" class="mode-tab" [class.active]="mode() === 'weekly'" (click)="mode.set('weekly')">
+      {{ 'calendar.patternDialog.modeWeekly' | transloco }}
+    </button>
+    <button type="button" class="mode-tab" [class.active]="mode() === 'advanced'" (click)="mode.set('advanced')">
+      {{ 'calendar.patternDialog.modeAdvanced' | transloco }}
+    </button>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label" for="pattern-label">{{ 'calendar.patternDialog.label' | transloco }}</label>
+    <input
+      id="pattern-label"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [value]="label()"
+      (input)="label.set($any($event.target).value)"
+      maxlength="128"
+    />
+  </div>
+
+  @if (isEditMode) {
+    <p class="mode-hint">{{ 'calendar.patternDialog.editEffectiveHint' | transloco }}</p>
+  }
+
+  @if (mode() === 'weekly') {
+    <p class="mode-hint">{{ 'calendar.patternDialog.weeklyHint' | transloco }}</p>
+  } @else {
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label" for="cycle-length">{{ 'calendar.patternDialog.cycleLengthDays' | transloco }}</label>
+        <input
+          id="cycle-length"
+          type="number"
+          min="1"
+          [max]="60"
+          class="number-input"
+          [value]="cycleLengthDays()"
+          (change)="setCycleLengthDays(+$any($event.target).value)"
+        />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="anchor-date">{{ 'calendar.patternDialog.anchorDate' | transloco }}</label>
+        <input
+          id="anchor-date"
+          type="date"
+          class="date-input"
+          [value]="anchorDateInputValue()"
+          (change)="setAnchorDate($any($event.target).value)"
+        />
+      </div>
+    </div>
+    <p class="mode-hint">{{ 'calendar.patternDialog.advancedHint' | transloco }}</p>
+  }
+
+  <div class="cycle-rows">
+    @for (slot of activeSlots(); track $index) {
+      <div class="cycle-row">
+        <span class="cycle-row-name">{{ activeLabels()[$index] }}</span>
+
+        <div class="status-options">
+          <label class="status-option">
+            <input
+              type="radio"
+              [name]="'slot-status-' + $index"
+              [checked]="slot.status === Status.Available"
+              (change)="updateSlot($index, { status: Status.Available })"
+            />
+            {{ 'calendar.status.available' | transloco }}
+          </label>
+          <label class="status-option">
+            <input
+              type="radio"
+              [name]="'slot-status-' + $index"
+              [checked]="slot.status === Status.Absent"
+              (change)="updateSlot($index, { status: Status.Absent })"
+            />
+            {{ 'calendar.status.absent' | transloco }}
+          </label>
+          <label class="status-option">
+            <input
+              type="radio"
+              [name]="'slot-status-' + $index"
+              [checked]="slot.status === Status.Partial"
+              (change)="updateSlot($index, { status: Status.Partial })"
+            />
+            {{ 'calendar.status.partial' | transloco }}
+          </label>
+        </div>
+
+        @if (slot.status === Status.Partial) {
+          <!-- (blur) not (change): see availability-exception-dialog for why — Chrome fires
+               `change` mid-typing and reacting there breaks the minute segment's two-digit combine. -->
+          <div class="time-bounds">
+            <input
+              type="time"
+              class="time-input"
+              [attr.aria-label]="'calendar.exceptionDialog.availableFrom' | transloco"
+              [value]="slot.availableFrom ?? ''"
+              (blur)="updateSlot($index, { availableFrom: $any($event.target).value ? $any($event.target).value + ':00' : null })"
+            />
+            <input
+              type="time"
+              class="time-input"
+              [attr.aria-label]="'calendar.exceptionDialog.availableUntil' | transloco"
+              [value]="slot.availableUntil ?? ''"
+              (blur)="updateSlot($index, { availableUntil: $any($event.target).value ? $any($event.target).value + ':00' : null })"
+            />
+          </div>
+        }
+
+        <input
+          type="text"
+          class="text-input reason-input"
+          autocomplete="off"
+          [placeholder]="'calendar.exceptionDialog.reason' | transloco"
+          [attr.aria-label]="'calendar.exceptionDialog.reason' | transloco"
+          [value]="slot.reason ?? ''"
+          (input)="updateSlot($index, { reason: $any($event.target).value || null })"
+          maxlength="256"
+        />
+      </div>
+    }
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'calendar.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'calendar.actions.save' | transloco }}
+  </app-button>
+</div>

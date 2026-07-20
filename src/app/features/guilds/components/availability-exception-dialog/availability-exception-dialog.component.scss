@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  padding: 20px;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  min-width: 320px;
+
+  @media (max-width: 400px) {
+    padding: 14px;
+    min-width: 0;
+  }
+}
+
+.dialog-title {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.status-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+
+  input[type='radio'] {
+    accent-color: var(--color-accent);
+  }
+}
+
+.time-bounds {
+  flex-direction: row;
+  gap: 16px;
+
+  > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
+}
+
+.time-input,
+.reason-input {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// Only the native time picker popup needs this — forcing it on .reason-input has no visual effect
+// there but can make Chrome's autocomplete-suggestions dropdown (browser-remembered past values
+// for this field) render with a stray light border.
+.time-input {
+  color-scheme: dark;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+
+  // 3 buttons (delete + cancel + save) with a spacer never fit on one row once the danger button's
+  // label ("Supprimer ce jour") has to share space with the dialog's own shrunk padding — it just
+  // gets clipped past the dialog's edge instead of wrapping. Stack full-width instead, same
+  // approach as guild-calendar's .month-actions.
+  @media (max-width: 400px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    .dialog-actions-spacer {
+      display: none;
+    }
+
+    ::ng-deep app-button .btn {
+      width: 100%;
+    }
+  }
+}
+
+.dialog-actions-spacer {
+  flex: 1;
+}

@@ -1,0 +1,163 @@
+// This component's host is a direct flex child of .calendar-panel (flex-direction: column) — flex
+// items are auto-blockified but do NOT auto-grow, so without an explicit flex-grow here the host
+// (and everything inside it, including .calendar-grid's own flex: 1 below) just sizes to content
+// and ignores the space .calendar-panel actually has available.
+//
+// This only holds when .calendar-panel itself has a real externally-constrained height to share
+// (desktop: its grid row is 1fr). Once the page stacks to a single column (see guild-calendar's
+// ≤900px breakpoint), that row becomes auto/content-sized instead — flex: 1 combined with
+// min-height: 0 then makes the whole chain report a near-zero content size to the now content-based
+// ancestor, while the grid still renders its full (unaccounted-for) height, spilling underneath
+// whatever comes after it in the DOM. Below that breakpoint there's no extra space to fill anyway,
+// so drop both and let everything size to its natural content height instead.
+:host {
+  display: flex;
+  // Explicit, since this host has only one child (.calendar-grid) and its own flex-direction was
+  // never set — defaulting to `row` meant .calendar-grid's WIDTH was governed by flex-grow/shrink
+  // (the main axis in a row), not by align-items: stretch (which only affects the cross axis).
+  // That happened to still fill the available width on desktop, purely because flex: 1 there
+  // has flex-grow: 1 — but the ≤900px override below sets flex: none for a *different* reason
+  // (see .calendar-grid's own comment), which as a side effect also dropped that width-filling
+  // behavior, letting .calendar-grid (and the 1fr grid tracks inside it) fall back to their
+  // intrinsic/max-content width instead of the host's real available width. Making this a column
+  // decouples "stretch to the host's width" (now the cross axis, always on) from "how much extra
+  // height to grow into" (the main axis, still controlled by .calendar-grid's own flex value).
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 900px) {
+    flex: none;
+    min-height: auto;
+  }
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 900px) {
+    flex: none;
+    min-height: auto;
+  }
+}
+
+.weekday-header {
+  display: grid;
+  // minmax(0, 1fr) not bare 1fr: a plain `1fr` track has an implicit *automatic* minimum equal to
+  // its content's min-content size — for nowrap text that's the widest unbreakable word, which
+  // silently overrides text-overflow: ellipsis and forces every column that wide regardless of
+  // viewport. minmax(0, 1fr) removes that floor so columns actually shrink on narrow screens.
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(90px, 1fr));
+  gap: 4px;
+  flex: 1;
+
+  @media (max-width: 600px) {
+    grid-template-rows: repeat(6, minmax(52px, 1fr));
+    gap: 2px;
+  }
+}
+
+.weekday-label {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  padding-bottom: 4px;
+
+  @media (max-width: 600px) {
+    font-size: 0.65rem;
+  }
+}
+
+.day-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 8px;
+  // Grid items default to a content-based automatic minimum size too — pairs with the tracks'
+  // own minmax(0, 1fr) above so a long nowrap reason can't force this cell (and its whole column)
+  // wider than the track actually has room for.
+  min-width: 0;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-border);
+  }
+
+  &.out-of-month {
+    opacity: 0.4;
+  }
+
+  // Independent of the status background below — a box-shadow layer stays visible on top of any tint.
+  &.today {
+    box-shadow: inset 0 0 0 2px var(--color-accent);
+  }
+
+  // At this width there's no room left for a second line of text to say anything legible — the
+  // tinted background (below) plus tapping the cell for the full dialog already carry the status,
+  // and the two lists further down the page show the full reason text with room to breathe.
+  // Centering the day number alone reads as a clean, deliberate "compact" cell instead of a
+  // cramped one with an empty second line.
+  @media (max-width: 600px) {
+    align-items: center;
+    justify-content: center;
+    padding: 3px 4px;
+    gap: 0;
+    border-radius: 4px;
+  }
+}
+
+.day-number {
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  @media (max-width: 600px) {
+    font-size: 0.7rem;
+  }
+}
+
+.day-detail {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+
+  // Hidden rather than shrunk further — at this width no font size makes a reason legible, and an
+  // empty second line just wastes space. The tinted background + tap-to-open dialog carry the
+  // status, and the Ponctuel/Récurrent lists below show the full text.
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+.status-absent {
+  background: rgba(224, 92, 92, 0.16);
+}
+
+.status-partial {
+  background: rgba(255, 183, 77, 0.16);
+}
+
+.status-available {
+  background: var(--color-bg-secondary);
+}

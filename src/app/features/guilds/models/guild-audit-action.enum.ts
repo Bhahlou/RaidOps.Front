@@ -7,4 +7,9 @@ export enum GuildAuditAction {
   MemberExcluded = 'MemberExcluded',
   MemberRankUpdated = 'MemberRankUpdated',
   OfficerThresholdUpdated = 'OfficerThresholdUpdated',
+  AvailabilityExceptionDeclared = 'AvailabilityExceptionDeclared',
+  AvailabilityExceptionDeleted = 'AvailabilityExceptionDeleted',
+  RecurringAvailabilityPatternCreated = 'RecurringAvailabilityPatternCreated',
+  RecurringAvailabilityPatternUpdated = 'RecurringAvailabilityPatternUpdated',
+  RecurringAvailabilityPatternStopped = 'RecurringAvailabilityPatternStopped',
 }

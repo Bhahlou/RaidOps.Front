@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.1.0...raidops-front-v1.2.0) (2026-07-20)
+
+
+### 🚀 Features
+
+* add guild calendar for personal availability declarations ([#54](https://github.com/Bhahlou/RaidOps.Front/issues/54)) ([1bf3584](https://github.com/Bhahlou/RaidOps.Front/commit/1bf35843b40e9715bafc4fc0d55a199e82155890))
+
 ## [1.1.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.0.7...raidops-front-v1.1.0) (2026-07-19)
 
 

@@ -91,6 +91,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         requiredAccessLevel: GuildAccessLevel.Officer,
         contentPath: (lang) => `assets/manual/${lang}/guild/audit-log.md`,
       },
+      {
+        id: 'calendar',
+        labelKey: 'manual.article.calendar.title',
+        requiredAccessLevel: GuildAccessLevel.Roster,
+        contentPath: (lang) => `assets/manual/${lang}/guild/calendar.md`,
+      },
     ],
   },
 ];
