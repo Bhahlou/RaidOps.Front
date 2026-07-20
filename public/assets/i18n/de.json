@@ -6,6 +6,10 @@
     "help": "Hilfe",
     "toggleNav": "Navigationsmenü öffnen/schließen"
   },
+  "confirmDialog": {
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen"
+  },
   "manual": {
     "back": "Zurück",
     "toc": "Inhalt",
@@ -48,6 +52,9 @@
       },
       "auditLog": {
         "title": "Audit-Log"
+      },
+      "calendar": {
+        "title": "Der Kalender"
       }
     }
   },
@@ -59,6 +66,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "calendar": {
+        "title": "Ein Kalender für Abwesenheiten und Wiederholungen",
+        "description": "Trage einmalige Abwesenheiten/Verspätungen ein (einzelnes Datum oder Zeitraum, Grund, teilweise Zeitgrenzen) oder eine Wiederholung (wöchentlich oder ein Schichtplan wie 5x8) — Änderungen wirken nie rückwirkend auf bereits vergangene Tage."
+      },
       "bnetMultiAccount": {
         "title": "Mehrere Battle.net-Konten verknüpfen",
         "description": "Ein RaidOps-Konto kann jetzt mehrere Battle.net-Konten verknüpfen und Charaktere aus jedem importieren — praktisch, wenn du auf mehreren Blizzard-Konten spielst."
@@ -380,7 +391,8 @@
     "categories": {
       "Guild": "Gilde",
       "Settings": "Einstellungen",
-      "Roster": "Roster"
+      "Roster": "Roster",
+      "Availability": "Verfügbarkeit"
     },
     "settingsFields": {
       "timezone": "Zeitzone",
@@ -395,7 +407,12 @@
       "MemberLeft": "Mitglied ausgetreten",
       "MemberExcluded": "Mitglied ausgeschlossen",
       "MemberRankUpdated": "Rang geändert",
-      "OfficerThresholdUpdated": "Officer-Schwelle geändert"
+      "OfficerThresholdUpdated": "Officer-Schwelle geändert",
+      "AvailabilityExceptionDeclared": "Abwesenheit/Verspätung eingetragen",
+      "AvailabilityExceptionDeleted": "Abwesenheit/Verspätung gelöscht",
+      "RecurringAvailabilityPatternCreated": "Wiederholung hinzugefügt",
+      "RecurringAvailabilityPatternUpdated": "Wiederholung geändert",
+      "RecurringAvailabilityPatternStopped": "Wiederholung beendet"
     }
   },
   "noGuild": {
@@ -519,6 +536,73 @@
       "dateTo": "Bis",
       "clear": "Löschen",
       "clearAll": "Alle Filter zurücksetzen"
+    }
+  },
+  "calendar": {
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "today": "Heute",
+    "declareException": "Abwesenheit/Verspätung melden",
+    "status": {
+      "absent": "Abwesend",
+      "partial": "Teilweise",
+      "available": "Verfügbar",
+      "availableOverride": "Ausnahmsweise anwesend"
+    },
+    "time": {
+      "from": "ab {{time}}",
+      "until": "bis {{time}}"
+    },
+    "exceptionDialog": {
+      "title": "Abwesenheit oder Verspätung melden",
+      "editTitle": "Diese Meldung bearbeiten",
+      "dateRange": "Datum(e)",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "status": "Status",
+      "availableFrom": "Verfügbar ab",
+      "availableUntil": "Verfügbar bis",
+      "reason": "Grund (optional)",
+      "removeDay": "Diesen Tag entfernen",
+      "saveSuccess": "Verfügbarkeitsausnahme gespeichert.",
+      "removeDaySuccess": "Tag aus der Meldung entfernt.",
+      "invalidRange": "Das Enddatum muss am oder nach dem Startdatum liegen."
+    },
+    "exceptions": {
+      "panelTitle": "Einmalig",
+      "empty": "Noch keine Ausnahme gemeldet.",
+      "deleteSuccess": "Meldung gelöscht.",
+      "pastLocked": "Vergangene Meldungen sind gesperrt und können nicht mehr geändert werden."
+    },
+    "patternDialog": {
+      "panelTitle": "Wiederkehrend",
+      "addPattern": "Muster hinzufügen",
+      "empty": "Noch kein wiederkehrendes Muster festgelegt.",
+      "unnamed": "Unbenanntes Muster",
+      "cycleSummary": "Alle {{days}} Tage",
+      "editTitle": "Wiederkehrendes Muster bearbeiten",
+      "createTitle": "Neues wiederkehrendes Muster",
+      "modeWeekly": "Wöchentlich",
+      "modeAdvanced": "Erweitert (eigener Zyklus)",
+      "weeklyHint": "Klicke auf einen Tag, um zwischen Verfügbar / Abwesend / Teilweise zu wechseln.",
+      "advancedHint": "Ein Feld pro Tag des Zyklus — klicke auf einen Tag, um zwischen Verfügbar / Abwesend / Teilweise zu wechseln.",
+      "editEffectiveHint": "Änderungen gelten ab heute — vergangene Tage behalten die vorherige Version.",
+      "dayNumber": "Tag {{n}}",
+      "label": "Name (optional)",
+      "cycleLengthDays": "Zykluslänge (Tage)",
+      "anchorDate": "Ankerdatum",
+      "stopPattern": "Ab heute stoppen",
+      "stopConfirmTitle": "Dieses wiederkehrende Muster stoppen?",
+      "stopConfirmMessage": "„{{label}}“ gilt ab heute nicht mehr. Vergangene Tage behalten genau das, was dieses Muster zuvor ergeben hat.",
+      "saveSuccess": "Wiederkehrendes Muster gespeichert.",
+      "deleteSuccess": "Wiederkehrendes Muster gestoppt.",
+      "invalidPattern": "Überprüfen Sie die Zykluslänge und die Tagesoffsets."
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
     }
   },
   "home": {

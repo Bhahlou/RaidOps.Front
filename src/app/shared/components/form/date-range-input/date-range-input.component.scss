@@ -5,7 +5,7 @@
 }
 
 .date-input {
-  padding: 5px 8px;
+  padding: 5px 4px 5px 8px;
   border-radius: 6px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-tertiary);
@@ -13,6 +13,25 @@
   font: inherit;
   font-size: 0.8125rem;
   color-scheme: dark;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  // The native picker indicator has its own built-in padding (sized for a ~24px touch target),
+  // which is what actually pushes the icon away from the date text — the input's own
+  // padding-right above barely matters next to it. Shrinking this is what buys back the room
+  // needed for dd/mm/yyyy to fit without the icon getting squeezed off/clipped in a narrow dialog.
+  &::-webkit-calendar-picker-indicator {
+    padding: 2px;
+    margin-left: 0;
+  }
 }
 
 .date-range-sep {

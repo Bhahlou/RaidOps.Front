@@ -1,0 +1,90 @@
+<h2 class="dialog-title">
+  {{ (isEditing ? 'calendar.exceptionDialog.editTitle' : 'calendar.exceptionDialog.title') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <div class="field-group">
+    <span class="field-label">{{ 'calendar.exceptionDialog.dateRange' | transloco }}</span>
+    <app-date-range-input
+      [start]="startDate()"
+      [end]="endDate()"
+      [startAriaLabel]="'calendar.exceptionDialog.startDate' | transloco"
+      [endAriaLabel]="'calendar.exceptionDialog.endDate' | transloco"
+      (startChange)="setStartDate($event)"
+      (endChange)="setEndDate($event)"
+    />
+  </div>
+
+  <div class="field-group">
+    <span class="field-label">{{ 'calendar.exceptionDialog.status' | transloco }}</span>
+    <div class="status-options">
+      <label class="status-option">
+        <input type="radio" name="status" [checked]="status() === Status.Absent" (change)="setStatus(Status.Absent)" />
+        {{ 'calendar.status.absent' | transloco }}
+      </label>
+      <label class="status-option">
+        <input type="radio" name="status" [checked]="status() === Status.Partial" (change)="setStatus(Status.Partial)" />
+        {{ 'calendar.status.partial' | transloco }}
+      </label>
+      <label class="status-option">
+        <input type="radio" name="status" [checked]="status() === Status.Available" (change)="setStatus(Status.Available)" />
+        {{ 'calendar.status.available' | transloco }}
+      </label>
+    </div>
+  </div>
+
+  @if (isPartial()) {
+    <!-- (blur) not (change): Chrome fires `change` on a native time input mid-typing (e.g. right
+         after a single ambiguous minute digit), and writing [value] back at that point breaks the
+         browser's own two-digit combine window — the next keystroke starts over instead of
+         completing the pair. Waiting for blur avoids reacting until typing is actually done. -->
+    <div class="field-group time-bounds">
+      <div>
+        <label class="field-label" for="available-from">{{ 'calendar.exceptionDialog.availableFrom' | transloco }}</label>
+        <input
+          id="available-from"
+          type="time"
+          class="time-input"
+          [value]="availableFrom()"
+          (blur)="availableFrom.set($any($event.target).value)"
+        />
+      </div>
+      <div>
+        <label class="field-label" for="available-until">{{ 'calendar.exceptionDialog.availableUntil' | transloco }}</label>
+        <input
+          id="available-until"
+          type="time"
+          class="time-input"
+          [value]="availableUntil()"
+          (blur)="availableUntil.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+  }
+
+  <div class="field-group">
+    <label class="field-label" for="reason">{{ 'calendar.exceptionDialog.reason' | transloco }}</label>
+    <input
+      id="reason"
+      type="text"
+      class="reason-input"
+      autocomplete="off"
+      [value]="reason()"
+      (input)="reason.set($any($event.target).value)"
+      maxlength="256"
+    />
+  </div>
+</div>
+
+<div class="dialog-actions">
+  @if (canRemoveDay) {
+    <app-button variant="danger" [disabled]="submitting()" (click)="removeDay()">
+      {{ 'calendar.exceptionDialog.removeDay' | transloco }}
+    </app-button>
+  }
+  <span class="dialog-actions-spacer"></span>
+  <app-button variant="text" (click)="cancel()">{{ 'calendar.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'calendar.actions.save' | transloco }}
+  </app-button>
+</div>

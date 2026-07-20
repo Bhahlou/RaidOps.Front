@@ -31,6 +31,7 @@ export function fix(id: string, date: string, key: string): ChangelogEntry {
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-07-20-calendar', '2026-07-20', 'calendar', { category: 'guild', article: 'calendar' }),
   feature('2026-07-19-bnet-multi-account', '2026-07-19', 'bnetMultiAccount', {
     category: 'getting-started',
     article: 'create-character',

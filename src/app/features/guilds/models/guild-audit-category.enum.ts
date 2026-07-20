@@ -3,4 +3,5 @@ export enum GuildAuditCategory {
   Guild = 'Guild',
   Settings = 'Settings',
   Roster = 'Roster',
+  Availability = 'Availability',
 }
