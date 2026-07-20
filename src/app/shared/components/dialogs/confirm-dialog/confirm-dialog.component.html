@@ -1,0 +1,12 @@
+<h2 class="dialog-title">{{ data.title | transloco }}</h2>
+
+<div class="dialog-content">
+  <p>{{ data.message | transloco: (data.messageParams ?? {}) }}</p>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ (data.cancelLabel ?? 'confirmDialog.cancel') | transloco }}</app-button>
+  <app-button [variant]="confirmVariant" (click)="confirm()">
+    {{ (data.confirmLabel ?? 'confirmDialog.confirm') | transloco }}
+  </app-button>
+</div>

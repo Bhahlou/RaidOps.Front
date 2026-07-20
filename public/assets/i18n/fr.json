@@ -6,6 +6,10 @@
     "help": "Aide",
     "toggleNav": "Ouvrir/fermer le menu"
   },
+  "confirmDialog": {
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  },
   "manual": {
     "back": "Retour",
     "toc": "Sommaire",
@@ -48,6 +52,9 @@
       },
       "auditLog": {
         "title": "Journal d'audit"
+      },
+      "calendar": {
+        "title": "Le calendrier"
       }
     }
   },
@@ -59,6 +66,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "calendar": {
+        "title": "Un calendrier pour déclarer tes absences et récurrences",
+        "description": "Déclare tes absences/retards ponctuels (date unique ou plage, motif, horaires partiels) ou une récurrence (hebdomadaire ou rotation de poste type 5x8) — les modifications ne sont jamais rétroactives sur les jours déjà passés."
+      },
       "bnetMultiAccount": {
         "title": "Lier plusieurs comptes Battle.net",
         "description": "Un même compte RaidOps peut désormais lier plusieurs comptes Battle.net et importer les personnages de chacun — pratique si tu joues sur plusieurs comptes Blizzard."
@@ -380,7 +391,8 @@
     "categories": {
       "Guild": "Guilde",
       "Settings": "Paramètres",
-      "Roster": "Roster"
+      "Roster": "Roster",
+      "Availability": "Disponibilité"
     },
     "settingsFields": {
       "timezone": "Fuseau horaire",
@@ -395,7 +407,12 @@
       "MemberLeft": "Membre parti",
       "MemberExcluded": "Membre exclu",
       "MemberRankUpdated": "Rang modifié",
-      "OfficerThresholdUpdated": "Seuil Officier modifié"
+      "OfficerThresholdUpdated": "Seuil Officier modifié",
+      "AvailabilityExceptionDeclared": "Absence/retard déclaré",
+      "AvailabilityExceptionDeleted": "Absence/retard supprimé",
+      "RecurringAvailabilityPatternCreated": "Récurrence ajoutée",
+      "RecurringAvailabilityPatternUpdated": "Récurrence modifiée",
+      "RecurringAvailabilityPatternStopped": "Récurrence arrêtée"
     }
   },
   "noGuild": {
@@ -519,6 +536,73 @@
       "dateTo": "Au",
       "clear": "Effacer",
       "clearAll": "Réinitialiser les filtres"
+    }
+  },
+  "calendar": {
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "today": "Aujourd'hui",
+    "declareException": "Déclarer une absence/retard",
+    "status": {
+      "absent": "Absent",
+      "partial": "Partiel",
+      "available": "Disponible",
+      "availableOverride": "Présence exceptionnelle"
+    },
+    "time": {
+      "from": "dès {{time}}",
+      "until": "jusqu'à {{time}}"
+    },
+    "exceptionDialog": {
+      "title": "Déclarer une absence ou un retard",
+      "editTitle": "Modifier cette déclaration",
+      "dateRange": "Date(s)",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "status": "Statut",
+      "availableFrom": "Disponible à partir de",
+      "availableUntil": "Disponible jusqu'à",
+      "reason": "Motif (optionnel)",
+      "removeDay": "Retirer ce jour",
+      "saveSuccess": "Exception de disponibilité enregistrée.",
+      "removeDaySuccess": "Jour retiré de la déclaration.",
+      "invalidRange": "La date de fin doit être postérieure ou égale à la date de début."
+    },
+    "exceptions": {
+      "panelTitle": "Ponctuel",
+      "empty": "Aucune exception déclarée pour l'instant.",
+      "deleteSuccess": "Déclaration supprimée.",
+      "pastLocked": "Les déclarations passées sont verrouillées et ne peuvent plus être modifiées."
+    },
+    "patternDialog": {
+      "panelTitle": "Récurrent",
+      "addPattern": "Ajouter une récurrence",
+      "empty": "Aucune récurrence déclarée pour le moment.",
+      "unnamed": "Récurrence sans nom",
+      "cycleSummary": "Tous les {{days}} jours",
+      "editTitle": "Modifier la récurrence",
+      "createTitle": "Nouvelle récurrence",
+      "modeWeekly": "Hebdomadaire",
+      "modeAdvanced": "Avancé (cycle personnalisé)",
+      "weeklyHint": "Clique sur un jour pour basculer entre Disponible / Absent / Partiel.",
+      "advancedHint": "Une case par jour du cycle — clique sur un jour pour basculer entre Disponible / Absent / Partiel.",
+      "editEffectiveHint": "Les changements s'appliquent à partir d'aujourd'hui — les jours passés gardent l'ancienne version.",
+      "dayNumber": "Jour {{n}}",
+      "label": "Nom (optionnel)",
+      "cycleLengthDays": "Longueur du cycle (jours)",
+      "anchorDate": "Date d'ancrage",
+      "stopPattern": "Arrêter à partir d'aujourd'hui",
+      "stopConfirmTitle": "Arrêter cette récurrence ?",
+      "stopConfirmMessage": "« {{label}} » ne s'appliquera plus à partir d'aujourd'hui. Les jours passés gardent exactement ce que cette récurrence donnait avant.",
+      "saveSuccess": "Récurrence enregistrée.",
+      "deleteSuccess": "Récurrence arrêtée.",
+      "invalidPattern": "Vérifiez la longueur du cycle et les offsets des jours."
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "edit": "Modifier",
+      "delete": "Supprimer"
     }
   },
   "home": {

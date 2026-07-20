@@ -1,6 +1,183 @@
+// Same reasoning as guild-layout's :host — this component's own host is otherwise an unstyled
+// (default inline) element, so .guild-page's height: 100% below has nothing real to resolve against.
+:host {
+  display: block;
+  height: 100%;
+}
+
 .guild-page {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: auto;
+}
+
+.calendar-page {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  // Explicit 1fr row instead of relying on the default auto-sized row to stretch — otherwise the
+  // single implicit row only grows to its content's height, leaving the rest of .guild-page's
+  // (now correctly full-height, see :host above) space unused below both cards.
+  grid-template-rows: 1fr;
+  gap: 24px;
+  padding: 16px 24px 24px;
+  flex: 1;
+  min-height: 0;
+
+  // Below this the two cards stack, so there's no real 2D layout left to justify Grid — a plain
+  // flex column instead. Also drop flex: 1 / min-height: 0 here: those made sense on desktop where
+  // .calendar-page should fill .guild-page's remaining viewport height exactly, but on a stacked
+  // mobile layout that forces .calendar-page to a *fixed* height equal to whatever's left on
+  // screen — flex-shrink then compresses .calendar-panel below its own content's real height
+  // (the calendar grid was rendering full-size regardless and spilling out visually past its own
+  // card, behind .declarations-panel). Letting the page size to its natural content height instead
+  // (and scroll via .guild-page's own overflow: auto when that's taller than the viewport) avoids
+  // the whole problem.
+  @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    min-height: auto;
+  }
+
+  @media (max-width: 600px) {
+    gap: 16px;
+    padding: 10px 10px 16px;
+  }
+}
+
+.calendar-panel,
+.declarations-panel {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 16px;
+
+  @media (max-width: 600px) {
+    padding: 10px;
+  }
+}
+
+.calendar-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.declarations-panel {
+  // Grid-only: stops the sidebar from stretching to the full row height next to the (taller)
+  // calendar card. Once .calendar-page switches to a flex column below 900px, align-self instead
+  // governs the CROSS axis — which is now width, not height — so this same value was silently
+  // shrinking the card to its content's width instead of the full column. Reset back to the
+  // default stretch there.
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (max-width: 900px) {
+    align-self: stretch;
+  }
+}
+
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  // Below this, nav (prev/label/next) and the action buttons no longer fit on one line without
+  // wrapping awkwardly mid-group — give each its own full-width row instead.
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.month-label {
+  min-width: 140px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+
+.month-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  // Shrinking 3 labelled buttons side by side just clips their text with no ellipsis — full-width
+  // stacked rows stay readable and keep a decent tap target instead.
+  @media (max-width: 600px) {
+    flex-direction: column;
+
+    // Stretching the <app-button> host isn't enough on its own — its inner .btn is
+    // display: inline-flex (content-sized by design, see styles.scss), so it doesn't fill the
+    // host's stretched width unless told to. ::ng-deep reaches past the child component's view
+    // encapsulation boundary — same trick header.component.scss already uses for icon-button.
+    ::ng-deep app-button .btn {
+      width: 100%;
+    }
+  }
+}
+
+.declarations-section {
+  h3 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+  }
+}
+
+.declaration-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.declaration-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
+  gap: 8px;
+}
+
+.declaration-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.declaration-label {
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.declaration-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.declaration-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
 }

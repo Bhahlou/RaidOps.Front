@@ -819,6 +819,165 @@ describe('GuildAuditLogComponent', () => {
       expect(component.changeSummary(entry({ actionType: GuildAuditAction.GuildRegistered }))).toBe('—');
       expect(component.changeSummary(entry({ actionType: GuildAuditAction.MemberJoined }))).toBe('—');
     });
+
+    it('falls back to an em dash for an availability exception missing startDate/endDate/status', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.AvailabilityExceptionDeclared }))).toBe('—');
+    });
+
+    it('falls back to the plain status word for a Partial exception with no time bounds set', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.AvailabilityExceptionDeclared,
+        variables: { startDate: '2026-07-23', endDate: '2026-07-23', status: 'Partial' },
+      }));
+
+      expect(result).toBe(`${new Intl.DateTimeFormat('fr', { day: 'numeric', month: 'short' }).format(new Date('2026-07-23'))} : calendar.status.partial`);
+    });
+
+    it('falls back to an em dash for a recurring pattern entry missing cycleLengthDays', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.RecurringAvailabilityPatternCreated }))).toBe('—');
+    });
+
+    it('shows the date range and plain status for a non-Partial availability exception', () => {
+      const component = setup();
+      const expectedRange = new Intl.DateTimeFormat('fr', { day: 'numeric', month: 'short' }).format(new Date('2026-07-23'));
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.AvailabilityExceptionDeclared,
+        variables: { startDate: '2026-07-23', endDate: '2026-07-23', status: 'Absent' },
+      }));
+
+      expect(result).toBe(`${expectedRange} : calendar.status.absent`);
+    });
+
+    it('shows a date range spanning two formatted dates for a multi-day exception', () => {
+      const component = setup();
+      const start = new Intl.DateTimeFormat('fr', { day: 'numeric', month: 'short' }).format(new Date('2026-07-23'));
+      const end = new Intl.DateTimeFormat('fr', { day: 'numeric', month: 'short' }).format(new Date('2026-07-24'));
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.AvailabilityExceptionDeleted,
+        variables: { startDate: '2026-07-23', endDate: '2026-07-24', status: 'Absent' },
+      }));
+
+      expect(result).toBe(`${start} – ${end} : calendar.status.absent`);
+    });
+
+    it('breaks a Partial exception down into late/early-leave wording instead of a bare "Partiel"', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.AvailabilityExceptionDeclared,
+        variables: {
+          startDate: '2026-07-23', endDate: '2026-07-23', status: 'Partial',
+          availableFrom: '21:30:00', availableUntil: '',
+        },
+      }));
+
+      expect(result).not.toContain('calendar.status.partial');
+      expect(transloco.translate).toHaveBeenCalledWith('calendar.time.from', { time: '21h30' });
+    });
+
+    it('shows a bounded window for a Partial exception with both time bounds set', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.AvailabilityExceptionDeclared,
+        variables: {
+          startDate: '2026-07-23', endDate: '2026-07-23', status: 'Partial',
+          availableFrom: '09:00:00', availableUntil: '17:00:00',
+        },
+      }));
+
+      expect(result).toContain('9h00 – 17h00');
+    });
+
+    it('breaks a weekly recurring pattern down by weekday instead of a generic cycle count', () => {
+      const component = setup();
+      const monday = new Intl.DateTimeFormat('fr', { weekday: 'short' }).format(new Date(2026, 0, 5));
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternCreated,
+        variables: {
+          label: 'Soirées raid', cycleLengthDays: '7', anchorDate: '2026-01-05',
+          days: JSON.stringify([{ offsetInCycle: 0, status: 'Absent', availableFrom: null, availableUntil: null }]),
+        },
+      }));
+
+      expect(result).toBe(`Soirées raid — ${monday} : calendar.status.absent`);
+    });
+
+    it('labels each day "Jour N" (1-indexed) for a non-7-day shift rotation', () => {
+      const component = setup();
+
+      component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternUpdated,
+        variables: {
+          label: 'Rotation 5x8', cycleLengthDays: '10', anchorDate: '2026-01-05',
+          days: JSON.stringify([{ offsetInCycle: 2, status: 'Absent', availableFrom: null, availableUntil: null }]),
+        },
+      }));
+
+      expect(transloco.translate).toHaveBeenCalledWith('calendar.patternDialog.dayNumber', { n: 3 });
+    });
+
+    it('sorts multiple out-of-order days by offsetInCycle before rendering them', () => {
+      const component = setup();
+
+      component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternCreated,
+        variables: {
+          label: 'Rotation', cycleLengthDays: '10', anchorDate: '2026-01-05',
+          days: JSON.stringify([
+            { offsetInCycle: 4, status: 'Absent', availableFrom: null, availableUntil: null },
+            { offsetInCycle: 1, status: 'Absent', availableFrom: null, availableUntil: null },
+          ]),
+        },
+      }));
+
+      const dayNumberCalls = transloco.translate.mock.calls
+        .filter((call: unknown[]) => call[0] === 'calendar.patternDialog.dayNumber')
+        .map((call: unknown[]) => (call[1] as { n: number }).n);
+      expect(dayNumberCalls).toEqual([2, 5]); // offset 1 (n=2) rendered before offset 4 (n=5)
+    });
+
+    it('falls back to the plain cycle-length summary when the days JSON is malformed', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternCreated,
+        variables: { label: 'Rotation', cycleLengthDays: '7', anchorDate: '2026-01-05', days: '{not valid json' },
+      }));
+
+      expect(result).toBe('Rotation (calendar.patternDialog.cycleSummary)');
+    });
+
+    it('falls back to the plain cycle-length summary when no per-day detail was logged (legacy entry)', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternStopped,
+        variables: { label: 'Rotation 5x8', cycleLengthDays: '10' },
+      }));
+
+      expect(result).toBe('Rotation 5x8 (calendar.patternDialog.cycleSummary)');
+    });
+
+    it('falls back to the "unnamed" label when a pattern entry has no label', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RecurringAvailabilityPatternStopped,
+        variables: { label: '', cycleLengthDays: '7' },
+      }));
+
+      expect(result).toBe('calendar.patternDialog.unnamed (calendar.patternDialog.cycleSummary)');
+    });
   });
 
   describe('actionLabel / categoryLabel / tableActionLabel', () => {

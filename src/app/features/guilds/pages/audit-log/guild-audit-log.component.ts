@@ -22,6 +22,8 @@ import { AuditLogEntry } from '../../models/audit-log-entry.model';
 import { GuildAuditAction } from '../../models/guild-audit-action.enum';
 import { GuildAuditCategory } from '../../models/guild-audit-category.enum';
 import { RosterMode } from '../../models/roster-mode.enum';
+import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
+import { describePartialTime, formatPartialTimeLabel } from '../../models/availability.model';
 
 type SortColumn = 'actor' | 'category' | 'action' | 'change' | 'time';
 type SortDirection = 'asc' | 'desc';
@@ -35,6 +37,14 @@ interface SettingsFieldChange {
   labelKey: string;
   summary: string;
   roleChange?: { old: RoleDisplay | null; new: RoleDisplay | null };
+}
+
+/** One day of a recurring pattern's cycle, as JSON-encoded into a RecurringAvailabilityPattern* audit entry's `days` variable. */
+interface AuditPatternDay {
+  offsetInCycle: number;
+  status: string;
+  availableFrom: string | null;
+  availableUntil: string | null;
 }
 
 interface RoleDisplay {
@@ -357,9 +367,107 @@ export class GuildAuditLogComponent {
         return `${characterName} : ${oldRank} → ${newRank}`;
       }
 
+      case GuildAuditAction.AvailabilityExceptionDeclared:
+      case GuildAuditAction.AvailabilityExceptionDeleted:
+        return this.#exceptionSummary(entry);
+
+      case GuildAuditAction.RecurringAvailabilityPatternCreated:
+      case GuildAuditAction.RecurringAvailabilityPatternUpdated:
+      case GuildAuditAction.RecurringAvailabilityPatternStopped:
+        return this.#patternSummary(entry);
+
       default:
         return characterName ?? '—';
     }
+  }
+
+  /**
+   * e.g. "23 juil. : Absent" or "23 juil. – 24 juil. : dès 21h30" for an availability exception
+   * entry — a bare "Partiel" says nothing useful on its own, so a Partial entry is broken down into
+   * the same late-arrival/early-leave/bounded-window wording the calendar page itself uses.
+   */
+  #exceptionSummary(entry: AuditLogEntry): string {
+    const startDate = entry.variables?.['startDate'];
+    const endDate = entry.variables?.['endDate'];
+    const status = entry.variables?.['status'];
+    if (!startDate || !endDate || !status) return '—';
+
+    const lang = this.#transloco.getActiveLang();
+    const formatter = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' });
+    const range =
+      startDate === endDate
+        ? formatter.format(new Date(startDate))
+        : `${formatter.format(new Date(startDate))} – ${formatter.format(new Date(endDate))}`;
+
+    const statusLabel = this.#statusLabel(
+      status,
+      entry.variables?.['availableFrom'] ?? null,
+      entry.variables?.['availableUntil'] ?? null,
+      lang,
+    );
+
+    return `${range} : ${statusLabel}`;
+  }
+
+  /** Same late/early-leave/window breakdown as `#exceptionSummary`, factored out so pattern days can reuse it. */
+  #statusLabel(status: string, availableFrom: string | null, availableUntil: string | null, lang: string): string {
+    if (status === DayAvailabilityStatus.Partial) {
+      const info = describePartialTime(availableFrom || null, availableUntil || null, lang);
+      if (info) return formatPartialTimeLabel(info, (key, params) => this.#transloco.translate(key, params));
+    }
+
+    return this.#transloco.translate(`calendar.status.${status.toLowerCase()}`);
+  }
+
+  /**
+   * e.g. "Rotation 5x8 — Lun : Absent · Ven : dès 18h00" for a weekly pattern, or
+   * "Cycle 5x8 — Jour 1 : Absent · Jour 2 : Absent" for a shift rotation — a bare cycle-length
+   * count ("tous les 7 jours") says nothing about which days actually changed, so every day the
+   * pattern actually marks (Absent/Partial) is broken out individually. Falls back to the plain
+   * cycle-length summary only for entries logged before this day-level detail existed.
+   */
+  #patternSummary(entry: AuditLogEntry): string {
+    const label = entry.variables?.['label'];
+    const cycleLengthDays = entry.variables?.['cycleLengthDays'];
+    if (!cycleLengthDays) return '—';
+
+    const header = label || this.#transloco.translate('calendar.patternDialog.unnamed');
+    const anchorDate = entry.variables?.['anchorDate'];
+    const days = this.#parsePatternDays(entry.variables?.['days']);
+
+    if (days.length === 0 || !anchorDate) {
+      const cycleSummary = this.#transloco.translate('calendar.patternDialog.cycleSummary', { days: cycleLengthDays });
+      return `${header} (${cycleSummary})`;
+    }
+
+    const lang = this.#transloco.getActiveLang();
+    const isWeekly = Number(cycleLengthDays) === 7;
+    const dayEntries = [...days]
+      .sort((a, b) => a.offsetInCycle - b.offsetInCycle)
+      .map((day) => {
+        const dayLabel = isWeekly
+          ? this.#weekdayLabel(anchorDate, day.offsetInCycle, lang)
+          : this.#transloco.translate('calendar.patternDialog.dayNumber', { n: day.offsetInCycle + 1 });
+        return `${dayLabel} : ${this.#statusLabel(day.status, day.availableFrom, day.availableUntil, lang)}`;
+      });
+
+    return `${header} — ${dayEntries.join(' · ')}`;
+  }
+
+  #parsePatternDays(daysJson: string | undefined): AuditPatternDay[] {
+    if (!daysJson) return [];
+    try {
+      return JSON.parse(daysJson) as AuditPatternDay[];
+    } catch {
+      return [];
+    }
+  }
+
+  /** Short weekday name (e.g. "lun.") for `offsetInCycle` days after `anchorDateIso` — only meaningful for a 7-day cycle. */
+  #weekdayLabel(anchorDateIso: string, offsetInCycle: number, lang: string): string {
+    const [y, m, d] = anchorDateIso.split('-').map(Number);
+    const date = new Date(y, m - 1, d + offsetInCycle);
+    return new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(date);
   }
 
   /**
