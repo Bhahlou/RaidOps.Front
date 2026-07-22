@@ -562,6 +562,7 @@
       "status": "Status",
       "availableFrom": "Verfügbar ab",
       "availableUntil": "Verfügbar bis",
+      "partialBoundsRequired": "Geben Sie mindestens eine der beiden Zeitgrenzen für den Status „Teilweise“ an.",
       "reason": "Grund (optional)",
       "removeDay": "Diesen Tag entfernen",
       "saveSuccess": "Verfügbarkeitsausnahme gespeichert.",

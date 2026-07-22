@@ -39,27 +39,18 @@
          browser's own two-digit combine window — the next keystroke starts over instead of
          completing the pair. Waiting for blur avoids reacting until typing is actually done. -->
     <div class="field-group time-bounds">
-      <div>
-        <label class="field-label" for="available-from">{{ 'calendar.exceptionDialog.availableFrom' | transloco }}</label>
-        <input
-          id="available-from"
-          type="time"
-          class="time-input"
-          [value]="availableFrom()"
-          (blur)="availableFrom.set($any($event.target).value)"
-        />
-      </div>
-      <div>
-        <label class="field-label" for="available-until">{{ 'calendar.exceptionDialog.availableUntil' | transloco }}</label>
-        <input
-          id="available-until"
-          type="time"
-          class="time-input"
-          [value]="availableUntil()"
-          (blur)="availableUntil.set($any($event.target).value)"
-        />
-      </div>
+      <label class="time-field">
+        <span class="time-field-label">{{ 'calendar.exceptionDialog.availableFrom' | transloco }}</span>
+        <input type="time" class="time-input" [value]="availableFrom()" (blur)="availableFrom.set($any($event.target).value)" />
+      </label>
+      <label class="time-field">
+        <span class="time-field-label">{{ 'calendar.exceptionDialog.availableUntil' | transloco }}</span>
+        <input type="time" class="time-input" [value]="availableUntil()" (blur)="availableUntil.set($any($event.target).value)" />
+      </label>
     </div>
+    @if (partialMissingBounds()) {
+      <p class="field-hint field-hint--error">{{ 'calendar.exceptionDialog.partialBoundsRequired' | transloco }}</p>
+    }
   }
 
   <div class="field-group">

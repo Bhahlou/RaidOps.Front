@@ -56,15 +56,59 @@
   flex-direction: row;
   gap: 16px;
 
-  > div {
+  > .time-field {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
   }
 
   @media (max-width: 400px) {
     flex-direction: column;
+  }
+}
+
+// Nests the label inside the input's own bordered box (small caption on top, value below) instead
+// of a separate label line above a plain input — same idea as PrimeNG's "ifta" float label, done
+// with plain CSS since we're not pulling that lib back in (see the PrimeNG pilot writeup).
+.time-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 3px 10px 5px;
+  cursor: text;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--color-accent);
+  }
+}
+
+.time-field-label {
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+}
+
+.time-field .time-input {
+  background: none;
+  border: none;
+  padding: 0;
+
+  &:hover,
+  &:focus {
+    border-color: transparent;
+  }
+}
+
+.field-hint {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+
+  &--error {
+    color: var(--color-error);
   }
 }
 

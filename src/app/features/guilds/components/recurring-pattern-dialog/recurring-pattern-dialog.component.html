@@ -99,33 +99,42 @@
           <!-- (blur) not (change): see availability-exception-dialog for why — Chrome fires
                `change` mid-typing and reacting there breaks the minute segment's two-digit combine. -->
           <div class="time-bounds">
-            <input
-              type="time"
-              class="time-input"
-              [attr.aria-label]="'calendar.exceptionDialog.availableFrom' | transloco"
-              [value]="slot.availableFrom ?? ''"
-              (blur)="updateSlot($index, { availableFrom: $any($event.target).value ? $any($event.target).value + ':00' : null })"
-            />
-            <input
-              type="time"
-              class="time-input"
-              [attr.aria-label]="'calendar.exceptionDialog.availableUntil' | transloco"
-              [value]="slot.availableUntil ?? ''"
-              (blur)="updateSlot($index, { availableUntil: $any($event.target).value ? $any($event.target).value + ':00' : null })"
-            />
+            <label class="field-shell">
+              <span class="field-shell-label">{{ 'calendar.exceptionDialog.availableFrom' | transloco }}</span>
+              <input
+                type="time"
+                class="time-input"
+                [value]="slot.availableFrom ?? ''"
+                (blur)="updateSlot($index, { availableFrom: $any($event.target).value ? $any($event.target).value + ':00' : null })"
+              />
+            </label>
+            <label class="field-shell">
+              <span class="field-shell-label">{{ 'calendar.exceptionDialog.availableUntil' | transloco }}</span>
+              <input
+                type="time"
+                class="time-input"
+                [value]="slot.availableUntil ?? ''"
+                (blur)="updateSlot($index, { availableUntil: $any($event.target).value ? $any($event.target).value + ':00' : null })"
+              />
+            </label>
           </div>
         }
 
-        <input
-          type="text"
-          class="text-input reason-input"
-          autocomplete="off"
-          [placeholder]="'calendar.exceptionDialog.reason' | transloco"
-          [attr.aria-label]="'calendar.exceptionDialog.reason' | transloco"
-          [value]="slot.reason ?? ''"
-          (input)="updateSlot($index, { reason: $any($event.target).value || null })"
-          maxlength="256"
-        />
+        <label class="field-shell reason-field">
+          <span class="field-shell-label">{{ 'calendar.exceptionDialog.reason' | transloco }}</span>
+          <input
+            type="text"
+            class="text-input"
+            autocomplete="off"
+            [value]="slot.reason ?? ''"
+            (input)="updateSlot($index, { reason: $any($event.target).value || null })"
+            maxlength="256"
+          />
+        </label>
+
+        @if (slotMissingBounds(slot)) {
+          <p class="field-hint field-hint--error">{{ 'calendar.exceptionDialog.partialBoundsRequired' | transloco }}</p>
+        }
       </div>
     }
   </div>
