@@ -562,6 +562,7 @@
       "status": "Statut",
       "availableFrom": "Disponible à partir de",
       "availableUntil": "Disponible jusqu'à",
+      "partialBoundsRequired": "Renseignez au moins une des deux bornes horaires pour un statut Partiel.",
       "reason": "Motif (optionnel)",
       "removeDay": "Retirer ce jour",
       "saveSuccess": "Exception de disponibilité enregistrée.",
