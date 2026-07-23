@@ -111,6 +111,13 @@ export class RecurringPatternDialogComponent {
     this.#updateActiveSlots((slots) => slots.map((slot, i) => (i === index ? { ...slot, ...patch } : slot)));
   }
 
+  /** True once a slot is Partial but neither time bound is set — same rule as the one-off exception dialog. */
+  slotMissingBounds(slot: Slot): boolean {
+    return slot.status === DayAvailabilityStatus.Partial && !slot.availableFrom && !slot.availableUntil;
+  }
+
+  readonly hasSlotMissingBounds = computed(() => this.activeSlots().some((slot) => this.slotMissingBounds(slot)));
+
   #updateActiveSlots(fn: (slots: Slot[]) => Slot[]): void {
     if (this.mode() === 'weekly') {
       this.weeklySlots.update(fn);
@@ -123,7 +130,9 @@ export class RecurringPatternDialogComponent {
 
   readonly submitting = signal(false);
 
-  readonly canSubmit = computed(() => !this.submitting() && (this.mode() === 'weekly' || !!this.anchorDate()));
+  readonly canSubmit = computed(
+    () => !this.submitting() && (this.mode() === 'weekly' || !!this.anchorDate()) && !this.hasSlotMissingBounds(),
+  );
 
   submit(): void {
     if (!this.canSubmit()) return;

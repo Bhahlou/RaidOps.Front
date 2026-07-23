@@ -125,6 +125,36 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
       expect(component.canSubmit()).toBe(true);
     });
+
+    it('is false when status is Partial and neither time bound is set', () => {
+      const component = setup(newDeclarationData);
+      component.setStatus(DayAvailabilityStatus.Partial);
+
+      expect(component.partialMissingBounds()).toBe(true);
+      expect(component.canSubmit()).toBe(false);
+    });
+
+    it.each([
+      ['21:30', ''],
+      ['', '23:00'],
+      ['21:30', '23:00'],
+    ])('is true when status is Partial and at least one bound is set (from=%s, until=%s)', (from, until) => {
+      const component = setup(newDeclarationData);
+      component.setStatus(DayAvailabilityStatus.Partial);
+      component.availableFrom.set(from);
+      component.availableUntil.set(until);
+
+      expect(component.partialMissingBounds()).toBe(false);
+      expect(component.canSubmit()).toBe(true);
+    });
+
+    it('is not affected by leftover bounds when status is not Partial', () => {
+      const component = setup(newDeclarationData);
+      component.setStatus(DayAvailabilityStatus.Absent);
+
+      expect(component.partialMissingBounds()).toBe(false);
+      expect(component.canSubmit()).toBe(true);
+    });
   });
 
   describe('submit — guarded by canSubmit', () => {
@@ -141,6 +171,15 @@ describe('AvailabilityExceptionDialogComponent', () => {
       const component = setup(newDeclarationData);
       component.setStartDate(new Date(2026, 6, 20));
       component.setEndDate(new Date(2026, 6, 19));
+
+      component.submit();
+
+      expect(store.createException).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when status is Partial and neither time bound is set', () => {
+      const component = setup(newDeclarationData);
+      component.setStatus(DayAvailabilityStatus.Partial);
 
       component.submit();
 

@@ -279,6 +279,45 @@ describe('RecurringPatternDialogComponent', () => {
 
       expect(component.canSubmit()).toBe(false);
     });
+
+    it('is false when a slot is Partial with neither time bound set', () => {
+      const component = setup(createData);
+      component.updateSlot(1, { status: DayAvailabilityStatus.Partial });
+
+      expect(component.hasSlotMissingBounds()).toBe(true);
+      expect(component.canSubmit()).toBe(false);
+    });
+
+    it.each([
+      ['21:30:00', null],
+      [null, '23:00:00'],
+      ['21:30:00', '23:00:00'],
+    ])('is true when the Partial slot has at least one bound set (from=%s, until=%s)', (availableFrom, availableUntil) => {
+      const component = setup(createData);
+      component.updateSlot(1, { status: DayAvailabilityStatus.Partial, availableFrom, availableUntil });
+
+      expect(component.hasSlotMissingBounds()).toBe(false);
+      expect(component.canSubmit()).toBe(true);
+    });
+
+    it('only considers active-mode slots, ignoring the other mode entirely', () => {
+      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      component.mode.set('advanced');
+      // weeklySlots is the inactive mode here — a Partial slot missing bounds there must not block advanced mode.
+      component.weeklySlots.update((slots) => slots.map((s, i) => (i === 0 ? { ...s, status: DayAvailabilityStatus.Partial } : s)));
+
+      expect(component.canSubmit()).toBe(true);
+    });
+  });
+
+  describe('slotMissingBounds', () => {
+    it('is true only for a Partial slot with neither bound set', () => {
+      const component = setup(createData);
+
+      expect(component.slotMissingBounds({ status: DayAvailabilityStatus.Partial, reason: null, availableFrom: null, availableUntil: null })).toBe(true);
+      expect(component.slotMissingBounds({ status: DayAvailabilityStatus.Partial, reason: null, availableFrom: '09:00:00', availableUntil: null })).toBe(false);
+      expect(component.slotMissingBounds({ status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null })).toBe(false);
+    });
   });
 
   // ── submit ────────────────────────────────────────────────────────────────
@@ -391,6 +430,15 @@ describe('RecurringPatternDialogComponent', () => {
 
       expect(store.createPattern).not.toHaveBeenCalled();
       expect(store.updatePattern).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when a slot is Partial with neither time bound set', () => {
+      const component = setup(createData);
+      component.updateSlot(1, { status: DayAvailabilityStatus.Partial });
+
+      component.submit();
+
+      expect(store.createPattern).not.toHaveBeenCalled();
     });
   });
 

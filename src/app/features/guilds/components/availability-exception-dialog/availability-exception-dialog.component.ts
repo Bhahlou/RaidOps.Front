@@ -59,10 +59,14 @@ export class AvailabilityExceptionDialogComponent {
 
   readonly isPartial = computed(() => this.status() === DayAvailabilityStatus.Partial);
 
+  /** True once Partial is selected but neither time bound is set — the one thing that would actually distinguish it from a plain Absent day. */
+  readonly partialMissingBounds = computed(() => this.isPartial() && !this.availableFrom() && !this.availableUntil());
+
   readonly canSubmit = computed(() => {
     const start = this.startDate();
     const end = this.endDate();
-    return !!start && !!end && end.getTime() >= start.getTime() && !this.submitting();
+    const validRange = !!start && !!end && end.getTime() >= start.getTime();
+    return validRange && !this.partialMissingBounds() && !this.submitting();
   });
 
   setStartDate(date: Date | null): void {
