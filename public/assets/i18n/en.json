@@ -562,6 +562,7 @@
       "status": "Status",
       "availableFrom": "Available from",
       "availableUntil": "Available until",
+      "partialBoundsRequired": "Fill in at least one of the two time bounds for a Partial status.",
       "reason": "Reason (optional)",
       "removeDay": "Remove this day",
       "saveSuccess": "Availability exception saved.",

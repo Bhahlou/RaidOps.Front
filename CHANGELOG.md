@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.2.0...raidops-front-v1.2.1) (2026-07-22)
+
+
+### 🐛 Bug Fixes
+
+* Block partial availabilities without time bound & explain Partial availability times bounds ([#57](https://github.com/Bhahlou/RaidOps.Front/issues/57)) ([3f1f95e](https://github.com/Bhahlou/RaidOps.Front/commit/3f1f95eb6b0c8aeb98b8f96e6dc04a3d98cb0504))
+
 ## [1.2.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.1.0...raidops-front-v1.2.0) (2026-07-20)
 
 
