@@ -24,6 +24,8 @@ describe('AvailabilityExceptionDialogComponent', () => {
   let store: {
     createException: ReturnType<typeof vi.fn>;
     deleteException: ReturnType<typeof vi.fn>;
+    updateException: ReturnType<typeof vi.fn>;
+    removeExceptionDay: ReturnType<typeof vi.fn>;
   };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialogRef: { close: ReturnType<typeof vi.fn> };
@@ -32,6 +34,8 @@ describe('AvailabilityExceptionDialogComponent', () => {
     store = {
       createException: vi.fn().mockReturnValue(of(undefined)),
       deleteException: vi.fn().mockReturnValue(of(undefined)),
+      updateException: vi.fn().mockReturnValue(of(undefined)),
+      removeExceptionDay: vi.fn().mockReturnValue(of(undefined)),
     };
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialogRef = { close: vi.fn() };
@@ -190,13 +194,13 @@ describe('AvailabilityExceptionDialogComponent', () => {
   // ── submit — new declaration ─────────────────────────────────────────────
 
   describe('submit (new declaration)', () => {
-    it('calls only createException, never deleteException', () => {
+    it('calls only createException, never updateException', () => {
       const component = setup(newDeclarationData);
 
       component.submit();
 
       expect(store.createException).toHaveBeenCalledTimes(1);
-      expect(store.deleteException).not.toHaveBeenCalled();
+      expect(store.updateException).not.toHaveBeenCalled();
     });
 
     it('sends reason as null when left blank', () => {
@@ -272,22 +276,34 @@ describe('AvailabilityExceptionDialogComponent', () => {
   // ── submit — editing an existing declaration ─────────────────────────────
 
   describe('submit (editing existing)', () => {
-    it('calls deleteException then createException, in that order', () => {
+    it('calls only updateException, never createException/deleteException', () => {
       const component = setup({ ...newDeclarationData, existing: exception({ id: 42 }) });
-      const callOrder: string[] = [];
-      store.deleteException.mockImplementation(() => {
-        callOrder.push('delete');
-        return of(undefined);
-      });
-      store.createException.mockImplementation(() => {
-        callOrder.push('create');
-        return of(undefined);
-      });
 
       component.submit();
 
-      expect(store.deleteException).toHaveBeenCalledWith('g1', 42);
-      expect(callOrder).toEqual(['delete', 'create']);
+      expect(store.updateException).toHaveBeenCalledWith('g1', 42, expect.any(Object));
+      expect(store.createException).not.toHaveBeenCalled();
+      expect(store.deleteException).not.toHaveBeenCalled();
+    });
+
+    it('on success shows a success snackbar and closes the dialog with true', () => {
+      const component = setup({ ...newDeclarationData, existing: exception({ id: 42 }) });
+
+      component.submit();
+
+      expect(snackbar.success).toHaveBeenCalledWith('calendar.exceptionDialog.saveSuccess');
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('on error resets submitting, shows the mapped snackbar key, and does not close', () => {
+      const component = setup({ ...newDeclarationData, existing: exception({ id: 42 }) });
+      store.updateException.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'PastDeclarationLocked' } })));
+
+      component.submit();
+
+      expect(component.submitting()).toBe(false);
+      expect(snackbar.error).toHaveBeenCalledWith('calendar.exceptions.pastLocked');
+      expect(dialogRef.close).not.toHaveBeenCalled();
     });
   });
 
@@ -299,37 +315,19 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
       component.removeDay();
 
-      expect(store.deleteException).not.toHaveBeenCalled();
-      expect(store.createException).not.toHaveBeenCalled();
+      expect(store.removeExceptionDay).not.toHaveBeenCalled();
     });
 
-    it('deletes the whole declaration without recreating anything when it was a single day', () => {
+    it('calls removeExceptionDay with the exception id and the target date', () => {
       const component = setup({
         ...newDeclarationData,
-        date: '2026-07-20',
-        existing: exception({ id: 5, startDate: '2026-07-20', endDate: '2026-07-20' }),
-      });
-
-      component.removeDay();
-
-      expect(store.deleteException).toHaveBeenCalledWith('g1', 5);
-      expect(store.createException).not.toHaveBeenCalled();
-    });
-
-    it('recreates the remaining sub-range when removing one end of a multi-day declaration', () => {
-      const component = setup({
-        ...newDeclarationData,
-        date: '2026-07-20',
+        date: '2026-07-21',
         existing: exception({ id: 5, startDate: '2026-07-20', endDate: '2026-07-22' }),
       });
 
       component.removeDay();
 
-      expect(store.deleteException).toHaveBeenCalledWith('g1', 5);
-      expect(store.createException).toHaveBeenCalledWith(
-        'g1',
-        expect.objectContaining({ startDate: '2026-07-21', endDate: '2026-07-22' }),
-      );
+      expect(store.removeExceptionDay).toHaveBeenCalledWith('g1', 5, '2026-07-21');
     });
 
     it('on success shows the removeDaySuccess snackbar and closes with true', () => {
@@ -343,7 +341,7 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
     it('on error resets submitting, shows the mapped snackbar key, and does not close', () => {
       const component = setup({ ...newDeclarationData, existing: exception({ id: 5 }) });
-      store.deleteException.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'InvalidRequest' } })));
+      store.removeExceptionDay.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'InvalidRequest' } })));
 
       component.removeDay();
 

@@ -602,6 +602,31 @@ describe('GuildAuditLogComponent', () => {
       expect(changes[0].summary).toBe('— → Europe/Paris');
     });
 
+    it('builds a language change from changedFields', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: { changedFields: 'language', oldLanguage: 'en', newLanguage: 'fr' },
+      }));
+
+      expect(changes).toEqual([{
+        labelKey: 'auditLog.settingsFields.language',
+        summary: 'en → fr',
+      }]);
+    });
+
+    it('shows an em dash for the language field when oldLanguage is missing (first-time configuration)', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: { changedFields: 'language', newLanguage: 'fr' },
+      }));
+
+      expect(changes[0].summary).toBe('— → fr');
+    });
+
     it('translates roster mode labels', () => {
       const component = setup();
 

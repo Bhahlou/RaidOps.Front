@@ -12,4 +12,5 @@ export enum GuildAuditAction {
   RecurringAvailabilityPatternCreated = 'RecurringAvailabilityPatternCreated',
   RecurringAvailabilityPatternUpdated = 'RecurringAvailabilityPatternUpdated',
   RecurringAvailabilityPatternStopped = 'RecurringAvailabilityPatternStopped',
+  NotificationSettingsUpdated = 'NotificationSettingsUpdated',
 }

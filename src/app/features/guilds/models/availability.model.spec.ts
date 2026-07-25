@@ -1,11 +1,9 @@
 import { DayAvailabilityStatus } from './day-availability-status.enum';
 import {
   AvailabilityException,
-  DateRange,
   describePartialTime,
   findExceptionForDate,
   formatPartialTimeLabel,
-  removeDateFromRange,
 } from './availability.model';
 
 const exception = (overrides?: Partial<AvailabilityException>): AvailabilityException => ({
@@ -100,48 +98,5 @@ describe('formatPartialTimeLabel', () => {
     const label = formatPartialTimeLabel({ kind: 'earlyLeave', from: null, until: '17:00' }, translate);
     expect(translate).toHaveBeenCalledWith('calendar.time.until', { time: '17:00' });
     expect(label).toBe('until-result');
-  });
-});
-
-describe('removeDateFromRange', () => {
-  it('returns an empty array when the date is the range\'s only day', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-10' };
-    expect(removeDateFromRange(range, '2026-07-10')).toEqual([]);
-  });
-
-  it('shrinks the range by one day when the date is at the start', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-15' };
-    expect(removeDateFromRange(range, '2026-07-10')).toEqual([{ startDate: '2026-07-11', endDate: '2026-07-15' }]);
-  });
-
-  it('shrinks the range by one day when the date is at the end', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-15' };
-    expect(removeDateFromRange(range, '2026-07-15')).toEqual([{ startDate: '2026-07-10', endDate: '2026-07-14' }]);
-  });
-
-  it('splits the range in two when the date is strictly in the middle', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-15' };
-    expect(removeDateFromRange(range, '2026-07-12')).toEqual([
-      { startDate: '2026-07-10', endDate: '2026-07-11' },
-      { startDate: '2026-07-13', endDate: '2026-07-15' },
-    ]);
-  });
-
-  it('returns the range unchanged when the date is before it', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-15' };
-    expect(removeDateFromRange(range, '2026-07-01')).toEqual([range]);
-  });
-
-  it('returns the range unchanged when the date is after it', () => {
-    const range: DateRange = { startDate: '2026-07-10', endDate: '2026-07-15' };
-    expect(removeDateFromRange(range, '2026-08-01')).toEqual([range]);
-  });
-
-  it('handles month boundaries correctly when splitting', () => {
-    const range: DateRange = { startDate: '2026-06-29', endDate: '2026-07-02' };
-    expect(removeDateFromRange(range, '2026-06-30')).toEqual([
-      { startDate: '2026-06-29', endDate: '2026-06-29' },
-      { startDate: '2026-07-01', endDate: '2026-07-02' },
-    ]);
   });
 });

@@ -1,5 +1,7 @@
 export enum NotificationType {
   OfficerThresholdNotConfigured = 'OfficerThresholdNotConfigured',
+  GuildLanguageNotConfigured = 'GuildLanguageNotConfigured',
+  AbsenceNotificationsNotConfigured = 'AbsenceNotificationsNotConfigured',
 }
 
 export interface Notification {

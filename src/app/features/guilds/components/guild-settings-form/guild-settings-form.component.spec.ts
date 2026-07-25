@@ -9,6 +9,7 @@ import { GuildStore } from '../../stores/guild.store';
 import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { LanguageService } from '../../../../core/services/language.service';
 import { GuildSettings } from '../../models/guild-settings.model';
 import { OfficerThreshold } from '../../models/officer-threshold.model';
 import { RosterMode } from '../../models/roster-mode.enum';
@@ -21,6 +22,7 @@ const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
   timezone: 'Europe/Paris',
   rosterMode: RosterMode.Open,
   minRosterRoleId: null,
+  language: 'en',
   ...overrides,
 });
 
@@ -101,6 +103,7 @@ describe('GuildSettingsFormComponent', () => {
         { provide: OfficerThresholdStore,  useValue: officerThresholdStore },
         { provide: AuthStore,              useValue: authStore },
         { provide: SnackbarService,        useValue: snackbar },
+        { provide: LanguageService,        useValue: { activeLang: 'en', availableLangs: ['fr', 'en', 'de'], setLang: vi.fn() } },
       ],
     }).overrideComponent(GuildSettingsFormComponent, { set: { template: '', imports: [] } });
 
@@ -167,6 +170,53 @@ describe('GuildSettingsFormComponent', () => {
       expect(component.settingsForm.timezone().value()).toBe('');
 
       intlSpy.mockRestore();
+    });
+  });
+
+  // ── languageOptions ───────────────────────────────────────────────────────
+
+  describe('languageOptions', () => {
+    it('falls back to the raw language code when it has no native-language label', () => {
+      TestBed.configureTestingModule({
+        imports: [GuildSettingsFormComponent],
+        providers: [
+          { provide: GuildSettingsService,   useValue: { getDiscordRoles: vi.fn().mockReturnValue(of([])) } },
+          { provide: GuildStore,             useValue: { settings: signal(null), loadSettings: vi.fn() } },
+          { provide: OfficerThresholdStore,  useValue: { officerThreshold: signal(null), loadOfficerThreshold: vi.fn() } },
+          { provide: AuthStore,              useValue: { loadUser: vi.fn() } },
+          { provide: SnackbarService,        useValue: { error: vi.fn(), success: vi.fn() } },
+          { provide: LanguageService,        useValue: { activeLang: 'en', availableLangs: ['en', 'es'], setLang: vi.fn() } },
+        ],
+      }).overrideComponent(GuildSettingsFormComponent, { set: { template: '', imports: [] } });
+
+      const testFixture = TestBed.createComponent(GuildSettingsFormComponent);
+      testFixture.componentRef.setInput('guildId', 'g1');
+
+      expect(testFixture.componentInstance.languageOptions).toContainEqual({ value: 'es', label: 'es' });
+    });
+  });
+
+  // ── languageNotYetSaved ───────────────────────────────────────────────────
+
+  describe('languageNotYetSaved', () => {
+    it('is false before settings have loaded', () => {
+      setup();
+
+      expect(component.languageNotYetSaved()).toBe(false);
+    });
+
+    it('is true once settings have loaded with no language saved', () => {
+      setup('g1', settings({ language: '' }));
+      fixture.detectChanges();
+
+      expect(component.languageNotYetSaved()).toBe(true);
+    });
+
+    it('is false once settings have loaded with a language saved', () => {
+      setup('g1', settings({ language: 'fr' }));
+      fixture.detectChanges();
+
+      expect(component.languageNotYetSaved()).toBe(false);
     });
   });
 
@@ -386,6 +436,7 @@ describe('GuildSettingsFormComponent', () => {
           { provide: OfficerThresholdStore, useValue: officerThresholdStore },
           { provide: AuthStore,             useValue: authStore },
           { provide: SnackbarService,       useValue: snackbar },
+          { provide: LanguageService,       useValue: { activeLang: 'en', availableLangs: ['fr', 'en', 'de'], setLang: vi.fn() } },
         ],
       }).overrideComponent(GuildSettingsFormComponent, {
         set: { template: `<form [formRoot]="settingsForm"><button type="submit">Save</button></form>`, imports: [FormRoot] },
@@ -463,6 +514,7 @@ describe('GuildSettingsFormComponent', () => {
           { provide: OfficerThresholdStore, useValue: officerThresholdStore },
           { provide: AuthStore,             useValue: authStore },
           { provide: SnackbarService,       useValue: snackbar },
+          { provide: LanguageService,       useValue: { activeLang: 'en', availableLangs: ['fr', 'en', 'de'], setLang: vi.fn() } },
         ],
       }).overrideComponent(GuildSettingsFormComponent, {
         set: {

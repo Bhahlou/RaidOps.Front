@@ -22,4 +22,4 @@ Editing or stopping a recurring pattern is **never retroactive**: days that have
 
 ### Editing or deleting a one-off declaration
 
-The **One-off** and **Recurring** panels on the right list all your active declarations. A declaration that has already fully elapsed can no longer be edited or deleted — it's the historical record of what was actually declared at the time, and it stays intact.
+The **One-off** panel on the right only lists upcoming or ongoing declarations. Once a declaration has fully elapsed, it disappears from this list — there's no day-to-day value in keeping it there — but it stays visible and intact on the calendar grid itself, as the historical record of what was actually declared at the time. It can no longer be edited or deleted at that point.

@@ -11,12 +11,16 @@ import { ButtonComponent } from '../../buttons/button/button.component';
  */
 export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>> = {
   [NotificationType.OfficerThresholdNotConfigured]: 'notifications.officerThresholdNotConfigured',
+  [NotificationType.GuildLanguageNotConfigured]: 'notifications.guildLanguageNotConfigured',
+  [NotificationType.AbsenceNotificationsNotConfigured]: 'notifications.absenceNotificationsNotConfigured',
 };
 
 /** Route the notification's call-to-action link points to. */
 const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> =
   {
     [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
+    [NotificationType.GuildLanguageNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
+    [NotificationType.AbsenceNotificationsNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'notifications'],
   };
 
 /** Pure, presentational list of notification rows — caller owns filtering/state. */

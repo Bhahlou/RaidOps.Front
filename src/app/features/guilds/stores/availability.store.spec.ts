@@ -113,6 +113,8 @@ describe('AvailabilityStore', () => {
     let service: {
       createException: ReturnType<typeof vi.fn>;
       deleteException: ReturnType<typeof vi.fn>;
+      updateException: ReturnType<typeof vi.fn>;
+      removeExceptionDay: ReturnType<typeof vi.fn>;
       createPattern: ReturnType<typeof vi.fn>;
       updatePattern: ReturnType<typeof vi.fn>;
       deletePattern: ReturnType<typeof vi.fn>;
@@ -122,6 +124,8 @@ describe('AvailabilityStore', () => {
       service = {
         createException: vi.fn().mockReturnValue(of(undefined)),
         deleteException: vi.fn().mockReturnValue(of(undefined)),
+        updateException: vi.fn().mockReturnValue(of(undefined)),
+        removeExceptionDay: vi.fn().mockReturnValue(of(undefined)),
         createPattern: vi.fn().mockReturnValue(of(undefined)),
         updatePattern: vi.fn().mockReturnValue(of(undefined)),
         deletePattern: vi.fn().mockReturnValue(of(undefined)),
@@ -152,6 +156,27 @@ describe('AvailabilityStore', () => {
       store.deleteException('g1', 42).subscribe();
 
       expect(service.deleteException).toHaveBeenCalledWith('g1', 42);
+    });
+
+    it('updateException delegates to AvailabilityService.updateException', () => {
+      const payload = {
+        startDate: '2026-07-10',
+        endDate: '2026-07-12',
+        status: DayAvailabilityStatus.Absent,
+        reason: null,
+        availableFrom: null,
+        availableUntil: null,
+      };
+
+      store.updateException('g1', 42, payload).subscribe();
+
+      expect(service.updateException).toHaveBeenCalledWith('g1', 42, payload);
+    });
+
+    it('removeExceptionDay delegates to AvailabilityService.removeExceptionDay', () => {
+      store.removeExceptionDay('g1', 42, '2026-07-11').subscribe();
+
+      expect(service.removeExceptionDay).toHaveBeenCalledWith('g1', 42, '2026-07-11');
     });
 
     it('createPattern delegates to AvailabilityService.createPattern', () => {

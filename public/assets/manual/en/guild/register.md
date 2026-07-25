@@ -8,6 +8,6 @@ Click **Invite the bot and register** — you're redirected to Discord to author
 
 ### 2. Settings
 
-This step is exactly the form described in [Guild settings](/manual/guild/settings) (timezone, roster access, Officer access threshold). Once saved, you're redirected to the guild's dashboard.
+This step is exactly the form described in [Settings - General](/manual/guild/settings) (timezone, language, roster access, Officer access threshold). Once saved, you're redirected to the guild's dashboard.
 
 > You need to be an administrator of the Discord server to access this page. If the guild is already registered and configured, RaidOps redirects you straight to its dashboard.

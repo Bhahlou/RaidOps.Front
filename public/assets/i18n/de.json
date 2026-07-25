@@ -39,22 +39,25 @@
         "title": "Charakter verwalten"
       },
       "guildList": {
-        "title": "Meine Gilden"
+        "title": "Auf meine Gilden zugreifen"
       },
       "register": {
         "title": "Gilde registrieren"
       },
       "roster": {
-        "title": "Der Roster"
+        "title": "Roster anzeigen"
       },
       "settings": {
-        "title": "Gildeneinstellungen"
+        "title": "Einstellungen - Allgemein"
       },
       "auditLog": {
-        "title": "Audit-Log"
+        "title": "Änderungsverlauf"
       },
       "calendar": {
-        "title": "Der Kalender"
+        "title": "Meine Verfügbarkeit verwalten"
+      },
+      "guildNotifications": {
+        "title": "Einstellungen - Benachrichtigungen"
       }
     }
   },
@@ -66,6 +69,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "guildNotifications": {
+        "title": "Discord-Benachrichtigungen für Gildenereignisse",
+        "description": "Lege pro Ereignis (zunächst für eingetragene Abwesenheiten) fest, ob der Bot eine Nachricht in einen Discord-Kanal postet — und in welchen — über den neuen Tab Benachrichtigungen in den Gildeneinstellungen."
+      },
       "calendar": {
         "title": "Ein Kalender für Abwesenheiten und Wiederholungen",
         "description": "Trage einmalige Abwesenheiten/Verspätungen ein (einzelnes Datum oder Zeitraum, Grund, teilweise Zeitgrenzen) oder eine Wiederholung (wöchentlich oder ein Schichtplan wie 5x8) — Änderungen wirken nie rückwirkend auf bereits vergangene Tage."
@@ -186,6 +193,10 @@
         "title": "In-App-Benachrichtigungen",
         "description": "Hinweise auf erforderliche Officer-Aktionen."
       },
+      "discordNotifications": {
+        "title": "Discord-Benachrichtigungen",
+        "description": "Discord-Kanalbenachrichtigungen pro Ereignis (Abwesenheiten, später Raid-Ereignisse)."
+      },
       "getStarted": {
         "title": "Onboarding-Ablauf",
         "description": "4-Schritte-Assistent für den Einstieg."
@@ -200,7 +211,7 @@
       },
       "guildCalendar": {
         "title": "Gildenkalender",
-        "description": "Abwesenheitsverwaltung und Planung von Raid-Terminen."
+        "description": "Einmalige und wiederkehrende Abwesenheitseintragungen mit Discord-Benachrichtigungen — die Planung von Raid-Terminen folgt noch."
       },
       "raidBuilder": {
         "title": "Raid-Builder",
@@ -342,6 +353,12 @@
       "required": "Die Zeitzone ist erforderlich.",
       "hint": "Diese Einstellung legt die Zeitzone der Gilde für Raids und Abwesenheiten fest."
     },
+    "language": {
+      "label": "Sprache",
+      "required": "Die Sprache ist erforderlich.",
+      "hint": "Sprache, in der RaidOps mit deiner Gilde kommuniziert (z. B. Discord-Bot-Nachrichten).",
+      "notSaved": "Noch nicht gespeichert — nur eine Vermutung basierend auf deinem eigenen Browser. Speichere, um sie für die Gilde zu bestätigen."
+    },
     "rosterMode": {
       "label": "Roster-Zugriff",
       "open": "Für alle offen",
@@ -360,12 +377,37 @@
       "hint": "Wähle die Mindestrolle für Officer-Zugriff aus. Diese Rolle und alle Rollen darüber werden Officer, unabhängig vom Roster-Zugriff. Discord-Server-Administratoren behalten unabhängig von dieser Wahl immer vollen Zugriff."
     },
     "save": "Einstellungen speichern",
-    "saveSuccess": "Einstellungen gespeichert."
+    "saveSuccess": "Einstellungen gespeichert.",
+    "tabs": {
+      "general": "Allgemein",
+      "notifications": "Benachrichtigungen"
+    },
+    "notificationSettings": {
+      "families": {
+        "absences": {
+          "label": "Abwesenheiten",
+          "hint": "Benachrichtigen, wenn sich die eingetragene Verfügbarkeit eines Mitglieds ändert."
+        }
+      },
+      "events": {
+        "AbsenceAdded": "Ein Mitglied trägt eine Abwesenheit ein",
+        "AbsenceRemoved": "Ein Mitglied entfernt eine Abwesenheit"
+      },
+      "channel": {
+        "placeholder": "Kanal auswählen",
+        "required": "Wähle einen Kanal, um diese Benachrichtigung zu aktivieren.",
+        "missingPermission": "Der Bot hat keine Berechtigung, in diesem Kanal zu schreiben."
+      },
+      "save": "Benachrichtigungseinstellungen speichern",
+      "saveSuccess": "Benachrichtigungseinstellungen gespeichert."
+    }
   },
   "notifications": {
     "title": "Benachrichtigungen",
     "empty": "Keine Benachrichtigungen.",
     "officerThresholdNotConfigured": "„{{ guildName }}“ hat noch keine Officer-Zugriffsschwelle konfiguriert — wähle in den Gildeneinstellungen, welche Discord-Rolle Officer-Zugriff gewährt.",
+    "guildLanguageNotConfigured": "„{{ guildName }}“ hat noch keine Sprache konfiguriert — wähle in den Einstellungen die Sprache, in der RaidOps mit deiner Gilde kommuniziert.",
+    "absenceNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Abwesenheiten noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "viewLink": "Konfigurieren",
     "dismiss": "Nie wieder anzeigen"
   },
@@ -396,6 +438,7 @@
     },
     "settingsFields": {
       "timezone": "Zeitzone",
+      "language": "Sprache",
       "rosterMode": "Roster-Zugriff",
       "minRosterRoleId": "Discord-Rollenschwelle geändert",
       "minOfficerRoleId": "Officer-Zugriffsschwelle geändert"
@@ -408,11 +451,12 @@
       "MemberExcluded": "Mitglied ausgeschlossen",
       "MemberRankUpdated": "Rang geändert",
       "OfficerThresholdUpdated": "Officer-Schwelle geändert",
-      "AvailabilityExceptionDeclared": "Abwesenheit/Verspätung eingetragen",
+      "AvailabilityExceptionDeclared": "Abwesenheit/Verspätung hinzugefügt",
       "AvailabilityExceptionDeleted": "Abwesenheit/Verspätung gelöscht",
       "RecurringAvailabilityPatternCreated": "Wiederholung hinzugefügt",
       "RecurringAvailabilityPatternUpdated": "Wiederholung geändert",
-      "RecurringAvailabilityPatternStopped": "Wiederholung beendet"
+      "RecurringAvailabilityPatternStopped": "Wiederholung beendet",
+      "NotificationSettingsUpdated": "Benachrichtigungseinstellungen geändert"
     }
   },
   "noGuild": {

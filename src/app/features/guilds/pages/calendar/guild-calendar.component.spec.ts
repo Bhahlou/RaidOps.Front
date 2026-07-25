@@ -247,14 +247,37 @@ describe('GuildCalendarComponent', () => {
 
     it('sorts exceptions by startDate ascending', () => {
       const component = setup('g1');
+      const laterDate = addDaysToIso(todayIso(), 10);
+      const earlierDate = addDaysToIso(todayIso(), 5);
       const calendar: AvailabilityCalendar = {
         days: [],
-        exceptions: [exception({ id: 1, startDate: '2026-03-01' }), exception({ id: 2, startDate: '2026-01-01' })],
+        exceptions: [
+          exception({ id: 1, startDate: laterDate, endDate: laterDate }),
+          exception({ id: 2, startDate: earlierDate, endDate: earlierDate }),
+        ],
         patterns: [],
       };
       store.calendar.set(calendar);
 
       expect(component.exceptions().map((e) => e.id)).toEqual([2, 1]);
+    });
+
+    it('excludes exceptions whose endDate has already fully elapsed', () => {
+      const component = setup('g1');
+      const pastDate = addDaysToIso(todayIso(), -5);
+      const futureDate = addDaysToIso(todayIso(), 5);
+      const calendar: AvailabilityCalendar = {
+        days: [],
+        exceptions: [
+          exception({ id: 1, startDate: pastDate, endDate: pastDate }),
+          exception({ id: 2, startDate: futureDate, endDate: futureDate }),
+          exception({ id: 3, startDate: todayIso(), endDate: todayIso() }),
+        ],
+        patterns: [],
+      };
+      store.calendar.set(calendar);
+
+      expect(component.exceptions().map((e) => e.id)).toEqual([3, 2]);
     });
 
     it('returns the patterns straight from the loaded calendar', () => {

@@ -8,6 +8,6 @@ Klicke auf **Bot einladen und registrieren** — du wirst zu Discord weitergelei
 
 ### 2. Einstellungen
 
-Dieser Schritt ist genau das Formular, das in [Gildeneinstellungen](/manual/guild/settings) beschrieben wird (Zeitzone, Roster-Zugriff, Officer-Zugriffsschwelle). Nach dem Speichern wirst du zum Dashboard der Gilde weitergeleitet.
+Dieser Schritt ist genau das Formular, das in [Einstellungen - Allgemein](/manual/guild/settings) beschrieben wird (Zeitzone, Sprache, Roster-Zugriff, Officer-Zugriffsschwelle). Nach dem Speichern wirst du zum Dashboard der Gilde weitergeleitet.
 
 > Du musst Administrator des Discord-Servers sein, um auf diese Seite zuzugreifen. Ist die Gilde bereits registriert und eingerichtet, leitet RaidOps dich direkt zu ihrem Dashboard weiter.

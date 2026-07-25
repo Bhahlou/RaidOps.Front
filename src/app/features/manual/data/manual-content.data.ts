@@ -62,16 +62,16 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
     icon: 'groups',
     articles: [
       {
-        id: 'guild-list',
-        labelKey: 'manual.article.guildList.title',
-        requiresAuth: true,
-        contentPath: (lang) => `assets/manual/${lang}/guild/guild-list.md`,
-      },
-      {
         id: 'register',
         labelKey: 'manual.article.register.title',
         requiresAuth: true,
         contentPath: (lang) => `assets/manual/${lang}/guild/register.md`,
+      },
+      {
+        id: 'guild-list',
+        labelKey: 'manual.article.guildList.title',
+        requiresAuth: true,
+        contentPath: (lang) => `assets/manual/${lang}/guild/guild-list.md`,
       },
       {
         id: 'roster',
@@ -80,10 +80,10 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         contentPath: (lang) => `assets/manual/${lang}/guild/roster.md`,
       },
       {
-        id: 'settings',
-        labelKey: 'manual.article.settings.title',
-        requiredAccessLevel: GuildAccessLevel.Officer,
-        contentPath: (lang) => `assets/manual/${lang}/guild/settings.md`,
+        id: 'calendar',
+        labelKey: 'manual.article.calendar.title',
+        requiredAccessLevel: GuildAccessLevel.Roster,
+        contentPath: (lang) => `assets/manual/${lang}/guild/calendar.md`,
       },
       {
         id: 'audit-log',
@@ -92,10 +92,16 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         contentPath: (lang) => `assets/manual/${lang}/guild/audit-log.md`,
       },
       {
-        id: 'calendar',
-        labelKey: 'manual.article.calendar.title',
-        requiredAccessLevel: GuildAccessLevel.Roster,
-        contentPath: (lang) => `assets/manual/${lang}/guild/calendar.md`,
+        id: 'settings',
+        labelKey: 'manual.article.settings.title',
+        requiredAccessLevel: GuildAccessLevel.Officer,
+        contentPath: (lang) => `assets/manual/${lang}/guild/settings.md`,
+      },
+      {
+        id: 'notifications',
+        labelKey: 'manual.article.guildNotifications.title',
+        requiredAccessLevel: GuildAccessLevel.Officer,
+        contentPath: (lang) => `assets/manual/${lang}/guild/notifications.md`,
       },
     ],
   },

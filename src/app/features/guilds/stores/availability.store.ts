@@ -6,6 +6,7 @@ import {
   AvailabilityCalendar,
   CreateAvailabilityExceptionPayload,
   RecurringAvailabilityPatternPayload,
+  UpdateAvailabilityExceptionPayload,
 } from '../models/availability.model';
 import { AvailabilityService } from '../services/availability.service';
 
@@ -55,6 +56,14 @@ export class AvailabilityStore {
 
   deleteException(guildId: string, exceptionId: number): Observable<void> {
     return this.#service.deleteException(guildId, exceptionId);
+  }
+
+  updateException(guildId: string, exceptionId: number, payload: UpdateAvailabilityExceptionPayload): Observable<void> {
+    return this.#service.updateException(guildId, exceptionId, payload);
+  }
+
+  removeExceptionDay(guildId: string, exceptionId: number, date: string): Observable<void> {
+    return this.#service.removeExceptionDay(guildId, exceptionId, date);
   }
 
   createPattern(guildId: string, payload: RecurringAvailabilityPatternPayload): Observable<void> {

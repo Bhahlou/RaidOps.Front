@@ -15,6 +15,7 @@ import { GuildStore } from '../../stores/guild.store';
 import { OfficerThresholdStore } from '../../stores/officer-threshold.store';
 import { RoleThresholdPickerComponent } from '../role-threshold-picker/role-threshold-picker.component';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { LanguageService } from '../../../../core/services/language.service';
 
 interface TimezoneOption {
   id: string;
@@ -26,7 +27,11 @@ interface SettingsFormModel {
   rosterMode: RosterMode;
   minRosterRoleId: string | null;
   minOfficerRoleId: string | null;
+  language: string;
 }
+
+/** Native-language labels — deliberately not translated, same convention as the header's lang selector. */
+const LANGUAGE_LABELS: Record<string, string> = { fr: 'Français', en: 'English', de: 'Deutsch' };
 
 const NOW = new Date();
 
@@ -69,6 +74,7 @@ export class GuildSettingsFormComponent implements OnInit {
   readonly #officerThresholdStore = inject(OfficerThresholdStore);
   readonly #authStore = inject(AuthStore);
   readonly #snackbar = inject(SnackbarService);
+  readonly #languageService = inject(LanguageService);
 
   readonly RosterMode = RosterMode;
 
@@ -80,6 +86,7 @@ export class GuildSettingsFormComponent implements OnInit {
     rosterMode: RosterMode.Open,
     minRosterRoleId: null,
     minOfficerRoleId: null,
+    language: this.#languageService.activeLang,
   });
 
   readonly settingsForm = form(
@@ -90,15 +97,17 @@ export class GuildSettingsFormComponent implements OnInit {
         when: ({ valueOf }) => valueOf(schemaPath.rosterMode) === RosterMode.DiscordRoleOnly,
       });
       required(schemaPath.minOfficerRoleId);
+      required(schemaPath.language);
     },
     {
       submission: {
         action: async (field) => {
-          const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId } = field().value();
+          const { timezone, rosterMode, minRosterRoleId, minOfficerRoleId, language } = field().value();
           const settings: GuildSettings = {
             timezone,
             rosterMode,
             minRosterRoleId: rosterMode === RosterMode.DiscordRoleOnly ? minRosterRoleId : null,
+            language,
           };
           const officerThreshold: OfficerThreshold = { minOfficerRoleId };
 
@@ -134,9 +143,25 @@ export class GuildSettingsFormComponent implements OnInit {
     label: tz.label,
   }));
 
+  readonly languageOptions: SelectOption<string>[] = this.#languageService.availableLangs.map((lang) => ({
+    value: lang,
+    label: LANGUAGE_LABELS[lang] ?? lang,
+  }));
+
   readonly isDiscordRoleMode = computed(
     () => this.settingsForm.rosterMode().value() === RosterMode.DiscordRoleOnly,
   );
+
+  /**
+   * True once settings have loaded and the guild has no `language` saved server-side yet — the
+   * value currently shown in the picker is only this browser's own guess (see `#model`'s initial
+   * value), never persisted for the guild until Save is pressed. Surfaces that distinction in the
+   * template instead of letting an unsaved guess look identical to a real saved setting.
+   */
+  readonly languageNotYetSaved = computed(() => {
+    const settings = this.#guildStore.settings();
+    return settings != null && !settings.language;
+  });
 
   /**
    * Roles in display order, preserving the backend order (ascending by Discord position).
@@ -159,6 +184,7 @@ export class GuildSettingsFormComponent implements OnInit {
         ...(settings.timezone ? { timezone: settings.timezone } : {}),
         rosterMode: settings.rosterMode,
         minRosterRoleId: settings.minRosterRoleId,
+        ...(settings.language ? { language: settings.language } : {}),
       }));
     });
 
