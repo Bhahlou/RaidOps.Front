@@ -6,6 +6,7 @@ import {
   AvailabilityCalendar,
   CreateAvailabilityExceptionPayload,
   RecurringAvailabilityPatternPayload,
+  UpdateAvailabilityExceptionPayload,
 } from '../models/availability.model';
 import { DayAvailabilityStatus } from '../models/day-availability-status.enum';
 import { AvailabilityService } from './availability.service';
@@ -63,6 +64,41 @@ describe('AvailabilityService', () => {
       const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(payload);
+      req.flush(null);
+    });
+  });
+
+  // ── updateException ──────────────────────────────────────────────────────
+
+  describe('updateException', () => {
+    it('sends PATCH to /guilds/:id/availability/exceptions/:exceptionId with the payload', () => {
+      const payload: UpdateAvailabilityExceptionPayload = {
+        startDate: '2026-07-10',
+        endDate: '2026-07-12',
+        status: DayAvailabilityStatus.Absent,
+        reason: 'Vacances',
+        availableFrom: null,
+        availableUntil: null,
+      };
+
+      service.updateException('guild-1', 42, payload).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions/42'));
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual(payload);
+      req.flush(null);
+    });
+  });
+
+  // ── removeExceptionDay ───────────────────────────────────────────────────
+
+  describe('removeExceptionDay', () => {
+    it('sends POST to /guilds/:id/availability/exceptions/:exceptionId/remove-day with the date', () => {
+      service.removeExceptionDay('guild-1', 42, '2026-07-11').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions/42/remove-day'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ date: '2026-07-11' });
       req.flush(null);
     });
   });

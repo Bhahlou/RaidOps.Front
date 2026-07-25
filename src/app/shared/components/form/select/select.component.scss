@@ -162,6 +162,16 @@ legend.select-field-label {
   }
 }
 
+.select-group-header {
+  padding: 6px 10px 2px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  list-style: none;
+}
+
 .select-empty {
   padding: 6px 10px;
   font-size: 0.8125rem;

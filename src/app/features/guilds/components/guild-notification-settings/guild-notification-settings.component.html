@@ -1,0 +1,48 @@
+@for (family of families; track family.id) {
+  <app-form-field-card class="full-width" [label]="family.labelKey | transloco">
+    <p class="field-hint">{{ family.hintKey | transloco }}</p>
+
+    <div class="notification-rows">
+      @for (eventType of family.eventTypes; track eventType) {
+        <div class="notification-row">
+          <app-checkbox
+            class="notification-row-checkbox"
+            [checked]="row(eventType).enabled"
+            (checkedChange)="toggleEnabled(eventType, $event)"
+          >
+            {{ eventLabel(eventType) }}
+          </app-checkbox>
+
+          <app-select
+            class="notification-row-channel-select"
+            [inputId]="'notification-channel-' + eventType"
+            [options]="channelOptions()"
+            [filterable]="true"
+            [placeholder]="'guildSettings.notificationSettings.channel.placeholder' | transloco"
+            [value]="row(eventType).channelId"
+            [disabled]="!row(eventType).enabled"
+            (valueChange)="setChannel(eventType, $event)"
+          />
+
+          @if (channelMissing(eventType)) {
+            <p class="channel-warning">
+              <span class="material-icons">error</span>
+              {{ 'guildSettings.notificationSettings.channel.required' | transloco }}
+            </p>
+          } @else if (row(eventType).enabled && channelHasNoPermission(row(eventType).channelId)) {
+            <p class="channel-warning">
+              <span class="material-icons">warning</span>
+              {{ 'guildSettings.notificationSettings.channel.missingPermission' | transloco }}
+            </p>
+          }
+        </div>
+      }
+    </div>
+  </app-form-field-card>
+}
+
+<div class="form-actions">
+  <app-button variant="primary" icon="check_circle" [disabled]="submitting() || !canSave()" (click)="save()">
+    {{ 'guildSettings.notificationSettings.save' | transloco }}
+  </app-button>
+</div>

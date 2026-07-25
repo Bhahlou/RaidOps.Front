@@ -43,6 +43,20 @@ describe('NotificationListComponent', () => {
 
       expect(component.link(notification({ guildId: 'g42' }))).toEqual(['/guilds', 'g42', 'settings']);
     });
+
+    it('builds the guild settings route for GuildLanguageNotConfigured', () => {
+      setup();
+
+      expect(component.link(notification({ type: NotificationType.GuildLanguageNotConfigured, guildId: 'g42' })))
+        .toEqual(['/guilds', 'g42', 'settings']);
+    });
+
+    it('builds the guild notifications settings route for AbsenceNotificationsNotConfigured', () => {
+      setup();
+
+      expect(component.link(notification({ type: NotificationType.AbsenceNotificationsNotConfigured, guildId: 'g42' })))
+        .toEqual(['/guilds', 'g42', 'settings', 'notifications']);
+    });
   });
 
   // ── dismiss ───────────────────────────────────────────────────────────────

@@ -51,8 +51,13 @@
       [cdkListboxValue]="listboxValue()"
       (cdkListboxValueChange)="onListboxValueChange($any($event))"
     >
-      @for (opt of filteredOptions(); track opt.value) {
-        <li class="select-option" [cdkOption]="opt.value">{{ opt.label }}</li>
+      @for (grp of groupedOptions(); track $index) {
+        @if (grp.group) {
+          <li class="select-group-header">{{ grp.group }}</li>
+        }
+        @for (opt of grp.options; track opt.value) {
+          <li class="select-option" [cdkOption]="opt.value">{{ opt.label }}</li>
+        }
       } @empty {
         <li class="select-empty">—</li>
       }

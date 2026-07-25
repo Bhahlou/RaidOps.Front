@@ -63,8 +63,12 @@ export class GuildCalendarComponent {
 
   readonly isLoading = this.#store.isLoading;
   readonly patterns = computed<RecurringAvailabilityPattern[]>(() => this.#store.calendar()?.patterns ?? []);
+  // Fully elapsed declarations are still shown on the grid itself (historical record), but serve
+  // no purpose in this list — an admin scanning it only cares about what's upcoming or ongoing.
   readonly exceptions = computed<AvailabilityException[]>(() =>
-    [...(this.#store.calendar()?.exceptions ?? [])].sort((a, b) => a.startDate.localeCompare(b.startDate)),
+    [...(this.#store.calendar()?.exceptions ?? [])]
+      .filter((e) => e.endDate >= todayIso())
+      .sort((a, b) => a.startDate.localeCompare(b.startDate)),
   );
 
   readonly calendarDays = computed<CalendarGridDay[]>(() => {

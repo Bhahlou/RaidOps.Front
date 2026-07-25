@@ -6,6 +6,7 @@ import {
   AvailabilityCalendar,
   CreateAvailabilityExceptionPayload,
   RecurringAvailabilityPatternPayload,
+  UpdateAvailabilityExceptionPayload,
 } from '../models/availability.model';
 
 @Service()
@@ -28,6 +29,19 @@ export class AvailabilityService {
   /** Deletes one of the requesting member's own one-off availability exceptions. */
   deleteException(guildId: string, exceptionId: number): Observable<void> {
     return this.#http.delete<void>(`${this.#api}/guilds/${guildId}/availability/exceptions/${exceptionId}`);
+  }
+
+  /** Replaces the dates/status of one of the requesting member's own one-off availability exceptions. */
+  updateException(guildId: string, exceptionId: number, payload: UpdateAvailabilityExceptionPayload): Observable<void> {
+    return this.#http.patch<void>(`${this.#api}/guilds/${guildId}/availability/exceptions/${exceptionId}`, payload);
+  }
+
+  /**
+   * Clears a single day out of one of the requesting member's own one-off availability
+   * exceptions — the back end shrinks or splits the declaration as needed.
+   */
+  removeExceptionDay(guildId: string, exceptionId: number, date: string): Observable<void> {
+    return this.#http.post<void>(`${this.#api}/guilds/${guildId}/availability/exceptions/${exceptionId}/remove-day`, { date });
   }
 
   /** Creates a recurring availability pattern. */
