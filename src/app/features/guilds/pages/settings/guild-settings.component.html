@@ -1,6 +1,19 @@
 <div class="guild-page">
   <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'settings' }" />
   <div class="settings-content">
-    <app-guild-settings-form [guildId]="guildId" />
+    <app-tabs [tabs]="tabs" [activeTabId]="activeTab()" (tabChange)="onTabChange($event)" />
+
+    <div id="panel-general" role="tabpanel" aria-labelledby="tab-general" [hidden]="activeTab() !== 'general'">
+      <app-guild-settings-form [guildId]="guildId" />
+    </div>
+
+    <div
+      id="panel-notifications"
+      role="tabpanel"
+      aria-labelledby="tab-notifications"
+      [hidden]="activeTab() !== 'notifications'"
+    >
+      <app-guild-notification-settings [guildId]="guildId" />
+    </div>
   </div>
 </div>

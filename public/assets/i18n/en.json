@@ -39,22 +39,25 @@
         "title": "Manage your character"
       },
       "guildList": {
-        "title": "My guilds"
+        "title": "Access my guilds"
       },
       "register": {
         "title": "Register a guild"
       },
       "roster": {
-        "title": "The roster"
+        "title": "View the roster"
       },
       "settings": {
-        "title": "Guild settings"
+        "title": "Settings - General"
       },
       "auditLog": {
-        "title": "Audit log"
+        "title": "Change history"
       },
       "calendar": {
-        "title": "The calendar"
+        "title": "Manage my availability"
+      },
+      "guildNotifications": {
+        "title": "Settings - Notifications"
       }
     }
   },
@@ -66,6 +69,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "guildNotifications": {
+        "title": "Discord notifications for guild events",
+        "description": "Configure, per event (starting with declared absences), whether the bot posts a message to a Discord channel — and which one — from the new Notifications tab in guild settings."
+      },
       "calendar": {
         "title": "A calendar to declare your absences and recurring patterns",
         "description": "Declare one-off absences/lateness (single date or range, reason, partial time bounds) or a recurring pattern (weekly, or a 5x8-style shift rotation) — changes are never retroactive on days that have already passed."
@@ -186,6 +193,10 @@
         "title": "In-app notifications",
         "description": "Alerts for actions needed on the officer side."
       },
+      "discordNotifications": {
+        "title": "Discord notifications",
+        "description": "Per-event Discord channel notifications (absences, and later raid events)."
+      },
       "getStarted": {
         "title": "Onboarding flow",
         "description": "4-step guided wizard to get started."
@@ -200,7 +211,7 @@
       },
       "guildCalendar": {
         "title": "Guild calendar",
-        "description": "Absence management and raid event scheduling."
+        "description": "One-off and recurring absence declarations, with Discord notifications — raid event scheduling is still to come."
       },
       "raidBuilder": {
         "title": "Raid builder",
@@ -342,6 +353,12 @@
       "required": "Timezone is required.",
       "hint": "This setting controls the guild's timezone for raids and absences."
     },
+    "language": {
+      "label": "Language",
+      "required": "Language is required.",
+      "hint": "Language RaidOps uses to communicate with your guild (e.g. Discord bot messages).",
+      "notSaved": "Not saved yet — this is only a guess based on your own browser. Save to confirm it for the guild."
+    },
     "rosterMode": {
       "label": "Roster access",
       "open": "Open to all",
@@ -360,12 +377,37 @@
       "hint": "Select the minimum role required for Officer access. That role and all roles above it become Officers, independently of roster access. Discord server administrators always keep full access, regardless of this choice."
     },
     "save": "Save settings",
-    "saveSuccess": "Settings saved."
+    "saveSuccess": "Settings saved.",
+    "tabs": {
+      "general": "General",
+      "notifications": "Notifications"
+    },
+    "notificationSettings": {
+      "families": {
+        "absences": {
+          "label": "Absences",
+          "hint": "Notify when a member's declared availability changes."
+        }
+      },
+      "events": {
+        "AbsenceAdded": "A member adds an absence",
+        "AbsenceRemoved": "A member removes an absence"
+      },
+      "channel": {
+        "placeholder": "Select a channel",
+        "required": "Pick a channel to enable this notification.",
+        "missingPermission": "The bot doesn't have permission to post in this channel."
+      },
+      "save": "Save notification settings",
+      "saveSuccess": "Notification settings saved."
+    }
   },
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications.",
     "officerThresholdNotConfigured": "\"{{ guildName }}\" has no Officer access threshold configured yet — choose which Discord role grants Officer access in the guild settings.",
+    "guildLanguageNotConfigured": "\"{{ guildName }}\" has no language configured yet — choose the language RaidOps uses to communicate with your guild in the settings.",
+    "absenceNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for absences yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "viewLink": "Configure",
     "dismiss": "Never show again"
   },
@@ -396,6 +438,7 @@
     },
     "settingsFields": {
       "timezone": "Timezone",
+      "language": "Language",
       "rosterMode": "Roster access",
       "minRosterRoleId": "Discord role threshold changed",
       "minOfficerRoleId": "Officer access threshold changed"
@@ -408,11 +451,12 @@
       "MemberExcluded": "Member excluded",
       "MemberRankUpdated": "Rank updated",
       "OfficerThresholdUpdated": "Officer threshold updated",
-      "AvailabilityExceptionDeclared": "Absence/lateness declared",
+      "AvailabilityExceptionDeclared": "Absence/lateness added",
       "AvailabilityExceptionDeleted": "Absence/lateness deleted",
       "RecurringAvailabilityPatternCreated": "Recurring pattern added",
       "RecurringAvailabilityPatternUpdated": "Recurring pattern edited",
-      "RecurringAvailabilityPatternStopped": "Recurring pattern stopped"
+      "RecurringAvailabilityPatternStopped": "Recurring pattern stopped",
+      "NotificationSettingsUpdated": "Notification settings updated"
     }
   },
   "noGuild": {

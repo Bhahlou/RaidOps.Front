@@ -25,6 +25,9 @@ export interface CreateAvailabilityExceptionPayload {
   availableUntil: string | null;
 }
 
+/** Payload for replacing the dates/status of an existing one-off availability exception. */
+export type UpdateAvailabilityExceptionPayload = CreateAvailabilityExceptionPayload;
+
 /** One day of a recurring pattern's cycle that is not fully available. */
 export interface RecurringAvailabilityPatternDay {
   offsetInCycle: number;
@@ -133,36 +136,4 @@ export function formatPartialTimeLabel(
 function formatTime(time: string, locale: string): string {
   const [hh, mm] = time.slice(0, 5).split(':');
   return locale.startsWith('fr') ? `${hh}h${mm}` : `${hh}:${mm}`;
-}
-
-export interface DateRange {
-  startDate: string;
-  endDate: string;
-}
-
-/**
- * Removes a single date from a range, returning the remaining sub-range(s) — shrunk by one day when
- * `date` is at either end, split in two when it's strictly in the middle, or empty when `date` was
- * the range's only day. `date` outside the range is returned unchanged.
- */
-export function removeDateFromRange(range: DateRange, date: string): DateRange[] {
-  if (date < range.startDate || date > range.endDate) return [range];
-
-  const remaining: DateRange[] = [];
-  if (date > range.startDate) {
-    remaining.push({ startDate: range.startDate, endDate: addDaysToIsoDate(date, -1) });
-  }
-  if (date < range.endDate) {
-    remaining.push({ startDate: addDaysToIsoDate(date, 1), endDate: range.endDate });
-  }
-  return remaining;
-}
-
-function addDaysToIsoDate(iso: string, delta: number): string {
-  const [y, m, d] = iso.split('-').map(Number);
-  const date = new Date(y, m - 1, d + delta);
-  const yy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yy}-${mm}-${dd}`;
 }
