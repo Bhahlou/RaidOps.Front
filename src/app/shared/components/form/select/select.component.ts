@@ -62,7 +62,7 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
     for (const opt of this.filteredOptions()) {
       const key = opt.group ?? null;
       const last = groups.at(-1);
-      if (last && last.group === key) {
+      if (last?.group === key) {
         last.options.push(opt);
       } else {
         groups.push({ group: key, options: [opt] });

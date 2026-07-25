@@ -9,7 +9,7 @@ import { injectGuildContext } from '../../inject-guild-context';
 
 type SettingsTabId = 'general' | 'notifications';
 
-const TAB_IDS: SettingsTabId[] = ['general', 'notifications'];
+const TAB_IDS = new Set<SettingsTabId>(['general', 'notifications']);
 
 @Component({
   selector: 'app-guild-settings',
@@ -38,7 +38,7 @@ export class GuildSettingsComponent {
 
   readonly activeTab = computed<SettingsTabId>(() => {
     const tab = this.#routeTab().get('tab');
-    return TAB_IDS.includes(tab as SettingsTabId) ? (tab as SettingsTabId) : 'general';
+    return TAB_IDS.has(tab as SettingsTabId) ? (tab as SettingsTabId) : 'general';
   });
 
   onTabChange(id: string): void {
