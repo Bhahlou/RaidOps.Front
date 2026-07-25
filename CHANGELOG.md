@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.2.1...raidops-front-v1.3.0) (2026-07-25)
+
+
+### 🚀 Features
+
+* Add guild Discord notification settings tab and switch availability edits to real in-place updates ([#60](https://github.com/Bhahlou/RaidOps.Front/issues/60)) ([0925c3f](https://github.com/Bhahlou/RaidOps.Front/commit/0925c3f0198f654e617e9b045b7883fadd233ab0))
+
 ## [1.2.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.2.0...raidops-front-v1.2.1) (2026-07-22)
 
 
