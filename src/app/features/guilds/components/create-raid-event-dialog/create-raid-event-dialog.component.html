@@ -1,0 +1,91 @@
+<h2 class="dialog-title">{{ 'raidBuilder.eventDialog.createTitle' | transloco }}</h2>
+
+<div class="dialog-content">
+  <div class="field-group">
+    <label class="field-label" for="event-name">{{ 'raidBuilder.eventDialog.name' | transloco }}</label>
+    <input
+      id="event-name"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      maxlength="128"
+    />
+  </div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label class="field-label" for="event-branch">{{ 'raidBuilder.eventDialog.branch' | transloco }}</label>
+      <app-select
+        [inputId]="'event-branch'"
+        [options]="branchOptions()"
+        [value]="branchId()"
+        (valueChange)="setBranchId($any($event))"
+        [placeholder]="'raidBuilder.seriesDialog.branchPlaceholder' | transloco"
+      />
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="event-starts-at">{{ 'raidBuilder.eventDialog.startsAt' | transloco }}</label>
+      <input
+        id="event-starts-at"
+        type="datetime-local"
+        class="datetime-input"
+        [value]="startsAtLocal()"
+        (change)="startsAtLocal.set($any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label class="field-label" for="event-groups">{{ 'raidBuilder.seriesDialog.groupCount' | transloco }}</label>
+      <input
+        id="event-groups"
+        type="number"
+        min="1"
+        max="8"
+        class="number-input"
+        [value]="groupCount()"
+        (change)="groupCount.set(+$any($event.target).value)"
+      />
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="event-slots">{{ 'raidBuilder.seriesDialog.slotsPerGroup' | transloco }}</label>
+      <input
+        id="event-slots"
+        type="number"
+        min="1"
+        max="10"
+        class="number-input"
+        [value]="slotsPerGroup()"
+        (change)="slotsPerGroup.set(+$any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <div class="field-group">
+    <span class="field-label">{{ 'raidBuilder.seriesDialog.zones' | transloco }}</span>
+    @if (branchId() === null) {
+      <p class="mode-hint">{{ 'raidBuilder.seriesDialog.pickBranchFirst' | transloco }}</p>
+    } @else if (zones().length === 0) {
+      <p class="mode-hint">{{ 'raidBuilder.seriesDialog.noZones' | transloco }}</p>
+    } @else {
+      <div class="zone-checkboxes">
+        @for (zone of zones(); track zone.id) {
+          <label class="zone-checkbox">
+            <input type="checkbox" [checked]="isZoneSelected(zone.id)" (change)="toggleZone(zone.id)" />
+            {{ zone.name }}
+          </label>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'raidBuilder.actions.save' | transloco }}
+  </app-button>
+</div>

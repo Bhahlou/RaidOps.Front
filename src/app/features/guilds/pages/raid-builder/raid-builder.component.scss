@@ -1,0 +1,145 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.guild-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+
+.raid-builder-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px 24px;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 600px) {
+    padding: 10px 10px 16px;
+  }
+}
+
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.range-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-label {
+  min-width: 120px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+
+.board-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.series-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.series-menu-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.series-menu-empty {
+  margin: 4px 12px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.board-body {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+}
+
+.pool-column {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 0;
+
+  @media (max-width: 900px) {
+    width: auto;
+    max-height: 320px;
+  }
+}
+
+.board-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.unassigned-column {
+  flex-shrink: 0;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 0;
+}
+
+.board-spinner {
+  align-self: center;
+  margin-top: 32px;
+}
+
+.active-event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+  }
+}
+
+.active-event-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}

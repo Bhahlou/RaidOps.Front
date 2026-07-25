@@ -1,0 +1,39 @@
+<div
+  class="raid-slot"
+  [class.raid-slot--empty]="!assignment()"
+  cdkDropList
+  [id]="dropListId()"
+  [cdkDropListData]="assignment()"
+  [cdkDropListDisabled]="dropDisabled()"
+  (cdkDropListDropped)="onDropped($event)"
+>
+  @if (assignment(); as a) {
+    <div class="slot-chip" cdkDrag [cdkDragData]="dragItem(a)" [cdkDragDisabled]="disabled()">
+      <app-wow-class-icon [classId]="a.classId" [size]="26" />
+      <div class="slot-chip-info">
+        <span class="slot-chip-name" [style.color]="a.classColor">{{ a.characterName }}</span>
+        @if (a.availabilityStatus === Availability.Absent) {
+          <span class="slot-chip-badge slot-chip-badge--absent" [title]="'raidBuilder.pool.absent' | transloco">
+            <span class="material-icons">event_busy</span>
+          </span>
+        } @else if (a.availabilityStatus === Availability.Partial) {
+          <span class="slot-chip-badge slot-chip-badge--partial" [title]="'raidBuilder.pool.partial' | transloco">
+            <span class="material-icons">schedule</span>
+          </span>
+        }
+      </div>
+      @if (!disabled()) {
+        <button
+          type="button"
+          class="slot-chip-remove"
+          [attr.aria-label]="'raidBuilder.grid.unassign' | transloco"
+          (click)="unassign.emit()"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      }
+    </div>
+  } @else {
+    <span class="slot-empty-label">{{ groupNumber() }}.{{ slotNumber() }}</span>
+  }
+</div>

@@ -86,6 +86,14 @@
               </a>
               <a
                 class="sidenav-item"
+                [routerLink]="['/guilds', guild.id, branchId, 'raid-builder']"
+                routerLinkActive="active-link"
+              >
+                <span class="material-icons item-icon">grid_view</span>
+                <span class="sidenav-label">{{ 'sidenav.guild.raidBuilder' | transloco }}</span>
+              </a>
+              <a
+                class="sidenav-item"
                 [routerLink]="['/guilds', guild.id, branchId, 'loot']"
                 routerLinkActive="active-link"
               >

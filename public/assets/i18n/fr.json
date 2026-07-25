@@ -338,6 +338,7 @@
     "guild": {
       "dashboard": "Tableau de bord",
       "roster": "Roster",
+      "raidBuilder": "Constructeur de raid",
       "loot": "Loot",
       "settings": "Paramètres",
       "auditLog": "Journal d'audit",
@@ -708,6 +709,116 @@
       "save": "Enregistrer",
       "edit": "Modifier",
       "delete": "Supprimer"
+    }
+  },
+  "raidBuilder": {
+    "previousRange": "Période précédente",
+    "nextRange": "Période suivante",
+    "draft": "Brouillon",
+    "publish": "Publier",
+    "publishConfirm": "« {{name}} » deviendra visible pour tous les membres du roster. Cette action est irréversible.",
+    "board": {
+      "empty": "Aucun raid prévu sur cette période — créez une série ou un raid ponctuel pour commencer."
+    },
+    "tabs": {
+      "empty": "Aucun raid sur cette période.",
+      "addEvent": "Ajouter un raid ponctuel"
+    },
+    "grid": {
+      "group": "Groupe {{n}}",
+      "unassign": "Retirer de ce slot"
+    },
+    "pool": {
+      "title": "Vivier du roster",
+      "searchPlaceholder": "Rechercher un joueur ou un personnage...",
+      "allClasses": "Toutes les classes",
+      "filterClass": "Filtrer par classe",
+      "allSpecs": "Toutes les spés",
+      "filterSpec": "Filtrer par spé",
+      "allRanks": "Tous les rangs",
+      "filterRank": "Filtrer par rang",
+      "noActiveEvent": "Sélectionnez ou créez un raid pour voir les disponibilités.",
+      "empty": "Aucun personnage disponible sur cette branche.",
+      "emptyFiltered": "Aucun personnage ne correspond aux filtres actifs.",
+      "absent": "Déclaré absent à la date de ce raid",
+      "partial": "Disponibilité partielle à la date de ce raid"
+    },
+    "unassigned": {
+      "title": "Non affectés",
+      "empty": "Tous les membres du roster sont affectés à un raid sur cette période."
+    },
+    "series": {
+      "manage": "Séries",
+      "addSeries": "Nouvelle série",
+      "empty": "Aucune série récurrente pour le moment.",
+      "deactivate": "Arrêter cette série",
+      "deactivateSuccess": "Série arrêtée — son historique est conservé."
+    },
+    "seriesDialog": {
+      "createTitle": "Nouvelle série de raid",
+      "editTitle": "Modifier la série de raid",
+      "name": "Nom",
+      "branch": "Branche",
+      "branchPlaceholder": "Sélectionner une branche",
+      "dayOfWeek": "Jour de la semaine",
+      "startTime": "Heure de début",
+      "intervalWeeks": "Toutes les N semaines",
+      "groupCount": "Groupes",
+      "slotsPerGroup": "Slots par groupe",
+      "zones": "Zones de raid",
+      "pickBranchFirst": "Sélectionnez une branche pour voir ses zones de raid.",
+      "noZones": "Aucune zone de raid configurée pour cette branche.",
+      "saveSuccess": "Série de raid enregistrée."
+    },
+    "eventDialog": {
+      "createTitle": "Nouveau raid",
+      "editTitle": "Modifier le raid",
+      "name": "Nom",
+      "branch": "Branche",
+      "startsAt": "Débute à",
+      "createSuccess": "Raid créé.",
+      "saveSuccess": "Raid enregistré.",
+      "readOnlyCancelled": "Ce raid est annulé et ne peut plus être modifié.",
+      "readOnlyCompleted": "Ce raid est terminé et ne peut plus être modifié.",
+      "cancelEvent": "Annuler le raid",
+      "cancelConfirmTitle": "Annuler ce raid ?",
+      "cancelConfirmMessage": "« {{name}} » sera marqué comme annulé. Son historique (affectations comprises) est conservé.",
+      "cancelSuccess": "Raid annulé.",
+      "deleteEvent": "Supprimer le raid",
+      "deleteConfirmTitle": "Supprimer ce raid ?",
+      "deleteConfirmMessage": "« {{name}} » sera définitivement supprimé. Possible uniquement s'il n'a aucune affectation.",
+      "deleteSuccess": "Raid supprimé.",
+      "publishConfirmTitle": "Publier ce raid ?",
+      "publishSuccess": "Raid publié."
+    },
+    "weekday": {
+      "Monday": "Lundi",
+      "Tuesday": "Mardi",
+      "Wednesday": "Mercredi",
+      "Thursday": "Jeudi",
+      "Friday": "Vendredi",
+      "Saturday": "Samedi",
+      "Sunday": "Dimanche"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "edit": "Modifier"
+    },
+    "errors": {
+      "raidZoneNotFound": "Cette zone de raid n'existe plus.",
+      "raidSeriesNotFound": "Cette série de raid n'existe plus.",
+      "raidEventNotFound": "Ce raid n'existe plus.",
+      "raidEventCancelled": "Ce raid est annulé.",
+      "raidEventHasAssignments": "Ce raid a encore des affectations — annulez-le plutôt que de le supprimer.",
+      "slotOccupied": "Ce slot est déjà occupé — désaffectez-le d'abord.",
+      "invalidGroupOrSlotNumber": "Numéro de groupe ou de slot invalide pour ce raid.",
+      "characterNotOnRoster": "Ce personnage n'est pas sur le roster de la guilde.",
+      "branchMismatch": "La branche de ce personnage ne correspond pas à celle du raid.",
+      "playerAlreadyAssignedInEvent": "Ce joueur a déjà un personnage affecté à ce raid.",
+      "memberDeclaredAbsent": "Ce membre s'est déclaré absent à la date de ce raid.",
+      "raidLockoutConflict": "Ce personnage est déjà verrouillé sur cette zone de raid dans un autre raid.",
+      "raidEventAlreadyPublished": "Ce raid est déjà publié."
     }
   },
   "home": {

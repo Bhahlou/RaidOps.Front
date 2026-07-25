@@ -1,0 +1,85 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'raid-builder' }" />
+
+  <div class="raid-builder-page">
+    <header class="board-header">
+      <div class="range-nav">
+        <app-icon-button icon="chevron_left" [ariaLabel]="'raidBuilder.previousRange' | transloco" (click)="prevRange()" />
+        <span class="range-label">{{ rangeLabel() }}</span>
+        <app-icon-button icon="chevron_right" [ariaLabel]="'raidBuilder.nextRange' | transloco" (click)="nextRange()" />
+        <app-button variant="stroked" icon="today" (click)="goToday()">{{ 'calendar.today' | transloco }}</app-button>
+      </div>
+
+      @if (isOfficer()) {
+        <div class="board-actions">
+          <button type="button" class="btn btn-stroked" [cdkMenuTriggerFor]="seriesMenu">
+            <span class="material-icons">repeat</span>
+            {{ 'raidBuilder.series.manage' | transloco }}
+          </button>
+          <ng-template #seriesMenu>
+            <div class="menu-panel" cdkMenu>
+              @for (s of activeSeries(); track s.id) {
+                <div class="menu-item series-menu-item" cdkMenuItem (click)="openCreateSeriesDialog(s)">
+                  <span class="series-menu-name">{{ s.name }}</span>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    [title]="'raidBuilder.series.deactivate' | transloco"
+                    (click)="$event.stopPropagation(); deactivateSeries(s)"
+                  >
+                    <span class="material-icons">stop_circle</span>
+                  </button>
+                </div>
+              }
+              @if (activeSeries().length === 0) {
+                <p class="series-menu-empty">{{ 'raidBuilder.series.empty' | transloco }}</p>
+              }
+              <button type="button" class="menu-item" cdkMenuItem (click)="openCreateSeriesDialog(null)">
+                <span class="material-icons">add</span>
+                {{ 'raidBuilder.series.addSeries' | transloco }}
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      }
+    </header>
+
+    <div class="board-body" cdkDropListGroup>
+      <aside class="pool-column">
+        <app-raid-roster-pool [guildId]="guildId()" [activeEvent]="activeEvent()" [disabled]="!isOfficer()" />
+      </aside>
+
+      <section class="board-main">
+        <app-raid-event-tabs
+          [events]="events()"
+          [activeEventId]="activeEventId()"
+          [disabled]="!isOfficer()"
+          (select)="selectEvent($event)"
+          (createEvent)="openCreateEventDialog()"
+        />
+
+        @if (isLoading()) {
+          <span class="spinner board-spinner"></span>
+        } @else if (!activeEvent()) {
+          <app-empty-hint>{{ 'raidBuilder.board.empty' | transloco }}</app-empty-hint>
+        } @else {
+          <div class="active-event-header">
+            <div class="active-event-info">
+              <h2>{{ activeEvent()!.name }}</h2>
+              <span class="active-event-meta">{{ activeEvent()!.branchName }}</span>
+            </div>
+            @if (isOfficer()) {
+              <app-icon-button icon="edit" [ariaLabel]="'raidBuilder.actions.edit' | transloco" (click)="openEditEventDialog(activeEvent()!)" />
+            }
+          </div>
+
+          <app-raid-event-grid [guildId]="guildId()" [event]="activeEvent()!" [disabled]="!isOfficer()" />
+        }
+      </section>
+
+      <aside class="unassigned-column">
+        <app-unassigned-members-panel [members]="unassignedMembers()" [isLoading]="unassignedLoading()" [(collapsed)]="panelCollapsed" />
+      </aside>
+    </div>
+  </div>
+</div>

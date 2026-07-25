@@ -338,6 +338,7 @@
     "guild": {
       "dashboard": "Dashboard",
       "roster": "Roster",
+      "raidBuilder": "Raid-Builder",
       "loot": "Loot",
       "settings": "Einstellungen",
       "auditLog": "Audit-Log",
@@ -708,6 +709,116 @@
       "save": "Speichern",
       "edit": "Bearbeiten",
       "delete": "Löschen"
+    }
+  },
+  "raidBuilder": {
+    "previousRange": "Vorheriger Zeitraum",
+    "nextRange": "Nächster Zeitraum",
+    "draft": "Entwurf",
+    "publish": "Veröffentlichen",
+    "publishConfirm": "„{{name}}“ wird für alle Rostermitglieder sichtbar. Dies kann nicht rückgängig gemacht werden.",
+    "board": {
+      "empty": "Noch kein Raid in diesem Zeitraum — erstelle eine Serie oder einen Ad-hoc-Raid, um zu starten."
+    },
+    "tabs": {
+      "empty": "Kein Raid in diesem Zeitraum.",
+      "addEvent": "Ad-hoc-Raid hinzufügen"
+    },
+    "grid": {
+      "group": "Gruppe {{n}}",
+      "unassign": "Aus diesem Slot entfernen"
+    },
+    "pool": {
+      "title": "Rosterpool",
+      "searchPlaceholder": "Spieler oder Charakter suchen...",
+      "allClasses": "Alle Klassen",
+      "filterClass": "Nach Klasse filtern",
+      "allSpecs": "Alle Spezialisierungen",
+      "filterSpec": "Nach Spezialisierung filtern",
+      "allRanks": "Alle Ränge",
+      "filterRank": "Nach Rang filtern",
+      "noActiveEvent": "Wähle oder erstelle einen Raid, um die Verfügbarkeit zu sehen.",
+      "empty": "Kein Charakter auf diesem Branch verfügbar.",
+      "emptyFiltered": "Kein Charakter entspricht den aktiven Filtern.",
+      "absent": "Am Datum dieses Raids als abwesend gemeldet",
+      "partial": "Am Datum dieses Raids nur teilweise verfügbar"
+    },
+    "unassigned": {
+      "title": "Nicht zugeteilt",
+      "empty": "Alle Rostermitglieder sind einem Raid in diesem Zeitraum zugeteilt."
+    },
+    "series": {
+      "manage": "Serien",
+      "addSeries": "Neue Serie",
+      "empty": "Noch keine wiederkehrende Serie.",
+      "deactivate": "Diese Serie stoppen",
+      "deactivateSuccess": "Serie gestoppt — die Vergangenheit bleibt erhalten."
+    },
+    "seriesDialog": {
+      "createTitle": "Neue Raid-Serie",
+      "editTitle": "Raid-Serie bearbeiten",
+      "name": "Name",
+      "branch": "Branch",
+      "branchPlaceholder": "Branch auswählen",
+      "dayOfWeek": "Wochentag",
+      "startTime": "Startzeit",
+      "intervalWeeks": "Alle N Wochen",
+      "groupCount": "Gruppen",
+      "slotsPerGroup": "Slots pro Gruppe",
+      "zones": "Raid-Zonen",
+      "pickBranchFirst": "Wähle einen Branch, um dessen Raid-Zonen zu sehen.",
+      "noZones": "Keine Raid-Zone für diesen Branch konfiguriert.",
+      "saveSuccess": "Raid-Serie gespeichert."
+    },
+    "eventDialog": {
+      "createTitle": "Neuer Raid",
+      "editTitle": "Raid bearbeiten",
+      "name": "Name",
+      "branch": "Branch",
+      "startsAt": "Beginnt am",
+      "createSuccess": "Raid erstellt.",
+      "saveSuccess": "Raid gespeichert.",
+      "readOnlyCancelled": "Dieser Raid ist abgesagt und kann nicht mehr bearbeitet werden.",
+      "readOnlyCompleted": "Dieser Raid ist abgeschlossen und kann nicht mehr bearbeitet werden.",
+      "cancelEvent": "Raid absagen",
+      "cancelConfirmTitle": "Diesen Raid absagen?",
+      "cancelConfirmMessage": "„{{name}}“ wird als abgesagt markiert. Der Verlauf (inkl. Zuteilungen) bleibt erhalten.",
+      "cancelSuccess": "Raid abgesagt.",
+      "deleteEvent": "Raid löschen",
+      "deleteConfirmTitle": "Diesen Raid löschen?",
+      "deleteConfirmMessage": "„{{name}}“ wird endgültig gelöscht. Nur möglich, solange keine Zuteilung besteht.",
+      "deleteSuccess": "Raid gelöscht.",
+      "publishConfirmTitle": "Diesen Raid veröffentlichen?",
+      "publishSuccess": "Raid veröffentlicht."
+    },
+    "weekday": {
+      "Monday": "Montag",
+      "Tuesday": "Dienstag",
+      "Wednesday": "Mittwoch",
+      "Thursday": "Donnerstag",
+      "Friday": "Freitag",
+      "Saturday": "Samstag",
+      "Sunday": "Sonntag"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "edit": "Bearbeiten"
+    },
+    "errors": {
+      "raidZoneNotFound": "Diese Raid-Zone existiert nicht mehr.",
+      "raidSeriesNotFound": "Diese Raid-Serie existiert nicht mehr.",
+      "raidEventNotFound": "Dieser Raid existiert nicht mehr.",
+      "raidEventCancelled": "Dieser Raid ist abgesagt.",
+      "raidEventHasAssignments": "Dieser Raid hat noch Zuteilungen — sage ihn stattdessen ab, statt ihn zu löschen.",
+      "slotOccupied": "Dieser Slot ist bereits belegt — zuerst die Zuteilung aufheben.",
+      "invalidGroupOrSlotNumber": "Ungültige Gruppen- oder Slot-Nummer für diesen Raid.",
+      "characterNotOnRoster": "Dieser Charakter steht nicht auf dem Gilden-Roster.",
+      "branchMismatch": "Der Branch dieses Charakters stimmt nicht mit dem des Raids überein.",
+      "playerAlreadyAssignedInEvent": "Dieser Spieler hat bereits einen Charakter in diesem Raid zugeteilt.",
+      "memberDeclaredAbsent": "Dieses Mitglied hat sich am Datum dieses Raids als abwesend gemeldet.",
+      "raidLockoutConflict": "Dieser Charakter ist in einem anderen Raid bereits an diese Raid-Zone gebunden.",
+      "raidEventAlreadyPublished": "Dieser Raid ist bereits veröffentlicht."
     }
   },
   "home": {

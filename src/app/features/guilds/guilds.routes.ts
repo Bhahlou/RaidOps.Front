@@ -80,6 +80,12 @@ export const guildRoutes: Routes = [
                 loadComponent: () =>
                   import('./pages/loots/guild-loot.component').then(m => m.GuildLootComponent),
               },
+              {
+                path: 'raid-builder',
+                data: { minAccessLevel: GuildAccessLevel.Roster },
+                loadComponent: () =>
+                  import('./pages/raid-builder/raid-builder.component').then(m => m.RaidBuilderComponent),
+              },
             ],
           },
         ],

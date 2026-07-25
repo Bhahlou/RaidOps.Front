@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.raid-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.raid-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.raid-group-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.raid-group-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

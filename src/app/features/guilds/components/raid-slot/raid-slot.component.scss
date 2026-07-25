@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.raid-slot {
+  min-height: 52px;
+  border: 1px dashed var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  transition: border-color 0.12s ease, background 0.12s ease;
+
+  &.raid-slot--empty {
+    justify-content: center;
+  }
+
+  &.cdk-drop-list-dragging:not(.raid-slot--empty) {
+    // Occupied slots stay visually inert while a drag is in progress elsewhere on the board —
+    // only empty slots (the real drop targets) should react.
+    opacity: 1;
+  }
+}
+
+.slot-empty-label {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.slot-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    background: var(--color-bg-elevated);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+}
+
+.slot-chip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.slot-chip-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot-chip-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+
+  .material-icons {
+    font-size: 14px;
+  }
+
+  &--absent {
+    color: var(--color-error);
+  }
+
+  &--partial {
+    color: var(--color-accent);
+  }
+}
+
+.slot-chip-remove {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+
+  .material-icons {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-error);
+  }
+}
+
+// Drop-target highlight when a compatible drag is hovering an empty slot.
+.raid-slot--empty.cdk-drop-list-receiving {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-tertiary));
+}

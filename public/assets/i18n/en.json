@@ -338,6 +338,7 @@
     "guild": {
       "dashboard": "Dashboard",
       "roster": "Roster",
+      "raidBuilder": "Raid builder",
       "loot": "Loot",
       "settings": "Settings",
       "auditLog": "Audit log",
@@ -708,6 +709,116 @@
       "save": "Save",
       "edit": "Edit",
       "delete": "Delete"
+    }
+  },
+  "raidBuilder": {
+    "previousRange": "Previous range",
+    "nextRange": "Next range",
+    "draft": "Draft",
+    "publish": "Publish",
+    "publishConfirm": "\"{{name}}\" will become visible to every roster member. This can't be undone.",
+    "board": {
+      "empty": "No raid event in this range yet — create a series or an ad-hoc event to get started."
+    },
+    "tabs": {
+      "empty": "No raid event in this range.",
+      "addEvent": "Add an ad-hoc raid event"
+    },
+    "grid": {
+      "group": "Group {{n}}",
+      "unassign": "Remove from this slot"
+    },
+    "pool": {
+      "title": "Roster pool",
+      "searchPlaceholder": "Search player or character...",
+      "allClasses": "All classes",
+      "filterClass": "Filter by class",
+      "allSpecs": "All specs",
+      "filterSpec": "Filter by spec",
+      "allRanks": "All ranks",
+      "filterRank": "Filter by rank",
+      "noActiveEvent": "Select or create a raid event to see who's available.",
+      "empty": "No character available on this branch.",
+      "emptyFiltered": "No character matches the active filters.",
+      "absent": "Declared absent on this raid's date",
+      "partial": "Partially available on this raid's date"
+    },
+    "unassigned": {
+      "title": "Unassigned",
+      "empty": "Every roster member is assigned to a raid in this range."
+    },
+    "series": {
+      "manage": "Series",
+      "addSeries": "New series",
+      "empty": "No recurring series yet.",
+      "deactivate": "Stop this series",
+      "deactivateSuccess": "Series stopped — its past events are kept."
+    },
+    "seriesDialog": {
+      "createTitle": "New raid series",
+      "editTitle": "Edit raid series",
+      "name": "Name",
+      "branch": "Branch",
+      "branchPlaceholder": "Select a branch",
+      "dayOfWeek": "Day of week",
+      "startTime": "Start time",
+      "intervalWeeks": "Every N weeks",
+      "groupCount": "Groups",
+      "slotsPerGroup": "Slots per group",
+      "zones": "Raid zones",
+      "pickBranchFirst": "Select a branch to see its raid zones.",
+      "noZones": "No raid zone configured for this branch.",
+      "saveSuccess": "Raid series saved."
+    },
+    "eventDialog": {
+      "createTitle": "New raid event",
+      "editTitle": "Edit raid event",
+      "name": "Name",
+      "branch": "Branch",
+      "startsAt": "Starts at",
+      "createSuccess": "Raid event created.",
+      "saveSuccess": "Raid event saved.",
+      "readOnlyCancelled": "This event is cancelled and can no longer be edited.",
+      "readOnlyCompleted": "This event is completed and can no longer be edited.",
+      "cancelEvent": "Cancel event",
+      "cancelConfirmTitle": "Cancel this raid event?",
+      "cancelConfirmMessage": "\"{{name}}\" will be marked cancelled. Its history (assignments included) is kept.",
+      "cancelSuccess": "Raid event cancelled.",
+      "deleteEvent": "Delete event",
+      "deleteConfirmTitle": "Delete this raid event?",
+      "deleteConfirmMessage": "\"{{name}}\" will be permanently deleted. This is only possible while it has no assignment.",
+      "deleteSuccess": "Raid event deleted.",
+      "publishConfirmTitle": "Publish this raid event?",
+      "publishSuccess": "Raid event published."
+    },
+    "weekday": {
+      "Monday": "Monday",
+      "Tuesday": "Tuesday",
+      "Wednesday": "Wednesday",
+      "Thursday": "Thursday",
+      "Friday": "Friday",
+      "Saturday": "Saturday",
+      "Sunday": "Sunday"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit"
+    },
+    "errors": {
+      "raidZoneNotFound": "This raid zone no longer exists.",
+      "raidSeriesNotFound": "This raid series no longer exists.",
+      "raidEventNotFound": "This raid event no longer exists.",
+      "raidEventCancelled": "This raid event is cancelled.",
+      "raidEventHasAssignments": "This event still has assignments — cancel it instead of deleting it.",
+      "slotOccupied": "This slot is already taken — unassign it first.",
+      "invalidGroupOrSlotNumber": "Invalid group or slot number for this event.",
+      "characterNotOnRoster": "This character isn't on the guild roster.",
+      "branchMismatch": "This character's branch doesn't match the raid's branch.",
+      "playerAlreadyAssignedInEvent": "This player already has a character assigned to this raid.",
+      "memberDeclaredAbsent": "This member has declared themselves absent on this raid's date.",
+      "raidLockoutConflict": "This character is already locked to this raid zone in another event.",
+      "raidEventAlreadyPublished": "This raid event is already published."
     }
   },
   "home": {
