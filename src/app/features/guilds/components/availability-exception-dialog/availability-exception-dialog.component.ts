@@ -1,6 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { forkJoin, of, switchMap } from 'rxjs';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
@@ -8,7 +7,7 @@ import { DateRangeInputComponent } from '../../../../shared/components/form/date
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AvailabilityStore } from '../../stores/availability.store';
 import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
-import { AvailabilityException, removeDateFromRange } from '../../models/availability.model';
+import { AvailabilityException } from '../../models/availability.model';
 
 export interface AvailabilityExceptionDialogData {
   guildId: string;
@@ -99,9 +98,7 @@ export class AvailabilityExceptionDialogComponent {
 
     const existing = this.data.existing;
     const request = existing
-      ? this.#store
-          .deleteException(this.data.guildId, existing.id)
-          .pipe(switchMap(() => this.#store.createException(this.data.guildId, payload)))
+      ? this.#store.updateException(this.data.guildId, existing.id, payload)
       : this.#store.createException(this.data.guildId, payload);
 
     request.subscribe({
@@ -117,41 +114,26 @@ export class AvailabilityExceptionDialogComponent {
   }
 
   /**
-   * Removes only `data.date` from the existing declaration: shrinks the range by one day when
-   * `date` is at either end, splits it in two around `date` when it's strictly in the middle, or
-   * deletes it outright when it was the range's only day — going back to a fully available day
-   * (or the recurring pattern's default) for that date specifically.
+   * Removes only `data.date` from the existing declaration — the back end shrinks the range by
+   * one day when `date` is at either end, splits it in two around `date` when it's strictly in
+   * the middle, or deletes it outright when it was the range's only day, going back to a fully
+   * available day (or the recurring pattern's default) for that date specifically.
    */
   removeDay(): void {
     const existing = this.data.existing;
     if (!existing) return;
 
-    const remainingRanges = removeDateFromRange(existing, this.data.date);
-    const recreations = remainingRanges.map((range) =>
-      this.#store.createException(this.data.guildId, {
-        startDate: range.startDate,
-        endDate: range.endDate,
-        status: existing.status,
-        reason: existing.reason,
-        availableFrom: existing.availableFrom,
-        availableUntil: existing.availableUntil,
-      }),
-    );
-
     this.submitting.set(true);
-    this.#store
-      .deleteException(this.data.guildId, existing.id)
-      .pipe(switchMap(() => (recreations.length > 0 ? forkJoin(recreations) : of(null))))
-      .subscribe({
-        next: () => {
-          this.#snackbar.success('calendar.exceptionDialog.removeDaySuccess');
-          this.#dialogRef.close(true);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.submitting.set(false);
-          this.#snackbar.error(this.#errorKeyFor(err));
-        },
-      });
+    this.#store.removeExceptionDay(this.data.guildId, existing.id, this.data.date).subscribe({
+      next: () => {
+        this.#snackbar.success('calendar.exceptionDialog.removeDaySuccess');
+        this.#dialogRef.close(true);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.submitting.set(false);
+        this.#snackbar.error(this.#errorKeyFor(err));
+      },
+    });
   }
 
   cancel(): void {

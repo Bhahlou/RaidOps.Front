@@ -39,22 +39,25 @@
         "title": "Gérer son personnage"
       },
       "guildList": {
-        "title": "Mes guildes"
+        "title": "Accéder à mes guildes"
       },
       "register": {
         "title": "Enregistrer une guilde"
       },
       "roster": {
-        "title": "Le roster"
+        "title": "Afficher le roster"
       },
       "settings": {
-        "title": "Paramètres de la guilde"
+        "title": "Paramètres - Généraux"
       },
       "auditLog": {
-        "title": "Journal d'audit"
+        "title": "Historique des modifications"
       },
       "calendar": {
-        "title": "Le calendrier"
+        "title": "Gérer mes disponibilités"
+      },
+      "guildNotifications": {
+        "title": "Paramètres - Notifications"
       }
     }
   },
@@ -66,6 +69,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "guildNotifications": {
+        "title": "Notifications Discord pour les évènements de guilde",
+        "description": "Configure, pour chaque évènement (en commençant par les absences déclarées), si le bot poste un message dans un salon Discord — et lequel — depuis le nouvel onglet Notifications des paramètres de guilde."
+      },
       "calendar": {
         "title": "Un calendrier pour déclarer tes absences et récurrences",
         "description": "Déclare tes absences/retards ponctuels (date unique ou plage, motif, horaires partiels) ou une récurrence (hebdomadaire ou rotation de poste type 5x8) — les modifications ne sont jamais rétroactives sur les jours déjà passés."
@@ -186,6 +193,10 @@
         "title": "Notifications in-app",
         "description": "Alertes sur les actions requises côté officier."
       },
+      "discordNotifications": {
+        "title": "Notifications Discord",
+        "description": "Notifications par salon Discord par évènement (absences, puis évènements de raid)."
+      },
       "getStarted": {
         "title": "Parcours d'onboarding",
         "description": "Assistant guidé en 4 étapes pour démarrer."
@@ -200,7 +211,7 @@
       },
       "guildCalendar": {
         "title": "Calendrier de guilde",
-        "description": "Gestion des absences et planification des events de raid."
+        "description": "Déclaration d'absences ponctuelles ou récurrentes, avec notifications Discord — la planification des events de raid reste à venir."
       },
       "raidBuilder": {
         "title": "Raid builder",
@@ -342,6 +353,12 @@
       "required": "Le fuseau horaire est requis.",
       "hint": "Ce réglage permet de régler le fuseau horaire de la guilde pour les raids ou les absences."
     },
+    "language": {
+      "label": "Langue",
+      "required": "La langue est requise.",
+      "hint": "Langue utilisée par RaidOps pour communiquer avec ta guilde (ex. messages du bot Discord).",
+      "notSaved": "Pas encore enregistrée — c'est juste une supposition basée sur ton propre navigateur. Enregistre pour la valider pour la guilde."
+    },
     "rosterMode": {
       "label": "Accès au roster",
       "open": "Ouvert à tous",
@@ -360,12 +377,37 @@
       "hint": "Sélectionne le rôle minimum requis pour l'accès Officier. Ce rôle et tous les rôles au-dessus deviennent Officiers, indépendamment de l'accès au roster. Les administrateurs du serveur Discord conservent toujours l'accès complet, quel que soit ce choix."
     },
     "save": "Enregistrer les réglages",
-    "saveSuccess": "Réglages enregistrés."
+    "saveSuccess": "Réglages enregistrés.",
+    "tabs": {
+      "general": "Général",
+      "notifications": "Notifications"
+    },
+    "notificationSettings": {
+      "families": {
+        "absences": {
+          "label": "Absences",
+          "hint": "Notifier quand la disponibilité déclarée d'un membre change."
+        }
+      },
+      "events": {
+        "AbsenceAdded": "Un membre ajoute une absence",
+        "AbsenceRemoved": "Un membre retire une absence"
+      },
+      "channel": {
+        "placeholder": "Sélectionner un salon",
+        "required": "Choisis un salon pour activer cette notification.",
+        "missingPermission": "Le bot n'a pas la permission d'écrire dans ce salon."
+      },
+      "save": "Enregistrer les notifications",
+      "saveSuccess": "Réglages de notifications enregistrés."
+    }
   },
   "notifications": {
     "title": "Notifications",
     "empty": "Aucune notification.",
     "officerThresholdNotConfigured": "« {{ guildName }} » n'a pas encore de seuil d'accès Officier configuré — choisis quel rôle Discord donne accès au statut Officier dans les paramètres de la guilde.",
+    "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
+    "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "viewLink": "Configurer",
     "dismiss": "Ne plus jamais afficher"
   },
@@ -396,6 +438,7 @@
     },
     "settingsFields": {
       "timezone": "Fuseau horaire",
+      "language": "Langue",
       "rosterMode": "Accès au roster",
       "minRosterRoleId": "Seuil de rôle Discord modifié",
       "minOfficerRoleId": "Seuil d'accès Officier modifié"
@@ -408,11 +451,12 @@
       "MemberExcluded": "Membre exclu",
       "MemberRankUpdated": "Rang modifié",
       "OfficerThresholdUpdated": "Seuil Officier modifié",
-      "AvailabilityExceptionDeclared": "Absence/retard déclaré",
+      "AvailabilityExceptionDeclared": "Absence/retard ajouté",
       "AvailabilityExceptionDeleted": "Absence/retard supprimé",
       "RecurringAvailabilityPatternCreated": "Récurrence ajoutée",
       "RecurringAvailabilityPatternUpdated": "Récurrence modifiée",
-      "RecurringAvailabilityPatternStopped": "Récurrence arrêtée"
+      "RecurringAvailabilityPatternStopped": "Récurrence arrêtée",
+      "NotificationSettingsUpdated": "Réglages de notifications modifiés"
     }
   },
   "noGuild": {

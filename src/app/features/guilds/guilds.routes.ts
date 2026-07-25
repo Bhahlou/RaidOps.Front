@@ -59,6 +59,11 @@ export const guildRoutes: Routes = [
           },
           {
             path: 'settings',
+            redirectTo: 'settings/general',
+            pathMatch: 'full',
+          },
+          {
+            path: 'settings/:tab',
             data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
               import('./pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),

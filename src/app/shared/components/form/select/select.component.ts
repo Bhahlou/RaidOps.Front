@@ -7,6 +7,16 @@ import { CdkListbox, CdkOption, ListboxValueChangeEvent } from '@angular/cdk/lis
 export interface SelectOption<T> {
   value: T;
   label: string;
+  /**
+   * Optional group header, rendered above consecutive options sharing the same value — the
+   * caller is responsible for sorting `options` so same-group entries are contiguous.
+   */
+  group?: string;
+}
+
+interface OptionGroup<T> {
+  group: string | null;
+  options: SelectOption<T>[];
 }
 
 /**
@@ -44,6 +54,21 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
     const query = this.filterQuery().toLowerCase().trim();
     if (!query) return this.options();
     return this.options().filter((o) => o.label.toLowerCase().includes(query));
+  });
+
+  /** `filteredOptions` folded into runs of consecutive same-group entries, for group headers. */
+  readonly groupedOptions = computed<OptionGroup<T>[]>(() => {
+    const groups: OptionGroup<T>[] = [];
+    for (const opt of this.filteredOptions()) {
+      const key = opt.group ?? null;
+      const last = groups.at(-1);
+      if (last && last.group === key) {
+        last.options.push(opt);
+      } else {
+        groups.push({ group: key, options: [opt] });
+      }
+    }
+    return groups;
   });
 
   readonly selectedLabel = computed(() => {

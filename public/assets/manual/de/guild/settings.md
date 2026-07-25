@@ -1,12 +1,16 @@
 > Nur für Officer.
 
-Die Seite **Gildeneinstellungen** konfiguriert die Zeitzone und die Zugriffsregeln der Gilde.
+Der Tab **Allgemein** (in den Gildeneinstellungen) konfiguriert die Zeitzone, die Sprache und die Zugriffsregeln der Gilde.
 
 ![Übersicht der Einstellungsseite](/assets/manual/de/guild/settings-overview.png)
 
 ### Zeitzone
 
 Ein Autocomplete-Feld, das beim ersten Laden automatisch mit der Zeitzone deines Browsers vorausgefüllt wird. Diese Zeitzone dient als Referenz für alle Termine der Gilde (Raids, Kalender).
+
+### Sprache
+
+Die Sprache, in der RaidOps mit der Gilde kommuniziert — vorerst der Inhalt der Nachrichten, die der Discord-Bot postet (einmalige Abwesenheiten und Wiederholungen). Solange sie für diese Gilde noch nie gespeichert wurde, ist sie lediglich anhand der Sprache deines eigenen Browsers vorausgefüllt, worauf ein Hinweis deutlich macht.
 
 ### Roster-Zugriff
 
@@ -24,4 +28,4 @@ Unabhängig vom Roster-Zugriffsmodus: Diese Einstellung legt die Mindest-Discord
 
 ### Speichern
 
-**Einstellungen speichern** sichert beide Blöcke (Zeitzone/Roster und Officer-Schwelle) in einer Aktion. Nach dem Speichern erscheint eine Bestätigungsmeldung.
+**Einstellungen speichern** sichert alle Einstellungen dieses Tabs (Zeitzone, Sprache, Roster-Zugriff, Officer-Schwelle) in einer Aktion, unabhängig vom Tab Benachrichtigungen. Nach dem Speichern erscheint eine Bestätigungsmeldung.

@@ -22,4 +22,4 @@ Das Ändern oder Beenden einer Wiederholung wirkt **nie rückwirkend**: Bereits 
 
 ### Eine einmalige Eintragung ändern oder löschen
 
-Die Panels **Einmalig** und **Wiederkehrend** rechts listen alle deine aktiven Eintragungen auf. Eine bereits vollständig vergangene Eintragung kann nicht mehr geändert oder gelöscht werden — sie ist der historische Nachweis dessen, was damals tatsächlich eingetragen wurde, und bleibt unverändert erhalten.
+Das Panel **Einmalig** rechts listet nur bevorstehende oder laufende Eintragungen auf. Ist eine Eintragung vollständig vergangen, verschwindet sie aus dieser Liste — im Alltag hat sie dort keinen Nutzen mehr —, bleibt aber auf der Kalendergrafik selbst sichtbar und unverändert erhalten, als historischer Nachweis dessen, was damals tatsächlich eingetragen wurde. Sie kann dann nicht mehr geändert oder gelöscht werden.

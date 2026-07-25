@@ -1,8 +1,33 @@
+// Container query against the host, not a viewport media query: this form renders both at full
+// page width (settings page) and squeezed into a narrower card (get-started wizard's guild step,
+// sharing a row with two other cards) — viewport width alone can't tell those apart.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .settings-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 8px 0;
+}
+
+.settings-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+
+  @container (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settings-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .full-width {
@@ -26,6 +51,21 @@
 .field-error {
   font-size: 0.75rem;
   color: var(--mat-sys-error);
+}
+
+.field-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-accent);
+
+  .material-icons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
 }
 
 // ── Roster mode toggle ────────────────────────────────────────────────────────

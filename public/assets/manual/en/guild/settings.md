@@ -1,12 +1,16 @@
 > Officer only.
 
-The **Guild settings** page configures the guild's timezone and access rules.
+The **General** tab (in guild settings) configures the guild's timezone, language, and access rules.
 
 ![Settings page overview](/assets/manual/en/guild/settings-overview.png)
 
 ### Timezone
 
 An autocomplete field, automatically pre-filled with your browser's timezone on first load. This timezone is the reference for all guild schedules (raids, calendar).
+
+### Language
+
+The language RaidOps uses to communicate with the guild — for now, the content of the messages the Discord bot posts (one-off absences and recurring patterns). Until it's ever been saved for this guild, it's just pre-filled from your own browser's language, and a notice makes that clear.
 
 ### Roster access
 
@@ -24,4 +28,4 @@ Independent from the roster access mode: this setting defines the minimum Discor
 
 ### Save
 
-**Save settings** saves both blocks (timezone/roster and Officer threshold) in a single action. A confirmation message appears once saved.
+**Save settings** saves every setting on this tab (timezone, language, roster access, Officer threshold) in a single action, independently of the Notifications tab. A confirmation message appears once saved.

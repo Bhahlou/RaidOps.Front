@@ -8,6 +8,6 @@ Clique sur **Inviter le bot et enregistrer** — tu es redirigé vers Discord po
 
 ### 2. Réglages
 
-Cette étape est exactement le formulaire décrit dans [Paramètres de la guilde](/manual/guild/settings) (fuseau horaire, accès au roster, seuil d'accès Officier). Une fois enregistré, tu es redirigé vers le tableau de bord de la guilde.
+Cette étape est exactement le formulaire décrit dans [Paramètres - Généraux](/manual/guild/settings) (fuseau horaire, langue, accès au roster, seuil d'accès Officier). Une fois enregistré, tu es redirigé vers le tableau de bord de la guilde.
 
 > Tu dois être administrateur du serveur Discord pour accéder à cette page. Si la guilde est déjà enregistrée et configurée, RaidOps te redirige directement vers son tableau de bord.

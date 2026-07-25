@@ -493,6 +493,12 @@ export class GuildAuditLogComponent {
           summary: `${v['oldTimezone'] ?? '—'} → ${v['newTimezone']}`,
         };
 
+      case 'language':
+        return {
+          labelKey: 'auditLog.settingsFields.language',
+          summary: `${v['oldLanguage'] ?? '—'} → ${v['newLanguage']}`,
+        };
+
       case 'rosterMode': {
         const oldLabel = v['oldRosterMode'] ? this.#rosterModeLabel(v['oldRosterMode']) : '—';
         return {

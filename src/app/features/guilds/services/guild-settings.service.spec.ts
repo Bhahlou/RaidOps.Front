@@ -3,8 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { GuildSettings } from '../models/guild-settings.model';
+import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
 import { OfficerThreshold } from '../models/officer-threshold.model';
 import { RosterMode } from '../models/roster-mode.enum';
+import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildSettingsService } from './guild-settings.service';
 
@@ -42,7 +44,7 @@ describe('GuildSettingsService', () => {
 
   describe('updateSettings', () => {
     it('sends PATCH to /guilds/:id/settings with the settings body', () => {
-      const body: GuildSettings = { timezone: 'UTC', rosterMode: RosterMode.Open, minRosterRoleId: null };
+      const body: GuildSettings = { timezone: 'UTC', rosterMode: RosterMode.Open, minRosterRoleId: null, language: 'en' };
 
       service.updateSettings('guild-1', body).subscribe();
 
@@ -64,6 +66,57 @@ describe('GuildSettingsService', () => {
       const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/officer-threshold'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(body);
+      req.flush(null);
+    });
+  });
+
+  // ── getNotificationSettings ──────────────────────────────────────────────
+
+  describe('getNotificationSettings', () => {
+    it('sends GET to /guilds/:id/notification-settings and returns the list', () => {
+      const expected: GuildNotificationSetting[] = [
+        { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
+      ];
+      let result: GuildNotificationSetting[] | undefined;
+
+      service.getNotificationSettings('guild-1').subscribe(r => (result = r));
+
+      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-settings'));
+      expect(req.request.method).toBe('GET');
+      req.flush(expected);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  // ── getNotificationChannels ──────────────────────────────────────────────
+
+  describe('getNotificationChannels', () => {
+    it('sends GET to /guilds/:id/notification-channels and returns the list', () => {
+      const expected: DiscordChannel[] = [{ id: 'chan-1', name: 'general', botCanSendMessages: true, categoryName: null }];
+      let result: DiscordChannel[] | undefined;
+
+      service.getNotificationChannels('guild-1').subscribe(r => (result = r));
+
+      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-channels'));
+      expect(req.request.method).toBe('GET');
+      req.flush(expected);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  // ── updateNotificationSettings ───────────────────────────────────────────
+
+  describe('updateNotificationSettings', () => {
+    it('sends PATCH to /guilds/:id/notification-settings with the settings wrapped in a body', () => {
+      const settings: GuildNotificationSetting[] = [
+        { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
+      ];
+
+      service.updateNotificationSettings('guild-1', settings).subscribe();
+
+      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-settings'));
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ settings });
       req.flush(null);
     });
   });

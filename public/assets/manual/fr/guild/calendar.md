@@ -22,4 +22,4 @@ Modifier ou arrêter une récurrence n'est **jamais rétroactif** : les jours d�
 
 ### Modifier ou supprimer une déclaration ponctuelle
 
-Les panneaux **Ponctuel** et **Récurrent** à droite listent toutes tes déclarations actives. Une déclaration déjà entièrement passée n'est plus modifiable ni supprimable — c'est l'historique de ce qui a réellement été déclaré à l'époque, il reste intact.
+Le panneau **Ponctuel** à droite ne liste que les déclarations à venir ou en cours. Une fois entièrement passée, une déclaration disparaît de cette liste — elle n'a plus d'intérêt à consulter au quotidien — mais reste visible et intacte sur la grille du calendrier, comme historique de ce qui a réellement été déclaré à l'époque. Elle n'est alors plus modifiable ni supprimable.

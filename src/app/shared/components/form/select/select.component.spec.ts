@@ -49,6 +49,64 @@ describe('SelectComponent', () => {
     });
   });
 
+  // ── groupedOptions ───────────────────────────────────────────────────────
+
+  describe('groupedOptions', () => {
+    it('folds all options into a single null-group when none carry a group', () => {
+      expect(setup().groupedOptions()).toEqual([{ group: null, options }]);
+    });
+
+    it('folds consecutive same-group options into one group entry', () => {
+      TestBed.configureTestingModule({ imports: [SelectComponent] })
+        .overrideComponent(SelectComponent, { set: { template: '', imports: [] } });
+
+      const fixture = TestBed.createComponent(SelectComponent<string>);
+      const grouped: SelectOption<string>[] = [
+        { value: 'a', label: 'Alpha', group: 'Cat 1' },
+        { value: 'b', label: 'Beta', group: 'Cat 1' },
+        { value: 'c', label: 'Gamma', group: 'Cat 2' },
+      ];
+      fixture.componentRef.setInput('options', grouped);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.groupedOptions()).toEqual([
+        { group: 'Cat 1', options: [grouped[0], grouped[1]] },
+        { group: 'Cat 2', options: [grouped[2]] },
+      ]);
+    });
+
+    it('starts a new group entry when the same group name reappears non-consecutively', () => {
+      TestBed.configureTestingModule({ imports: [SelectComponent] })
+        .overrideComponent(SelectComponent, { set: { template: '', imports: [] } });
+
+      const fixture = TestBed.createComponent(SelectComponent<string>);
+      const grouped: SelectOption<string>[] = [
+        { value: 'a', label: 'Alpha', group: 'Cat 1' },
+        { value: 'b', label: 'Beta', group: 'Cat 2' },
+        { value: 'c', label: 'Gamma', group: 'Cat 1' },
+      ];
+      fixture.componentRef.setInput('options', grouped);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.groupedOptions()).toEqual([
+        { group: 'Cat 1', options: [grouped[0]] },
+        { group: 'Cat 2', options: [grouped[1]] },
+        { group: 'Cat 1', options: [grouped[2]] },
+      ]);
+    });
+
+    it('is empty when there are no options', () => {
+      TestBed.configureTestingModule({ imports: [SelectComponent] })
+        .overrideComponent(SelectComponent, { set: { template: '', imports: [] } });
+
+      const fixture = TestBed.createComponent(SelectComponent<string>);
+      fixture.componentRef.setInput('options', []);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.groupedOptions()).toEqual([]);
+    });
+  });
+
   // ── selectedLabel ────────────────────────────────────────────────────────
 
   describe('selectedLabel', () => {

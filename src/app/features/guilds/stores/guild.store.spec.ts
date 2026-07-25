@@ -11,6 +11,7 @@ const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
   timezone: 'Europe/Paris',
   rosterMode: RosterMode.Open,
   minRosterRoleId: null,
+  language: 'en',
   ...overrides,
 });
 
