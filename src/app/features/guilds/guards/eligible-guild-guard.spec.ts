@@ -36,19 +36,19 @@ describe('eligibleGuildGuard', () => {
   });
 
   it('returns true when user has a registered guild', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: true, isConfigured: false, isAdmin: false, accessLevel: GuildAccessLevel.Public }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: true, isConfigured: false, isAdmin: false, branches: [], accessLevel: GuildAccessLevel.Public }]));
 
     expect(executeGuard({} as any, {} as any)).toBe(true);
   });
 
   it('returns true when user is admin of an unregistered guild', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, accessLevel: GuildAccessLevel.Officer }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, branches: [], accessLevel: GuildAccessLevel.Officer }]));
 
     expect(executeGuard({} as any, {} as any)).toBe(true);
   });
 
   it('redirects to /no-guild when user has only non-admin unregistered guilds', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: false, accessLevel: GuildAccessLevel.Public }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: false, branches: [], accessLevel: GuildAccessLevel.Public }]));
     const router = TestBed.inject(Router);
 
     const result = executeGuard({} as any, {} as any);

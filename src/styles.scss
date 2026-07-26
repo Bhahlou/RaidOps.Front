@@ -156,7 +156,7 @@ body::after {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 20px;
+  padding: 8px 10px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -167,7 +167,11 @@ body::after {
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: filter 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease,
+  transition:
+    filter 0.12s ease,
+    opacity 0.12s ease,
+    background-color 0.12s ease,
+    border-color 0.12s ease,
     color 0.12s ease;
 
   &:disabled {
@@ -231,7 +235,9 @@ body::after {
   color: var(--color-text-secondary);
   cursor: pointer;
   text-decoration: none;
-  transition: color 0.12s ease, background-color 0.12s ease;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
 
   &:hover:not(:disabled) {
     background: var(--color-bg-tertiary);
@@ -332,6 +338,12 @@ body::after {
   border: 1px solid var(--mat-sys-outline-variant);
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.72);
   color: var(--mat-sys-on-surface);
+  // CDK's own base style caps this element at `max-height: inherit`, i.e. whatever maxHeight the
+  // opener passed via DialogConfig (e.g. 85vh) — but without overflow handling, content beyond
+  // that cap just spills past the visible box instead of scrolling (e.g. set-raid-specs-dialog
+  // with many characters). Dialogs that manage their own internal scroll region (recurring-pattern
+  // -dialog) never actually reach this cap, so this is a no-op for them.
+  overflow-y: auto;
 }
 
 // Structural classes for CDK dialog content — Material's mat-dialog-title/-content/-actions
@@ -406,4 +418,3 @@ body::after {
     color: var(--color-error);
   }
 }
-

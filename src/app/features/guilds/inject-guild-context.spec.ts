@@ -12,7 +12,7 @@ import { GuildAccessLevel } from '../../core/models/guild-access-level.enum';
 
 const makeGuild = (overrides: Partial<UserGuild> = {}): UserGuild => ({
   id: 'g1', name: 'Epic Guild', iconHash: 'hash1',
-  isRegistered: true, isConfigured: true, isAdmin: false, accessLevel: GuildAccessLevel.Public,
+  isRegistered: true, isConfigured: true, isAdmin: false, branches: [], accessLevel: GuildAccessLevel.Public,
   ...overrides,
 });
 

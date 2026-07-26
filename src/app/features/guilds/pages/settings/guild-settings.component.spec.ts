@@ -51,6 +51,10 @@ describe('GuildSettingsComponent', () => {
       expect(setup('g1', 'notifications').activeTab()).toBe('notifications');
     });
 
+    it('reads branches from the route segment', () => {
+      expect(setup('g1', 'branches').activeTab()).toBe('branches');
+    });
+
     it('falls back to general for an unknown tab segment', () => {
       expect(setup('g1', 'bogus').activeTab()).toBe('general');
     });

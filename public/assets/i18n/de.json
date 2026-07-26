@@ -346,7 +346,7 @@
   },
   "guildSettings": {
     "pageTitle": "Gildeneinstellungen",
-    "pageSubtitle": "Konfiguriere die Zeitzone und die Roster-Zugriffsregeln.",
+    "pageSubtitle": "Konfiguriere die Zeitzone und die Sprache der Gilde.",
     "timezone": {
       "label": "Zeitzone",
       "placeholder": "z. B. Europe/Paris",
@@ -359,28 +359,44 @@
       "hint": "Sprache, in der RaidOps mit deiner Gilde kommuniziert (z. B. Discord-Bot-Nachrichten).",
       "notSaved": "Noch nicht gespeichert — nur eine Vermutung basierend auf deinem eigenen Browser. Speichere, um sie für die Gilde zu bestätigen."
     },
-    "rosterMode": {
-      "label": "Roster-Zugriff",
-      "open": "Für alle offen",
-      "discordRoleOnly": "Discord-Rolle erforderlich",
-      "hint": "Diese Einstellung legt fest, wer deinem Roster beitreten kann: jeder auf deinem Discord oder eine Mindestrolle."
-    },
     "roles": {
       "loading": "Rollen werden geladen…",
       "empty": "Keine zuweisbaren Rollen auf diesem Server gefunden.",
-      "hint": "Klicke auf eine Rolle, um die Mindestschwelle festzulegen. Diese Rolle und alle Rollen darüber erhalten Zugriff auf den Roster.",
-      "threshold": "Schwelle",
-      "excluded": "Ausgeschlossene Rollen"
-    },
-    "officerThreshold": {
-      "label": "Officer-Zugriffsschwelle",
-      "hint": "Wähle die Mindestrolle für Officer-Zugriff aus. Diese Rolle und alle Rollen darüber werden Officer, unabhängig vom Roster-Zugriff. Discord-Server-Administratoren behalten unabhängig von dieser Wahl immer vollen Zugriff."
+      "placeholder": "Rollen auswählen…"
     },
     "save": "Einstellungen speichern",
     "saveSuccess": "Einstellungen gespeichert.",
     "tabs": {
       "general": "Allgemein",
+      "branches": "Spielzweige",
       "notifications": "Benachrichtigungen"
+    },
+    "branches": {
+      "activation": {
+        "label": "Aktive Spielzweige",
+        "hint": "Aktiviere die Spielzweige, die deine Gilde derzeit spielt. Das Deaktivieren eines Spielzweigs löscht nie seinen Roster oder seine Rolleneinstellungen — reaktiviere ihn später, um genau dort weiterzumachen, wo du aufgehört hast.",
+        "placeholder": "Spielzweige auswählen…",
+        "loading": "Spielzweige werden geladen…"
+      },
+      "rosterMode": {
+        "label": "Roster-Zugriff",
+        "open": "Für alle offen",
+        "discordRoleOnly": "Discord-Rolle erforderlich",
+        "hint": "Legt fest, wer dem Roster dieses Spielzweigs beitreten kann: jeder auf deinem Discord, oder Mitglieder mit einer der ausgewählten Rollen."
+      },
+      "rosterRoles": {
+        "label": "Roster-Rollen",
+        "hint": "Mitglieder mit einer dieser Rollen können dem Roster dieses Spielzweigs beitreten.",
+        "required": "Wähle mindestens eine Rolle, oder wechsle zurück zu „Für alle offen“."
+      },
+      "officerRoles": {
+        "label": "Officer-Rollen",
+        "hint": "Mitglieder mit einer dieser Rollen erhalten Officer-Zugriff auf diesen Spielzweig, unabhängig vom Roster-Zugriff. Discord-Server-Administratoren und der Server-Besitzer behalten unabhängig von dieser Wahl immer vollen Zugriff."
+      },
+      "save": "Spielzweig-Einstellungen speichern",
+      "rosterSettings": {
+        "saveSuccess": "Spielzweig-Einstellungen gespeichert."
+      }
     },
     "notificationSettings": {
       "families": {
@@ -405,7 +421,7 @@
   "notifications": {
     "title": "Benachrichtigungen",
     "empty": "Keine Benachrichtigungen.",
-    "officerThresholdNotConfigured": "„{{ guildName }}“ hat noch keine Officer-Zugriffsschwelle konfiguriert — wähle in den Gildeneinstellungen, welche Discord-Rolle Officer-Zugriff gewährt.",
+    "branchOfficerRolesNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Officer-Rollen — wähle im Reiter „Spielzweige“ der Gildeneinstellungen, welche Discord-Rollen Officer-Zugriff gewähren.",
     "guildLanguageNotConfigured": "„{{ guildName }}“ hat noch keine Sprache konfiguriert — wähle in den Einstellungen die Sprache, in der RaidOps mit deiner Gilde kommuniziert.",
     "absenceNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Abwesenheiten noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "viewLink": "Konfigurieren",
@@ -434,7 +450,8 @@
       "Guild": "Gilde",
       "Settings": "Einstellungen",
       "Roster": "Roster",
-      "Availability": "Verfügbarkeit"
+      "Availability": "Verfügbarkeit",
+      "Branches": "Spielzweige"
     },
     "settingsFields": {
       "timezone": "Zeitzone",
@@ -456,7 +473,10 @@
       "RecurringAvailabilityPatternCreated": "Wiederholung hinzugefügt",
       "RecurringAvailabilityPatternUpdated": "Wiederholung geändert",
       "RecurringAvailabilityPatternStopped": "Wiederholung beendet",
-      "NotificationSettingsUpdated": "Benachrichtigungseinstellungen geändert"
+      "NotificationSettingsUpdated": "Benachrichtigungseinstellungen geändert",
+      "BranchActivated": "Spielzweig aktiviert",
+      "BranchDeactivated": "Spielzweig deaktiviert",
+      "BranchRosterSettingsUpdated": "Roster-Einstellungen des Spielzweigs geändert"
     }
   },
   "noGuild": {

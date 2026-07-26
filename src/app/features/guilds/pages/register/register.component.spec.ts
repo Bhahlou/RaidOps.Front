@@ -17,6 +17,7 @@ const makeGuild = (id: string, overrides?: Partial<UserGuild>): UserGuild => ({
   isRegistered: false,
   isConfigured: false,
   isAdmin: true,
+  branches: [],
   accessLevel: GuildAccessLevel.Officer,
   ...overrides,
 });

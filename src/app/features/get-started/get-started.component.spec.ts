@@ -18,6 +18,7 @@ import { CharacterRank } from '../guilds/models/character-rank.enum';
 const makeGuild = (overrides: Partial<UserGuild> = {}): UserGuild => ({
   id: 'g1', name: 'Guild', iconHash: null,
   isRegistered: false, isConfigured: false, isAdmin: false,
+  branches: [],
   accessLevel: GuildAccessLevel.Public,
   ...overrides,
 });
