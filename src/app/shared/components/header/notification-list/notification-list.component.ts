@@ -10,7 +10,7 @@ import { ButtonComponent } from '../../buttons/button/button.component';
  * front/back deploy order mismatch — before showing them in the badge count or the list.
  */
 export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>> = {
-  [NotificationType.OfficerThresholdNotConfigured]: 'notifications.officerThresholdNotConfigured',
+  [NotificationType.BranchOfficerRolesNotConfigured]: 'notifications.branchOfficerRolesNotConfigured',
   [NotificationType.GuildLanguageNotConfigured]: 'notifications.guildLanguageNotConfigured',
   [NotificationType.AbsenceNotificationsNotConfigured]: 'notifications.absenceNotificationsNotConfigured',
 };
@@ -18,7 +18,7 @@ export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>
 /** Route the notification's call-to-action link points to. */
 const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> =
   {
-    [NotificationType.OfficerThresholdNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
+    [NotificationType.BranchOfficerRolesNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'branches'],
     [NotificationType.GuildLanguageNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
     [NotificationType.AbsenceNotificationsNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'notifications'],
   };

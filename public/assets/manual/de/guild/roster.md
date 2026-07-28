@@ -2,6 +2,12 @@ Die Seite **Roster** listet alle Mitglieder der Gilde auf und ermöglicht es dir
 
 ![Übersicht der Roster-Seite](/assets/manual/de/guild/roster-overview.png)
 
+### Zwischen Spielzweigen wechseln
+
+Hat deine Gilde mehr als einen aktiven WoW-Spielzweig (siehe Anleitung **Einstellungen - Spielzweige**), erscheinen oben auf der Seite Tabs, um auszuwählen, welcher Spielzweig-Roster angezeigt wird. Eine Gilde mit nur einem aktiven Spielzweig sieht diese Tabs nicht.
+
+![Die Spielzweig-Tabs](/assets/manual/de/guild/branch-switcher-tabs.png)
+
 ### Suchen und filtern
 
 Nutze die Suchleiste, um einen Spieler oder Charakter nach Namen zu finden. Über die Filter-Icons kannst du nach Klasse, Hauptspezialisierung, Rang (**Main**, **Split**, **Alt**) oder Beitrittszeitraum filtern. Die Trefferanzahl steht oben in der Liste, und **Filter zurücksetzen** löscht alle Filter auf einmal.

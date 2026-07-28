@@ -63,6 +63,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
 })
 export class GuildRosterListComponent {
   readonly guildId = input.required<string>();
+  readonly guildBranchId = input.required<number>();
 
   readonly #store = inject(GuildRosterStore);
   readonly #characterStore = inject(CharacterStore);
@@ -84,9 +85,15 @@ export class GuildRosterListComponent {
 
   readonly isLoading = this.#store.isLoading;
 
+  // Branch-specific, not guild.accessLevel (guild-wide max) — an officer on branch A must not
+  // see rank-edit/kick controls on branch B's roster just because they outrank somewhere else
+  // in the guild. The backend already enforces this per-branch (UpdateCharacterRankCommandHandler/
+  // LeaveGuildCommandHandler check membership.GuildBranchId), this only fixes the front from
+  // offering a control that would otherwise fail server-side with a confusing Forbidden error.
   readonly isOfficer = computed(() => {
     const guild = this.#authStore.user()?.guilds.find((g) => g.id === this.guildId());
-    return guild ? hasGuildAccess(guild.accessLevel, GuildAccessLevel.Officer) : false;
+    const branch = guild?.branches.find((b) => b.id === this.guildBranchId());
+    return branch ? hasGuildAccess(branch.accessLevel, GuildAccessLevel.Officer) : false;
   });
 
   readonly updatingRankCharacterId = this.#characterStore.updatingRankCharacterId;
@@ -206,7 +213,8 @@ export class GuildRosterListComponent {
     // self-triggering-loop risk here — no untracked() needed.
     effect(() => {
       const guildId = this.guildId();
-      this.#store.loadRoster(guildId);
+      const guildBranchId = this.guildBranchId();
+      this.#store.loadRoster(guildId, guildBranchId);
     });
   }
 

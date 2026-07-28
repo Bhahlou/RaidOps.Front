@@ -2,6 +2,12 @@ La page **Roster** liste tous les membres de la guilde et te permet de gérer te
 
 ![Vue d'ensemble de la page Roster](/assets/manual/fr/guild/roster-overview.png)
 
+### Basculer entre les branches
+
+Si ta guilde a plus d'une branche WoW active (voir le guide **Paramètres - Branches**), des onglets apparaissent en haut de la page pour choisir de quelle branche afficher le roster. Une guilde avec une seule branche active ne voit pas ces onglets.
+
+![Les onglets de branche](/assets/manual/fr/guild/branch-switcher-tabs.png)
+
 ### Rechercher et filtrer
 
 Utilise la barre de recherche pour trouver un joueur ou un personnage par nom. Les icônes de filtre permettent d'affiner par classe, spécialisation principale, rang (**Main**, **Split**, **Alt**) ou plage de dates d'arrivée dans la guilde. Le nombre de résultats s'affiche en haut de la liste, et **Réinitialiser les filtres** efface tout d'un coup.

@@ -7,6 +7,10 @@
       <app-guild-settings-form [guildId]="guildId" />
     </div>
 
+    <div id="panel-branches" role="tabpanel" aria-labelledby="tab-branches" [hidden]="activeTab() !== 'branches'">
+      <app-guild-branches [guildId]="guildId" />
+    </div>
+
     <div
       id="panel-notifications"
       role="tabpanel"

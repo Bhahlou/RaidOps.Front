@@ -6,7 +6,6 @@ import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildNotificationSetting } from '../models/guild-notification-setting.model';
 import { GuildSettings } from '../models/guild-settings.model';
-import { OfficerThreshold } from '../models/officer-threshold.model';
 
 @Service()
 export class GuildSettingsService {
@@ -18,14 +17,9 @@ export class GuildSettingsService {
     return this.#http.get<DiscordRole[]>(`${this.#api}/guilds/${guildId}/discord-roles`);
   }
 
-  /** Persists the guild settings (timezone, roster mode, allowed roles). */
+  /** Persists the guild-level identity settings (timezone, language). */
   updateSettings(guildId: string, settings: GuildSettings): Observable<void> {
     return this.#http.patch<void>(`${this.#api}/guilds/${guildId}/settings`, settings);
-  }
-
-  /** Persists the guild's Officer access threshold, independently of the rest of guild settings. */
-  updateOfficerThreshold(guildId: string, officerThreshold: OfficerThreshold): Observable<void> {
-    return this.#http.patch<void>(`${this.#api}/guilds/${guildId}/officer-threshold`, officerThreshold);
   }
 
   /** Fetches the guild's Discord notification settings (one entry per event type). */

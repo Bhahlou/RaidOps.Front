@@ -1,5 +1,5 @@
 export enum NotificationType {
-  OfficerThresholdNotConfigured = 'OfficerThresholdNotConfigured',
+  BranchOfficerRolesNotConfigured = 'BranchOfficerRolesNotConfigured',
   GuildLanguageNotConfigured = 'GuildLanguageNotConfigured',
   AbsenceNotificationsNotConfigured = 'AbsenceNotificationsNotConfigured',
 }

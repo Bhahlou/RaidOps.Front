@@ -3,17 +3,24 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { GuildNotificationSettingsComponent } from '../../components/guild-notification-settings/guild-notification-settings.component';
+import { GuildBranchesComponent } from '../../components/guild-branches/guild-branches.component';
 import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
 import { TabDefinition, TabsComponent } from '../../../../shared/components/layout/tabs/tabs.component';
 import { injectGuildContext } from '../../inject-guild-context';
 
-type SettingsTabId = 'general' | 'notifications';
+type SettingsTabId = 'general' | 'branches' | 'notifications';
 
-const TAB_IDS = new Set<SettingsTabId>(['general', 'notifications']);
+const TAB_IDS = new Set<SettingsTabId>(['general', 'branches', 'notifications']);
 
 @Component({
   selector: 'app-guild-settings',
-  imports: [GuildSettingsFormComponent, GuildNotificationSettingsComponent, PageHeaderComponent, TabsComponent],
+  imports: [
+    GuildSettingsFormComponent,
+    GuildNotificationSettingsComponent,
+    GuildBranchesComponent,
+    PageHeaderComponent,
+    TabsComponent,
+  ],
   templateUrl: './guild-settings.component.html',
   styleUrl: './guild-settings.component.scss',
 })
@@ -28,6 +35,7 @@ export class GuildSettingsComponent {
 
   readonly tabs: TabDefinition[] = [
     { id: 'general', labelKey: 'guildSettings.tabs.general' },
+    { id: 'branches', labelKey: 'guildSettings.tabs.branches' },
     { id: 'notifications', labelKey: 'guildSettings.tabs.notifications' },
   ];
 

@@ -58,6 +58,9 @@
       },
       "guildNotifications": {
         "title": "Settings - Notifications"
+      },
+      "guildBranches": {
+        "title": "Settings - Branches"
       }
     }
   },
@@ -69,6 +72,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "guildBranches": {
+        "title": "Manage several WoW versions in the same guild",
+        "description": "A Discord guild can now activate several WoW branches in parallel (e.g. Classic Anniversary and MoP Classic), each with its own roster access mode and its own Officer roles. Once a guild has more than one active branch, tabs appear on the roster to switch between them."
+      },
       "guildNotifications": {
         "title": "Discord notifications for guild events",
         "description": "Configure, per event (starting with declared absences), whether the bot posts a message to a Discord channel — and which one — from the new Notifications tab in guild settings."
@@ -213,6 +220,10 @@
         "title": "Guild calendar",
         "description": "One-off and recurring absence declarations, with Discord notifications — raid event scheduling is still to come."
       },
+      "guildMultiBranch": {
+        "title": "Multi-branch guilds",
+        "description": "A Discord guild can activate several WoW branches in parallel, with roster access and Officer roles configured separately for each."
+      },
       "raidBuilder": {
         "title": "Raid builder",
         "description": "Raid compositions, with automatic building."
@@ -346,7 +357,7 @@
   },
   "guildSettings": {
     "pageTitle": "Guild settings",
-    "pageSubtitle": "Configure the timezone and roster access rules.",
+    "pageSubtitle": "Configure the guild's timezone and language.",
     "timezone": {
       "label": "Timezone",
       "placeholder": "e.g. Europe/Paris",
@@ -359,28 +370,44 @@
       "hint": "Language RaidOps uses to communicate with your guild (e.g. Discord bot messages).",
       "notSaved": "Not saved yet — this is only a guess based on your own browser. Save to confirm it for the guild."
     },
-    "rosterMode": {
-      "label": "Roster access",
-      "open": "Open to all",
-      "discordRoleOnly": "Discord role required",
-      "hint": "This setting controls who can join your roster: anyone on your Discord, or a minimum role."
-    },
     "roles": {
       "loading": "Loading roles…",
       "empty": "No assignable roles found on this server.",
-      "hint": "Click a role to set the minimum threshold. That role and all roles above it will have access to the roster.",
-      "threshold": "Threshold",
-      "excluded": "Excluded roles"
-    },
-    "officerThreshold": {
-      "label": "Officer access threshold",
-      "hint": "Select the minimum role required for Officer access. That role and all roles above it become Officers, independently of roster access. Discord server administrators always keep full access, regardless of this choice."
+      "placeholder": "Select roles…"
     },
     "save": "Save settings",
     "saveSuccess": "Settings saved.",
     "tabs": {
       "general": "General",
+      "branches": "Branches",
       "notifications": "Notifications"
+    },
+    "branches": {
+      "activation": {
+        "label": "Active branches",
+        "hint": "Activate the WoW branches your guild currently runs. Deactivating a branch never deletes its roster or role settings — reactivate it later to pick up right where you left off.",
+        "placeholder": "Select branches…",
+        "loading": "Loading branches…"
+      },
+      "rosterMode": {
+        "label": "Roster access",
+        "open": "Open to all",
+        "discordRoleOnly": "Discord role required",
+        "hint": "Controls who can join this branch's roster: anyone on your Discord, or members holding one of the selected roles."
+      },
+      "rosterRoles": {
+        "label": "Roster roles",
+        "hint": "Members holding any one of these roles can join this branch's roster.",
+        "required": "Select at least one role, or switch back to \"Open to all\"."
+      },
+      "officerRoles": {
+        "label": "Officer roles",
+        "hint": "Members holding any one of these roles get Officer access on this branch, independently of roster access. Discord server administrators and the server owner always keep full access, regardless of this choice."
+      },
+      "save": "Save branch settings",
+      "rosterSettings": {
+        "saveSuccess": "Branch settings saved."
+      }
     },
     "notificationSettings": {
       "families": {
@@ -405,7 +432,7 @@
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications.",
-    "officerThresholdNotConfigured": "\"{{ guildName }}\" has no Officer access threshold configured yet — choose which Discord role grants Officer access in the guild settings.",
+    "branchOfficerRolesNotConfigured": "\"{{ guildName }}\" has an active branch with no Officer roles configured yet — choose which Discord roles grant Officer access in the Branches tab of the guild settings.",
     "guildLanguageNotConfigured": "\"{{ guildName }}\" has no language configured yet — choose the language RaidOps uses to communicate with your guild in the settings.",
     "absenceNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for absences yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "viewLink": "Configure",
@@ -434,7 +461,8 @@
       "Guild": "Guild",
       "Settings": "Settings",
       "Roster": "Roster",
-      "Availability": "Availability"
+      "Availability": "Availability",
+      "Branches": "Branches"
     },
     "settingsFields": {
       "timezone": "Timezone",
@@ -456,7 +484,10 @@
       "RecurringAvailabilityPatternCreated": "Recurring pattern added",
       "RecurringAvailabilityPatternUpdated": "Recurring pattern edited",
       "RecurringAvailabilityPatternStopped": "Recurring pattern stopped",
-      "NotificationSettingsUpdated": "Notification settings updated"
+      "NotificationSettingsUpdated": "Notification settings updated",
+      "BranchActivated": "Branch activated",
+      "BranchDeactivated": "Branch deactivated",
+      "BranchRosterSettingsUpdated": "Branch roster settings updated"
     }
   },
   "noGuild": {

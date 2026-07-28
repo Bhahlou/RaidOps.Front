@@ -376,6 +376,11 @@ export class GuildAuditLogComponent {
       case GuildAuditAction.RecurringAvailabilityPatternStopped:
         return this.#patternSummary(entry);
 
+      case GuildAuditAction.BranchActivated:
+      case GuildAuditAction.BranchDeactivated:
+      case GuildAuditAction.BranchRosterSettingsUpdated:
+        return entry.variables?.['branchName'] ?? '—';
+
       default:
         return characterName ?? '—';
     }
@@ -535,8 +540,8 @@ export class GuildAuditLogComponent {
   #rosterModeLabel(rosterMode: string): string {
     return this.#transloco.translate(
       rosterMode === RosterMode.DiscordRoleOnly
-        ? 'guildSettings.rosterMode.discordRoleOnly'
-        : 'guildSettings.rosterMode.open',
+        ? 'guildSettings.branches.rosterMode.discordRoleOnly'
+        : 'guildSettings.branches.rosterMode.open',
     );
   }
 

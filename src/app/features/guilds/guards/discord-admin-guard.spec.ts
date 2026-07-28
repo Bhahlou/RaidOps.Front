@@ -39,13 +39,13 @@ describe('discordAdminGuard', () => {
   });
 
   it('returns true when user is admin of the guild matching the route param', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, accessLevel: GuildAccessLevel.Officer }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, branches: [], accessLevel: GuildAccessLevel.Officer }]));
 
     expect(executeGuard(makeRoute('g1'), {} as any)).toBe(true);
   });
 
   it('redirects to /no-guild when user is not admin of the guild', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: false, accessLevel: GuildAccessLevel.Public }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: false, branches: [], accessLevel: GuildAccessLevel.Public }]));
     const router = TestBed.inject(Router);
 
     const result = executeGuard(makeRoute('g1'), {} as any);
@@ -55,7 +55,7 @@ describe('discordAdminGuard', () => {
   });
 
   it('redirects to /no-guild when guild id does not match any user guild', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, accessLevel: GuildAccessLevel.Officer }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, branches: [], accessLevel: GuildAccessLevel.Officer }]));
     const router = TestBed.inject(Router);
 
     const result = executeGuard(makeRoute('other-id'), {} as any);
@@ -65,7 +65,7 @@ describe('discordAdminGuard', () => {
   });
 
   it('redirects to /no-guild when route has no id param', () => {
-    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, accessLevel: GuildAccessLevel.Officer }]));
+    userSignal.set(makeUser([{ id: 'g1', name: 'Guild', iconHash: null, isRegistered: false, isConfigured: false, isAdmin: true, branches: [], accessLevel: GuildAccessLevel.Officer }]));
     const router = TestBed.inject(Router);
 
     const result = executeGuard(makeRoute(null), {} as any);

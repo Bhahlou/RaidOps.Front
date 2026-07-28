@@ -13,7 +13,7 @@ import { GuildMembership } from '../../../guilds/models/guild-membership.model';
 import { CharacterRank } from '../../../guilds/models/character-rank.enum';
 
 const makeMembership = (guildId: string): GuildMembership => ({
-  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  guildId, guildBranchId: 1, guildName: `Guild ${guildId}`, guildIconHash: null,
   characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
 });
 
@@ -220,10 +220,10 @@ describe('GetStartedLinkStepComponent', () => {
       expect(joinGuildBulk).toHaveBeenCalledWith('g1', [{ characterId: 1, rank: CharacterRank.Alt }]);
     });
 
-    it('navigates to guild dashboard when no guilds remain after join', () => {
+    it('navigates to the guild when no guilds remain after join', () => {
       setup({ guilds: [guild] });
       component.joinGuild(guild);
-      expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1', 'dashboard']);
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1']);
     });
 
     it('shows snackbar error and clears joining state when joinGuildBulk fails', () => {

@@ -4,8 +4,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuildSettings } from '../models/guild-settings.model';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
-import { OfficerThreshold } from '../models/officer-threshold.model';
-import { RosterMode } from '../models/roster-mode.enum';
 import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildSettingsService } from './guild-settings.service';
@@ -44,26 +42,11 @@ describe('GuildSettingsService', () => {
 
   describe('updateSettings', () => {
     it('sends PATCH to /guilds/:id/settings with the settings body', () => {
-      const body: GuildSettings = { timezone: 'UTC', rosterMode: RosterMode.Open, minRosterRoleId: null, language: 'en' };
+      const body: GuildSettings = { timezone: 'UTC', language: 'en' };
 
       service.updateSettings('guild-1', body).subscribe();
 
       const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/settings'));
-      expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual(body);
-      req.flush(null);
-    });
-  });
-
-  // ── updateOfficerThreshold ───────────────────────────────────────────────
-
-  describe('updateOfficerThreshold', () => {
-    it('sends PATCH to /guilds/:id/officer-threshold with the threshold body', () => {
-      const body: OfficerThreshold = { minOfficerRoleId: 'role-1' };
-
-      service.updateOfficerThreshold('guild-1', body).subscribe();
-
-      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/officer-threshold'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(body);
       req.flush(null);

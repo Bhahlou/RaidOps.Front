@@ -1,0 +1,17 @@
+@if (branches().length > 1) {
+  <div class="tabs" role="tablist">
+    @for (branch of branches(); track branch.id) {
+      <a
+        class="tab"
+        role="tab"
+        [routerLink]="['/guilds', guildId(), branch.id, leaf()]"
+        routerLinkActive="tab--active"
+      >
+        @if (iconUrl(branch); as url) {
+          <img class="tab-icon" [src]="url" [alt]="branch.branchName" (error)="onIconError(branch)" />
+        }
+        {{ branch.branchName }}
+      </a>
+    }
+  </div>
+}

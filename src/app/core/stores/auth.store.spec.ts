@@ -175,7 +175,7 @@ describe('AuthStore', () => {
     });
 
     it('reflects the current user notifications', () => {
-      const notification = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g1', guildName: 'RaidOps' };
+      const notification = { type: NotificationType.BranchOfficerRolesNotConfigured, guildId: 'g1', guildName: 'RaidOps' };
       getMe.mockReturnValue(of({ ...mockUser, notifications: [notification] }));
       const store = setup();
 
@@ -188,16 +188,16 @@ describe('AuthStore', () => {
   // ── dismissNotification ───────────────────────────────────────────────────
 
   describe('dismissNotification', () => {
-    const notificationA = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g1', guildName: 'Guild A' };
-    const notificationB = { type: NotificationType.OfficerThresholdNotConfigured, guildId: 'g2', guildName: 'Guild B' };
+    const notificationA = { type: NotificationType.BranchOfficerRolesNotConfigured, guildId: 'g1', guildName: 'Guild A' };
+    const notificationB = { type: NotificationType.BranchOfficerRolesNotConfigured, guildId: 'g2', guildName: 'Guild B' };
 
     it('calls NotificationService.dismiss with the type and guildId', () => {
       const store = setup();
       store.loadUser().subscribe();
 
-      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+      store.dismissNotification(NotificationType.BranchOfficerRolesNotConfigured, 'g1').subscribe();
 
-      expect(dismiss).toHaveBeenCalledWith(NotificationType.OfficerThresholdNotConfigured, 'g1');
+      expect(dismiss).toHaveBeenCalledWith(NotificationType.BranchOfficerRolesNotConfigured, 'g1');
     });
 
     it('removes only the matching notification from the user signal and localStorage', () => {
@@ -205,7 +205,7 @@ describe('AuthStore', () => {
       const store = setup();
       store.loadUser().subscribe();
 
-      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+      store.dismissNotification(NotificationType.BranchOfficerRolesNotConfigured, 'g1').subscribe();
 
       expect(store.notifications()).toEqual([notificationB]);
       expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).notifications).toEqual([notificationB]);
@@ -214,7 +214,7 @@ describe('AuthStore', () => {
     it('does nothing when there is no user', () => {
       const store = setup();
 
-      store.dismissNotification(NotificationType.OfficerThresholdNotConfigured, 'g1').subscribe();
+      store.dismissNotification(NotificationType.BranchOfficerRolesNotConfigured, 'g1').subscribe();
 
       expect(store.user()).toBeNull();
     });

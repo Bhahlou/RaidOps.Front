@@ -41,7 +41,7 @@ export class GuildListComponent implements OnInit {
     this.#authStore.loadUser().subscribe(() => {
       this.loading.set(false);
       if (this.registeredGuilds().length === 1 && this.adminGuilds().length === 0) {
-        this.#router.navigate(['/guilds', this.registeredGuilds()[0].id, 'dashboard']);
+        this.#router.navigate(['/guilds', this.registeredGuilds()[0].id]);
       } else if (
         this.registeredGuilds().length === 0 &&
         this.adminGuilds().length === 1 &&

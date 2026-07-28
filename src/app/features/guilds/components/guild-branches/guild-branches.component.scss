@@ -1,0 +1,19 @@
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.field-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+// ── Per-branch roster/officer settings ──────────────────────────────────────────
+
+.branch-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
