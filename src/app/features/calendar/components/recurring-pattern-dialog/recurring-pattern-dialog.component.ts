@@ -9,11 +9,12 @@ import { DayAvailabilityStatus } from '../../models/day-availability-status.enum
 import {
   RecurringAvailabilityPattern,
   RecurringAvailabilityPatternDay,
-  RecurringAvailabilityPatternPayload,
+  UpdateRecurringAvailabilityPatternPayload,
 } from '../../models/availability.model';
+import { AvailabilityScopeFieldComponent } from '../availability-scope-field/availability-scope-field.component';
+import { scopeFromKey, scopeToKey } from '../../utils/availability-scope.util';
 
 export interface RecurringPatternDialogData {
-  guildId: string;
   /** The pattern to edit, or `null` to create a new one. */
   pattern: RecurringAvailabilityPattern | null;
 }
@@ -36,7 +37,7 @@ const MAX_CYCLE_LENGTH = 60;
 @Component({
   selector: 'app-recurring-pattern-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent],
+  imports: [TranslocoPipe, ButtonComponent, AvailabilityScopeFieldComponent],
   templateUrl: './recurring-pattern-dialog.component.html',
   styleUrl: './recurring-pattern-dialog.component.scss',
 })
@@ -49,6 +50,11 @@ export class RecurringPatternDialogComponent {
 
   readonly Status = DayAvailabilityStatus;
   readonly isEditMode = !!this.data.pattern;
+
+  /** Scope is only pickable while creating — immutable once the pattern exists. */
+  readonly scopeKey = signal(
+    scopeToKey({ guildId: this.data.pattern?.guildId ?? null, guildBranchId: this.data.pattern?.guildBranchId ?? null }),
+  );
 
   readonly mode = signal<DialogMode>(this.data.pattern && this.data.pattern.cycleLengthDays !== 7 ? 'advanced' : 'weekly');
 
@@ -143,8 +149,8 @@ export class RecurringPatternDialogComponent {
 
     this.submitting.set(true);
     const request = this.data.pattern
-      ? this.#store.updatePattern(this.data.guildId, this.data.pattern.id, payload)
-      : this.#store.createPattern(this.data.guildId, payload);
+      ? this.#store.updatePattern(this.data.pattern.id, payload)
+      : this.#store.createPattern({ ...payload, ...scopeFromKey(this.scopeKey()) });
 
     request.subscribe({
       next: () => {
@@ -162,7 +168,7 @@ export class RecurringPatternDialogComponent {
     this.#dialogRef.close(false);
   }
 
-  #buildWeeklyPayload(): RecurringAvailabilityPatternPayload {
+  #buildWeeklyPayload(): UpdateRecurringAvailabilityPatternPayload {
     return {
       label: this.label().trim() || null,
       cycleLengthDays: 7,
@@ -172,7 +178,7 @@ export class RecurringPatternDialogComponent {
   }
 
   /** Only ever called once `canSubmit` has confirmed `anchorDate` is set in advanced mode. */
-  #buildAdvancedPayload(): RecurringAvailabilityPatternPayload {
+  #buildAdvancedPayload(): UpdateRecurringAvailabilityPatternPayload {
     return {
       label: this.label().trim() || null,
       cycleLengthDays: this.cycleLengthDays(),

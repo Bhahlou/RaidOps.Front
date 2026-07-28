@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
-import { GuildCalendarComponent } from './guild-calendar.component';
+import { UserCalendarComponent } from './user-calendar.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { AvailabilityStore } from '../../stores/availability.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -14,9 +13,13 @@ import { AvailabilityExceptionDialogComponent } from '../../components/availabil
 import { RecurringPatternDialogComponent } from '../../components/recurring-pattern-dialog/recurring-pattern-dialog.component';
 import { AvailabilityCalendar, AvailabilityException } from '../../models/availability.model';
 import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
+import { User } from '../../../../core/models/user.model';
+import { GuildAccessLevel } from '../../../../core/models/guild-access-level.enum';
 
 const exception = (overrides?: Partial<AvailabilityException>): AvailabilityException => ({
   id: 1,
+  guildId: null,
+  guildBranchId: null,
   startDate: '2026-01-01',
   endDate: '2026-01-01',
   status: DayAvailabilityStatus.Absent,
@@ -26,7 +29,26 @@ const exception = (overrides?: Partial<AvailabilityException>): AvailabilityExce
   ...overrides,
 });
 
-describe('GuildCalendarComponent', () => {
+const fakeUser: User = {
+  discordId: 'user-1',
+  name: 'Thrall',
+  avatarHash: null,
+  guilds: [
+    {
+      id: 'guild-1',
+      name: 'Horde Guild',
+      iconHash: null,
+      isRegistered: true,
+      isConfigured: true,
+      isAdmin: false,
+      accessLevel: GuildAccessLevel.Roster,
+      branches: [{ id: 1, branchId: 10, branchName: 'Classic', accessLevel: GuildAccessLevel.Roster, hasActiveCharacter: true }],
+    },
+  ],
+  notifications: [],
+};
+
+describe('UserCalendarComponent', () => {
   let store: {
     calendar: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
@@ -46,7 +68,7 @@ describe('GuildCalendarComponent', () => {
     translate: ReturnType<typeof vi.fn>;
   };
 
-  const setup = (guildId: string | null = 'g1') => {
+  const setup = () => {
     store = {
       calendar: signal(null),
       isLoading: signal(false),
@@ -67,53 +89,40 @@ describe('GuildCalendarComponent', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [GuildCalendarComponent],
+      imports: [UserCalendarComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            parent: {
-              snapshot: { paramMap: { get: () => guildId } },
-              paramMap: of(convertToParamMap(guildId ? { id: guildId } : {})),
-            },
-          },
-        },
-        { provide: AuthStore, useValue: { user: signal(null) } },
+        { provide: AuthStore, useValue: { user: signal(fakeUser) } },
         { provide: AvailabilityStore, useValue: store },
         { provide: Dialog, useValue: dialog },
         { provide: SnackbarService, useValue: snackbar },
         { provide: TranslocoService, useValue: transloco },
       ],
-    }).overrideComponent(GuildCalendarComponent, { set: { template: '', imports: [] } });
+    }).overrideComponent(UserCalendarComponent, { set: { template: '', imports: [] } });
 
-    const fixture = TestBed.createComponent(GuildCalendarComponent);
+    const fixture = TestBed.createComponent(UserCalendarComponent);
     fixture.detectChanges();
     return fixture.componentInstance;
   };
 
   it('should create', () => {
-    expect(setup('g1')).toBeTruthy();
+    expect(setup()).toBeTruthy();
   });
 
-  it('extracts guildId from the parent route', () => {
-    expect(setup('guild-42').guildId).toBe('guild-42');
-  });
-
-  it('sets i18nKey to sidenav.guild.calendar on the last breadcrumb', () => {
-    expect(setup('g1').breadcrumbs().at(-1)?.i18nKey).toBe('sidenav.guild.calendar');
+  it('sets i18nKey to calendar.pageTitle on the last breadcrumb', () => {
+    expect(setup().breadcrumbs().at(-1)?.i18nKey).toBe('calendar.pageTitle');
   });
 
   it('loads the current month range on creation', () => {
-    setup('g1');
+    setup();
 
-    expect(store.loadRange).toHaveBeenCalledWith('g1', expect.any(String), expect.any(String));
+    expect(store.loadRange).toHaveBeenCalledWith(expect.any(String), expect.any(String));
   });
 
   // ── month navigation ────────────────────────────────────────────────────
 
   describe('month navigation', () => {
     it('prevMonth moves the label back one month', () => {
-      const component = setup('g1');
+      const component = setup();
       const before = component.monthLabel();
 
       component.prevMonth();
@@ -122,7 +131,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('nextMonth moves the label forward one month', () => {
-      const component = setup('g1');
+      const component = setup();
       const before = component.monthLabel();
 
       component.nextMonth();
@@ -131,7 +140,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('goToday resets to the current month after navigating away', () => {
-      const component = setup('g1');
+      const component = setup();
       component.nextMonth();
       component.nextMonth();
       TestBed.tick();
@@ -148,14 +157,14 @@ describe('GuildCalendarComponent', () => {
 
   describe('isExceptionEditLocked', () => {
     it('is true once startDate is before today', () => {
-      const component = setup('g1');
+      const component = setup();
       const yesterday = addDaysToIso(todayIso(), -1);
 
       expect(component.isExceptionEditLocked(exception({ startDate: yesterday, endDate: yesterday }))).toBe(true);
     });
 
     it('is false when startDate is today or in the future', () => {
-      const component = setup('g1');
+      const component = setup();
       const today = todayIso();
       const tomorrow = addDaysToIso(today, 1);
 
@@ -166,27 +175,43 @@ describe('GuildCalendarComponent', () => {
 
   describe('isExceptionDeleteLocked', () => {
     it('is true once endDate is before today', () => {
-      const component = setup('g1');
+      const component = setup();
       const yesterday = addDaysToIso(todayIso(), -1);
 
       expect(component.isExceptionDeleteLocked(exception({ startDate: yesterday, endDate: yesterday }))).toBe(true);
     });
 
     it('is false when endDate is today or in the future', () => {
-      const component = setup('g1');
+      const component = setup();
       const today = todayIso();
 
       expect(component.isExceptionDeleteLocked(exception({ startDate: today, endDate: today }))).toBe(false);
     });
   });
 
+  // ── scopeLabel ───────────────────────────────────────────────────────────
+
+  describe('scopeLabel', () => {
+    it('returns the translated Global label when guildId is null', () => {
+      const component = setup();
+
+      expect(component.scopeLabel(null, null)).toBe('calendar.scope.global');
+    });
+
+    it('returns "guild — branch" for a known branch scope', () => {
+      const component = setup();
+
+      expect(component.scopeLabel('guild-1', 1)).toBe('Horde Guild — Classic');
+    });
+  });
+
   // ── deletePattern ────────────────────────────────────────────────────────
 
   describe('deletePattern', () => {
-    const pattern = { id: 9, label: 'Rotation 5x8', cycleLengthDays: 10, anchorDate: '2026-01-01', days: [] };
+    const pattern = { id: 9, guildId: null, guildBranchId: null, label: 'Rotation 5x8', cycleLengthDays: 10, anchorDate: '2026-01-01', days: [] };
 
     it('opens a ConfirmDialogComponent before deleting', () => {
-      const component = setup('g1');
+      const component = setup();
 
       component.deletePattern(pattern);
 
@@ -194,17 +219,17 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('calls store.deletePattern when the confirm dialog resolves true', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
 
       component.deletePattern(pattern);
 
-      expect(store.deletePattern).toHaveBeenCalledWith('g1', pattern.id);
+      expect(store.deletePattern).toHaveBeenCalledWith(pattern.id);
     });
 
     it('does not call store.deletePattern when the confirm dialog resolves false', () => {
       dialog.open.mockReturnValue({ closed: of(false) });
-      const component = setup('g1');
+      const component = setup();
 
       component.deletePattern(pattern);
 
@@ -212,7 +237,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('on error shows the generic server error snackbar', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
       store.deletePattern.mockReturnValue(throwError(() => new Error('boom')));
 
@@ -222,7 +247,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('falls back to the translated "unnamed" label when the pattern has no label', () => {
-      const component = setup('g1');
+      const component = setup();
       const unnamedPattern = { ...pattern, label: '' };
 
       component.deletePattern(unnamedPattern);
@@ -239,14 +264,14 @@ describe('GuildCalendarComponent', () => {
 
   describe('patterns / exceptions', () => {
     it('returns an empty array when the store has no calendar loaded yet', () => {
-      const component = setup('g1');
+      const component = setup();
 
       expect(component.patterns()).toEqual([]);
       expect(component.exceptions()).toEqual([]);
     });
 
     it('sorts exceptions by startDate ascending', () => {
-      const component = setup('g1');
+      const component = setup();
       const laterDate = addDaysToIso(todayIso(), 10);
       const earlierDate = addDaysToIso(todayIso(), 5);
       const calendar: AvailabilityCalendar = {
@@ -263,7 +288,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('excludes exceptions whose endDate has already fully elapsed', () => {
-      const component = setup('g1');
+      const component = setup();
       const pastDate = addDaysToIso(todayIso(), -5);
       const futureDate = addDaysToIso(todayIso(), 5);
       const calendar: AvailabilityCalendar = {
@@ -281,11 +306,11 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('returns the patterns straight from the loaded calendar', () => {
-      const component = setup('g1');
+      const component = setup();
       const calendar: AvailabilityCalendar = {
         days: [],
         exceptions: [],
-        patterns: [{ id: 9, label: 'Rotation', cycleLengthDays: 7, anchorDate: '2026-01-05', days: [] }],
+        patterns: [{ id: 9, guildId: null, guildBranchId: null, label: 'Rotation', cycleLengthDays: 7, anchorDate: '2026-01-05', days: [] }],
       };
       store.calendar.set(calendar);
 
@@ -295,7 +320,7 @@ describe('GuildCalendarComponent', () => {
 
   describe('calendarDays', () => {
     it('produces a 42-day grid marking today and days outside the current month', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const days = component.calendarDays();
 
@@ -305,7 +330,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('attaches the resolved day matching each grid day\'s ISO date', () => {
-      const component = setup('g1');
+      const component = setup();
       const today = todayIso();
       const calendar: AvailabilityCalendar = {
         days: [{ date: today, status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null, isException: true }],
@@ -324,18 +349,18 @@ describe('GuildCalendarComponent', () => {
 
   describe('openExceptionDialog', () => {
     it('opens the dialog for a future day with no existing declaration', () => {
-      const component = setup('g1');
+      const component = setup();
       const tomorrow = addDaysToIso(todayIso(), 1);
 
       component.openExceptionDialog({ date: new Date(), iso: tomorrow, inCurrentMonth: true, isToday: false, resolved: null });
 
       expect(dialog.open).toHaveBeenCalledWith(AvailabilityExceptionDialogComponent, expect.objectContaining({
-        data: expect.objectContaining({ guildId: 'g1', date: tomorrow, existing: null }),
+        data: expect.objectContaining({ date: tomorrow, existing: null }),
       }));
     });
 
     it('blocks and shows pastLocked for a past day with no existing declaration', () => {
-      const component = setup('g1');
+      const component = setup();
       const yesterday = addDaysToIso(todayIso(), -1);
 
       component.openExceptionDialog({ date: new Date(), iso: yesterday, inCurrentMonth: true, isToday: false, resolved: null });
@@ -345,7 +370,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('opens the dialog for today with no day argument (declare button)', () => {
-      const component = setup('g1');
+      const component = setup();
 
       component.openExceptionDialog();
 
@@ -353,7 +378,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('reloads the store when the dialog closes with true', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
       const tomorrow = addDaysToIso(todayIso(), 1);
 
@@ -363,7 +388,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('does not reload the store when the dialog closes with false', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(false) });
       const tomorrow = addDaysToIso(todayIso(), 1);
 
@@ -373,7 +398,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('opens the dialog for an editable day that already has a declaration', () => {
-      const component = setup('g1');
+      const component = setup();
       const tomorrow = addDaysToIso(todayIso(), 1);
       const existing = exception({ id: 7, startDate: tomorrow, endDate: tomorrow });
       store.calendar.set({ days: [], exceptions: [existing], patterns: [] });
@@ -386,7 +411,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('blocks and shows pastLocked for a day whose existing declaration is already edit-locked', () => {
-      const component = setup('g1');
+      const component = setup();
       const yesterday = addDaysToIso(todayIso(), -1);
       const existing = exception({ id: 7, startDate: yesterday, endDate: yesterday });
       store.calendar.set({ days: [], exceptions: [existing], patterns: [] });
@@ -402,7 +427,7 @@ describe('GuildCalendarComponent', () => {
 
   describe('editException', () => {
     it('blocks and shows pastLocked when the declaration is edit-locked', () => {
-      const component = setup('g1');
+      const component = setup();
       const locked = exception({ startDate: addDaysToIso(todayIso(), -1) });
 
       component.editException(locked);
@@ -412,7 +437,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('opens the dialog with allowSingleDayRemoval false when editable', () => {
-      const component = setup('g1');
+      const component = setup();
       const editable = exception({ startDate: addDaysToIso(todayIso(), 1) });
 
       component.editException(editable);
@@ -423,7 +448,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('reloads the store when the dialog closes with true', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
       const editable = exception({ startDate: addDaysToIso(todayIso(), 1) });
 
@@ -433,7 +458,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('does not reload the store when the dialog closes with false', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(false) });
       const editable = exception({ startDate: addDaysToIso(todayIso(), 1) });
 
@@ -447,7 +472,7 @@ describe('GuildCalendarComponent', () => {
 
   describe('deleteException', () => {
     it('blocks and shows pastLocked when the declaration is delete-locked', () => {
-      const component = setup('g1');
+      const component = setup();
       const locked = exception({ endDate: addDaysToIso(todayIso(), -1) });
 
       component.deleteException(locked);
@@ -457,18 +482,18 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('on success shows a success snackbar and reloads', () => {
-      const component = setup('g1');
+      const component = setup();
       const deletable = exception({ id: 3, endDate: addDaysToIso(todayIso(), 1) });
 
       component.deleteException(deletable);
 
-      expect(store.deleteException).toHaveBeenCalledWith('g1', 3);
+      expect(store.deleteException).toHaveBeenCalledWith(3);
       expect(snackbar.success).toHaveBeenCalledWith('calendar.exceptions.deleteSuccess');
       expect(store.reload).toHaveBeenCalled();
     });
 
     it('on error shows the generic server error snackbar', () => {
-      const component = setup('g1');
+      const component = setup();
       store.deleteException.mockReturnValue(throwError(() => new Error('boom')));
       const deletable = exception({ id: 3, endDate: addDaysToIso(todayIso(), 1) });
 
@@ -482,7 +507,7 @@ describe('GuildCalendarComponent', () => {
 
   describe('exceptionRangeLabel', () => {
     it('returns a single formatted date for a one-day exception', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const label = component.exceptionRangeLabel(exception({ startDate: '2026-07-23', endDate: '2026-07-23' }));
 
@@ -490,7 +515,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('returns a range for a multi-day exception', () => {
-      const component = setup('g1');
+      const component = setup();
       const fmt = (d: Date) => new Intl.DateTimeFormat('fr', { day: 'numeric', month: 'short' }).format(d);
 
       const label = component.exceptionRangeLabel(exception({ startDate: '2026-07-23', endDate: '2026-07-24' }));
@@ -501,28 +526,28 @@ describe('GuildCalendarComponent', () => {
 
   describe('exceptionDetailLabel', () => {
     it('shows the status word alone for a non-Partial exception with no reason', () => {
-      const component = setup('g1');
+      const component = setup();
 
       expect(component.exceptionDetailLabel(exception({ status: DayAvailabilityStatus.Absent, reason: null })))
         .toBe('calendar.status.absent');
     });
 
     it('combines status and reason for a non-Partial exception', () => {
-      const component = setup('g1');
+      const component = setup();
 
       expect(component.exceptionDetailLabel(exception({ status: DayAvailabilityStatus.Absent, reason: 'Vacances' })))
         .toBe('calendar.status.absent · Vacances');
     });
 
     it('uses the availableOverride status key for an Available exception', () => {
-      const component = setup('g1');
+      const component = setup();
 
       expect(component.exceptionDetailLabel(exception({ status: DayAvailabilityStatus.Available, reason: null })))
         .toBe('calendar.status.availableOverride');
     });
 
     it('combines reason and time label for a Partial exception with both', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const label = component.exceptionDetailLabel(exception({
         status: DayAvailabilityStatus.Partial, reason: 'Boulot', availableFrom: '21:30:00',
@@ -532,7 +557,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('returns just the reason for a Partial exception with a reason but no time bounds', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const label = component.exceptionDetailLabel(exception({
         status: DayAvailabilityStatus.Partial, reason: 'Sieste', availableFrom: null, availableUntil: null,
@@ -542,7 +567,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('returns just the time label for a Partial exception with time bounds but no reason', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const label = component.exceptionDetailLabel(exception({
         status: DayAvailabilityStatus.Partial, reason: null, availableFrom: '21:30:00',
@@ -553,7 +578,7 @@ describe('GuildCalendarComponent', () => {
     });
 
     it('falls back to the plain "Partiel" word for a Partial exception with no reason or time bounds', () => {
-      const component = setup('g1');
+      const component = setup();
 
       const label = component.exceptionDetailLabel(exception({
         status: DayAvailabilityStatus.Partial, reason: null, availableFrom: null, availableUntil: null,
@@ -567,17 +592,17 @@ describe('GuildCalendarComponent', () => {
 
   describe('openPatternDialog', () => {
     it('opens the pattern dialog with the given pattern (or null to create)', () => {
-      const component = setup('g1');
+      const component = setup();
 
       component.openPatternDialog(null);
 
       expect(dialog.open).toHaveBeenCalledWith(RecurringPatternDialogComponent, expect.objectContaining({
-        data: { guildId: 'g1', pattern: null },
+        data: { pattern: null },
       }));
     });
 
     it('reloads the store when the dialog closes with true', () => {
-      const component = setup('g1');
+      const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
 
       component.openPatternDialog(null);

@@ -1,11 +1,11 @@
-// Same reasoning as guild-layout's :host — this component's own host is otherwise an unstyled
-// (default inline) element, so .guild-page's height: 100% below has nothing real to resolve against.
+// This component's own host is otherwise an unstyled (default inline) element, so
+// .user-calendar-page's height: 100% below has nothing real to resolve against.
 :host {
   display: block;
   height: 100%;
 }
 
-.guild-page {
+.user-calendar-page {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -16,8 +16,8 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   // Explicit 1fr row instead of relying on the default auto-sized row to stretch — otherwise the
-  // single implicit row only grows to its content's height, leaving the rest of .guild-page's
-  // (now correctly full-height, see :host above) space unused below both cards.
+  // single implicit row only grows to its content's height, leaving the rest of
+  // .user-calendar-page's (now correctly full-height, see :host above) space unused below both cards.
   grid-template-rows: 1fr;
   gap: 24px;
   padding: 16px 24px 24px;
@@ -26,13 +26,13 @@
 
   // Below this the two cards stack, so there's no real 2D layout left to justify Grid — a plain
   // flex column instead. Also drop flex: 1 / min-height: 0 here: those made sense on desktop where
-  // .calendar-page should fill .guild-page's remaining viewport height exactly, but on a stacked
-  // mobile layout that forces .calendar-page to a *fixed* height equal to whatever's left on
-  // screen — flex-shrink then compresses .calendar-panel below its own content's real height
+  // .calendar-page should fill .user-calendar-page's remaining viewport height exactly, but on a
+  // stacked mobile layout that forces .calendar-page to a *fixed* height equal to whatever's left
+  // on screen — flex-shrink then compresses .calendar-panel below its own content's real height
   // (the calendar grid was rendering full-size regardless and spilling out visually past its own
   // card, behind .declarations-panel). Letting the page size to its natural content height instead
-  // (and scroll via .guild-page's own overflow: auto when that's taller than the viewport) avoids
-  // the whole problem.
+  // (and scroll via .user-calendar-page's own overflow: auto when that's taller than the viewport)
+  // avoids the whole problem.
   @media (max-width: 900px) {
     display: flex;
     flex-direction: column;
@@ -174,6 +174,13 @@
 .declaration-meta {
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+// This page merges declarations across every guild/branch, so each one needs its scope spelled
+// out — otherwise there's no way to tell two same-looking "Absent" rows apart.
+.declaration-scope {
+  font-size: 0.7rem;
+  color: var(--color-accent);
 }
 
 .declaration-actions {

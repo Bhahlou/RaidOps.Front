@@ -3,6 +3,13 @@
 </h2>
 
 <div class="dialog-content">
+  <app-availability-scope-field
+    [editable]="!isEditing"
+    [guildId]="data.existing?.guildId ?? null"
+    [guildBranchId]="data.existing?.guildBranchId ?? null"
+    [(value)]="scopeKey"
+  />
+
   <div class="field-group">
     <span class="field-label">{{ 'calendar.exceptionDialog.dateRange' | transloco }}</span>
     <app-date-range-input

@@ -4,7 +4,7 @@
 // and ignores the space .calendar-panel actually has available.
 //
 // This only holds when .calendar-panel itself has a real externally-constrained height to share
-// (desktop: its grid row is 1fr). Once the page stacks to a single column (see guild-calendar's
+// (desktop: its grid row is 1fr). Once the page stacks to a single column (see user-calendar's
 // ≤900px breakpoint), that row becomes auto/content-sized instead — flex: 1 combined with
 // min-height: 0 then makes the whole chain report a near-zero content size to the now content-based
 // ancestor, while the grid still renders its full (unaccounted-for) height, spilling underneath

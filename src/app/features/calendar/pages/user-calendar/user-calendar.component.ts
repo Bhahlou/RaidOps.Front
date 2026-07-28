@@ -1,13 +1,14 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
+import { PageHeaderComponent, BreadcrumbItem } from '../../../../shared/components/layout/page-header/page-header.component';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/dialogs/confirm-dialog/confirm-dialog.component';
-import { injectGuildContext } from '../../inject-guild-context';
+import { AuthStore } from '../../../../core/stores/auth.store';
+import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { AvailabilityStore } from '../../stores/availability.store';
 import {
   AvailabilityException,
@@ -29,7 +30,7 @@ import {
 } from '../../components/recurring-pattern-dialog/recurring-pattern-dialog.component';
 
 @Component({
-  selector: 'app-guild-calendar',
+  selector: 'app-user-calendar',
   imports: [
     PageHeaderComponent,
     AvailabilityCalendarGridComponent,
@@ -38,19 +39,26 @@ import {
     EmptyHintComponent,
     TranslocoPipe,
   ],
-  templateUrl: './guild-calendar.component.html',
-  styleUrl: './guild-calendar.component.scss',
+  templateUrl: './user-calendar.component.html',
+  styleUrl: './user-calendar.component.scss',
 })
-export class GuildCalendarComponent {
-  readonly #guildContext = injectGuildContext();
+export class UserCalendarComponent {
+  readonly #authStore = inject(AuthStore);
   readonly #store = inject(AvailabilityStore);
   readonly #dialog = inject(Dialog);
   readonly #snackbar = inject(SnackbarService);
   readonly #transloco = inject(TranslocoService);
 
-  readonly guildId = this.#guildContext.guildId;
-
-  readonly breadcrumbs = computed(() => this.#guildContext.breadcrumbs('sidenav.guild.calendar'));
+  readonly breadcrumbs = computed((): BreadcrumbItem[] => {
+    const user = this.#authStore.user();
+    return [
+      {
+        label: user?.name ?? '…',
+        discordIcon: user ? { id: user.discordId, hash: user.avatarHash, type: DiscordIconType.User } : undefined,
+      },
+      { i18nKey: 'calendar.pageTitle' },
+    ];
+  });
 
   readonly currentMonth = signal(startOfMonth(new Date()));
 
@@ -64,7 +72,7 @@ export class GuildCalendarComponent {
   readonly isLoading = this.#store.isLoading;
   readonly patterns = computed<RecurringAvailabilityPattern[]>(() => this.#store.calendar()?.patterns ?? []);
   // Fully elapsed declarations are still shown on the grid itself (historical record), but serve
-  // no purpose in this list — an admin scanning it only cares about what's upcoming or ongoing.
+  // no purpose in this list — a member scanning it only cares about what's upcoming or ongoing.
   readonly exceptions = computed<AvailabilityException[]>(() =>
     [...(this.#store.calendar()?.exceptions ?? [])]
       .filter((e) => e.endDate >= todayIso())
@@ -95,7 +103,7 @@ export class GuildCalendarComponent {
       const gridStart = startOfGrid(this.currentMonth());
       const gridEnd = new Date(gridStart);
       gridEnd.setDate(gridStart.getDate() + 41);
-      this.#store.loadRange(this.guildId, toIsoDate(gridStart), toIsoDate(gridEnd));
+      this.#store.loadRange(toIsoDate(gridStart), toIsoDate(gridEnd));
     });
   }
 
@@ -111,9 +119,15 @@ export class GuildCalendarComponent {
     this.currentMonth.set(startOfMonth(new Date()));
   }
 
+  /**
+   * `day` set → a specific calendar cell was clicked, so an existing declaration covering it opens
+   * for editing. `day` omitted → the "Declare" button, which always starts a fresh declaration for
+   * today regardless of whatever's already declared there (multiple scopes can legitimately overlap
+   * the same date, and forcing today's existing one into edit mode here was surprising/unwanted).
+   */
   openExceptionDialog(day?: CalendarGridDay): void {
     const date = day?.iso ?? toIsoDate(new Date());
-    const existing = findExceptionForDate(this.#store.calendar()?.exceptions ?? [], date);
+    const existing = day ? findExceptionForDate(this.#store.calendar()?.exceptions ?? [], date) : null;
 
     // A day with no declaration yet can't be backdated, and an existing declaration that already
     // started in the past can't be edited (the back-end would reject the save either way) — the
@@ -127,7 +141,7 @@ export class GuildCalendarComponent {
       .open<boolean>(AvailabilityExceptionDialogComponent, {
         width: '480px',
         maxWidth: '95vw',
-        data: { guildId: this.guildId, date, existing },
+        data: { date, existing },
       })
       .closed.subscribe((saved) => {
         if (saved) this.#store.reload();
@@ -145,7 +159,7 @@ export class GuildCalendarComponent {
       .open<boolean>(AvailabilityExceptionDialogComponent, {
         width: '480px',
         maxWidth: '95vw',
-        data: { guildId: this.guildId, date: exception.startDate, existing: exception, allowSingleDayRemoval: false },
+        data: { date: exception.startDate, existing: exception, allowSingleDayRemoval: false },
       })
       .closed.subscribe((saved) => {
         if (saved) this.#store.reload();
@@ -158,7 +172,7 @@ export class GuildCalendarComponent {
       return;
     }
 
-    this.#store.deleteException(this.guildId, exception.id).subscribe({
+    this.#store.deleteException(exception.id).subscribe({
       next: () => {
         this.#snackbar.success('calendar.exceptions.deleteSuccess');
         this.#store.reload();
@@ -199,6 +213,14 @@ export class GuildCalendarComponent {
     return exception.reason ?? timeLabel ?? this.#transloco.translate('calendar.status.partial');
   }
 
+  /** "Global", or "GuildName — BranchName" — shown next to each declaration since this page merges every guild/branch's declarations together. */
+  scopeLabel(guildId: string | null, guildBranchId: number | null): string {
+    if (guildId === null) return this.#transloco.translate('calendar.scope.global');
+    const guild = this.#authStore.user()?.guilds.find((g) => g.id === guildId);
+    const branch = guild?.branches.find((b) => b.id === guildBranchId);
+    return guild && branch ? `${guild.name} — ${branch.branchName}` : this.#transloco.translate('calendar.scope.global');
+  }
+
   openPatternDialog(pattern: RecurringAvailabilityPattern | null): void {
     this.#dialog
       .open<boolean>(RecurringPatternDialogComponent, {
@@ -206,7 +228,7 @@ export class GuildCalendarComponent {
         // instead of wrapping onto extra lines — that wrapping was the main driver of needing to
         // scroll the cycle-day list. Narrow-screen behavior is a separate pass, not this one.
         width: 'min(960px, 95vw)',
-        data: { guildId: this.guildId, pattern },
+        data: { pattern },
       })
       .closed.subscribe((saved) => {
         if (saved) this.#store.reload();
@@ -228,7 +250,7 @@ export class GuildCalendarComponent {
       .closed.subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.#store.deletePattern(this.guildId, pattern.id).subscribe({
+        this.#store.deletePattern(pattern.id).subscribe({
           next: () => {
             this.#snackbar.success('calendar.patternDialog.deleteSuccess');
             this.#store.reload();

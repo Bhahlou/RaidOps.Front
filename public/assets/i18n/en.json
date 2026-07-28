@@ -319,12 +319,12 @@
   "sidenav": {
     "account": {
       "characters": "Characters",
-      "equipment": "Gear planner"
+      "equipment": "Gear planner",
+      "calendar": "Calendar"
     },
     "guilds": "My guilds",
     "guild": {
       "dashboard": "Dashboard",
-      "calendar": "Calendar",
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Settings",
@@ -614,10 +614,15 @@
     }
   },
   "calendar": {
+    "pageTitle": "My calendar",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "today": "Today",
     "declareException": "Declare absence/lateness",
+    "scope": {
+      "label": "Applies to",
+      "global": "Global"
+    },
     "status": {
       "absent": "Absent",
       "partial": "Partial",

@@ -22,6 +22,8 @@ const patternDay = (overrides?: Partial<RecurringAvailabilityPatternDay>): Recur
 
 const pattern = (overrides?: Partial<RecurringAvailabilityPattern>): RecurringAvailabilityPattern => ({
   id: 9,
+  guildId: null,
+  guildBranchId: null,
   label: 'Rotation',
   cycleLengthDays: 7,
   anchorDate: '2026-01-05', // a Monday
@@ -69,7 +71,7 @@ describe('RecurringPatternDialogComponent', () => {
     return TestBed.createComponent(RecurringPatternDialogComponent).componentInstance;
   };
 
-  const createData: RecurringPatternDialogData = { guildId: 'g1', pattern: null };
+  const createData: RecurringPatternDialogData = { pattern: null };
 
   it('should create', () => {
     expect(setup(createData)).toBeTruthy();
@@ -103,7 +105,7 @@ describe('RecurringPatternDialogComponent', () => {
         anchorDate: '2026-01-05',
         days: [patternDay({ offsetInCycle: 2, status: DayAvailabilityStatus.Partial, availableFrom: '18:00:00' })],
       });
-      const component = setup({ guildId: 'g1', pattern: existing });
+      const component = setup({ pattern: existing });
 
       expect(component.mode()).toBe('weekly');
       expect(component.weeklySlots()[2].status).toBe(DayAvailabilityStatus.Partial);
@@ -112,7 +114,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('pre-fills the label', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ label: 'Soirées raid' }) });
+      const component = setup({ pattern: pattern({ label: 'Soirées raid' }) });
 
       expect(component.label()).toBe('Soirées raid');
     });
@@ -125,7 +127,7 @@ describe('RecurringPatternDialogComponent', () => {
         anchorDate: '2026-01-05',
         days: [patternDay({ offsetInCycle: 4, status: DayAvailabilityStatus.Absent })],
       });
-      const component = setup({ guildId: 'g1', pattern: existing });
+      const component = setup({ pattern: existing });
 
       expect(component.mode()).toBe('advanced');
       expect(component.cycleLengthDays()).toBe(10);
@@ -152,7 +154,7 @@ describe('RecurringPatternDialogComponent', () => {
 
   describe('advancedLabels', () => {
     it('returns one "Jour N" label per advanced slot, 1-indexed', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 3 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 3 }) });
 
       expect(component.advancedLabels()).toEqual([
         'calendar.patternDialog.dayNumber:{"n":1}',
@@ -162,7 +164,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('is used as activeLabels in advanced mode', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
 
       expect(component.activeLabels()).toEqual(component.advancedLabels());
     });
@@ -170,13 +172,13 @@ describe('RecurringPatternDialogComponent', () => {
 
   describe('anchorDateInputValue', () => {
     it('returns the ISO date string for the current anchor date', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10, anchorDate: '2026-02-01' }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10, anchorDate: '2026-02-01' }) });
 
       expect(component.anchorDateInputValue()).toBe('2026-02-01');
     });
 
     it('returns an empty string when the anchor date is cleared', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
       component.setAnchorDate('');
 
       expect(component.anchorDateInputValue()).toBe('');
@@ -239,7 +241,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('updates advancedSlots when in advanced mode', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
 
       component.updateSlot(1, { status: DayAvailabilityStatus.Partial, availableUntil: '23:00:00' });
 
@@ -267,13 +269,13 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('is true in advanced mode when an anchor date is set (defaulted to today)', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
 
       expect(component.canSubmit()).toBe(true);
     });
 
     it('is false in advanced mode when the anchor date is cleared', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
 
       component.setAnchorDate('');
 
@@ -301,7 +303,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('only considers active-mode slots, ignoring the other mode entirely', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
       component.mode.set('advanced');
       // weeklySlots is the inactive mode here — a Partial slot missing bounds there must not block advanced mode.
       component.weeklySlots.update((slots) => slots.map((s, i) => (i === 0 ? { ...s, status: DayAvailabilityStatus.Partial } : s)));
@@ -329,7 +331,7 @@ describe('RecurringPatternDialogComponent', () => {
 
       component.submit();
 
-      expect(store.createPattern).toHaveBeenCalledWith('g1', expect.objectContaining({
+      expect(store.createPattern).toHaveBeenCalledWith(expect.objectContaining({
         cycleLengthDays: 7,
         days: [{ offsetInCycle: 1, status: DayAvailabilityStatus.Absent, reason: 'Boulot', availableFrom: null, availableUntil: null }],
       }));
@@ -341,13 +343,13 @@ describe('RecurringPatternDialogComponent', () => {
 
       component.submit();
 
-      expect(store.createPattern).toHaveBeenCalledWith('g1', expect.objectContaining({ label: null }));
+      expect(store.createPattern).toHaveBeenCalledWith(expect.objectContaining({ label: null }));
     });
   });
 
   describe('submit — create (advanced)', () => {
     it('calls createPattern with the current cycleLengthDays and anchorDate', () => {
-      const component = setup({ guildId: 'g1', pattern: null });
+      const component = setup({ pattern: null });
       component.mode.set('advanced');
       component.setCycleLengthDays(10);
       component.setAnchorDate('2026-02-01');
@@ -355,7 +357,7 @@ describe('RecurringPatternDialogComponent', () => {
 
       component.submit();
 
-      expect(store.createPattern).toHaveBeenCalledWith('g1', expect.objectContaining({
+      expect(store.createPattern).toHaveBeenCalledWith(expect.objectContaining({
         cycleLengthDays: 10,
         anchorDate: '2026-02-01',
         days: [{ offsetInCycle: 3, status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null }],
@@ -363,7 +365,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('does nothing when the anchor date is cleared', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
       component.setAnchorDate('');
 
       component.submit();
@@ -374,11 +376,11 @@ describe('RecurringPatternDialogComponent', () => {
 
   describe('submit — editing an existing pattern', () => {
     it('calls updatePattern with the pattern id, not createPattern', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ id: 42 }) });
+      const component = setup({ pattern: pattern({ id: 42 }) });
 
       component.submit();
 
-      expect(store.updatePattern).toHaveBeenCalledWith('g1', 42, expect.anything());
+      expect(store.updatePattern).toHaveBeenCalledWith(42, expect.anything());
       expect(store.createPattern).not.toHaveBeenCalled();
     });
   });
@@ -423,7 +425,7 @@ describe('RecurringPatternDialogComponent', () => {
     });
 
     it('does nothing when canSubmit is false', () => {
-      const component = setup({ guildId: 'g1', pattern: pattern({ cycleLengthDays: 10 }) });
+      const component = setup({ pattern: pattern({ cycleLengthDays: 10 }) });
       component.setAnchorDate('');
 
       component.submit();

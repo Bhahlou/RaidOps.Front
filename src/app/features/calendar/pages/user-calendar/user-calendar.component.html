@@ -1,4 +1,4 @@
-<div class="guild-page">
+<div class="user-calendar-page">
   <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'calendar' }" />
 
   <div class="calendar-page">
@@ -36,6 +36,7 @@
                 <div class="declaration-info">
                   <span class="declaration-label">{{ exceptionRangeLabel(exception) }}</span>
                   <span class="declaration-meta">{{ exceptionDetailLabel(exception) }}</span>
+                  <span class="declaration-scope">{{ scopeLabel(exception.guildId, exception.guildBranchId) }}</span>
                 </div>
                 <div class="declaration-actions">
                   <app-icon-button
@@ -71,6 +72,7 @@
                   <span class="declaration-meta">
                     {{ 'calendar.patternDialog.cycleSummary' | transloco: { days: pattern.cycleLengthDays } }}
                   </span>
+                  <span class="declaration-scope">{{ scopeLabel(pattern.guildId, pattern.guildBranchId) }}</span>
                 </div>
                 <div class="declaration-actions">
                   <app-icon-button icon="edit" [ariaLabel]="'calendar.actions.edit' | transloco" (click)="openPatternDialog(pattern)" />

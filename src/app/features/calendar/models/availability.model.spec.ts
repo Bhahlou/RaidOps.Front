@@ -8,6 +8,8 @@ import {
 
 const exception = (overrides?: Partial<AvailabilityException>): AvailabilityException => ({
   id: 1,
+  guildId: null,
+  guildBranchId: null,
   startDate: '2026-07-10',
   endDate: '2026-07-12',
   status: DayAvailabilityStatus.Absent,

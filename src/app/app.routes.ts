@@ -53,6 +53,11 @@ export const routes: Routes = [
               import('./features/characters/characters.routes').then(m => m.characterRoutes),
           },
           {
+            path: 'calendar',
+            loadComponent: () =>
+              import('./features/calendar/pages/user-calendar/user-calendar.component').then(m => m.UserCalendarComponent),
+          },
+          {
             path: 'gear-planner',
             loadComponent: () =>
               import('./features/gear-planner/gear-planner.component').then(m => m.GearPlannerComponent),

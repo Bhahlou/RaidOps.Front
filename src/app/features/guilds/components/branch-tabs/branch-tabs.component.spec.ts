@@ -16,6 +16,7 @@ const branch = (overrides: Partial<UserGuildBranch> = {}): UserGuildBranch => ({
   branchId: 3,
   branchName: 'Classic Anniversary',
   accessLevel: GuildAccessLevel.Roster,
+  hasActiveCharacter: true,
   ...overrides,
 });
 

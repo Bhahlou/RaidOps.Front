@@ -3,6 +3,13 @@
 </h2>
 
 <div class="dialog-content">
+  <app-availability-scope-field
+    [editable]="!isEditMode"
+    [guildId]="data.pattern?.guildId ?? null"
+    [guildBranchId]="data.pattern?.guildBranchId ?? null"
+    [(value)]="scopeKey"
+  />
+
   <div class="mode-tabs">
     <button type="button" class="mode-tab" [class.active]="mode() === 'weekly'" (click)="mode.set('weekly')">
       {{ 'calendar.patternDialog.modeWeekly' | transloco }}

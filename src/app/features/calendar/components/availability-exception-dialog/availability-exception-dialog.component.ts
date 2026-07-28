@@ -8,9 +8,10 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AvailabilityStore } from '../../stores/availability.store';
 import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
 import { AvailabilityException } from '../../models/availability.model';
+import { AvailabilityScopeFieldComponent } from '../availability-scope-field/availability-scope-field.component';
+import { scopeFromKey, scopeToKey } from '../../utils/availability-scope.util';
 
 export interface AvailabilityExceptionDialogData {
-  guildId: string;
   /** ISO date string (`yyyy-MM-dd`) to preselect, e.g. the day clicked in the calendar grid. */
   date: string;
   /** The exception already covering that date, if any — edits/removes it instead of creating a new one. */
@@ -28,7 +29,7 @@ export interface AvailabilityExceptionDialogData {
 @Component({
   selector: 'app-availability-exception-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, DateRangeInputComponent],
+  imports: [TranslocoPipe, ButtonComponent, DateRangeInputComponent, AvailabilityScopeFieldComponent],
   templateUrl: './availability-exception-dialog.component.html',
   styleUrl: './availability-exception-dialog.component.scss',
 })
@@ -42,6 +43,11 @@ export class AvailabilityExceptionDialogComponent {
 
   readonly isEditing = !!this.data.existing;
   readonly canRemoveDay = !!this.data.existing && this.data.allowSingleDayRemoval !== false;
+
+  /** Scope is only pickable while creating — immutable once the declaration exists. */
+  readonly scopeKey = signal(
+    scopeToKey({ guildId: this.data.existing?.guildId ?? null, guildBranchId: this.data.existing?.guildBranchId ?? null }),
+  );
 
   readonly startDate = signal<Date | null>(
     parseIsoDate(this.data.existing?.startDate ?? this.data.date),
@@ -85,7 +91,7 @@ export class AvailabilityExceptionDialogComponent {
     const end = this.endDate();
     if (!start || !end || !this.canSubmit()) return;
 
-    const payload = {
+    const base = {
       startDate: toIsoDate(start),
       endDate: toIsoDate(end),
       status: this.status(),
@@ -98,8 +104,8 @@ export class AvailabilityExceptionDialogComponent {
 
     const existing = this.data.existing;
     const request = existing
-      ? this.#store.updateException(this.data.guildId, existing.id, payload)
-      : this.#store.createException(this.data.guildId, payload);
+      ? this.#store.updateException(existing.id, base)
+      : this.#store.createException({ ...base, ...scopeFromKey(this.scopeKey()) });
 
     request.subscribe({
       next: () => {
@@ -124,7 +130,7 @@ export class AvailabilityExceptionDialogComponent {
     if (!existing) return;
 
     this.submitting.set(true);
-    this.#store.removeExceptionDay(this.data.guildId, existing.id, this.data.date).subscribe({
+    this.#store.removeExceptionDay(existing.id, this.data.date).subscribe({
       next: () => {
         this.#snackbar.success('calendar.exceptionDialog.removeDaySuccess');
         this.#dialogRef.close(true);

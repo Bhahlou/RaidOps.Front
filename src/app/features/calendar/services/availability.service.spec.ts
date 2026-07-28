@@ -5,8 +5,9 @@ import { TestBed } from '@angular/core/testing';
 import {
   AvailabilityCalendar,
   CreateAvailabilityExceptionPayload,
-  RecurringAvailabilityPatternPayload,
+  CreateRecurringAvailabilityPatternPayload,
   UpdateAvailabilityExceptionPayload,
+  UpdateRecurringAvailabilityPatternPayload,
 } from '../models/availability.model';
 import { DayAvailabilityStatus } from '../models/day-availability-status.enum';
 import { AvailabilityService } from './availability.service';
@@ -28,15 +29,15 @@ describe('AvailabilityService', () => {
   // ── getMyAvailability ─────────────────────────────────────────────────────
 
   describe('getMyAvailability', () => {
-    it('sends GET to /guilds/:id/availability with rangeStart/rangeEnd params', () => {
+    it('sends GET to /me/availability with rangeStart/rangeEnd params', () => {
       const expected: AvailabilityCalendar = { days: [], exceptions: [], patterns: [] };
       let result: AvailabilityCalendar | undefined;
 
-      service.getMyAvailability('guild-1', '2026-07-01', '2026-07-31').subscribe((r) => (result = r));
+      service.getMyAvailability('2026-07-01', '2026-07-31').subscribe((r) => (result = r));
 
       const req = controller.expectOne(
         (r) =>
-          r.url.endsWith('/guilds/guild-1/availability') &&
+          r.url.endsWith('/me/availability') &&
           r.params.get('rangeStart') === '2026-07-01' &&
           r.params.get('rangeEnd') === '2026-07-31',
       );
@@ -49,8 +50,10 @@ describe('AvailabilityService', () => {
   // ── createException ──────────────────────────────────────────────────────
 
   describe('createException', () => {
-    it('sends POST to /guilds/:id/availability/exceptions with the payload', () => {
+    it('sends POST to /me/availability/exceptions with the payload', () => {
       const payload: CreateAvailabilityExceptionPayload = {
+        guildId: null,
+        guildBranchId: null,
         startDate: '2026-07-10',
         endDate: '2026-07-10',
         status: DayAvailabilityStatus.Absent,
@@ -59,9 +62,9 @@ describe('AvailabilityService', () => {
         availableUntil: null,
       };
 
-      service.createException('guild-1', payload).subscribe();
+      service.createException(payload).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/exceptions'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(payload);
       req.flush(null);
@@ -71,7 +74,7 @@ describe('AvailabilityService', () => {
   // ── updateException ──────────────────────────────────────────────────────
 
   describe('updateException', () => {
-    it('sends PATCH to /guilds/:id/availability/exceptions/:exceptionId with the payload', () => {
+    it('sends PATCH to /me/availability/exceptions/:exceptionId with the payload', () => {
       const payload: UpdateAvailabilityExceptionPayload = {
         startDate: '2026-07-10',
         endDate: '2026-07-12',
@@ -81,9 +84,9 @@ describe('AvailabilityService', () => {
         availableUntil: null,
       };
 
-      service.updateException('guild-1', 42, payload).subscribe();
+      service.updateException(42, payload).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions/42'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/exceptions/42'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(payload);
       req.flush(null);
@@ -93,10 +96,10 @@ describe('AvailabilityService', () => {
   // ── removeExceptionDay ───────────────────────────────────────────────────
 
   describe('removeExceptionDay', () => {
-    it('sends POST to /guilds/:id/availability/exceptions/:exceptionId/remove-day with the date', () => {
-      service.removeExceptionDay('guild-1', 42, '2026-07-11').subscribe();
+    it('sends POST to /me/availability/exceptions/:exceptionId/remove-day with the date', () => {
+      service.removeExceptionDay(42, '2026-07-11').subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions/42/remove-day'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/exceptions/42/remove-day'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ date: '2026-07-11' });
       req.flush(null);
@@ -106,10 +109,10 @@ describe('AvailabilityService', () => {
   // ── deleteException ──────────────────────────────────────────────────────
 
   describe('deleteException', () => {
-    it('sends DELETE to /guilds/:id/availability/exceptions/:exceptionId', () => {
-      service.deleteException('guild-1', 42).subscribe();
+    it('sends DELETE to /me/availability/exceptions/:exceptionId', () => {
+      service.deleteException(42).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/exceptions/42'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/exceptions/42'));
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
     });
@@ -118,17 +121,19 @@ describe('AvailabilityService', () => {
   // ── createPattern ─────────────────────────────────────────────────────────
 
   describe('createPattern', () => {
-    it('sends POST to /guilds/:id/availability/patterns with the payload', () => {
-      const payload: RecurringAvailabilityPatternPayload = {
+    it('sends POST to /me/availability/patterns with the payload', () => {
+      const payload: CreateRecurringAvailabilityPatternPayload = {
+        guildId: null,
+        guildBranchId: null,
         label: 'Raid nights',
         cycleLengthDays: 7,
         anchorDate: '2026-01-05',
         days: [],
       };
 
-      service.createPattern('guild-1', payload).subscribe();
+      service.createPattern(payload).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/patterns'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/patterns'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(payload);
       req.flush(null);
@@ -138,17 +143,17 @@ describe('AvailabilityService', () => {
   // ── updatePattern ─────────────────────────────────────────────────────────
 
   describe('updatePattern', () => {
-    it('sends PATCH to /guilds/:id/availability/patterns/:patternId with the payload', () => {
-      const payload: RecurringAvailabilityPatternPayload = {
+    it('sends PATCH to /me/availability/patterns/:patternId with the payload', () => {
+      const payload: UpdateRecurringAvailabilityPatternPayload = {
         label: 'Raid nights',
         cycleLengthDays: 7,
         anchorDate: '2026-01-05',
         days: [],
       };
 
-      service.updatePattern('guild-1', 7, payload).subscribe();
+      service.updatePattern(7, payload).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/patterns/7'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/patterns/7'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(payload);
       req.flush(null);
@@ -158,10 +163,10 @@ describe('AvailabilityService', () => {
   // ── deletePattern ─────────────────────────────────────────────────────────
 
   describe('deletePattern', () => {
-    it('sends DELETE to /guilds/:id/availability/patterns/:patternId', () => {
-      service.deletePattern('guild-1', 7).subscribe();
+    it('sends DELETE to /me/availability/patterns/:patternId', () => {
+      service.deletePattern(7).subscribe();
 
-      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/availability/patterns/7'));
+      const req = controller.expectOne((r) => r.url.endsWith('/me/availability/patterns/7'));
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
     });

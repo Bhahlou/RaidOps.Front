@@ -14,6 +14,7 @@ const makeBranch = (overrides: Partial<UserGuildBranch> = {}): UserGuildBranch =
   branchId: 3,
   branchName: 'Classic Anniversary',
   accessLevel: GuildAccessLevel.Public,
+  hasActiveCharacter: true,
   ...overrides,
 });
 

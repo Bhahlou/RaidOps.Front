@@ -31,10 +31,10 @@ describe('AvailabilityStore', () => {
     });
 
     it('fetches the calendar for the given range', async () => {
-      store.loadRange('g1', '2026-07-01', '2026-07-31');
+      store.loadRange('2026-07-01', '2026-07-31');
       TestBed.tick();
 
-      const req = controller.expectOne((r) => r.url.includes('/guilds/g1/availability'));
+      const req = controller.expectOne((r) => r.url.includes('/me/availability'));
       expect(req.request.method).toBe('GET');
       req.flush({ days: [], exceptions: [], patterns: [] });
       await TestBed.inject(ApplicationRef).whenStable();
@@ -43,17 +43,17 @@ describe('AvailabilityStore', () => {
     });
 
     it('re-fetches (reload) when called again with the same range, firing exactly one extra request', async () => {
-      store.loadRange('g1', '2026-07-01', '2026-07-31');
+      store.loadRange('2026-07-01', '2026-07-31');
       TestBed.tick();
       controller
-        .expectOne((r) => r.url.includes('/guilds/g1/availability'))
+        .expectOne((r) => r.url.includes('/me/availability'))
         .flush({ days: [], exceptions: [], patterns: [] } as AvailabilityCalendar);
       await TestBed.inject(ApplicationRef).whenStable();
 
-      store.loadRange('g1', '2026-07-01', '2026-07-31');
+      store.loadRange('2026-07-01', '2026-07-31');
       TestBed.tick();
 
-      const req = controller.expectOne((r) => r.url.includes('/guilds/g1/availability'));
+      const req = controller.expectOne((r) => r.url.includes('/me/availability'));
       req.flush({
         days: [{ date: '2026-07-05', status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null, isException: true }],
         exceptions: [],
@@ -66,18 +66,18 @@ describe('AvailabilityStore', () => {
     });
 
     it('re-fetches when the range changes', async () => {
-      store.loadRange('g1', '2026-07-01', '2026-07-31');
+      store.loadRange('2026-07-01', '2026-07-31');
       TestBed.tick();
       controller
-        .expectOne((r) => r.url.includes('/guilds/g1/availability'))
+        .expectOne((r) => r.url.includes('/me/availability'))
         .flush({ days: [], exceptions: [], patterns: [] } as AvailabilityCalendar);
       await TestBed.inject(ApplicationRef).whenStable();
 
-      store.loadRange('g1', '2026-08-01', '2026-08-31');
+      store.loadRange('2026-08-01', '2026-08-31');
       TestBed.tick();
 
       const req = controller.expectOne(
-        (r) => r.url.includes('/guilds/g1/availability') && r.url.includes('rangeStart=2026-08-01'),
+        (r) => r.url.includes('/me/availability') && r.url.includes('rangeStart=2026-08-01'),
       );
       req.flush({ days: [], exceptions: [], patterns: [] } as AvailabilityCalendar);
       await TestBed.inject(ApplicationRef).whenStable();
@@ -86,20 +86,20 @@ describe('AvailabilityStore', () => {
     });
 
     it('reload() re-fetches the currently tracked range', async () => {
-      store.loadRange('g1', '2026-07-01', '2026-07-31');
+      store.loadRange('2026-07-01', '2026-07-31');
       TestBed.tick();
       controller
-        .expectOne((r) => r.url.includes('/guilds/g1/availability'))
+        .expectOne((r) => r.url.includes('/me/availability'))
         .flush({ days: [], exceptions: [], patterns: [] } as AvailabilityCalendar);
       await TestBed.inject(ApplicationRef).whenStable();
 
       store.reload();
       TestBed.tick();
 
-      const req = controller.expectOne((r) => r.url.includes('/guilds/g1/availability'));
+      const req = controller.expectOne((r) => r.url.includes('/me/availability'));
       req.flush({
         days: [],
-        exceptions: [{ id: 1, startDate: '2026-07-10', endDate: '2026-07-10', status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null }],
+        exceptions: [{ id: 1, guildId: null, guildBranchId: null, startDate: '2026-07-10', endDate: '2026-07-10', status: DayAvailabilityStatus.Absent, reason: null, availableFrom: null, availableUntil: null }],
         patterns: [],
       } as AvailabilityCalendar);
       await TestBed.inject(ApplicationRef).whenStable();
@@ -139,6 +139,8 @@ describe('AvailabilityStore', () => {
 
     it('createException delegates to AvailabilityService.createException', () => {
       const payload = {
+        guildId: null,
+        guildBranchId: null,
         startDate: '2026-07-10',
         endDate: '2026-07-10',
         status: DayAvailabilityStatus.Absent,
@@ -147,15 +149,15 @@ describe('AvailabilityStore', () => {
         availableUntil: null,
       };
 
-      store.createException('g1', payload).subscribe();
+      store.createException(payload).subscribe();
 
-      expect(service.createException).toHaveBeenCalledWith('g1', payload);
+      expect(service.createException).toHaveBeenCalledWith(payload);
     });
 
     it('deleteException delegates to AvailabilityService.deleteException', () => {
-      store.deleteException('g1', 42).subscribe();
+      store.deleteException(42).subscribe();
 
-      expect(service.deleteException).toHaveBeenCalledWith('g1', 42);
+      expect(service.deleteException).toHaveBeenCalledWith(42);
     });
 
     it('updateException delegates to AvailabilityService.updateException', () => {
@@ -168,37 +170,37 @@ describe('AvailabilityStore', () => {
         availableUntil: null,
       };
 
-      store.updateException('g1', 42, payload).subscribe();
+      store.updateException(42, payload).subscribe();
 
-      expect(service.updateException).toHaveBeenCalledWith('g1', 42, payload);
+      expect(service.updateException).toHaveBeenCalledWith(42, payload);
     });
 
     it('removeExceptionDay delegates to AvailabilityService.removeExceptionDay', () => {
-      store.removeExceptionDay('g1', 42, '2026-07-11').subscribe();
+      store.removeExceptionDay(42, '2026-07-11').subscribe();
 
-      expect(service.removeExceptionDay).toHaveBeenCalledWith('g1', 42, '2026-07-11');
+      expect(service.removeExceptionDay).toHaveBeenCalledWith(42, '2026-07-11');
     });
 
     it('createPattern delegates to AvailabilityService.createPattern', () => {
-      const payload = { label: null, cycleLengthDays: 7, anchorDate: '2026-01-05', days: [] };
+      const payload = { guildId: null, guildBranchId: null, label: null, cycleLengthDays: 7, anchorDate: '2026-01-05', days: [] };
 
-      store.createPattern('g1', payload).subscribe();
+      store.createPattern(payload).subscribe();
 
-      expect(service.createPattern).toHaveBeenCalledWith('g1', payload);
+      expect(service.createPattern).toHaveBeenCalledWith(payload);
     });
 
     it('updatePattern delegates to AvailabilityService.updatePattern', () => {
       const payload = { label: null, cycleLengthDays: 7, anchorDate: '2026-01-05', days: [] };
 
-      store.updatePattern('g1', 7, payload).subscribe();
+      store.updatePattern(7, payload).subscribe();
 
-      expect(service.updatePattern).toHaveBeenCalledWith('g1', 7, payload);
+      expect(service.updatePattern).toHaveBeenCalledWith(7, payload);
     });
 
     it('deletePattern delegates to AvailabilityService.deletePattern', () => {
-      store.deletePattern('g1', 7).subscribe();
+      store.deletePattern(7).subscribe();
 
-      expect(service.deletePattern).toHaveBeenCalledWith('g1', 7);
+      expect(service.deletePattern).toHaveBeenCalledWith(7);
     });
   });
 });

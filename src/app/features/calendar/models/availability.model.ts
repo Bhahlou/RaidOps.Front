@@ -3,6 +3,10 @@ import { DayAvailabilityStatus } from './day-availability-status.enum';
 /** One-off availability exception for a single date or date range, as returned for editing. */
 export interface AvailabilityException {
   id: number;
+  /** The guild of this exception's branch scope, or `null` if it's Global. */
+  guildId: string | null;
+  /** This exception's specific branch scope, or `null` if it's Global. */
+  guildBranchId: number | null;
   /** ISO date string (`yyyy-MM-dd`). */
   startDate: string;
   /** ISO date string (`yyyy-MM-dd`). */
@@ -15,8 +19,12 @@ export interface AvailabilityException {
   availableUntil: string | null;
 }
 
-/** Payload for declaring a new one-off availability exception. */
+/** Payload for declaring a new one-off availability exception, either Global or scoped to a branch. */
 export interface CreateAvailabilityExceptionPayload {
+  /** The guild of the target branch scope, or `null` for a Global declaration. Set together with `guildBranchId`. */
+  guildId: string | null;
+  /** The specific branch scope, or `null` for a Global declaration. Set together with `guildId`. */
+  guildBranchId: number | null;
   startDate: string;
   endDate: string;
   status: DayAvailabilityStatus;
@@ -25,8 +33,8 @@ export interface CreateAvailabilityExceptionPayload {
   availableUntil: string | null;
 }
 
-/** Payload for replacing the dates/status of an existing one-off availability exception. */
-export type UpdateAvailabilityExceptionPayload = CreateAvailabilityExceptionPayload;
+/** Payload for replacing the dates/status of an existing one-off availability exception. Scope is immutable, not part of this request. */
+export type UpdateAvailabilityExceptionPayload = Omit<CreateAvailabilityExceptionPayload, 'guildId' | 'guildBranchId'>;
 
 /** One day of a recurring pattern's cycle that is not fully available. */
 export interface RecurringAvailabilityPatternDay {
@@ -45,6 +53,10 @@ export interface RecurringAvailabilityPatternDay {
  */
 export interface RecurringAvailabilityPattern {
   id: number;
+  /** The guild of this pattern's branch scope, or `null` if it's Global. */
+  guildId: string | null;
+  /** This pattern's specific branch scope, or `null` if it's Global. */
+  guildBranchId: number | null;
   label: string | null;
   cycleLengthDays: number;
   /** ISO date string (`yyyy-MM-dd`) at which offset 0 of the cycle begins. */
@@ -52,13 +64,20 @@ export interface RecurringAvailabilityPattern {
   days: RecurringAvailabilityPatternDay[];
 }
 
-/** Payload for creating or replacing a recurring availability pattern (effective from today onward). */
-export interface RecurringAvailabilityPatternPayload {
+/** Payload for creating a recurring availability pattern (effective from today onward), either Global or scoped to a branch. */
+export interface CreateRecurringAvailabilityPatternPayload {
+  /** The guild of the target branch scope, or `null` for a Global pattern. Set together with `guildBranchId`. */
+  guildId: string | null;
+  /** The specific branch scope, or `null` for a Global pattern. Set together with `guildId`. */
+  guildBranchId: number | null;
   label: string | null;
   cycleLengthDays: number;
   anchorDate: string;
   days: RecurringAvailabilityPatternDay[];
 }
+
+/** Payload for replacing an existing recurring pattern's settings and full day set. Scope is immutable, not part of this request. */
+export type UpdateRecurringAvailabilityPatternPayload = Omit<CreateRecurringAvailabilityPatternPayload, 'guildId' | 'guildBranchId'>;
 
 /** The resolved availability status for a single date. */
 export interface ResolvedDayAvailability {

@@ -11,6 +11,8 @@ import { DayAvailabilityStatus } from '../../models/day-availability-status.enum
 
 const exception = (overrides?: Partial<AvailabilityException>): AvailabilityException => ({
   id: 1,
+  guildId: null,
+  guildBranchId: null,
   startDate: '2026-07-20',
   endDate: '2026-07-20',
   status: DayAvailabilityStatus.Absent,
@@ -53,7 +55,7 @@ describe('AvailabilityExceptionDialogComponent', () => {
     return TestBed.createComponent(AvailabilityExceptionDialogComponent).componentInstance;
   };
 
-  const newDeclarationData: AvailabilityExceptionDialogData = { guildId: 'g1', date: '2026-07-20' };
+  const newDeclarationData: AvailabilityExceptionDialogData = { date: '2026-07-20' };
 
   it('should create', () => {
     expect(setup(newDeclarationData)).toBeTruthy();
@@ -209,7 +211,7 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
       component.submit();
 
-      expect(store.createException).toHaveBeenCalledWith('g1', expect.objectContaining({ reason: null }));
+      expect(store.createException).toHaveBeenCalledWith(expect.objectContaining({ reason: null }));
     });
 
     it('sends availableFrom/availableUntil as null when status is not Partial, even if times were set', () => {
@@ -220,7 +222,6 @@ describe('AvailabilityExceptionDialogComponent', () => {
       component.submit();
 
       expect(store.createException).toHaveBeenCalledWith(
-        'g1',
         expect.objectContaining({ availableFrom: null, availableUntil: null }),
       );
     });
@@ -234,7 +235,6 @@ describe('AvailabilityExceptionDialogComponent', () => {
       component.submit();
 
       expect(store.createException).toHaveBeenCalledWith(
-        'g1',
         expect.objectContaining({ availableFrom: '21:30:00', availableUntil: '23:00:00' }),
       );
     });
@@ -281,7 +281,7 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
       component.submit();
 
-      expect(store.updateException).toHaveBeenCalledWith('g1', 42, expect.any(Object));
+      expect(store.updateException).toHaveBeenCalledWith(42, expect.any(Object));
       expect(store.createException).not.toHaveBeenCalled();
       expect(store.deleteException).not.toHaveBeenCalled();
     });
@@ -327,7 +327,7 @@ describe('AvailabilityExceptionDialogComponent', () => {
 
       component.removeDay();
 
-      expect(store.removeExceptionDay).toHaveBeenCalledWith('g1', 5, '2026-07-21');
+      expect(store.removeExceptionDay).toHaveBeenCalledWith(5, '2026-07-21');
     });
 
     it('on success shows the removeDaySuccess snackbar and closes with true', () => {

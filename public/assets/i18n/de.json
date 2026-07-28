@@ -319,12 +319,12 @@
   "sidenav": {
     "account": {
       "characters": "Charaktere",
-      "equipment": "Ausrüstungsplaner"
+      "equipment": "Ausrüstungsplaner",
+      "calendar": "Kalender"
     },
     "guilds": "Meine Gilden",
     "guild": {
       "dashboard": "Dashboard",
-      "calendar": "Kalender",
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Einstellungen",
@@ -614,10 +614,15 @@
     }
   },
   "calendar": {
+    "pageTitle": "Mein Kalender",
     "previousMonth": "Vorheriger Monat",
     "nextMonth": "Nächster Monat",
     "today": "Heute",
     "declareException": "Abwesenheit/Verspätung melden",
+    "scope": {
+      "label": "Gilt für",
+      "global": "Global"
+    },
     "status": {
       "absent": "Abwesend",
       "partial": "Teilweise",
