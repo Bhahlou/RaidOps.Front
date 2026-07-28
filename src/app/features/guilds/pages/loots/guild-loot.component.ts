@@ -12,11 +12,14 @@ import { injectGuildContext, injectGuildBranchContext } from '../../inject-guild
 })
 export class GuildLootComponent {
   readonly #guildContext = injectGuildContext();
-  // Not read directly — calling this records the visit for the "last visited branch" fallback
-  // used by guildDefaultBranchGuard and the sidenav (see injectGuildBranchContext).
-  readonly #branchContext = injectGuildBranchContext();
 
   readonly guildId = this.#guildContext.guildId;
 
   readonly breadcrumbs = computed(() => this.#guildContext.breadcrumbs('sidenav.guild.loot'));
+
+  constructor() {
+    // Records the visit for the "last visited branch" fallback used by
+    // guildDefaultBranchGuard and the sidenav.
+    injectGuildBranchContext();
+  }
 }

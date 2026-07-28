@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FormValueControl } from '@angular/forms/signals';
 import { OverlayModule, STANDARD_DROPDOWN_BELOW_POSITIONS } from '@angular/cdk/overlay';
 import { CdkListbox, CdkOption, ListboxValueChangeEvent } from '@angular/cdk/listbox';
+import { filterOptionsByLabel, groupOptions, OptionGroup } from '../../../utils/select-options.util';
 
 export interface MultiSelectOption<T> {
   value: T;
@@ -17,11 +18,6 @@ export interface MultiSelectOption<T> {
   color?: string | null;
   /** Optional icon rendered before the label instead of the color dot, if set. */
   iconUrl?: string | null;
-}
-
-interface OptionGroup<T> {
-  group: string | null;
-  options: MultiSelectOption<T>[];
 }
 
 /**
@@ -55,25 +51,9 @@ export class MultiSelectComponent<T> implements FormValueControl<T[]> {
   readonly filterQuery = signal('');
   readonly triggerWidth = signal<number>(200);
 
-  readonly filteredOptions = computed(() => {
-    const query = this.filterQuery().toLowerCase().trim();
-    if (!query) return this.options();
-    return this.options().filter((o) => o.label.toLowerCase().includes(query));
-  });
+  readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.filterQuery()));
 
-  readonly groupedOptions = computed<OptionGroup<T>[]>(() => {
-    const groups: OptionGroup<T>[] = [];
-    for (const opt of this.filteredOptions()) {
-      const key = opt.group ?? null;
-      const last = groups.at(-1);
-      if (last?.group === key) {
-        last.options.push(opt);
-      } else {
-        groups.push({ group: key, options: [opt] });
-      }
-    }
-    return groups;
-  });
+  readonly groupedOptions = computed<OptionGroup<MultiSelectOption<T>>[]>(() => groupOptions(this.filteredOptions()));
 
   /** Comma-joined labels of the current selection, in `options` order — ellipsized by CSS when it overflows. */
   readonly selectedLabel = computed(() => {

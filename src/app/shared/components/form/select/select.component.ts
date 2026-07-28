@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { FormValueControl } from '@angular/forms/signals';
 import { OverlayModule, STANDARD_DROPDOWN_BELOW_POSITIONS } from '@angular/cdk/overlay';
 import { CdkListbox, CdkOption, ListboxValueChangeEvent } from '@angular/cdk/listbox';
+import { filterOptionsByLabel, groupOptions, OptionGroup } from '../../../utils/select-options.util';
 
 export interface SelectOption<T> {
   value: T;
@@ -12,11 +13,6 @@ export interface SelectOption<T> {
    * caller is responsible for sorting `options` so same-group entries are contiguous.
    */
   group?: string;
-}
-
-interface OptionGroup<T> {
-  group: string | null;
-  options: SelectOption<T>[];
 }
 
 /**
@@ -50,26 +46,10 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   readonly filterQuery = signal('');
   readonly triggerWidth = signal<number>(200);
 
-  readonly filteredOptions = computed(() => {
-    const query = this.filterQuery().toLowerCase().trim();
-    if (!query) return this.options();
-    return this.options().filter((o) => o.label.toLowerCase().includes(query));
-  });
+  readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.filterQuery()));
 
   /** `filteredOptions` folded into runs of consecutive same-group entries, for group headers. */
-  readonly groupedOptions = computed<OptionGroup<T>[]>(() => {
-    const groups: OptionGroup<T>[] = [];
-    for (const opt of this.filteredOptions()) {
-      const key = opt.group ?? null;
-      const last = groups.at(-1);
-      if (last?.group === key) {
-        last.options.push(opt);
-      } else {
-        groups.push({ group: key, options: [opt] });
-      }
-    }
-    return groups;
-  });
+  readonly groupedOptions = computed<OptionGroup<SelectOption<T>>[]>(() => groupOptions(this.filteredOptions()));
 
   readonly selectedLabel = computed(() => {
     const current = this.value();

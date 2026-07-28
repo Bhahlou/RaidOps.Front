@@ -213,5 +213,22 @@ describe('GuildBranchesComponent', () => {
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
     });
+
+    it('is a no-op if the branch is no longer in the store by the time deactivation runs', async () => {
+      const branch = guildBranch({ id: 7, branchId: 3, isActive: true });
+      setup([branch]);
+      fixture.detectChanges();
+
+      // Simulates the store's branches signal changing between computing which branches to
+      // deactivate and #deactivate looking the branch back up by id (e.g. a concurrent reload,
+      // or another tab deactivating it first) — the guard should no-op rather than call the API
+      // with a stale guild-branch id.
+      (component as unknown as { guildBranches: () => GuildBranch[] }).guildBranches = vi.fn().mockReturnValueOnce([branch]).mockReturnValue([]);
+
+      await component.onBranchSelectionChange([]);
+
+      expect(branchesService.deactivateBranch).not.toHaveBeenCalled();
+      expect(store.reload).not.toHaveBeenCalled();
+    });
   });
 });
