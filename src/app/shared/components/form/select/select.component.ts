@@ -1,9 +1,10 @@
-import { Component, computed, ElementRef, model, signal, viewChild, input } from '@angular/core';
+import { Component, computed, ElementRef, model, viewChild, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormValueControl } from '@angular/forms/signals';
 import { OverlayModule, STANDARD_DROPDOWN_BELOW_POSITIONS } from '@angular/cdk/overlay';
 import { CdkListbox, CdkOption, ListboxValueChangeEvent } from '@angular/cdk/listbox';
 import { filterOptionsByLabel, groupOptions, OptionGroup } from '../../../utils/select-options.util';
+import { createDropdownPanel } from '../../../utils/dropdown-panel.util';
 
 export interface SelectOption<T> {
   value: T;
@@ -42,9 +43,10 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
 
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('triggerButton');
 
-  readonly isOpen = signal(false);
-  readonly filterQuery = signal('');
-  readonly triggerWidth = signal<number>(200);
+  readonly #panel = createDropdownPanel(this.disabled, this.trigger);
+  readonly isOpen = this.#panel.isOpen;
+  readonly filterQuery = this.#panel.filterQuery;
+  readonly triggerWidth = this.#panel.triggerWidth;
 
   readonly filteredOptions = computed(() => filterOptionsByLabel(this.options(), this.filterQuery()));
 
@@ -62,16 +64,11 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   });
 
   toggle(): void {
-    if (this.disabled()) return;
-    this.isOpen.update((open) => !open);
-    if (this.isOpen()) {
-      this.filterQuery.set('');
-      this.triggerWidth.set(this.trigger()?.nativeElement.offsetWidth ?? 200);
-    }
+    this.#panel.toggle();
   }
 
   close(): void {
-    this.isOpen.set(false);
+    this.#panel.close();
   }
 
   onListboxValueChange(event: ListboxValueChangeEvent<T>): void {
@@ -80,9 +77,6 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   }
 
   onPanelKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      this.close();
-      this.trigger()?.nativeElement.focus();
-    }
+    this.#panel.onPanelKeydown(event);
   }
 }
