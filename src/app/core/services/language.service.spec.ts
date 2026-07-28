@@ -65,6 +65,14 @@ describe('LanguageService', () => {
 
       expect(setActiveLang).toHaveBeenCalledWith('en');
     });
+
+    it('sets the document lang attribute to the resolved lang', () => {
+      localStorage.setItem('lang', 'de');
+
+      setup();
+
+      expect(document.documentElement.lang).toBe('de');
+    });
   });
 
   describe('setLang', () => {
@@ -85,6 +93,23 @@ describe('LanguageService', () => {
       expect(localStorage.getItem('lang')).toBeNull();
       // setActiveLang called once by constructor, not again
       expect(setActiveLang).toHaveBeenCalledOnce();
+    });
+
+    it('updates the document lang attribute', () => {
+      const service = setup();
+
+      service.setLang('de');
+
+      expect(document.documentElement.lang).toBe('de');
+    });
+
+    it('leaves the document lang attribute untouched for an unsupported lang', () => {
+      const service = setup();
+      document.documentElement.lang = 'fr';
+
+      service.setLang('zz');
+
+      expect(document.documentElement.lang).toBe('fr');
     });
   });
 
