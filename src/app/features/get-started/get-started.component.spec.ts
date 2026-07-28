@@ -33,7 +33,7 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
 });
 
 const makeMembership = (guildId: string): GuildMembership => ({
-  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  guildId, guildBranchId: 1, guildName: `Guild ${guildId}`, guildIconHash: null,
   characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
 });
 

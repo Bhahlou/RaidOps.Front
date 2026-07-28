@@ -11,7 +11,7 @@ import { GuildMembership } from '../../../guilds/models/guild-membership.model';
 import { CharacterRank } from '../../../guilds/models/character-rank.enum';
 
 const makeMembership = (guildId: string): GuildMembership => ({
-  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  guildId, guildBranchId: 1, guildName: `Guild ${guildId}`, guildIconHash: null,
   characterRank: CharacterRank.Main, joinedAt: '2025-01-01',
 });
 

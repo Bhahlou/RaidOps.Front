@@ -37,6 +37,7 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
 })
 export class GuildMyCharactersComponent {
   readonly guildId = input.required<string>();
+  readonly guildBranchId = input.required<number>();
 
   readonly #store = inject(CharacterStore);
   readonly #rosterStore = inject(GuildRosterStore);
@@ -118,7 +119,7 @@ export class GuildMyCharactersComponent {
         next: () => {
           this.showAddPanel.set(false);
           this.#snackbar.success('characterDetail.guilds.joinSuccess');
-          this.#rosterStore.loadRoster(this.guildId());
+          this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
         },
         error: (err: HttpErrorResponse) =>
           this.#snackbar.error(this.#store.membershipErrorKey(err)),
@@ -129,7 +130,7 @@ export class GuildMyCharactersComponent {
     this.#store.updateRank(characterId, this.guildId(), rank).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
-        this.#rosterStore.loadRoster(this.guildId());
+        this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
@@ -139,7 +140,7 @@ export class GuildMyCharactersComponent {
     this.#store.leaveGuild(characterId, this.guildId()).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.leaveSuccess');
-        this.#rosterStore.loadRoster(this.guildId());
+        this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });

@@ -74,7 +74,7 @@ export class RegisterComponent implements OnInit {
         if (!this.guild()) {
           this.#router.navigate(['/no-guild']);
         } else if (this.guild()?.isRegistered && this.isAlreadyConfigured()) {
-          this.#router.navigate(['/guilds', this.#guildId, 'dashboard']);
+          this.#router.navigate(['/guilds', this.#guildId]);
         }
       },
       error: () => {
@@ -91,6 +91,6 @@ export class RegisterComponent implements OnInit {
   }
 
   onSettingsSaved(): void {
-    this.#router.navigate(['/guilds', this.#guildId, 'dashboard']);
+    this.#router.navigate(['/guilds', this.#guildId]);
   }
 }

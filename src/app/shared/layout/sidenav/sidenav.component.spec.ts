@@ -8,7 +8,17 @@ import { SidenavService } from '../../../core/services/sidenav.service';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { User } from '../../../core/models/user.model';
 import { UserGuild } from '../../../core/models/user-guild.model';
+import { UserGuildBranch } from '../../../core/models/user-guild-branch.model';
 import { GuildAccessLevel } from '../../../core/models/guild-access-level.enum';
+import { setLastVisitedBranchId } from '../../../features/guilds/utils/last-visited-branch.util';
+
+const makeBranch = (overrides: Partial<UserGuildBranch> = {}): UserGuildBranch => ({
+  id: 7,
+  branchId: 3,
+  branchName: 'Classic Anniversary',
+  accessLevel: GuildAccessLevel.Public,
+  ...overrides,
+});
 
 const makeGuild = (overrides: Partial<UserGuild>): UserGuild => ({
   id: 'g1',
@@ -188,6 +198,40 @@ describe('SidenavComponent', () => {
     it('is true for an Officer-tier guild', () => {
       const component = setup();
       expect(component.hasRosterAccess(makeGuild({ accessLevel: GuildAccessLevel.Officer }))).toBe(true);
+    });
+  });
+
+  // ── defaultBranchId ─────────────────────────────────────────────────────────
+
+  describe('defaultBranchId', () => {
+    afterEach(() => localStorage.clear());
+
+    it('is null when the guild has no active branch', () => {
+      const component = setup();
+      expect(component.defaultBranchId(makeGuild({ branches: [] }))).toBeNull();
+    });
+
+    it('is the first branch when nothing was previously visited', () => {
+      const component = setup();
+      const guild = makeGuild({ branches: [makeBranch({ id: 7 }), makeBranch({ id: 8 })] });
+
+      expect(component.defaultBranchId(guild)).toBe(7);
+    });
+
+    it('is the last-visited branch when it still exists', () => {
+      const component = setup();
+      const guild = makeGuild({ id: 'g1', branches: [makeBranch({ id: 7 }), makeBranch({ id: 8 })] });
+      setLastVisitedBranchId('g1', 8);
+
+      expect(component.defaultBranchId(guild)).toBe(8);
+    });
+
+    it('falls back to the first branch when the last-visited one no longer exists', () => {
+      const component = setup();
+      const guild = makeGuild({ id: 'g1', branches: [makeBranch({ id: 7 }), makeBranch({ id: 8 })] });
+      setLastVisitedBranchId('g1', 99);
+
+      expect(component.defaultBranchId(guild)).toBe(7);
     });
   });
 

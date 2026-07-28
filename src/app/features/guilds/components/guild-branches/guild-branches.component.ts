@@ -7,6 +7,7 @@ import { DiscordRole } from '../../../../shared/models/discord-role.model';
 import { Branch } from '../../../../shared/models/branch.model';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildBranchesService } from '../../services/guild-branches.service';
 import { GuildBranchesStore } from '../../stores/guild-branches.store';
 import { GuildSettingsService } from '../../services/guild-settings.service';
@@ -26,6 +27,7 @@ export class GuildBranchesComponent implements OnInit {
   readonly #wowBranchService = inject(WowBrancheService);
   readonly #settingsService = inject(GuildSettingsService);
   readonly #snackbar = inject(SnackbarService);
+  readonly #authStore = inject(AuthStore);
   readonly #transloco = inject(TranslocoService);
 
   readonly wowBranches = signal<Branch[]>([]);
@@ -77,6 +79,10 @@ export class GuildBranchesComponent implements OnInit {
     try {
       await firstValueFrom(this.#branchesService.activateBranch(this.guildId(), branchId));
       this.#store.reload();
+      // The sidenav and branch routing guards read AuthStore.user().guilds[].branches, which
+      // would otherwise go stale until next login — resync it so the newly-activated branch is
+      // immediately visible/navigable.
+      this.#authStore.loadUser().subscribe();
     } catch {
       this.#snackbar.error('errors.server');
     }
@@ -89,6 +95,7 @@ export class GuildBranchesComponent implements OnInit {
     try {
       await firstValueFrom(this.#branchesService.deactivateBranch(this.guildId(), guildBranch.id));
       this.#store.reload();
+      this.#authStore.loadUser().subscribe();
     } catch {
       this.#snackbar.error('errors.server');
     }

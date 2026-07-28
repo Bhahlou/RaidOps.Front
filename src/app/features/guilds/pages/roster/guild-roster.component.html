@@ -1,7 +1,8 @@
 <div class="guild-page">
   <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'roster' }" />
+  <app-branch-tabs [guildId]="guildId()" leaf="roster" />
   <div class="roster-layout">
-    <app-guild-roster-list class="col-main" [guildId]="guildId()" />
-    <app-guild-my-characters class="col-side" [guildId]="guildId()" />
+    <app-guild-roster-list class="col-main" [guildId]="guildId()" [guildBranchId]="guildBranchId()" />
+    <app-guild-my-characters class="col-side" [guildId]="guildId()" [guildBranchId]="guildBranchId()" />
   </div>
 </div>

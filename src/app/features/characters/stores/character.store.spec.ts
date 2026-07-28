@@ -41,6 +41,7 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
 
 const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
   guildId,
+  guildBranchId: 1,
   guildName: `Guild ${guildId}`,
   guildIconHash: null,
   characterRank: rank,

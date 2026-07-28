@@ -98,6 +98,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         contentPath: (lang) => `assets/manual/${lang}/guild/settings.md`,
       },
       {
+        id: 'branches',
+        labelKey: 'manual.article.guildBranches.title',
+        requiredAccessLevel: GuildAccessLevel.Officer,
+        contentPath: (lang) => `assets/manual/${lang}/guild/branches.md`,
+      },
+      {
         id: 'notifications',
         labelKey: 'manual.article.guildNotifications.title',
         requiredAccessLevel: GuildAccessLevel.Officer,

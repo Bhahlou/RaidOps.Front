@@ -9,6 +9,7 @@ import { GuildBranchesStore } from '../../stores/guild-branches.store';
 import { GuildSettingsService } from '../../services/guild-settings.service';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildBranch } from '../../models/guild-branch.model';
 import { RosterMode } from '../../models/roster-mode.enum';
 import { Branch } from '../../../../shared/models/branch.model';
@@ -41,6 +42,7 @@ describe('GuildBranchesComponent', () => {
   let settingsService: { getDiscordRoles: ReturnType<typeof vi.fn> };
   let wowBranchService: { getAll: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
+  let authStore: { loadUser: ReturnType<typeof vi.fn> };
 
   const setup = (branches: GuildBranch[] = [], wowBranches: Branch[] = [wowBranch()], roles: DiscordRole[] = []) => {
     branchesService = {
@@ -56,6 +58,7 @@ describe('GuildBranchesComponent', () => {
     settingsService = { getDiscordRoles: vi.fn().mockReturnValue(of(roles)) };
     wowBranchService = { getAll: vi.fn().mockReturnValue(of(wowBranches)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
+    authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
 
     TestBed.configureTestingModule({
       imports: [GuildBranchesComponent],
@@ -65,6 +68,7 @@ describe('GuildBranchesComponent', () => {
         { provide: GuildSettingsService, useValue: settingsService },
         { provide: WowBrancheService, useValue: wowBranchService },
         { provide: SnackbarService, useValue: snackbar },
+        { provide: AuthStore, useValue: authStore },
         { provide: TranslocoService, useValue: { translate: vi.fn((key: string) => key) } },
       ],
     }).overrideComponent(GuildBranchesComponent, { set: { template: '', imports: [] } });

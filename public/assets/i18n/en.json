@@ -58,6 +58,9 @@
       },
       "guildNotifications": {
         "title": "Settings - Notifications"
+      },
+      "guildBranches": {
+        "title": "Settings - Branches"
       }
     }
   },
@@ -69,6 +72,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "guildBranches": {
+        "title": "Manage several WoW versions in the same guild",
+        "description": "A Discord guild can now activate several WoW branches in parallel (e.g. Classic Anniversary and MoP Classic), each with its own roster access mode and its own Officer roles. Once a guild has more than one active branch, tabs appear on the roster to switch between them."
+      },
       "guildNotifications": {
         "title": "Discord notifications for guild events",
         "description": "Configure, per event (starting with declared absences), whether the bot posts a message to a Discord channel — and which one — from the new Notifications tab in guild settings."
@@ -212,6 +219,10 @@
       "guildCalendar": {
         "title": "Guild calendar",
         "description": "One-off and recurring absence declarations, with Discord notifications — raid event scheduling is still to come."
+      },
+      "guildMultiBranch": {
+        "title": "Multi-branch guilds",
+        "description": "A Discord guild can activate several WoW branches in parallel, with roster access and Officer roles configured separately for each."
       },
       "raidBuilder": {
         "title": "Raid builder",

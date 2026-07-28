@@ -6,26 +6,32 @@ import { GuildRosterMember } from '../models/guild-roster-member.model';
 @Service()
 export class GuildRosterStore {
   readonly #guildId = signal<string | null>(null);
+  readonly #guildBranchId = signal<number | null>(null);
 
   readonly #rosterResource = httpResource<GuildRosterMember[]>(() => {
     const guildId = this.#guildId();
-    return guildId ? `${environment.apiUrl}/guilds/${guildId}/roster` : undefined;
+    const guildBranchId = this.#guildBranchId();
+    return guildId != null && guildBranchId != null
+      ? { url: `${environment.apiUrl}/guilds/${guildId}/roster`, params: { guildBranchId } }
+      : undefined;
   });
 
   readonly members = computed(() => this.#rosterResource.value() ?? null);
   readonly isLoading = this.#rosterResource.isLoading;
 
   /**
-   * Points the store at a guild's roster and forces a fresh fetch — the roster can be edited by
-   * other officers/players between visits, so cached data can't be trusted on its own. Setting the
-   * guildId signal already triggers httpResource's own refetch when it changes; reload() covers
-   * the case where the same guildId is requested again (a no-op signal write on its own).
+   * Points the store at a guild branch's roster and forces a fresh fetch — the roster can be
+   * edited by other officers/players between visits, so cached data can't be trusted on its own.
+   * Setting the signals already triggers httpResource's own refetch when either changes;
+   * reload() covers the case where the same guild+branch is requested again (a no-op signal
+   * write on its own).
    */
-  loadRoster(guildId: string): void {
-    if (this.#guildId() === guildId) {
+  loadRoster(guildId: string, guildBranchId: number): void {
+    if (this.#guildId() === guildId && this.#guildBranchId() === guildBranchId) {
       this.#rosterResource.reload();
     } else {
       this.#guildId.set(guildId);
+      this.#guildBranchId.set(guildBranchId);
     }
   }
 

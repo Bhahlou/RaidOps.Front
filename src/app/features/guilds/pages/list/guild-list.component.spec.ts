@@ -145,11 +145,11 @@ describe('GuildListComponent', () => {
       expect(component.loading()).toBe(false);
     });
 
-    it('auto-navigates to dashboard when exactly one registered guild and no admin guilds', () => {
+    it('auto-navigates to the guild when exactly one registered guild and no admin guilds', () => {
       setup([guild({ id: 'g1', isRegistered: true, isConfigured: true })]);
       fixture.detectChanges();
 
-      expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1', 'dashboard']);
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'g1']);
     });
 
     it('does not auto-navigate when there are multiple registered guilds', () => {

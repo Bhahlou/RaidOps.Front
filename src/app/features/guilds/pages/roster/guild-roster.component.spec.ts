@@ -6,13 +6,20 @@ import { of } from 'rxjs';
 import { GuildRosterComponent } from './guild-roster.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
 
-const setup = (guildId: string | null) => {
+const setup = (guildId: string | null, branchId = 1) => {
   TestBed.configureTestingModule({
     imports: [GuildRosterComponent],
     providers: [
       {
         provide: ActivatedRoute,
         useValue: {
+          // paramsInheritanceStrategy:'always' merges ancestor params into every descendant
+          // snapshot, so the leaf's own paramMap (used by injectGuildBranchContext) carries
+          // both id and branchId, same as `.parent`'s (used by injectGuildContext).
+          snapshot: {
+            paramMap: { get: (key: string) => (key === 'branchId' ? String(branchId) : guildId) },
+          },
+          paramMap: of(convertToParamMap(guildId ? { id: guildId, branchId: String(branchId) } : {})),
           parent: {
             snapshot: { paramMap: { get: () => guildId } },
             paramMap: of(convertToParamMap(guildId ? { id: guildId } : {})),

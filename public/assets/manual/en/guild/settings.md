@@ -1,6 +1,6 @@
 > Officer only.
 
-The **General** tab (in guild settings) configures the guild's timezone, language, and access rules.
+The **General** tab (in guild settings) configures the guild's timezone and language.
 
 ![Settings page overview](/assets/manual/en/guild/settings-overview.png)
 
@@ -12,20 +12,8 @@ An autocomplete field, automatically pre-filled with your browser's timezone on 
 
 The language RaidOps uses to communicate with the guild — for now, the content of the messages the Discord bot posts (one-off absences and recurring patterns). Until it's ever been saved for this guild, it's just pre-filled from your own browser's language, and a notice makes that clear.
 
-### Roster access
-
-Two modes are available:
-- **Open to all** — any authenticated member can join the roster.
-- **Discord role required** — only members with a sufficient Discord role can join.
-
-If you choose **Discord role required**, a **roster access threshold** picker appears: click a Discord role to set it as the minimum threshold. That role and every role above it in the Discord hierarchy grant roster access; the rest are listed under **Excluded roles**.
-
-![Roster access threshold picker](/assets/manual/en/guild/roster-threshold-picker.png)
-
-### Officer access threshold
-
-Independent from the roster access mode: this setting defines the minimum Discord role required to get Officer access in RaidOps (editable roster, settings, audit log). Discord server administrators always keep full access, regardless of this choice. This field is required — the save button stays disabled until a role is picked.
-
 ### Save
 
-**Save settings** saves every setting on this tab (timezone, language, roster access, Officer threshold) in a single action, independently of the Notifications tab. A confirmation message appears once saved.
+**Save settings** saves the timezone and language in a single action, independently of the Branches and Notifications tabs. A confirmation message appears once saved.
+
+> Roster access and Officer roles are no longer configured here: they're now set per branch, in the **Branches** tab — see the dedicated guide.

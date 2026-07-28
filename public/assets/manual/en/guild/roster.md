@@ -2,6 +2,12 @@ The **Roster** page lists every member of the guild and lets you manage your own
 
 ![Roster page overview](/assets/manual/en/guild/roster-overview.png)
 
+### Switching between branches
+
+If your guild has more than one active WoW branch (see the **Settings - Branches** guide), tabs appear at the top of the page to pick which branch's roster to display. A guild with a single active branch doesn't see these tabs.
+
+![The branch tabs](/assets/manual/en/guild/branch-switcher-tabs.png)
+
 ### Search and filter
 
 Use the search bar to find a player or character by name. The filter icons let you narrow down by class, main spec, rank (**Main**, **Split**, **Alt**), or join date range. The result count shows at the top of the list, and **Clear filters** resets everything at once.

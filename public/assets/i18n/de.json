@@ -58,6 +58,9 @@
       },
       "guildNotifications": {
         "title": "Einstellungen - Benachrichtigungen"
+      },
+      "guildBranches": {
+        "title": "Einstellungen - Spielzweige"
       }
     }
   },
@@ -69,6 +72,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "guildBranches": {
+        "title": "Mehrere WoW-Versionen in derselben Gilde verwalten",
+        "description": "Eine Discord-Gilde kann jetzt mehrere Spielzweige parallel aktivieren (z. B. Classic Anniversary und MoP Classic), jeweils mit eigenem Roster-Zugriff und eigenen Officer-Rollen. Sobald eine Gilde mehr als einen aktiven Spielzweig hat, erscheinen auf dem Roster Tabs zum Wechseln zwischen ihnen."
+      },
       "guildNotifications": {
         "title": "Discord-Benachrichtigungen für Gildenereignisse",
         "description": "Lege pro Ereignis (zunächst für eingetragene Abwesenheiten) fest, ob der Bot eine Nachricht in einen Discord-Kanal postet — und in welchen — über den neuen Tab Benachrichtigungen in den Gildeneinstellungen."
@@ -212,6 +219,10 @@
       "guildCalendar": {
         "title": "Gildenkalender",
         "description": "Einmalige und wiederkehrende Abwesenheitseintragungen mit Discord-Benachrichtigungen — die Planung von Raid-Terminen folgt noch."
+      },
+      "guildMultiBranch": {
+        "title": "Gilden mit mehreren Spielzweigen",
+        "description": "Eine Discord-Gilde kann mehrere Spielzweige parallel aktivieren, mit für jeden separat konfiguriertem Roster-Zugriff und Officer-Rollen."
       },
       "raidBuilder": {
         "title": "Raid-Builder",

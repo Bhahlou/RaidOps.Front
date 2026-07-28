@@ -3,12 +3,13 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
-import { injectGuildContext } from './inject-guild-context';
+import { injectGuildContext, injectGuildBranchContext } from './inject-guild-context';
 import { AuthStore } from '../../core/stores/auth.store';
 import { DiscordIconType } from '../../shared/models/discord-icon-type.enum';
 import { UserGuild } from '../../core/models/user-guild.model';
 import { User } from '../../core/models/user.model';
 import { GuildAccessLevel } from '../../core/models/guild-access-level.enum';
+import { getLastVisitedBranchId } from './utils/last-visited-branch.util';
 
 const makeGuild = (overrides: Partial<UserGuild> = {}): UserGuild => ({
   id: 'g1', name: 'Epic Guild', iconHash: 'hash1',
@@ -106,11 +107,11 @@ describe('injectGuildContext', () => {
 
   // ── breadcrumbs — dashboard link ─────────────────────────────────────────────
 
-  it('links the first item to the guild dashboard by default', () => {
+  it('links the first item to the bare guild path by default', () => {
     const guild = makeGuild({ id: 'g1' });
     const crumbs = setup('g1', makeUser([guild])).breadcrumbs('sidenav.guild.settings');
 
-    expect(crumbs[0].link).toEqual(['/guilds', 'g1', 'dashboard']);
+    expect(crumbs[0].link).toEqual(['/guilds', 'g1']);
   });
 
   it('omits the link on the first item when withDashboardLink is false', () => {
@@ -118,5 +119,69 @@ describe('injectGuildContext', () => {
     const crumbs = setup('g1', makeUser([guild])).breadcrumbs('sidenav.guild.dashboard', false);
 
     expect(crumbs[0].link).toBeUndefined();
+  });
+});
+
+describe('injectGuildBranchContext', () => {
+  afterEach(() => localStorage.clear());
+
+  const setupBranch = (
+    guildId: string,
+    branchId: number,
+    paramMap$: Observable<ParamMap> = of(convertToParamMap({ id: guildId, branchId: String(branchId) })),
+  ) => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: { get: (key: string) => (key === 'branchId' ? String(branchId) : guildId) },
+            },
+            paramMap: paramMap$,
+          },
+        },
+      ],
+    });
+    return TestBed.runInInjectionContext(() => injectGuildBranchContext());
+  };
+
+  it('reads branchId from the route snapshot', () => {
+    expect(setupBranch('g1', 7).branchId).toBe(7);
+  });
+
+  describe('currentBranchId', () => {
+    it('starts at the snapshot value', () => {
+      expect(setupBranch('g1', 7).currentBranchId()).toBe(7);
+    });
+
+    it('updates when the paramMap emits a different branchId', () => {
+      const paramMap$ = new BehaviorSubject(convertToParamMap({ id: 'g1', branchId: '7' }));
+      const context = setupBranch('g1', 7, paramMap$);
+
+      paramMap$.next(convertToParamMap({ id: 'g1', branchId: '8' }));
+
+      expect(context.currentBranchId()).toBe(8);
+    });
+  });
+
+  describe('last-visited bookkeeping', () => {
+    it('records the initial branch as last-visited for this guild', () => {
+      setupBranch('g1', 7);
+      TestBed.tick();
+
+      expect(getLastVisitedBranchId('g1')).toBe(7);
+    });
+
+    it('updates the recorded branch when the paramMap emits a different branchId', () => {
+      const paramMap$ = new BehaviorSubject(convertToParamMap({ id: 'g1', branchId: '7' }));
+      setupBranch('g1', 7, paramMap$);
+      TestBed.tick();
+
+      paramMap$.next(convertToParamMap({ id: 'g1', branchId: '8' }));
+      TestBed.tick();
+
+      expect(getLastVisitedBranchId('g1')).toBe(8);
+    });
   });
 });

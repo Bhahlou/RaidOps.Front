@@ -67,14 +67,14 @@ describe('guildAccessGuard', () => {
     expect(execute('g1', GuildAccessLevel.Roster)).toBe(true);
   });
 
-  it('redirects to the guild dashboard when the user is below the required level', () => {
+  it('redirects to the bare guild path when the user is below the required level', () => {
     userSignal.set(makeUser([makeGuild({ id: 'g1', accessLevel: GuildAccessLevel.Public })]));
     const router = TestBed.inject(Router);
 
     const result = execute('g1', GuildAccessLevel.Officer);
 
     expect(result).toBeInstanceOf(UrlTree);
-    expect(router.serializeUrl(result as UrlTree)).toBe('/guilds/g1/dashboard');
+    expect(router.serializeUrl(result as UrlTree)).toBe('/guilds/g1');
   });
 
   it('redirects to /guilds when the user has no relation to this guild', () => {

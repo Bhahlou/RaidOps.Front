@@ -164,10 +164,10 @@ describe('RegisterComponent', () => {
       expect(navigate).toHaveBeenCalledWith(['/no-guild']);
     });
 
-    it('redirects to dashboard when guild is already configured', () => {
+    it('redirects to the guild when it is already configured', () => {
       setup('abc', [makeGuild('abc', { isRegistered: true, isConfigured: true })]);
 
-      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc', 'dashboard']);
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc']);
     });
 
     it('does not redirect when guild is found but not yet configured', () => {
@@ -205,12 +205,12 @@ describe('RegisterComponent', () => {
   // ── onSettingsSaved ───────────────────────────────────────────────────────
 
   describe('onSettingsSaved', () => {
-    it('navigates to the guild dashboard', () => {
+    it('navigates to the guild', () => {
       setup('abc', [makeGuild('abc')]);
 
       component.onSettingsSaved();
 
-      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc', 'dashboard']);
+      expect(navigate).toHaveBeenCalledWith(['/guilds', 'abc']);
     });
   });
 });

@@ -12,8 +12,9 @@ import { GuildAccessLevel, hasGuildAccess } from '../../../core/models/guild-acc
  * between its children, so it can't gate per-child access on its own.
  *
  * - No relation to this guild at all → redirect to `/guilds`.
- * - Insufficient tier for this specific child → redirect to the guild's dashboard (Public-tier,
- *   always allowed for a guild the user has any relation to — no redirect loop).
+ * - Insufficient tier for this specific child → redirect to the bare `/guilds/:id`, which
+ *   `guildDefaultBranchGuard` resolves to a branch the user actually has access to — no
+ *   redirect loop, and no assumption about which leaf routes currently exist one level down.
  */
 export const guildAccessGuard: CanActivateChildFn = (route) => {
   const authStore = inject(AuthStore);
@@ -30,5 +31,5 @@ export const guildAccessGuard: CanActivateChildFn = (route) => {
     return true;
   }
 
-  return router.createUrlTree(['/guilds', guildId, 'dashboard']);
+  return router.createUrlTree(['/guilds', guildId]);
 };
