@@ -1,3 +1,12 @@
+<app-select
+  class="scope-select"
+  inputId="notification-settings-scope"
+  [label]="'guildSettings.notificationSettings.scope.label' | transloco"
+  [options]="scopeOptions()"
+  [value]="scopeKey()"
+  (valueChange)="onScopeChange($event)"
+/>
+
 @for (family of families; track family.id) {
   <app-form-field-card class="full-width" [label]="family.labelKey | transloco">
     <p class="field-hint">{{ family.hintKey | transloco }}</p>
@@ -24,6 +33,18 @@
             (valueChange)="setChannel(eventType, $event)"
           />
 
+          @if (isInherited(eventType)) {
+            <p class="channel-hint">{{ 'guildSettings.notificationSettings.scope.inherited' | transloco }}</p>
+          } @else if (scopeGuildBranchId() !== null) {
+            <app-icon-button
+              class="reset-icon-button"
+              icon="restart_alt"
+              [ariaLabel]="'guildSettings.notificationSettings.scope.resetToInherited' | transloco"
+              [disabled]="resetting() === eventType"
+              (click)="resetToInherited(eventType)"
+            />
+          }
+
           @if (channelMissing(eventType)) {
             <p class="channel-warning">
               <span class="material-icons">error</span>
@@ -32,7 +53,7 @@
           } @else if (row(eventType).enabled && channelHasNoPermission(row(eventType).channelId)) {
             <p class="channel-warning">
               <span class="material-icons">warning</span>
-              {{ 'guildSettings.notificationSettings.channel.missingPermission' | transloco }}
+              {{ 'guildSettings.notificationSettings.channel.missingPermission' | transloco: { permissions: missingPermissionsLabel(row(eventType).channelId) } }}
             </p>
           }
         </div>

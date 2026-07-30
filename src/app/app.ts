@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { LanguageService } from './core/services/language.service';
 import { EnvBrandingService } from './core/services/env-branding.service';
 
 @Component({
@@ -12,8 +11,8 @@ import { EnvBrandingService } from './core/services/env-branding.service';
 })
 export class App {
   constructor() {
-    inject(LanguageService);
-
+    // LanguageService is instantiated by the app initializer in app.config.ts (needs to resolve
+    // and load the active language before the first render, not just before this component).
     const favicon = inject(DOCUMENT).querySelector<HTMLLinkElement>('link[rel="icon"]');
     if (favicon) {
       favicon.href = inject(EnvBrandingService).logoPath;

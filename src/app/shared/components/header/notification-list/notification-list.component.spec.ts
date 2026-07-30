@@ -4,7 +4,7 @@ import { NotificationListComponent } from './notification-list.component';
 import { Notification, NotificationType } from '../../../../core/models/notification.model';
 
 const notification = (overrides?: Partial<Notification>): Notification => ({
-  type: NotificationType.OfficerThresholdNotConfigured,
+  type: NotificationType.BranchOfficerRolesNotConfigured,
   guildId: 'guild-1',
   guildName: 'RaidOps',
   ...overrides,
@@ -31,17 +31,17 @@ describe('NotificationListComponent', () => {
     it('returns the i18n key for a known notification type', () => {
       setup();
 
-      expect(component.messageKey(notification())).toBe('notifications.officerThresholdNotConfigured');
+      expect(component.messageKey(notification())).toBe('notifications.branchOfficerRolesNotConfigured');
     });
   });
 
   // ── link ──────────────────────────────────────────────────────────────────
 
   describe('link', () => {
-    it('builds the guild settings route for OfficerThresholdNotConfigured', () => {
+    it('builds the guild branches settings route for BranchOfficerRolesNotConfigured', () => {
       setup();
 
-      expect(component.link(notification({ guildId: 'g42' }))).toEqual(['/guilds', 'g42', 'settings']);
+      expect(component.link(notification({ guildId: 'g42' }))).toEqual(['/guilds', 'g42', 'settings', 'branches']);
     });
 
     it('builds the guild settings route for GuildLanguageNotConfigured', () => {

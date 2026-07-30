@@ -23,11 +23,11 @@ describe('NotificationService', () => {
 
   describe('dismiss', () => {
     it('sends POST to /notifications/dismiss with the type and guildId', () => {
-      service.dismiss(NotificationType.OfficerThresholdNotConfigured, 'guild-1').subscribe();
+      service.dismiss(NotificationType.BranchOfficerRolesNotConfigured, 'guild-1').subscribe();
 
       const req = controller.expectOne(r => r.url.endsWith('/notifications/dismiss'));
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ type: NotificationType.OfficerThresholdNotConfigured, guildId: 'guild-1' });
+      expect(req.request.body).toEqual({ type: NotificationType.BranchOfficerRolesNotConfigured, guildId: 'guild-1' });
       req.flush(null);
     });
   });

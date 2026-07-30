@@ -1,0 +1,80 @@
+<fieldset class="select-fieldset" [class.select-fieldset--open]="isOpen()">
+  @if (label()) {
+    <legend class="select-field-label">{{ label() }}</legend>
+  }
+  <button
+    #triggerButton
+    type="button"
+    class="select-trigger"
+    [id]="inputId()"
+    [disabled]="disabled()"
+    cdkOverlayOrigin
+    #origin="cdkOverlayOrigin"
+    (click)="toggle()"
+    [attr.aria-expanded]="isOpen()"
+  >
+    <span class="select-value" [class.select-value--placeholder]="!selectedLabel()">
+      {{ selectedLabel() || placeholder() }}
+    </span>
+    <span class="material-icons select-chevron">expand_more</span>
+  </button>
+</fieldset>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="dropdownPositions"
+  [cdkConnectedOverlayWidth]="triggerWidth()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()"
+>
+  <div class="select-panel" (keydown)="onPanelKeydown($event)">
+    @if (filterable()) {
+      <div class="select-filter">
+        <span class="material-icons select-filter-icon">search</span>
+        <input
+          type="text"
+          class="select-filter-input"
+          [attr.aria-label]="filterAriaLabel()"
+          [ngModel]="filterQuery()"
+          (ngModelChange)="filterQuery.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+    }
+    <ul
+      class="select-list"
+      cdkListbox
+      cdkListboxMultiple
+      [cdkListboxValue]="value()"
+      (cdkListboxValueChange)="onListboxValueChange($any($event))"
+    >
+      @for (grp of groupedOptions(); track $index) {
+        @if (grp.group) {
+          <li class="select-group-header">{{ grp.group }}</li>
+        }
+        @for (opt of grp.options; track opt.value) {
+          <li class="select-option multi-select-option" [cdkOption]="opt.value">
+            <span class="multi-select-indicator">
+              @if (isSelected(opt)) {
+                <span class="material-icons check-icon">check_circle</span>
+              } @else if (opt.iconUrl) {
+                <img class="option-icon" [ngSrc]="opt.iconUrl" alt="" width="18" height="18" />
+              } @else if (opt.color) {
+                <span class="option-dot" [style.background]="opt.color"></span>
+              } @else {
+                <span class="option-dot-empty"></span>
+              }
+            </span>
+            <span class="multi-select-label">{{ opt.label }}</span>
+          </li>
+        }
+      } @empty {
+        <li class="select-empty">—</li>
+      }
+    </ul>
+  </div>
+</ng-template>

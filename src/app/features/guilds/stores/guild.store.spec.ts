@@ -4,13 +4,10 @@ import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { GuildSettings } from '../models/guild-settings.model';
-import { RosterMode } from '../models/roster-mode.enum';
 import { GuildStore } from './guild.store';
 
 const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
   timezone: 'Europe/Paris',
-  rosterMode: RosterMode.Open,
-  minRosterRoleId: null,
   language: 'en',
   ...overrides,
 });

@@ -35,6 +35,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         labelKey: 'manual.article.whatsNew.title',
         contentPath: (lang) => `assets/manual/${lang}/account/whats-new.md`,
       },
+      {
+        id: 'calendar',
+        labelKey: 'manual.article.calendar.title',
+        requiresAuth: true,
+        contentPath: (lang) => `assets/manual/${lang}/account/calendar.md`,
+      },
     ],
   },
   {
@@ -80,12 +86,6 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         contentPath: (lang) => `assets/manual/${lang}/guild/roster.md`,
       },
       {
-        id: 'calendar',
-        labelKey: 'manual.article.calendar.title',
-        requiredAccessLevel: GuildAccessLevel.Roster,
-        contentPath: (lang) => `assets/manual/${lang}/guild/calendar.md`,
-      },
-      {
         id: 'audit-log',
         labelKey: 'manual.article.auditLog.title',
         requiredAccessLevel: GuildAccessLevel.Officer,
@@ -96,6 +96,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         labelKey: 'manual.article.settings.title',
         requiredAccessLevel: GuildAccessLevel.Officer,
         contentPath: (lang) => `assets/manual/${lang}/guild/settings.md`,
+      },
+      {
+        id: 'branches',
+        labelKey: 'manual.article.guildBranches.title',
+        requiredAccessLevel: GuildAccessLevel.Officer,
+        contentPath: (lang) => `assets/manual/${lang}/guild/branches.md`,
       },
       {
         id: 'notifications',

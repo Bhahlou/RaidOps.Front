@@ -2,6 +2,23 @@
   width: 100%;
 }
 
+.scope-select {
+  display: block;
+  max-width: 320px;
+  margin-bottom: 16px;
+}
+
+.channel-hint {
+  flex: 0 1 auto;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.reset-icon-button {
+  flex-shrink: 0;
+}
+
 .field-hint {
   font-size: 0.8125rem;
   color: var(--color-text-secondary);

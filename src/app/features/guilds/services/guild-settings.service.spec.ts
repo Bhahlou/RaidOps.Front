@@ -4,8 +4,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuildSettings } from '../models/guild-settings.model';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
-import { OfficerThreshold } from '../models/officer-threshold.model';
-import { RosterMode } from '../models/roster-mode.enum';
 import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildSettingsService } from './guild-settings.service';
@@ -44,26 +42,11 @@ describe('GuildSettingsService', () => {
 
   describe('updateSettings', () => {
     it('sends PATCH to /guilds/:id/settings with the settings body', () => {
-      const body: GuildSettings = { timezone: 'UTC', rosterMode: RosterMode.Open, minRosterRoleId: null, language: 'en' };
+      const body: GuildSettings = { timezone: 'UTC', language: 'en' };
 
       service.updateSettings('guild-1', body).subscribe();
 
       const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/settings'));
-      expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual(body);
-      req.flush(null);
-    });
-  });
-
-  // ── updateOfficerThreshold ───────────────────────────────────────────────
-
-  describe('updateOfficerThreshold', () => {
-    it('sends PATCH to /guilds/:id/officer-threshold with the threshold body', () => {
-      const body: OfficerThreshold = { minOfficerRoleId: 'role-1' };
-
-      service.updateOfficerThreshold('guild-1', body).subscribe();
-
-      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/officer-threshold'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual(body);
       req.flush(null);
@@ -92,7 +75,7 @@ describe('GuildSettingsService', () => {
 
   describe('getNotificationChannels', () => {
     it('sends GET to /guilds/:id/notification-channels and returns the list', () => {
-      const expected: DiscordChannel[] = [{ id: 'chan-1', name: 'general', botCanSendMessages: true, categoryName: null }];
+      const expected: DiscordChannel[] = [{ id: 'chan-1', name: 'general', missingPermissions: [], categoryName: null }];
       let result: DiscordChannel[] | undefined;
 
       service.getNotificationChannels('guild-1').subscribe(r => (result = r));
@@ -107,16 +90,40 @@ describe('GuildSettingsService', () => {
   // ── updateNotificationSettings ───────────────────────────────────────────
 
   describe('updateNotificationSettings', () => {
-    it('sends PATCH to /guilds/:id/notification-settings with the settings wrapped in a body', () => {
+    it('sends PATCH to /guilds/:id/notification-settings with guildBranchId null and the settings wrapped in a body', () => {
       const settings: GuildNotificationSetting[] = [
         { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
       ];
 
-      service.updateNotificationSettings('guild-1', settings).subscribe();
+      service.updateNotificationSettings('guild-1', null, settings).subscribe();
 
       const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-settings'));
       expect(req.request.method).toBe('PATCH');
-      expect(req.request.body).toEqual({ settings });
+      expect(req.request.body).toEqual({ guildBranchId: null, settings });
+      req.flush(null);
+    });
+
+    it('sends the branch id in the body when scoped to a specific branch', () => {
+      const settings: GuildNotificationSetting[] = [
+        { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
+      ];
+
+      service.updateNotificationSettings('guild-1', 7, settings).subscribe();
+
+      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-settings'));
+      expect(req.request.body).toEqual({ guildBranchId: 7, settings });
+      req.flush(null);
+    });
+  });
+
+  // ── resetNotificationSetting ─────────────────────────────────────────────
+
+  describe('resetNotificationSetting', () => {
+    it('sends DELETE to /guilds/:id/notification-settings/:guildBranchId/:eventType', () => {
+      service.resetNotificationSetting('guild-1', 7, GuildNotificationEventType.AbsenceAdded).subscribe();
+
+      const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-settings/7/AbsenceAdded'));
+      expect(req.request.method).toBe('DELETE');
       req.flush(null);
     });
   });

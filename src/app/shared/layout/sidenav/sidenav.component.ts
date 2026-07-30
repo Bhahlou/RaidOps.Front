@@ -9,6 +9,7 @@ import { DiscordIconType } from '../../models/discord-icon-type.enum';
 import { GuildAccessLevel, hasGuildAccess } from '../../../core/models/guild-access-level.enum';
 import { UserGuild } from '../../../core/models/user-guild.model';
 import { DiscordIconComponent } from '../../components/icons/discord-icon/discord-icon.component';
+import { getLastVisitedBranchId } from '../../../features/guilds/utils/last-visited-branch.util';
 
 @Component({
   selector: 'app-sidenav',
@@ -98,5 +99,18 @@ export class SidenavComponent {
   /** Calendar/roster/loot require Roster-tier access — matches `minAccessLevel` in guilds.routes.ts. */
   hasRosterAccess(guild: UserGuild): boolean {
     return hasGuildAccess(guild.accessLevel, GuildAccessLevel.Roster);
+  }
+
+  /**
+   * Branch-scoped leaves (dashboard/roster/loot) need a concrete branch id in their URL — the
+   * sidenav doesn't offer a branch picker (see `app-branch-tabs`, used on the pages themselves),
+   * so it always links to the same branch `guildDefaultBranchGuard` would resolve on a bare
+   * `/guilds/:id`: the last one actually visited, falling back to the first active branch.
+   * Null only for the 0-active-branch edge case, where callers should hide the link entirely.
+   */
+  defaultBranchId(guild: UserGuild): number | null {
+    if (guild.branches.length === 0) return null;
+    const lastVisited = getLastVisitedBranchId(guild.id);
+    return guild.branches.find((b) => b.id === lastVisited)?.id ?? guild.branches[0].id;
   }
 }

@@ -137,7 +137,7 @@ export class GetStartedLinkStepComponent {
       next: () => {
         this.#joiningGuildId.set(null);
         if (this.guilds().length === 0) {
-          this.#router.navigate(['/guilds', guild.guildId, 'dashboard']);
+          this.#router.navigate(['/guilds', guild.guildId]);
         }
       },
       error: (err: HttpErrorResponse) => {

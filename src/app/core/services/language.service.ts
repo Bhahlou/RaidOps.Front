@@ -12,6 +12,7 @@ export class LanguageService {
   constructor() {
     const lang = this.#resolveInitialLang();
     this.#transloco.setActiveLang(lang);
+    document.documentElement.lang = lang;
   }
 
   get activeLang(): Lang {
@@ -26,6 +27,7 @@ export class LanguageService {
     if (!AVAILABLE_LANGS.includes(lang as Lang)) return;
     localStorage.setItem(STORAGE_KEY, lang);
     this.#transloco.setActiveLang(lang);
+    document.documentElement.lang = lang;
   }
 
   #resolveInitialLang(): Lang {

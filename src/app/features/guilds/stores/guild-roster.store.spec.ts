@@ -57,7 +57,7 @@ describe('GuildRosterStore', () => {
     it('fetches the roster for the given guild', async () => {
       const m = [member({ characterName: 'Jaina' })];
 
-      store.loadRoster('g1');
+      store.loadRoster('g1', 1);
       TestBed.tick();
 
       const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster'));
@@ -70,12 +70,12 @@ describe('GuildRosterStore', () => {
     });
 
     it('re-fetches every time it is called, even for the same guildId', async () => {
-      store.loadRoster('g1');
+      store.loadRoster('g1', 1);
       TestBed.tick();
       controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
       await TestBed.inject(ApplicationRef).whenStable();
 
-      store.loadRoster('g1');
+      store.loadRoster('g1', 1);
       TestBed.tick();
       const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster'));
       req.flush([member({ characterName: 'Jaina' })]);
@@ -85,12 +85,12 @@ describe('GuildRosterStore', () => {
     });
 
     it('re-fetches when the guildId changes', async () => {
-      store.loadRoster('g1');
+      store.loadRoster('g1', 1);
       TestBed.tick();
       controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
       await TestBed.inject(ApplicationRef).whenStable();
 
-      store.loadRoster('g2');
+      store.loadRoster('g2', 1);
       TestBed.tick();
       controller
         .expectOne((r) => r.url.endsWith('/guilds/g2/roster'))
@@ -105,7 +105,7 @@ describe('GuildRosterStore', () => {
 
   describe('reload', () => {
     it('re-fetches the currently tracked guild roster', async () => {
-      store.loadRoster('g1');
+      store.loadRoster('g1', 1);
       TestBed.tick();
       controller.expectOne((r) => r.url.endsWith('/guilds/g1/roster')).flush([member()]);
       await TestBed.inject(ApplicationRef).whenStable();

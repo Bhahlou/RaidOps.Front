@@ -31,11 +31,26 @@ export function fix(id: string, date: string, key: string): ChangelogEntry {
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-07-30-branch-notifications', '2026-07-30', 'branchNotifications', {
+    category: 'guild',
+    article: 'notifications',
+  }),
+  feature('2026-07-29-global-calendar', '2026-07-29', 'globalCalendar', {
+    category: 'account',
+    article: 'calendar',
+  }),
+  feature('2026-07-28-guild-branches', '2026-07-28', 'guildBranches', {
+    category: 'guild',
+    article: 'branches',
+  }),
   feature('2026-07-23-guild-notifications', '2026-07-23', 'guildNotifications', {
     category: 'guild',
     article: 'notifications',
   }),
-  feature('2026-07-20-calendar', '2026-07-20', 'calendar', { category: 'guild', article: 'calendar' }),
+  feature('2026-07-20-calendar', '2026-07-20', 'calendar', {
+    category: 'account',
+    article: 'calendar',
+  }),
   feature('2026-07-19-bnet-multi-account', '2026-07-19', 'bnetMultiAccount', {
     category: 'getting-started',
     article: 'create-character',

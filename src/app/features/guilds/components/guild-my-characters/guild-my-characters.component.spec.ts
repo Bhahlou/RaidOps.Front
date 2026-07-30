@@ -10,9 +10,12 @@ import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildMembership } from '../../models/guild-membership.model';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
+import { GuildBranchesStore } from '../../stores/guild-branches.store';
+import { GuildBranch } from '../../models/guild-branch.model';
+import { RosterMode } from '../../models/roster-mode.enum';
 
 const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
-  guildId, guildName: `Guild ${guildId}`, guildIconHash: null,
+  guildId, guildBranchId: 1, guildName: `Guild ${guildId}`, guildIconHash: null,
   characterRank: rank, joinedAt: '2025-01-01',
 });
 
@@ -24,11 +27,19 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
   ...overrides,
 });
 
+const makeBranch = (overrides: Partial<GuildBranch> = {}): GuildBranch => ({
+  id: 1, branchId: 1, branchName: 'Classic Anniversary', isActive: true,
+  rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [],
+  ...overrides,
+});
+
 const setup = (opts: {
   guildId?: string;
+  guildBranchId?: number;
   characterList?: Character[];
+  branches?: GuildBranch[];
 } = {}) => {
-  const { guildId = 'g1', characterList = [] } = opts;
+  const { guildId = 'g1', guildBranchId = 1, characterList = [], branches = [makeBranch()] } = opts;
 
   const joinGuild  = vi.fn().mockReturnValue(of(undefined));
   const updateRank = vi.fn().mockReturnValue(of(undefined));
@@ -49,6 +60,7 @@ const setup = (opts: {
     membershipErrorKey,
   };
   const mockRosterStore = { isLoading: signal(false), members: signal([]), loadRoster };
+  const mockBranchesStore = { branches: signal(branches), load: vi.fn() };
 
   TestBed.configureTestingModule({
     imports: [GuildMyCharactersComponent],
@@ -56,11 +68,13 @@ const setup = (opts: {
       { provide: CharacterStore, useValue: mockStore },
       { provide: SnackbarService, useValue: snackbar },
       { provide: GuildRosterStore, useValue: mockRosterStore },
+      { provide: GuildBranchesStore, useValue: mockBranchesStore },
     ],
   }).overrideComponent(GuildMyCharactersComponent, { set: { template: '', imports: [] } });
 
   const fixture = TestBed.createComponent(GuildMyCharactersComponent);
   fixture.componentRef.setInput('guildId', guildId);
+  fixture.componentRef.setInput('guildBranchId', guildBranchId);
   fixture.detectChanges();
 
   return { component: fixture.componentInstance, joinGuild, updateRank, leaveGuild, membershipErrorKey, snackbar, loadRoster };
@@ -189,6 +203,14 @@ describe('GuildMyCharactersComponent', () => {
       });
       expect(component.addableCharacters()).toEqual([]);
     });
+
+    it('returns empty when the currently-viewed branch is not found in the branch catalog', () => {
+      const { component } = setup({
+        guildBranchId: 999,
+        characterList: [makeChar(1)],
+      });
+      expect(component.addableCharacters()).toEqual([]);
+    });
   });
 
   // ── rankFor ───────────────────────────────────────────────────────────────
@@ -286,7 +308,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(component.showAddPanel()).toBe(false);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.joinSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1');
+      expect(loadRoster).toHaveBeenCalledWith('g1', 1);
     });
 
     it('shows an error snackbar mapped via store.membershipErrorKey when the join fails', () => {
@@ -312,7 +334,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(updateRank).toHaveBeenCalledWith(3, 'g1', CharacterRank.Alt);
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.rankUpdateSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1');
+      expect(loadRoster).toHaveBeenCalledWith('g1', 1);
     });
 
     it('shows an error snackbar when the update fails', () => {
@@ -335,7 +357,7 @@ describe('GuildMyCharactersComponent', () => {
 
       expect(leaveGuild).toHaveBeenCalledWith(7, 'g1');
       expect(snackbar.success).toHaveBeenCalledWith('characterDetail.guilds.leaveSuccess');
-      expect(loadRoster).toHaveBeenCalledWith('g1');
+      expect(loadRoster).toHaveBeenCalledWith('g1', 1);
     });
 
     it('shows an error snackbar when the leave fails', () => {

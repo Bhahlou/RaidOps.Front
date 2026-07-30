@@ -31,7 +31,7 @@
                 [type]="DiscordIconType.Guild"
                 [size]="32"
               />
-              <a class="guild-name" [routerLink]="['/guilds', m.guildId, 'roster']">{{ m.guildName }}</a>
+              <a class="guild-name" [routerLink]="['/guilds', m.guildId, m.guildBranchId, 'roster']">{{ m.guildName }}</a>
             </div>
             <div class="membership-controls">
               <app-select

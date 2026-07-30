@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin: 12px 0 0;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.officer-roles-label {
+  margin-top: 16px;
+}
+
+.field-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--mat-sys-error);
+}
+
+// ── Roster mode toggle ────────────────────────────────────────────────────────
+
+.roster-toggle {
+  display: flex;
+  align-self: flex-start;
+  flex-wrap: wrap;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 6px;
+  border: none;
+  border-right: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:first-of-type {
+    border-radius: 5px 0 0 5px;
+  }
+
+  &:last-of-type {
+    border-radius: 0 5px 5px 0;
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-accent);
+  }
+}
+
+.toggle-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
