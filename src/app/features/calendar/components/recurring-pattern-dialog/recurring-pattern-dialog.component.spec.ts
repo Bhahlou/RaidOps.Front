@@ -77,6 +77,28 @@ describe('RecurringPatternDialogComponent', () => {
     expect(setup(createData)).toBeTruthy();
   });
 
+  // ── scopeKey ──────────────────────────────────────────────────────────────
+
+  describe('scopeKey', () => {
+    it('defaults to Global when creating a new pattern', () => {
+      const component = setup(createData);
+
+      expect(component.scopeKey()).toBe('__global__');
+    });
+
+    it('defaults to Global when editing a Global existing pattern', () => {
+      const component = setup({ pattern: pattern() });
+
+      expect(component.scopeKey()).toBe('__global__');
+    });
+
+    it('defaults to the branch scope when editing a branch-scoped existing pattern', () => {
+      const component = setup({ pattern: pattern({ guildId: 'guild-1', guildBranchId: 7 }) });
+
+      expect(component.scopeKey()).toBe('guild-1:7');
+    });
+  });
+
   // ── initial state ─────────────────────────────────────────────────────────
 
   describe('create mode (no existing pattern)', () => {

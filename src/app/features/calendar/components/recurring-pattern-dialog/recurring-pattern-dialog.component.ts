@@ -13,6 +13,7 @@ import {
 } from '../../models/availability.model';
 import { AvailabilityScopeFieldComponent } from '../availability-scope-field/availability-scope-field.component';
 import { scopeFromKey, scopeToKey } from '../../utils/availability-scope.util';
+import { parseIsoDate, toIsoDate } from '../../utils/iso-date.util';
 
 export interface RecurringPatternDialogData {
   /** The pattern to edit, or `null` to create a new one. */
@@ -222,14 +223,3 @@ function weekdayIndex(date: Date): number {
   return (date.getDay() + 6) % 7;
 }
 
-function parseIsoDate(iso: string): Date {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-function toIsoDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}

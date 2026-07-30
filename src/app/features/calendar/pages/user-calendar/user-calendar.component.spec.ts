@@ -15,6 +15,7 @@ import { AvailabilityCalendar, AvailabilityException } from '../../models/availa
 import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
 import { User } from '../../../../core/models/user.model';
 import { GuildAccessLevel } from '../../../../core/models/guild-access-level.enum';
+import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 
 const exception = (overrides?: Partial<AvailabilityException>): AvailabilityException => ({
   id: 1,
@@ -68,7 +69,7 @@ describe('UserCalendarComponent', () => {
     translate: ReturnType<typeof vi.fn>;
   };
 
-  const setup = () => {
+  const setup = (user: User | null = fakeUser) => {
     store = {
       calendar: signal(null),
       isLoading: signal(false),
@@ -91,7 +92,7 @@ describe('UserCalendarComponent', () => {
     TestBed.configureTestingModule({
       imports: [UserCalendarComponent],
       providers: [
-        { provide: AuthStore, useValue: { user: signal(fakeUser) } },
+        { provide: AuthStore, useValue: { user: signal(user) } },
         { provide: AvailabilityStore, useValue: store },
         { provide: Dialog, useValue: dialog },
         { provide: SnackbarService, useValue: snackbar },
@@ -110,6 +111,20 @@ describe('UserCalendarComponent', () => {
 
   it('sets i18nKey to calendar.pageTitle on the last breadcrumb', () => {
     expect(setup().breadcrumbs().at(-1)?.i18nKey).toBe('calendar.pageTitle');
+  });
+
+  it("uses the authenticated user's name and Discord icon on the first breadcrumb", () => {
+    const first = setup().breadcrumbs()[0];
+
+    expect(first.label).toBe('Thrall');
+    expect(first.discordIcon).toEqual({ id: 'user-1', hash: null, type: DiscordIconType.User });
+  });
+
+  it('falls back to a placeholder label and no Discord icon when there is no authenticated user', () => {
+    const first = setup(null).breadcrumbs()[0];
+
+    expect(first.label).toBe('…');
+    expect(first.discordIcon).toBeUndefined();
   });
 
   it('loads the current month range on creation', () => {
@@ -202,6 +217,18 @@ describe('UserCalendarComponent', () => {
       const component = setup();
 
       expect(component.scopeLabel('guild-1', 1)).toBe('Horde Guild — Classic');
+    });
+
+    it('returns the Global label when the guild is found but the branch is not', () => {
+      const component = setup();
+
+      expect(component.scopeLabel('guild-1', 999)).toBe('calendar.scope.global');
+    });
+
+    it('returns the Global label when there is no authenticated user', () => {
+      const component = setup(null);
+
+      expect(component.scopeLabel('guild-1', 1)).toBe('calendar.scope.global');
     });
   });
 

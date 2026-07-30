@@ -61,6 +61,28 @@ describe('AvailabilityExceptionDialogComponent', () => {
     expect(setup(newDeclarationData)).toBeTruthy();
   });
 
+  // ── scopeKey ──────────────────────────────────────────────────────────────
+
+  describe('scopeKey', () => {
+    it('defaults to Global when creating a new declaration', () => {
+      const component = setup(newDeclarationData);
+
+      expect(component.scopeKey()).toBe('__global__');
+    });
+
+    it('defaults to Global when editing a Global existing declaration', () => {
+      const component = setup({ ...newDeclarationData, existing: exception() });
+
+      expect(component.scopeKey()).toBe('__global__');
+    });
+
+    it('defaults to the branch scope when editing a branch-scoped existing declaration', () => {
+      const component = setup({ ...newDeclarationData, existing: exception({ guildId: 'guild-1', guildBranchId: 7 }) });
+
+      expect(component.scopeKey()).toBe('guild-1:7');
+    });
+  });
+
   // ── isEditing / canRemoveDay ─────────────────────────────────────────────
 
   describe('isEditing / canRemoveDay', () => {

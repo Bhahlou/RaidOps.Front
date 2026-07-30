@@ -10,6 +10,7 @@ import { DayAvailabilityStatus } from '../../models/day-availability-status.enum
 import { AvailabilityException } from '../../models/availability.model';
 import { AvailabilityScopeFieldComponent } from '../availability-scope-field/availability-scope-field.component';
 import { scopeFromKey, scopeToKey } from '../../utils/availability-scope.util';
+import { parseIsoDate, toIsoDate } from '../../utils/iso-date.util';
 
 export interface AvailabilityExceptionDialogData {
   /** ISO date string (`yyyy-MM-dd`) to preselect, e.g. the day clicked in the calendar grid. */
@@ -156,18 +157,6 @@ export class AvailabilityExceptionDialogComponent {
         return 'errors.server';
     }
   }
-}
-
-function parseIsoDate(iso: string): Date {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-function toIsoDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }
 
 /** Bridges a back-end `HH:mm:ss` time string to the `HH:mm` value a native `<input type="time">` expects. */
