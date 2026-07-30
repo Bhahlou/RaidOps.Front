@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
-import { GuildNotificationSetting } from '../models/guild-notification-setting.model';
+import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
 import { GuildSettings } from '../models/guild-settings.model';
 
 @Service()
@@ -32,8 +32,13 @@ export class GuildSettingsService {
     return this.#http.get<DiscordChannel[]>(`${this.#api}/guilds/${guildId}/notification-channels`);
   }
 
-  /** Persists the guild's Discord notification settings in bulk. */
-  updateNotificationSettings(guildId: string, settings: GuildNotificationSetting[]): Observable<void> {
-    return this.#http.patch<void>(`${this.#api}/guilds/${guildId}/notification-settings`, { settings });
+  /** Persists the guild's Discord notification settings in bulk, scoped to a branch or guild-wide (null). */
+  updateNotificationSettings(guildId: string, guildBranchId: number | null, settings: GuildNotificationSetting[]): Observable<void> {
+    return this.#http.patch<void>(`${this.#api}/guilds/${guildId}/notification-settings`, { guildBranchId, settings });
+  }
+
+  /** Removes the branch's override for one event type, reverting just that setting to the guild-wide fallback. */
+  resetNotificationSetting(guildId: string, guildBranchId: number, eventType: GuildNotificationEventType): Observable<void> {
+    return this.#http.delete<void>(`${this.#api}/guilds/${guildId}/notification-settings/${guildBranchId}/${eventType}`);
   }
 }

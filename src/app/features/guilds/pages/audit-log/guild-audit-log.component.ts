@@ -22,8 +22,8 @@ import { AuditLogEntry } from '../../models/audit-log-entry.model';
 import { GuildAuditAction } from '../../models/guild-audit-action.enum';
 import { GuildAuditCategory } from '../../models/guild-audit-category.enum';
 import { RosterMode } from '../../models/roster-mode.enum';
-import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
-import { describePartialTime, formatPartialTimeLabel } from '../../models/availability.model';
+import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
+import { describePartialTime, formatPartialTimeLabel } from '../../../calendar/models/availability.model';
 
 type SortColumn = 'actor' | 'category' | 'action' | 'change' | 'time';
 type SortDirection = 'asc' | 'desc';

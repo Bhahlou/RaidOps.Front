@@ -122,6 +122,37 @@ describe('SelectComponent', () => {
     });
   });
 
+  // ── selectedIconUrl ──────────────────────────────────────────────────────
+
+  describe('selectedIconUrl', () => {
+    it('is null when no option matches the current value', () => {
+      expect(setup().selectedIconUrl()).toBeNull();
+    });
+
+    it('is null when the matching option carries no iconUrl', () => {
+      const component = setup();
+      component.value.set('b');
+
+      expect(component.selectedIconUrl()).toBeNull();
+    });
+
+    it("is the matching option's iconUrl", () => {
+      TestBed.configureTestingModule({ imports: [SelectComponent] })
+        .overrideComponent(SelectComponent, { set: { template: '', imports: [] } });
+
+      const fixture = TestBed.createComponent(SelectComponent<string>);
+      const withIcon: SelectOption<string>[] = [
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta', iconUrl: '/assets/icon.png' },
+      ];
+      fixture.componentRef.setInput('options', withIcon);
+      fixture.detectChanges();
+      fixture.componentInstance.value.set('b');
+
+      expect(fixture.componentInstance.selectedIconUrl()).toBe('/assets/icon.png');
+    });
+  });
+
   // ── listboxValue ─────────────────────────────────────────────────────────
 
   describe('listboxValue', () => {

@@ -6,4 +6,6 @@ export interface UserGuildBranch {
   branchId: number;
   branchName: string;
   accessLevel: GuildAccessLevel;
+  /** Whether the user has an active roster character on this branch specifically, as opposed to merely a Discord role granting access. */
+  hasActiveCharacter: boolean;
 }

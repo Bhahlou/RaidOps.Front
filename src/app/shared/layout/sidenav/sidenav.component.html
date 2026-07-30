@@ -37,6 +37,10 @@
           <span class="material-icons item-icon">shield</span>
           <span class="sidenav-label">{{ 'sidenav.account.equipment' | transloco }}</span>
         </a>
+        <a class="sidenav-item" routerLink="/calendar" routerLinkActive="active-link">
+          <span class="material-icons item-icon">calendar_month</span>
+          <span class="sidenav-label">{{ 'sidenav.account.calendar' | transloco }}</span>
+        </a>
         <a class="sidenav-item" routerLink="/guilds" [class.active-link]="isGuildsActive()">
           <span class="material-icons item-icon">groups</span>
           <span class="sidenav-label">{{ 'sidenav.guilds' | transloco }}</span>
@@ -72,14 +76,6 @@
               <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
             </a>
             @if (hasRosterAccess(guild)) {
-              <a
-                class="sidenav-item"
-                [routerLink]="['/guilds', guild.id, 'calendar']"
-                routerLinkActive="active-link"
-              >
-                <span class="material-icons item-icon">calendar_month</span>
-                <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
-              </a>
               <a
                 class="sidenav-item"
                 [routerLink]="['/guilds', guild.id, branchId, 'roster']"

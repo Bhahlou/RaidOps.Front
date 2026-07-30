@@ -1,0 +1,8 @@
+<div class="field-group">
+  <span class="field-label">{{ 'calendar.scope.label' | transloco }}</span>
+  @if (editable()) {
+    <app-select [options]="options()" [value]="value()" (valueChange)="value.set($event ?? options()[0].value)" />
+  } @else {
+    <span class="scope-badge">{{ readonlyLabel() }}</span>
+  }
+</div>

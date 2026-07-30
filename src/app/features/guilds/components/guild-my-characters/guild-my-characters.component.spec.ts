@@ -10,6 +10,9 @@ import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildMembership } from '../../models/guild-membership.model';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
+import { GuildBranchesStore } from '../../stores/guild-branches.store';
+import { GuildBranch } from '../../models/guild-branch.model';
+import { RosterMode } from '../../models/roster-mode.enum';
 
 const makeMembership = (guildId: string, rank = CharacterRank.Main): GuildMembership => ({
   guildId, guildBranchId: 1, guildName: `Guild ${guildId}`, guildIconHash: null,
@@ -24,12 +27,19 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
   ...overrides,
 });
 
+const makeBranch = (overrides: Partial<GuildBranch> = {}): GuildBranch => ({
+  id: 1, branchId: 1, branchName: 'Classic Anniversary', isActive: true,
+  rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [],
+  ...overrides,
+});
+
 const setup = (opts: {
   guildId?: string;
   guildBranchId?: number;
   characterList?: Character[];
+  branches?: GuildBranch[];
 } = {}) => {
-  const { guildId = 'g1', guildBranchId = 1, characterList = [] } = opts;
+  const { guildId = 'g1', guildBranchId = 1, characterList = [], branches = [makeBranch()] } = opts;
 
   const joinGuild  = vi.fn().mockReturnValue(of(undefined));
   const updateRank = vi.fn().mockReturnValue(of(undefined));
@@ -50,6 +60,7 @@ const setup = (opts: {
     membershipErrorKey,
   };
   const mockRosterStore = { isLoading: signal(false), members: signal([]), loadRoster };
+  const mockBranchesStore = { branches: signal(branches), load: vi.fn() };
 
   TestBed.configureTestingModule({
     imports: [GuildMyCharactersComponent],
@@ -57,6 +68,7 @@ const setup = (opts: {
       { provide: CharacterStore, useValue: mockStore },
       { provide: SnackbarService, useValue: snackbar },
       { provide: GuildRosterStore, useValue: mockRosterStore },
+      { provide: GuildBranchesStore, useValue: mockBranchesStore },
     ],
   }).overrideComponent(GuildMyCharactersComponent, { set: { template: '', imports: [] } });
 
@@ -188,6 +200,14 @@ describe('GuildMyCharactersComponent', () => {
           makeChar(1, { guildMemberships: [makeMembership('g1')] }),
           makeChar(2, { guildMemberships: [makeMembership('g1')] }),
         ],
+      });
+      expect(component.addableCharacters()).toEqual([]);
+    });
+
+    it('returns empty when the currently-viewed branch is not found in the branch catalog', () => {
+      const { component } = setup({
+        guildBranchId: 999,
+        characterList: [makeChar(1)],
       });
       expect(component.addableCharacters()).toEqual([]);
     });

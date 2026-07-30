@@ -36,12 +36,6 @@ export const guildRoutes: Routes = [
         children: [
           { path: '', pathMatch: 'full', canActivate: [guildDefaultBranchGuard], children: [] },
           {
-            path: 'calendar',
-            data: { minAccessLevel: GuildAccessLevel.Roster },
-            loadComponent: () =>
-              import('./pages/calendar/guild-calendar.component').then(m => m.GuildCalendarComponent),
-          },
-          {
             path: 'settings',
             redirectTo: 'settings/general',
             pathMatch: 'full',
@@ -62,8 +56,8 @@ export const guildRoutes: Routes = [
             // Branch-scoped leaves. No component here on purpose — this route only groups
             // path + guard, its children render straight into GuildLayoutComponent's outlet.
             // Declared LAST — ':branchId' matches any single segment, including literal
-            // sibling names like 'settings'/'audit-log'/'calendar'; a param route earlier in
-            // the array would swallow those before Angular ever tries the literal routes.
+            // sibling names like 'settings'/'audit-log'; a param route earlier in the array
+            // would swallow those before Angular ever tries the literal routes.
             path: ':branchId',
             canActivateChild: [guildBranchAccessGuard],
             children: [

@@ -72,6 +72,14 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "branchNotifications": {
+        "title": "Per-branch Discord notification overrides",
+        "description": "Notification settings (starting with absences) can now be overridden for a specific branch instead of only guild-wide, with a clear \"inherited from the guild-wide setting\" indicator and one-click revert. Missing bot permissions are now listed by name (e.g. \"send messages\", \"embed links\") instead of a generic warning."
+      },
+      "globalCalendar": {
+        "title": "Your availability calendar now follows you, not just one guild",
+        "description": "Absences and recurring patterns are global by default — no more redeclaring the same absence for every guild. Optionally scope a declaration to one specific branch when it only applies there. Find it under My account → Calendar."
+      },
       "guildBranches": {
         "title": "Manage several WoW versions in the same guild",
         "description": "A Discord guild can now activate several WoW branches in parallel (e.g. Classic Anniversary and MoP Classic), each with its own roster access mode and its own Officer roles. Once a guild has more than one active branch, tabs appear on the roster to switch between them."
@@ -217,12 +225,16 @@
         "description": "History of shipped features."
       },
       "guildCalendar": {
-        "title": "Guild calendar",
-        "description": "One-off and recurring absence declarations, with Discord notifications — raid event scheduling is still to come."
+        "title": "Availability calendar",
+        "description": "Global-by-default one-off and recurring absence declarations, optionally scoped to a specific branch, with Discord notifications — raid event scheduling is still to come."
       },
       "guildMultiBranch": {
         "title": "Multi-branch guilds",
         "description": "A Discord guild can activate several WoW branches in parallel, with roster access and Officer roles configured separately for each."
+      },
+      "branchNotifications": {
+        "title": "Branch-aware Discord notifications",
+        "description": "Guild-wide notification settings can be overridden per branch, with a clear \"inherited\" indicator and one-click revert."
       },
       "raidBuilder": {
         "title": "Raid builder",
@@ -319,12 +331,12 @@
   "sidenav": {
     "account": {
       "characters": "Characters",
-      "equipment": "Gear planner"
+      "equipment": "Gear planner",
+      "calendar": "Calendar"
     },
     "guilds": "My guilds",
     "guild": {
       "dashboard": "Dashboard",
-      "calendar": "Calendar",
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Settings",
@@ -420,10 +432,22 @@
         "AbsenceAdded": "A member adds an absence",
         "AbsenceRemoved": "A member removes an absence"
       },
+      "scope": {
+        "label": "Scope",
+        "guildWide": "Whole guild",
+        "inherited": "Inherited from the guild-wide setting",
+        "resetToInherited": "Revert to inherited",
+        "resetSuccess": "This setting now inherits the guild-wide value again."
+      },
       "channel": {
         "placeholder": "Select a channel",
         "required": "Pick a channel to enable this notification.",
-        "missingPermission": "The bot doesn't have permission to post in this channel."
+        "missingPermission": "The bot is missing: {{ permissions }}.",
+        "permissionFlags": {
+          "ViewChannel": "view channel",
+          "SendMessages": "send messages",
+          "EmbedLinks": "embed links"
+        }
       },
       "save": "Save notification settings",
       "saveSuccess": "Notification settings saved."
@@ -614,10 +638,15 @@
     }
   },
   "calendar": {
+    "pageTitle": "My calendar",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "today": "Today",
     "declareException": "Declare absence/lateness",
+    "scope": {
+      "label": "Applies to",
+      "global": "Global"
+    },
     "status": {
       "absent": "Absent",
       "partial": "Partial",

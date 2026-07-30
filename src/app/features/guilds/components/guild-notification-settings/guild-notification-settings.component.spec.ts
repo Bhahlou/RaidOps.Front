@@ -6,15 +6,20 @@ import { of, throwError } from 'rxjs';
 import { GuildNotificationSettingsComponent } from './guild-notification-settings.component';
 import { GuildSettingsService } from '../../services/guild-settings.service';
 import { GuildNotificationSettingsStore } from '../../stores/guild-notification-settings.store';
+import { GuildBranchesStore } from '../../stores/guild-branches.store';
+import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../../models/guild-notification-setting.model';
-import { DiscordChannel } from '../../../../shared/models/discord-channel.model';
+import { GuildBranch } from '../../models/guild-branch.model';
+import { RosterMode } from '../../models/roster-mode.enum';
+import { DiscordChannel, DiscordChannelPermissionFlag } from '../../../../shared/models/discord-channel.model';
+import { Branch } from '../../../../shared/models/branch.model';
 
 const channel = (overrides?: Partial<DiscordChannel>): DiscordChannel => ({
   id: 'chan-1',
   name: 'general',
-  botCanSendMessages: true,
+  missingPermissions: [],
   categoryName: null,
   ...overrides,
 });
@@ -26,29 +31,55 @@ const setting = (overrides?: Partial<GuildNotificationSetting>): GuildNotificati
   ...overrides,
 });
 
+const branch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
+  id: 7,
+  branchId: 1,
+  branchName: 'Retail',
+  isActive: true,
+  rosterMode: RosterMode.Open,
+  rosterRoleIds: [],
+  officerRoleIds: [],
+  ...overrides,
+});
+
 describe('GuildNotificationSettingsComponent', () => {
   let fixture: ComponentFixture<GuildNotificationSettingsComponent>;
   let component: GuildNotificationSettingsComponent;
-  let settingsService: { updateNotificationSettings: ReturnType<typeof vi.fn> };
+  let settingsService: { updateNotificationSettings: ReturnType<typeof vi.fn>; resetNotificationSetting: ReturnType<typeof vi.fn> };
   let store: {
     settings: ReturnType<typeof signal<GuildNotificationSetting[]>>;
     channels: ReturnType<typeof signal<DiscordChannel[]>>;
     load: ReturnType<typeof vi.fn>;
     patchSettings: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
   };
+  let branchesStore: { branches: ReturnType<typeof signal<GuildBranch[]>>; load: ReturnType<typeof vi.fn> };
+  let wowBrancheService: { getAll: ReturnType<typeof vi.fn> };
   let authStore: { loadUser: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
   let transloco: { translate: ReturnType<typeof vi.fn> };
 
-  const setup = (guildId = 'g1', storeSettings: GuildNotificationSetting[] = [], storeChannels: DiscordChannel[] = [channel()]) => {
-    settingsService = { updateNotificationSettings: vi.fn().mockReturnValue(of(undefined)) };
+  const setup = (
+    guildId = 'g1',
+    storeSettings: GuildNotificationSetting[] = [],
+    storeChannels: DiscordChannel[] = [channel()],
+    storeBranches: GuildBranch[] = [branch()],
+    wowBranches: Branch[] = [],
+  ) => {
+    settingsService = {
+      updateNotificationSettings: vi.fn().mockReturnValue(of(undefined)),
+      resetNotificationSetting: vi.fn().mockReturnValue(of(undefined)),
+    };
     store = {
       settings: signal<GuildNotificationSetting[]>([]),
       channels: signal<DiscordChannel[]>(storeChannels),
       load: vi.fn(),
       patchSettings: vi.fn(),
+      reload: vi.fn(),
     };
     store.load.mockImplementation(() => store.settings.set(storeSettings));
+    branchesStore = { branches: signal<GuildBranch[]>(storeBranches), load: vi.fn() };
+    wowBrancheService = { getAll: vi.fn().mockReturnValue(of(wowBranches)) };
     authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
     transloco = { translate: vi.fn((key: string) => key) };
@@ -58,6 +89,8 @@ describe('GuildNotificationSettingsComponent', () => {
       providers: [
         { provide: GuildSettingsService, useValue: settingsService },
         { provide: GuildNotificationSettingsStore, useValue: store },
+        { provide: GuildBranchesStore, useValue: branchesStore },
+        { provide: WowBrancheService, useValue: wowBrancheService },
         { provide: AuthStore, useValue: authStore },
         { provide: SnackbarService, useValue: snackbar },
         { provide: TranslocoService, useValue: transloco },
@@ -72,11 +105,12 @@ describe('GuildNotificationSettingsComponent', () => {
   // ── ngOnInit ──────────────────────────────────────────────────────────────
 
   describe('ngOnInit', () => {
-    it('loads settings for the given guild', () => {
+    it('loads settings for the given guild, guild-wide by default', () => {
       setup('g1');
       fixture.detectChanges();
 
-      expect(store.load).toHaveBeenCalledWith('g1');
+      expect(store.load).toHaveBeenCalledWith('g1', null);
+      expect(branchesStore.load).toHaveBeenCalledWith('g1');
     });
 
     it('populates rows from the store settings', () => {
@@ -107,10 +141,10 @@ describe('GuildNotificationSettingsComponent', () => {
   // ── channelOptions ────────────────────────────────────────────────────────
 
   describe('channelOptions', () => {
-    it('sorts channels by category then name and flags channels the bot cannot post in', () => {
+    it('sorts channels by category then name and flags channels with a missing permission', () => {
       setup('g1', [], [
-        channel({ id: 'c2', name: 'bravo', categoryName: 'Zeta', botCanSendMessages: true }),
-        channel({ id: 'c1', name: 'alpha', categoryName: 'Alpha', botCanSendMessages: false }),
+        channel({ id: 'c2', name: 'bravo', categoryName: 'Zeta', missingPermissions: [] }),
+        channel({ id: 'c1', name: 'alpha', categoryName: 'Alpha', missingPermissions: [DiscordChannelPermissionFlag.EmbedLinks] }),
       ]);
       fixture.detectChanges();
 
@@ -204,15 +238,15 @@ describe('GuildNotificationSettingsComponent', () => {
       expect(component.channelHasNoPermission(null)).toBe(false);
     });
 
-    it('is true when the matching channel cannot receive bot messages', () => {
-      setup('g1', [], [channel({ id: 'c1', botCanSendMessages: false })]);
+    it('is true when the matching channel is missing a permission', () => {
+      setup('g1', [], [channel({ id: 'c1', missingPermissions: [DiscordChannelPermissionFlag.SendMessages] })]);
       fixture.detectChanges();
 
       expect(component.channelHasNoPermission('c1')).toBe(true);
     });
 
-    it('is false when the matching channel can receive bot messages', () => {
-      setup('g1', [], [channel({ id: 'c1', botCanSendMessages: true })]);
+    it('is false when the matching channel has no missing permissions', () => {
+      setup('g1', [], [channel({ id: 'c1', missingPermissions: [] })]);
       fixture.detectChanges();
 
       expect(component.channelHasNoPermission('c1')).toBe(false);
@@ -223,6 +257,26 @@ describe('GuildNotificationSettingsComponent', () => {
       fixture.detectChanges();
 
       expect(component.channelHasNoPermission('missing')).toBe(false);
+    });
+  });
+
+  // ── missingPermissionsLabel ───────────────────────────────────────────────
+
+  describe('missingPermissionsLabel', () => {
+    it('translates and joins every missing flag for the channel', () => {
+      setup('g1', [], [channel({ id: 'c1', missingPermissions: [DiscordChannelPermissionFlag.SendMessages, DiscordChannelPermissionFlag.EmbedLinks] })]);
+      fixture.detectChanges();
+
+      expect(component.missingPermissionsLabel('c1')).toBe(
+        'guildSettings.notificationSettings.channel.permissionFlags.SendMessages, guildSettings.notificationSettings.channel.permissionFlags.EmbedLinks',
+      );
+    });
+
+    it('returns an empty string when no channel matches the id', () => {
+      setup('g1', [], []);
+      fixture.detectChanges();
+
+      expect(component.missingPermissionsLabel('missing')).toBe('');
     });
   });
 
@@ -268,6 +322,119 @@ describe('GuildNotificationSettingsComponent', () => {
     });
   });
 
+  // ── onScopeChange / scopeOptions / isInherited ────────────────────────────
+
+  describe('scopeOptions', () => {
+    it('lists the guild-wide option first, then every active branch, with its expansion icon', () => {
+      setup(
+        'g1', [], [],
+        [branch({ id: 7, branchId: 1, branchName: 'Retail', isActive: true }), branch({ id: 8, branchName: 'Classic', isActive: false })],
+        [{ id: 1, name: 'Retail', bnetNamespacePrefix: 'retail', currentExpansionShortCode: 'TWW' }],
+      );
+      fixture.detectChanges();
+
+      expect(component.scopeOptions()).toEqual([
+        { value: '__guild_wide__', label: 'guildSettings.notificationSettings.scope.guildWide' },
+        { value: '7', label: 'Retail', iconUrl: '/assets/images/expansion-icons/TWW.png' },
+      ]);
+    });
+
+    it('falls back to no icon when the branch has no matching WoW branch catalog entry', () => {
+      setup('g1', [], [], [branch({ id: 7, branchId: 99, branchName: 'Retail', isActive: true })], []);
+      fixture.detectChanges();
+
+      expect(component.scopeOptions()[1]).toEqual({ value: '7', label: 'Retail', iconUrl: null });
+    });
+  });
+
+  describe('onScopeChange', () => {
+    it('switches scope to the given branch and reloads the store for it', () => {
+      setup('g1');
+      fixture.detectChanges();
+      store.load.mockClear();
+
+      component.onScopeChange('7');
+
+      expect(store.load).toHaveBeenCalledWith('g1', 7);
+    });
+
+    it('falls back to the guild-wide scope when given null', () => {
+      setup('g1');
+      fixture.detectChanges();
+      component.onScopeChange('7');
+      store.load.mockClear();
+
+      component.onScopeChange(null);
+
+      expect(store.load).toHaveBeenCalledWith('g1', null);
+    });
+  });
+
+  describe('isInherited', () => {
+    it('is false for the guild-wide scope', () => {
+      setup('g1', [setting({ guildBranchId: null })]);
+      fixture.detectChanges();
+
+      expect(component.isInherited(GuildNotificationEventType.AbsenceAdded)).toBe(false);
+    });
+
+    it('is true once a branch is selected and the row has no explicit override for it', () => {
+      setup('g1', [setting({ guildBranchId: null })]);
+      fixture.detectChanges();
+
+      component.onScopeChange('7');
+
+      expect(component.isInherited(GuildNotificationEventType.AbsenceAdded)).toBe(true);
+    });
+
+    it('is false once a branch is selected and the row is an explicit override for it', () => {
+      setup('g1', [setting({ guildBranchId: 7 })]);
+      fixture.detectChanges();
+
+      component.onScopeChange('7');
+
+      expect(component.isInherited(GuildNotificationEventType.AbsenceAdded)).toBe(false);
+    });
+  });
+
+  // ── resetToInherited ──────────────────────────────────────────────────────
+
+  describe('resetToInherited', () => {
+    it('does nothing for the guild-wide scope', async () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      await component.resetToInherited(GuildNotificationEventType.AbsenceAdded);
+
+      expect(settingsService.resetNotificationSetting).not.toHaveBeenCalled();
+    });
+
+    it('resets the branch override, reloads the store and shows a success snackbar', async () => {
+      setup('g1');
+      fixture.detectChanges();
+      component.onScopeChange('7');
+
+      await component.resetToInherited(GuildNotificationEventType.AbsenceAdded);
+
+      expect(settingsService.resetNotificationSetting).toHaveBeenCalledWith('g1', 7, GuildNotificationEventType.AbsenceAdded);
+      expect(store.reload).toHaveBeenCalledOnce();
+      expect(snackbar.success).toHaveBeenCalledWith('guildSettings.notificationSettings.scope.resetSuccess');
+      expect(component.resetting()).toBeNull();
+    });
+
+    it('shows an error snackbar and clears resetting on failure', async () => {
+      setup('g1');
+      settingsService.resetNotificationSetting.mockReturnValue(throwError(() => new Error('failed')));
+      fixture.detectChanges();
+      component.onScopeChange('7');
+
+      await component.resetToInherited(GuildNotificationEventType.AbsenceAdded);
+
+      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
+      expect(component.resetting()).toBeNull();
+    });
+  });
+
   // ── save ──────────────────────────────────────────────────────────────────
 
   describe('save', () => {
@@ -280,20 +447,33 @@ describe('GuildNotificationSettingsComponent', () => {
       expect(settingsService.updateNotificationSettings).not.toHaveBeenCalled();
     });
 
-    it('sends every family event row, patches the store, resyncs the user and shows a success snackbar', async () => {
+    it('sends every family event row for the guild-wide scope, patches the store, resyncs the user and shows a success snackbar', async () => {
       setup('g1', [setting({ enabled: true, channelId: 'chan-1' })]);
       fixture.detectChanges();
 
       await component.save();
 
-      expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', [
+      expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', null, [
         { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
         { eventType: GuildNotificationEventType.AbsenceRemoved, enabled: false, channelId: null },
       ]);
-      expect(store.patchSettings).toHaveBeenCalled();
+      expect(store.patchSettings).toHaveBeenCalledWith('g1', null, [
+        { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1', guildBranchId: null },
+        { eventType: GuildNotificationEventType.AbsenceRemoved, enabled: false, channelId: null, guildBranchId: null },
+      ]);
       expect(authStore.loadUser).toHaveBeenCalledOnce();
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.notificationSettings.saveSuccess');
       expect(component.submitting()).toBe(false);
+    });
+
+    it('sends the selected branch id when scoped to a branch', async () => {
+      setup('g1', [setting({ enabled: true, channelId: 'chan-1' })]);
+      fixture.detectChanges();
+      component.onScopeChange('7');
+
+      await component.save();
+
+      expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', 7, expect.anything());
     });
 
     it('shows an error snackbar and resets submitting on failure', async () => {
