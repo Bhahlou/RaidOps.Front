@@ -72,6 +72,14 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "branchNotifications": {
+        "title": "Discord-Benachrichtigungen pro Spielzweig überschreibbar",
+        "description": "Benachrichtigungseinstellungen (zunächst für Abwesenheiten) können jetzt für einen bestimmten Spielzweig überschrieben werden statt nur gildenweit, mit einem klaren Hinweis „übernommen von der gildenweiten Einstellung\" und einem Zurücksetzen mit einem Klick. Fehlende Bot-Berechtigungen werden jetzt namentlich aufgelistet (z. B. „Nachrichten senden\", „Links einbetten\") statt als allgemeine Warnung."
+      },
+      "globalCalendar": {
+        "title": "Dein Verfügbarkeitskalender folgt dir jetzt, nicht nur einer Gilde",
+        "description": "Abwesenheiten und Wiederholungen sind jetzt standardmäßig global — du musst dieselbe Abwesenheit nicht mehr für jede Gilde einzeln eintragen. Du kannst eine Eintragung weiterhin auf einen bestimmten Spielzweig beschränken, wenn sie nur dort gilt. Zu finden unter Mein Konto → Kalender."
+      },
       "guildBranches": {
         "title": "Mehrere WoW-Versionen in derselben Gilde verwalten",
         "description": "Eine Discord-Gilde kann jetzt mehrere Spielzweige parallel aktivieren (z. B. Classic Anniversary und MoP Classic), jeweils mit eigenem Roster-Zugriff und eigenen Officer-Rollen. Sobald eine Gilde mehr als einen aktiven Spielzweig hat, erscheinen auf dem Roster Tabs zum Wechseln zwischen ihnen."
@@ -217,12 +225,16 @@
         "description": "Verlauf der veröffentlichten Funktionen."
       },
       "guildCalendar": {
-        "title": "Gildenkalender",
-        "description": "Einmalige und wiederkehrende Abwesenheitseintragungen mit Discord-Benachrichtigungen — die Planung von Raid-Terminen folgt noch."
+        "title": "Verfügbarkeitskalender",
+        "description": "Einmalige und wiederkehrende Abwesenheitseintragungen, standardmäßig global mit der Möglichkeit, sie auf einen bestimmten Spielzweig zu beschränken, samt Discord-Benachrichtigungen — die Planung von Raid-Terminen folgt noch."
       },
       "guildMultiBranch": {
         "title": "Gilden mit mehreren Spielzweigen",
         "description": "Eine Discord-Gilde kann mehrere Spielzweige parallel aktivieren, mit für jeden separat konfiguriertem Roster-Zugriff und Officer-Rollen."
+      },
+      "branchNotifications": {
+        "title": "Spielzweig-bewusste Discord-Benachrichtigungen",
+        "description": "Die gildenweiten Benachrichtigungseinstellungen können jetzt pro Spielzweig überschrieben werden, mit einem klaren Hinweis auf Vererbung und einem Zurücksetzen mit einem Klick."
       },
       "raidBuilder": {
         "title": "Raid-Builder",
