@@ -118,7 +118,9 @@
   text-decoration: none;
   color: var(--mat-sys-on-surface-variant);
   white-space: nowrap;
-  transition: background 150ms ease, color 150ms ease;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background: var(--mat-sys-surface-container-high);

@@ -1,86 +1,39 @@
 <form [formRoot]="settingsForm" class="settings-form">
 
   <div class="settings-columns">
-    <div class="settings-column">
-      <!-- Timezone -->
-      <app-form-field-card class="full-width" [label]="'guildSettings.timezone.label' | transloco">
-        <p class="field-hint">{{ 'guildSettings.timezone.hint' | transloco }}</p>
-        <app-select
-          [inputId]="'guild-settings-timezone-input'"
-          [options]="timezoneOptions"
-          [filterable]="true"
-          [filterAriaLabel]="'guildSettings.timezone.label' | transloco"
-          [placeholder]="'guildSettings.timezone.placeholder' | transloco"
-          [formField]="settingsForm.timezone"
-        />
-        @if (settingsForm.timezone().invalid()) {
-          <small class="field-error">{{ 'guildSettings.timezone.required' | transloco }}</small>
-        }
-      </app-form-field-card>
+    <!-- Timezone -->
+    <app-form-field-card class="full-width" [label]="'guildSettings.timezone.label' | transloco">
+      <p class="field-hint">{{ 'guildSettings.timezone.hint' | transloco }}</p>
+      <app-select
+        [inputId]="'guild-settings-timezone-input'"
+        [options]="timezoneOptions"
+        [filterable]="true"
+        [filterAriaLabel]="'guildSettings.timezone.label' | transloco"
+        [placeholder]="'guildSettings.timezone.placeholder' | transloco"
+        [formField]="settingsForm.timezone"
+      />
+      @if (settingsForm.timezone().invalid()) {
+        <small class="field-error">{{ 'guildSettings.timezone.required' | transloco }}</small>
+      }
+    </app-form-field-card>
 
-      <!-- Roster access: toggle + (when Discord-role-gated) its role threshold picker, all one setting -->
-      <app-form-field-card [label]="'guildSettings.rosterMode.label' | transloco">
-        <p class="field-hint">{{ 'guildSettings.rosterMode.hint' | transloco }}</p>
-        <div class="roster-toggle">
-          <button
-            type="button"
-            class="toggle-btn"
-            [class.active]="settingsForm.rosterMode().value() === RosterMode.Open"
-            (click)="onRosterModeChange(RosterMode.Open)"
-          >
-            <span class="material-icons toggle-icon">public</span>
-            {{ 'guildSettings.rosterMode.open' | transloco }}
-          </button>
-          <button
-            type="button"
-            class="toggle-btn"
-            [class.active]="settingsForm.rosterMode().value() === RosterMode.DiscordRoleOnly"
-            (click)="onRosterModeChange(RosterMode.DiscordRoleOnly)"
-          >
-            <span class="material-icons toggle-icon">shield</span>
-            {{ 'guildSettings.rosterMode.discordRoleOnly' | transloco }}
-          </button>
-        </div>
-        @if (isDiscordRoleMode()) {
-          <p class="field-hint">{{ 'guildSettings.roles.hint' | transloco }}</p>
-          <app-role-threshold-picker
-            [roles]="sortedRoles()"
-            [loading]="rolesLoading()"
-            [formField]="settingsForm.minRosterRoleId"
-          />
-        }
-      </app-form-field-card>
-    </div>
-
-    <div class="settings-column">
-      <!-- Language -->
-      <app-form-field-card class="full-width" [label]="'guildSettings.language.label' | transloco">
-        <p class="field-hint">{{ 'guildSettings.language.hint' | transloco }}</p>
-        <app-select
-          [inputId]="'guild-settings-language-input'"
-          [options]="languageOptions"
-          [formField]="settingsForm.language"
-        />
-        @if (settingsForm.language().invalid()) {
-          <small class="field-error">{{ 'guildSettings.language.required' | transloco }}</small>
-        } @else if (languageNotYetSaved()) {
-          <p class="field-notice">
-            <span class="material-icons">info</span>
-            {{ 'guildSettings.language.notSaved' | transloco }}
-          </p>
-        }
-      </app-form-field-card>
-
-      <!-- Officer access threshold -->
-      <app-form-field-card [label]="'guildSettings.officerThreshold.label' | transloco">
-        <p class="field-hint">{{ 'guildSettings.officerThreshold.hint' | transloco }}</p>
-        <app-role-threshold-picker
-          [roles]="sortedRoles()"
-          [loading]="rolesLoading()"
-          [formField]="settingsForm.minOfficerRoleId"
-        />
-      </app-form-field-card>
-    </div>
+    <!-- Language -->
+    <app-form-field-card class="full-width" [label]="'guildSettings.language.label' | transloco">
+      <p class="field-hint">{{ 'guildSettings.language.hint' | transloco }}</p>
+      <app-select
+        [inputId]="'guild-settings-language-input'"
+        [options]="languageOptions"
+        [formField]="settingsForm.language"
+      />
+      @if (settingsForm.language().invalid()) {
+        <small class="field-error">{{ 'guildSettings.language.required' | transloco }}</small>
+      } @else if (languageNotYetSaved()) {
+        <p class="field-notice">
+          <span class="material-icons">info</span>
+          {{ 'guildSettings.language.notSaved' | transloco }}
+        </p>
+      }
+    </app-form-field-card>
   </div>
 
   <!-- Submit -->

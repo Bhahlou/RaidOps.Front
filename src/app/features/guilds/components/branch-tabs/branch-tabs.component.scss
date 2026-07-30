@@ -1,0 +1,49 @@
+// Same visual language as shared/components/layout/tabs/tabs.component.scss, duplicated rather
+// than shared — that component's API (click + emit, i18n-key labels) doesn't fit real
+// route-to-route navigation with dynamic (non-translatable) branch names.
+
+:host {
+  display: block;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 20px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  &--active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+}
+
+.tab-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}

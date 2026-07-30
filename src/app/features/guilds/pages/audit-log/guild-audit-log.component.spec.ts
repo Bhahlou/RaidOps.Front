@@ -635,9 +635,9 @@ describe('GuildAuditLogComponent', () => {
         variables: { changedFields: 'rosterMode', oldRosterMode: 'Open', newRosterMode: 'DiscordRoleOnly' },
       }));
 
-      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.rosterMode.open');
-      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.rosterMode.discordRoleOnly');
-      expect(changes[0].summary).toBe('guildSettings.rosterMode.open → guildSettings.rosterMode.discordRoleOnly');
+      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.branches.rosterMode.open');
+      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.branches.rosterMode.discordRoleOnly');
+      expect(changes[0].summary).toBe('guildSettings.branches.rosterMode.open → guildSettings.branches.rosterMode.discordRoleOnly');
     });
 
     it('shows an em dash for the roster mode field when oldRosterMode is missing (first-time configuration)', () => {
@@ -648,7 +648,7 @@ describe('GuildAuditLogComponent', () => {
         variables: { changedFields: 'rosterMode', newRosterMode: 'Open' },
       }));
 
-      expect(changes[0].summary).toBe('— → guildSettings.rosterMode.open');
+      expect(changes[0].summary).toBe('— → guildSettings.branches.rosterMode.open');
     });
 
     it('builds a role change with resolved name and color for minRosterRoleId', () => {
@@ -759,6 +759,29 @@ describe('GuildAuditLogComponent', () => {
       expect(component.changeSummary(entry({ actionType: GuildAuditAction.GuildRegistered }))).toBe('—');
     });
 
+    it.each([
+      GuildAuditAction.BranchActivated,
+      GuildAuditAction.BranchDeactivated,
+      GuildAuditAction.BranchRosterSettingsUpdated,
+    ])('shows the branch name for %s', (actionType) => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType,
+        variables: { branchId: '3', branchName: 'Classic Era' },
+      }))).toBe('Classic Era');
+    });
+
+    it.each([
+      GuildAuditAction.BranchActivated,
+      GuildAuditAction.BranchDeactivated,
+      GuildAuditAction.BranchRosterSettingsUpdated,
+    ])('falls back to an em dash for %s when branchName is missing', (actionType) => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType }))).toBe('—');
+    });
+
     it('shows the plain character name for MemberJoined/MemberLeft/MemberExcluded', () => {
       const component = setup();
 
@@ -786,7 +809,7 @@ describe('GuildAuditLogComponent', () => {
           oldTimezone: 'Europe/Paris', newTimezone: 'Europe/London',
           oldRosterMode: 'Open', newRosterMode: 'Open',
         },
-      }))).toBe('auditLog.settingsFields.timezone: Europe/Paris → Europe/London · auditLog.settingsFields.rosterMode: guildSettings.rosterMode.open → guildSettings.rosterMode.open');
+      }))).toBe('auditLog.settingsFields.timezone: Europe/Paris → Europe/London · auditLog.settingsFields.rosterMode: guildSettings.branches.rosterMode.open → guildSettings.branches.rosterMode.open');
     });
 
     it('shows an em dash for SettingsUpdated when changedFields is absent (legacy entry)', () => {

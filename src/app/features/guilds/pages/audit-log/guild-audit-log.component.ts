@@ -22,8 +22,8 @@ import { AuditLogEntry } from '../../models/audit-log-entry.model';
 import { GuildAuditAction } from '../../models/guild-audit-action.enum';
 import { GuildAuditCategory } from '../../models/guild-audit-category.enum';
 import { RosterMode } from '../../models/roster-mode.enum';
-import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
-import { describePartialTime, formatPartialTimeLabel } from '../../models/availability.model';
+import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
+import { describePartialTime, formatPartialTimeLabel } from '../../../calendar/models/availability.model';
 
 type SortColumn = 'actor' | 'category' | 'action' | 'change' | 'time';
 type SortDirection = 'asc' | 'desc';
@@ -376,6 +376,11 @@ export class GuildAuditLogComponent {
       case GuildAuditAction.RecurringAvailabilityPatternStopped:
         return this.#patternSummary(entry);
 
+      case GuildAuditAction.BranchActivated:
+      case GuildAuditAction.BranchDeactivated:
+      case GuildAuditAction.BranchRosterSettingsUpdated:
+        return entry.variables?.['branchName'] ?? '—';
+
       default:
         return characterName ?? '—';
     }
@@ -535,8 +540,8 @@ export class GuildAuditLogComponent {
   #rosterModeLabel(rosterMode: string): string {
     return this.#transloco.translate(
       rosterMode === RosterMode.DiscordRoleOnly
-        ? 'guildSettings.rosterMode.discordRoleOnly'
-        : 'guildSettings.rosterMode.open',
+        ? 'guildSettings.branches.rosterMode.discordRoleOnly'
+        : 'guildSettings.branches.rosterMode.open',
     );
   }
 

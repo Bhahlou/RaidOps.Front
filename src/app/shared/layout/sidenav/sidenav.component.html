@@ -37,6 +37,10 @@
           <span class="material-icons item-icon">shield</span>
           <span class="sidenav-label">{{ 'sidenav.account.equipment' | transloco }}</span>
         </a>
+        <a class="sidenav-item" routerLink="/calendar" routerLinkActive="active-link">
+          <span class="material-icons item-icon">calendar_month</span>
+          <span class="sidenav-label">{{ 'sidenav.account.calendar' | transloco }}</span>
+        </a>
         <a class="sidenav-item" routerLink="/guilds" [class.active-link]="isGuildsActive()">
           <span class="material-icons item-icon">groups</span>
           <span class="sidenav-label">{{ 'sidenav.guilds' | transloco }}</span>
@@ -62,40 +66,35 @@
         </button>
 
         @if (openGuildIds().has(guild.id)) {
-          <a
-            class="sidenav-item"
-            [routerLink]="['/guilds', guild.id, 'dashboard']"
-            routerLinkActive="active-link"
-          >
-            <span class="material-icons item-icon">home</span>
-            <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
-          </a>
-          @if (hasRosterAccess(guild)) {
+          @if (defaultBranchId(guild); as branchId) {
             <a
               class="sidenav-item"
-              [routerLink]="['/guilds', guild.id, 'calendar']"
+              [routerLink]="['/guilds', guild.id, branchId, 'dashboard']"
               routerLinkActive="active-link"
             >
-              <span class="material-icons item-icon">calendar_month</span>
-              <span class="sidenav-label">{{ 'sidenav.guild.calendar' | transloco }}</span>
+              <span class="material-icons item-icon">home</span>
+              <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
             </a>
-            <a
-              class="sidenav-item"
-              [routerLink]="['/guilds', guild.id, 'roster']"
-              routerLinkActive="active-link"
-            >
-              <span class="material-icons item-icon">groups</span>
-              <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
-            </a>
-            <a
-              class="sidenav-item"
-              [routerLink]="['/guilds', guild.id, 'loot']"
-              routerLinkActive="active-link"
-            >
-              <span class="material-icons item-icon">diamond</span>
-              <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
-            </a>
+            @if (hasRosterAccess(guild)) {
+              <a
+                class="sidenav-item"
+                [routerLink]="['/guilds', guild.id, branchId, 'roster']"
+                routerLinkActive="active-link"
+              >
+                <span class="material-icons item-icon">groups</span>
+                <span class="sidenav-label">{{ 'sidenav.guild.roster' | transloco }}</span>
+              </a>
+              <a
+                class="sidenav-item"
+                [routerLink]="['/guilds', guild.id, branchId, 'loot']"
+                routerLinkActive="active-link"
+              >
+                <span class="material-icons item-icon">diamond</span>
+                <span class="sidenav-label">{{ 'sidenav.guild.loot' | transloco }}</span>
+              </a>
+            }
           }
+
           @if (guild.isAdmin) {
             <div class="section-separator"></div>
             <a

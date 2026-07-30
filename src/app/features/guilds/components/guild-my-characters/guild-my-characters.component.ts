@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -14,6 +14,7 @@ import { CharacterRaidSpecsComponent } from '../../../characters/components/char
 import { CharacterRank } from '../../models/character-rank.enum';
 import { Character } from '../../../characters/models/character.model';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
+import { GuildBranchesStore } from '../../stores/guild-branches.store';
 import { characterLink } from '../../../../shared/utils/character-link.util';
 
 const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, CharacterRank.Alt];
@@ -35,12 +36,23 @@ const RANK_ORDER: CharacterRank[] = [CharacterRank.Main, CharacterRank.Split, Ch
   templateUrl: './guild-my-characters.component.html',
   styleUrl: './guild-my-characters.component.scss',
 })
-export class GuildMyCharactersComponent {
+export class GuildMyCharactersComponent implements OnInit {
   readonly guildId = input.required<string>();
+  readonly guildBranchId = input.required<number>();
 
   readonly #store = inject(CharacterStore);
   readonly #rosterStore = inject(GuildRosterStore);
+  readonly #branchesStore = inject(GuildBranchesStore);
   readonly #snackbar = inject(SnackbarService);
+
+  ngOnInit(): void {
+    this.#branchesStore.load(this.guildId());
+  }
+
+  /** The WoW branch name (e.g. "The War Within") backing the currently-viewed guild branch. */
+  readonly #currentBranchName = computed(
+    () => this.#branchesStore.branches().find((b) => b.id === this.guildBranchId())?.branchName,
+  );
 
   readonly CharacterRank = CharacterRank;
   readonly ranks = Object.values(CharacterRank);
@@ -65,9 +77,15 @@ export class GuildMyCharactersComponent {
       .sort((a, b) => RANK_ORDER.indexOf(this.rankFor(a)) - RANK_ORDER.indexOf(this.rankFor(b))),
   );
 
-  readonly addableCharacters = computed(() =>
-    this.#store.characterList().filter((c) => !this.#isInGuild(c)),
-  );
+  // Only characters whose own WoW version matches the branch being viewed — a character can only
+  // ever join the guild branch matching its own version (see JoinGuildCommandHandler), so listing
+  // e.g. a Retail character as "addable" while viewing the Classic roster would be misleading even
+  // though the join itself would still land it on the right branch server-side.
+  readonly addableCharacters = computed(() => {
+    const branchName = this.#currentBranchName();
+    if (!branchName) return [];
+    return this.#store.characterList().filter((c) => !this.#isInGuild(c) && c.branchName === branchName);
+  });
 
   // ── UI state ──────────────────────────────────────────────────────────────
 
@@ -80,14 +98,17 @@ export class GuildMyCharactersComponent {
   readonly #rankSelections = signal(new Map<number, CharacterRank>());
 
   #isInGuild(character: Character): boolean {
-    return character.guildMemberships.some((m) => m.guildId === this.guildId());
+    return character.guildMemberships.some(
+      (m) => m.guildId === this.guildId() && m.guildBranchId === this.guildBranchId(),
+    );
   }
 
-  /** The character's roster rank for this guild. */
+  /** The character's roster rank for this guild branch. */
   rankFor(character: Character): CharacterRank {
     return (
-      character.guildMemberships.find((m) => m.guildId === this.guildId())?.characterRank ??
-      CharacterRank.Main
+      character.guildMemberships.find(
+        (m) => m.guildId === this.guildId() && m.guildBranchId === this.guildBranchId(),
+      )?.characterRank ?? CharacterRank.Main
     );
   }
 
@@ -118,7 +139,7 @@ export class GuildMyCharactersComponent {
         next: () => {
           this.showAddPanel.set(false);
           this.#snackbar.success('characterDetail.guilds.joinSuccess');
-          this.#rosterStore.loadRoster(this.guildId());
+          this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
         },
         error: (err: HttpErrorResponse) =>
           this.#snackbar.error(this.#store.membershipErrorKey(err)),
@@ -129,7 +150,7 @@ export class GuildMyCharactersComponent {
     this.#store.updateRank(characterId, this.guildId(), rank).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.rankUpdateSuccess');
-        this.#rosterStore.loadRoster(this.guildId());
+        this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });
@@ -139,7 +160,7 @@ export class GuildMyCharactersComponent {
     this.#store.leaveGuild(characterId, this.guildId()).subscribe({
       next: () => {
         this.#snackbar.success('characterDetail.guilds.leaveSuccess');
-        this.#rosterStore.loadRoster(this.guildId());
+        this.#rosterStore.loadRoster(this.guildId(), this.guildBranchId());
       },
       error: (err: HttpErrorResponse) => this.#snackbar.error(this.#store.membershipErrorKey(err)),
     });

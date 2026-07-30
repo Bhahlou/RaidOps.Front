@@ -58,6 +58,9 @@
       },
       "guildNotifications": {
         "title": "Paramètres - Notifications"
+      },
+      "guildBranches": {
+        "title": "Paramètres - Branches"
       }
     }
   },
@@ -69,6 +72,18 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "branchNotifications": {
+        "title": "Notifications Discord personnalisables par branche",
+        "description": "Les réglages de notification (en commençant par les absences) peuvent désormais être surchargés pour une branche précise plutôt qu'au niveau de la guilde uniquement, avec une indication claire « hérité du réglage général de la guilde » et un retour en un clic. Les permissions manquantes du bot sont maintenant listées nommément (par exemple « envoyer des messages », « intégrer des liens ») plutôt qu'un avertissement générique."
+      },
+      "globalCalendar": {
+        "title": "Ton calendrier de disponibilité te suit, plus seulement une guilde",
+        "description": "Les absences et récurrences sont désormais globales par défaut — plus besoin de redéclarer la même absence pour chaque guilde. Tu peux toujours restreindre une déclaration à une branche précise quand elle ne s'applique qu'à celle-ci. Retrouve-le dans Mon compte → Calendrier."
+      },
+      "guildBranches": {
+        "title": "Gérer plusieurs versions de WoW dans une même guilde",
+        "description": "Une guilde Discord peut désormais activer plusieurs branches WoW en parallèle (par exemple Classic Anniversary et MoP Classic), chacune avec son propre mode d'accès au roster et ses propres rôles Officier. Dès qu'une guilde a plus d'une branche active, des onglets apparaissent sur le roster pour basculer de l'une à l'autre."
+      },
       "guildNotifications": {
         "title": "Notifications Discord pour les évènements de guilde",
         "description": "Configure, pour chaque évènement (en commençant par les absences déclarées), si le bot poste un message dans un salon Discord — et lequel — depuis le nouvel onglet Notifications des paramètres de guilde."
@@ -210,8 +225,16 @@
         "description": "Historique des fonctionnalités livrées."
       },
       "guildCalendar": {
-        "title": "Calendrier de guilde",
-        "description": "Déclaration d'absences ponctuelles ou récurrentes, avec notifications Discord — la planification des events de raid reste à venir."
+        "title": "Calendrier de disponibilité",
+        "description": "Déclarations d'absences ponctuelles ou récurrentes, globales par défaut avec possibilité de restreindre à une branche précise, et notifications Discord associées — la planification des events de raid reste à venir."
+      },
+      "guildMultiBranch": {
+        "title": "Guildes multi-branches",
+        "description": "Une guilde Discord peut activer plusieurs branches WoW en parallèle, avec un accès au roster et des rôles Officier configurés séparément pour chacune."
+      },
+      "branchNotifications": {
+        "title": "Notifications Discord par branche",
+        "description": "Les réglages de notification de la guilde peuvent désormais être surchargés par branche, avec une indication claire de l'héritage et un retour en un clic."
       },
       "raidBuilder": {
         "title": "Raid builder",
@@ -308,12 +331,12 @@
   "sidenav": {
     "account": {
       "characters": "Personnages",
-      "equipment": "Équipement"
+      "equipment": "Équipement",
+      "calendar": "Calendrier"
     },
     "guilds": "Mes guildes",
     "guild": {
       "dashboard": "Tableau de bord",
-      "calendar": "Calendrier",
       "roster": "Roster",
       "loot": "Loot",
       "settings": "Paramètres",
@@ -346,7 +369,7 @@
   },
   "guildSettings": {
     "pageTitle": "Paramètres de la guilde",
-    "pageSubtitle": "Configure le fuseau horaire et les règles d'accès au roster.",
+    "pageSubtitle": "Configure le fuseau horaire et la langue de la guilde.",
     "timezone": {
       "label": "Fuseau horaire",
       "placeholder": "ex. Europe/Paris",
@@ -359,28 +382,44 @@
       "hint": "Langue utilisée par RaidOps pour communiquer avec ta guilde (ex. messages du bot Discord).",
       "notSaved": "Pas encore enregistrée — c'est juste une supposition basée sur ton propre navigateur. Enregistre pour la valider pour la guilde."
     },
-    "rosterMode": {
-      "label": "Accès au roster",
-      "open": "Ouvert à tous",
-      "discordRoleOnly": "Rôle Discord requis",
-      "hint": "Ce réglage définit qui peut rejoindre votre roster : n'importe qui sur votre discord, ou un rôle minimum."
-    },
     "roles": {
       "loading": "Chargement des rôles…",
       "empty": "Aucun rôle assignable trouvé sur ce serveur.",
-      "hint": "Clique sur un rôle pour définir le seuil minimum. Ce rôle et tous les rôles au-dessus donnent accès au roster.",
-      "threshold": "Seuil",
-      "excluded": "Rôles exclus"
-    },
-    "officerThreshold": {
-      "label": "Seuil d'accès Officier",
-      "hint": "Sélectionne le rôle minimum requis pour l'accès Officier. Ce rôle et tous les rôles au-dessus deviennent Officiers, indépendamment de l'accès au roster. Les administrateurs du serveur Discord conservent toujours l'accès complet, quel que soit ce choix."
+      "placeholder": "Sélectionner des rôles…"
     },
     "save": "Enregistrer les réglages",
     "saveSuccess": "Réglages enregistrés.",
     "tabs": {
       "general": "Général",
+      "branches": "Branches",
       "notifications": "Notifications"
+    },
+    "branches": {
+      "activation": {
+        "label": "Branches actives",
+        "hint": "Active les branches WoW gérées par ta guilde. Désactiver une branche ne supprime jamais son roster ni ses réglages de rôles — réactive-la plus tard pour reprendre là où tu t'étais arrêté.",
+        "placeholder": "Sélectionner des branches…",
+        "loading": "Chargement des branches…"
+      },
+      "rosterMode": {
+        "label": "Accès au roster",
+        "open": "Ouvert à tous",
+        "discordRoleOnly": "Rôle Discord requis",
+        "hint": "Définit qui peut rejoindre le roster de cette branche : n'importe qui sur ton Discord, ou les membres ayant l'un des rôles sélectionnés."
+      },
+      "rosterRoles": {
+        "label": "Rôles du roster",
+        "hint": "Les membres ayant l'un de ces rôles peuvent rejoindre le roster de cette branche.",
+        "required": "Sélectionne au moins un rôle, ou reviens à « Ouvert à tous »."
+      },
+      "officerRoles": {
+        "label": "Rôles Officier",
+        "hint": "Les membres ayant l'un de ces rôles obtiennent l'accès Officier sur cette branche, indépendamment de l'accès au roster. Les administrateurs du serveur Discord et le propriétaire du serveur conservent toujours l'accès complet, quel que soit ce choix."
+      },
+      "save": "Enregistrer les réglages de la branche",
+      "rosterSettings": {
+        "saveSuccess": "Réglages de la branche enregistrés."
+      }
     },
     "notificationSettings": {
       "families": {
@@ -393,10 +432,22 @@
         "AbsenceAdded": "Un membre ajoute une absence",
         "AbsenceRemoved": "Un membre retire une absence"
       },
+      "scope": {
+        "label": "Portée",
+        "guildWide": "Toute la guilde",
+        "inherited": "Hérité du réglage général de la guilde",
+        "resetToInherited": "Revenir à l'héritage",
+        "resetSuccess": "Ce réglage hérite à nouveau du réglage général de la guilde."
+      },
       "channel": {
         "placeholder": "Sélectionner un salon",
         "required": "Choisis un salon pour activer cette notification.",
-        "missingPermission": "Le bot n'a pas la permission d'écrire dans ce salon."
+        "missingPermission": "Il manque au bot : {{ permissions }}.",
+        "permissionFlags": {
+          "ViewChannel": "voir le salon",
+          "SendMessages": "envoyer des messages",
+          "EmbedLinks": "intégrer des liens"
+        }
       },
       "save": "Enregistrer les notifications",
       "saveSuccess": "Réglages de notifications enregistrés."
@@ -405,7 +456,7 @@
   "notifications": {
     "title": "Notifications",
     "empty": "Aucune notification.",
-    "officerThresholdNotConfigured": "« {{ guildName }} » n'a pas encore de seuil d'accès Officier configuré — choisis quel rôle Discord donne accès au statut Officier dans les paramètres de la guilde.",
+    "branchOfficerRolesNotConfigured": "« {{ guildName }} » a une branche active sans rôles Officier configurés — choisis quels rôles Discord donnent accès au statut Officier dans l'onglet Branches des paramètres de la guilde.",
     "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
     "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "viewLink": "Configurer",
@@ -434,7 +485,8 @@
       "Guild": "Guilde",
       "Settings": "Paramètres",
       "Roster": "Roster",
-      "Availability": "Disponibilité"
+      "Availability": "Disponibilité",
+      "Branches": "Branches"
     },
     "settingsFields": {
       "timezone": "Fuseau horaire",
@@ -456,7 +508,10 @@
       "RecurringAvailabilityPatternCreated": "Récurrence ajoutée",
       "RecurringAvailabilityPatternUpdated": "Récurrence modifiée",
       "RecurringAvailabilityPatternStopped": "Récurrence arrêtée",
-      "NotificationSettingsUpdated": "Réglages de notifications modifiés"
+      "NotificationSettingsUpdated": "Réglages de notifications modifiés",
+      "BranchActivated": "Branche activée",
+      "BranchDeactivated": "Branche désactivée",
+      "BranchRosterSettingsUpdated": "Réglages de roster de branche modifiés"
     }
   },
   "noGuild": {
@@ -583,10 +638,15 @@
     }
   },
   "calendar": {
+    "pageTitle": "Mon calendrier",
     "previousMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
     "today": "Aujourd'hui",
     "declareException": "Déclarer une absence/retard",
+    "scope": {
+      "label": "S'applique à",
+      "global": "Global"
+    },
     "status": {
       "absent": "Absent",
       "partial": "Partiel",
@@ -695,7 +755,6 @@
   "characters": {
     "bnet": {
       "linkButton": "Lier Battle.net",
-      "connectedAs": "Connecté :",
       "notLinkedTitle": "Lie ton compte Battle.net",
       "notLinkedDescription": "Pour garantir que chaque personnage créé dans RaidOps appartienne bien à son propriétaire, nous synchronisons les personnages avec les comptes Battle.net. En liant ton compte Battle.net, tu pourras importer et synchroniser tes personnages facilement.",
       "linkedSuccess": "Compte Battle.net lié avec succès !",

@@ -1,10 +1,11 @@
-import { inject } from '@angular/core';
+import { effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { BreadcrumbItem } from '../../shared/components/layout/page-header/page-header.component';
 import { AuthStore } from '../../core/stores/auth.store';
 import { DiscordIconType } from '../../shared/models/discord-icon-type.enum';
+import { setLastVisitedBranchId } from './utils/last-visited-branch.util';
 
 /**
  * Functional injection helper for guild page components.
@@ -35,10 +36,35 @@ export function injectGuildContext() {
       discordIcon: guild
         ? { id: guild.id, hash: guild.iconHash, type: DiscordIconType.Guild }
         : undefined,
-      ...(withDashboardLink ? { link: ['/guilds', id, 'dashboard'] } : {}),
+      ...(withDashboardLink ? { link: ['/guilds', id] } : {}),
     };
     return [rootCrumb, { i18nKey: leafI18nKey }];
   }
 
   return { guildId, currentGuildId, breadcrumbs };
+}
+
+/**
+ * Functional injection helper for branch-scoped guild page components (dashboard/roster/loot —
+ * not calendar, which stays guild-wide, see `guilds.routes.ts`).
+ * Must be called in an injection context (class field initializer or constructor).
+ */
+export function injectGuildBranchContext() {
+  const route = inject(ActivatedRoute);
+  const guildId = route.snapshot.paramMap.get('id')!;
+  const branchId = Number(route.snapshot.paramMap.get('branchId'));
+
+  // Same staleness concern as currentGuildId above — the leaf route component is reused when
+  // only :branchId changes (e.g. switching branches without leaving the current page).
+  const currentBranchId = toSignal(
+    route.paramMap.pipe(map(params => Number(params.get('branchId')))),
+    { initialValue: branchId },
+  );
+
+  // Every visit to a branch-scoped page records itself as "last visited" for this guild — read
+  // back by guildDefaultBranchGuard when the user later lands on the bare /guilds/:id, and by
+  // the sidenav's own default-branch link.
+  effect(() => setLastVisitedBranchId(guildId, currentBranchId()));
+
+  return { branchId, currentBranchId };
 }

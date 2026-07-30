@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { discordAdminGuard } from './guards/discord-admin-guard';
 import { eligibleGuildGuard } from './guards/eligible-guild-guard';
 import { guildAccessGuard } from './guards/guild-access-guard';
+import { guildBranchAccessGuard } from './guards/guild-branch-access-guard';
+import { guildDefaultBranchGuard } from './guards/guild-default-branch-guard';
 import { charactersResolver } from '../characters/characters.resolver';
 import { GuildAccessLevel } from '../../core/models/guild-access-level.enum';
 
@@ -32,31 +34,7 @@ export const guildRoutes: Routes = [
         loadComponent: () =>
           import('./layout/guild-layout.component').then(m => m.GuildLayoutComponent),
         children: [
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-          {
-            path: 'dashboard',
-            loadComponent: () =>
-              import('./pages/dashboard/guild-dashboard.component').then(m => m.GuildDashboardComponent),
-          },
-          {
-            path: 'calendar',
-            data: { minAccessLevel: GuildAccessLevel.Roster },
-            loadComponent: () =>
-              import('./pages/calendar/guild-calendar.component').then(m => m.GuildCalendarComponent),
-          },
-          {
-            path: 'roster',
-            data: { minAccessLevel: GuildAccessLevel.Roster },
-            resolve: { characters: charactersResolver },
-            loadComponent: () =>
-              import('./pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
-          },
-          {
-            path: 'loot',
-            data: { minAccessLevel: GuildAccessLevel.Roster },
-            loadComponent: () =>
-              import('./pages/loots/guild-loot.component').then(m => m.GuildLootComponent),
-          },
+          { path: '', pathMatch: 'full', canActivate: [guildDefaultBranchGuard], children: [] },
           {
             path: 'settings',
             redirectTo: 'settings/general',
@@ -73,6 +51,36 @@ export const guildRoutes: Routes = [
             data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
               import('./pages/audit-log/guild-audit-log.component').then(m => m.GuildAuditLogComponent),
+          },
+          {
+            // Branch-scoped leaves. No component here on purpose — this route only groups
+            // path + guard, its children render straight into GuildLayoutComponent's outlet.
+            // Declared LAST — ':branchId' matches any single segment, including literal
+            // sibling names like 'settings'/'audit-log'; a param route earlier in the array
+            // would swallow those before Angular ever tries the literal routes.
+            path: ':branchId',
+            canActivateChild: [guildBranchAccessGuard],
+            children: [
+              { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+              {
+                path: 'dashboard',
+                loadComponent: () =>
+                  import('./pages/dashboard/guild-dashboard.component').then(m => m.GuildDashboardComponent),
+              },
+              {
+                path: 'roster',
+                data: { minAccessLevel: GuildAccessLevel.Roster },
+                resolve: { characters: charactersResolver },
+                loadComponent: () =>
+                  import('./pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
+              },
+              {
+                path: 'loot',
+                data: { minAccessLevel: GuildAccessLevel.Roster },
+                loadComponent: () =>
+                  import('./pages/loots/guild-loot.component').then(m => m.GuildLootComponent),
+              },
+            ],
           },
         ],
       },

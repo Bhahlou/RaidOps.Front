@@ -57,13 +57,20 @@ describe('GuildRosterListComponent', () => {
   };
   let fixture: ComponentFixture<GuildRosterListComponent>;
 
+  // `accessLevel` here is the branch's own level (branch id fixed at 1, matching setup()'s
+  // default guildBranchId) — isOfficer/canEditRank read the specific branch, not a guild-wide max.
   const setup = (
     guildId = 'g1',
     userGuilds: { id: string; accessLevel: GuildAccessLevel }[] = [],
     discordId = 'viewer-1',
     confirmKick = true,
     loggedOut = false,
+    guildBranchId = 1,
   ) => {
+    const guildsWithBranches = userGuilds.map((g) => ({
+      ...g,
+      branches: [{ id: guildBranchId, branchId: guildBranchId, branchName: 'Branch', accessLevel: g.accessLevel }],
+    }));
     store = {
       isLoading: signal(false),
       members: signal([]),
@@ -81,7 +88,7 @@ describe('GuildRosterListComponent', () => {
     dialog = { open: vi.fn().mockReturnValue({ closed: of(confirmKick) }) };
     authStore = {
       user: signal(
-        loggedOut ? null : { discordId, name: 'Viewer', avatarHash: null, guilds: userGuilds },
+        loggedOut ? null : { discordId, name: 'Viewer', avatarHash: null, guilds: guildsWithBranches },
       ),
     };
     transloco = {
@@ -104,6 +111,7 @@ describe('GuildRosterListComponent', () => {
 
     fixture = TestBed.createComponent(GuildRosterListComponent);
     fixture.componentRef.setInput('guildId', guildId);
+    fixture.componentRef.setInput('guildBranchId', guildBranchId);
     fixture.detectChanges();
     return fixture.componentInstance;
   };
@@ -116,7 +124,7 @@ describe('GuildRosterListComponent', () => {
     it('force-loads the roster for the given guildId', () => {
       setup('g42');
 
-      expect(store.loadRoster).toHaveBeenCalledWith('g42');
+      expect(store.loadRoster).toHaveBeenCalledWith('g42', 1);
     });
   });
 

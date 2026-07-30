@@ -7,7 +7,7 @@ import { AuthStore } from '../../../../core/stores/auth.store';
 import { Notification, NotificationType } from '../../../../core/models/notification.model';
 
 const notification = (overrides?: Partial<Notification>): Notification => ({
-  type: NotificationType.OfficerThresholdNotConfigured,
+  type: NotificationType.BranchOfficerRolesNotConfigured,
   guildId: 'guild-1',
   guildName: 'RaidOps',
   ...overrides,
