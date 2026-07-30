@@ -58,6 +58,9 @@ legend.select-field-label {
 }
 
 .select-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -70,6 +73,12 @@ legend.select-field-label {
   &.select-value--placeholder {
     color: var(--color-text-muted);
   }
+}
+
+.select-value-icon {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .select-chevron {
@@ -143,6 +152,9 @@ legend.select-field-label {
 }
 
 .select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -160,6 +172,12 @@ legend.select-field-label {
     color: var(--color-accent);
     font-weight: 500;
   }
+}
+
+.select-option-icon {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .select-group-header {

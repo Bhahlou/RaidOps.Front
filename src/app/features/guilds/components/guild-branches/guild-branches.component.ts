@@ -6,6 +6,7 @@ import { FormFieldCardComponent } from '../../../../shared/components/form/form-
 import { DiscordRole } from '../../../../shared/models/discord-role.model';
 import { Branch } from '../../../../shared/models/branch.model';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
+import { expansionIconUrl } from '../../../../shared/utils/expansion-icon.util';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildBranchesService } from '../../services/guild-branches.service';
@@ -38,7 +39,11 @@ export class GuildBranchesComponent implements OnInit {
   readonly isLoading = this.#store.isLoading;
 
   readonly branchOptions = computed<MultiSelectOption<number>[]>(() =>
-    this.wowBranches().map((b) => ({ value: b.id, label: `${b.name} (${b.currentExpansionShortCode})` })),
+    this.wowBranches().map((b) => ({
+      value: b.id,
+      label: `${b.name} (${b.currentExpansionShortCode})`,
+      iconUrl: expansionIconUrl(b.currentExpansionShortCode),
+    })),
   );
 
   readonly activeBranchIds = computed(() =>

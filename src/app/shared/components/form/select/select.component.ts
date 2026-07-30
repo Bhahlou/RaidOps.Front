@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, ElementRef, model, viewChild, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormValueControl } from '@angular/forms/signals';
@@ -14,6 +15,8 @@ export interface SelectOption<T> {
    * caller is responsible for sorting `options` so same-group entries are contiguous.
    */
   group?: string;
+  /** Optional icon rendered before the label, both in the option row and the collapsed trigger. */
+  iconUrl?: string | null;
 }
 
 /**
@@ -23,7 +26,7 @@ export interface SelectOption<T> {
  */
 @Component({
   selector: 'app-select',
-  imports: [OverlayModule, CdkListbox, CdkOption, FormsModule],
+  imports: [OverlayModule, CdkListbox, CdkOption, FormsModule, NgOptimizedImage],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
 })
@@ -56,6 +59,11 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   readonly selectedLabel = computed(() => {
     const current = this.value();
     return this.options().find((o) => o.value === current)?.label ?? '';
+  });
+
+  readonly selectedIconUrl = computed(() => {
+    const current = this.value();
+    return this.options().find((o) => o.value === current)?.iconUrl ?? null;
   });
 
   readonly listboxValue = computed(() => {

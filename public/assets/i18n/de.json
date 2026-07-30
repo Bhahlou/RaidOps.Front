@@ -420,10 +420,22 @@
         "AbsenceAdded": "Ein Mitglied trägt eine Abwesenheit ein",
         "AbsenceRemoved": "Ein Mitglied entfernt eine Abwesenheit"
       },
+      "scope": {
+        "label": "Geltungsbereich",
+        "guildWide": "Ganze Gilde",
+        "inherited": "Übernommen von der gildenweiten Einstellung",
+        "resetToInherited": "Vererbung wiederherstellen",
+        "resetSuccess": "Diese Einstellung übernimmt wieder den gildenweiten Wert."
+      },
       "channel": {
         "placeholder": "Kanal auswählen",
         "required": "Wähle einen Kanal, um diese Benachrichtigung zu aktivieren.",
-        "missingPermission": "Der Bot hat keine Berechtigung, in diesem Kanal zu schreiben."
+        "missingPermission": "Dem Bot fehlt: {{ permissions }}.",
+        "permissionFlags": {
+          "ViewChannel": "Kanal ansehen",
+          "SendMessages": "Nachrichten senden",
+          "EmbedLinks": "Links einbetten"
+        }
       },
       "save": "Benachrichtigungseinstellungen speichern",
       "saveSuccess": "Benachrichtigungseinstellungen gespeichert."

@@ -1,15 +1,24 @@
 import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
+import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
 import { FormFieldCardComponent } from '../../../../shared/components/form/form-field-card/form-field-card.component';
 import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
+import { DiscordChannelPermissionFlag } from '../../../../shared/models/discord-channel.model';
+import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
+import { expansionIconUrl } from '../../../../shared/utils/expansion-icon.util';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../../models/guild-notification-setting.model';
 import { GuildSettingsService } from '../../services/guild-settings.service';
 import { GuildNotificationSettingsStore } from '../../stores/guild-notification-settings.store';
+import { GuildBranchesStore } from '../../stores/guild-branches.store';
+
+/** `app-select` needs a stable primitive value, so "guild-wide" (`null`) is encoded as this key. */
+const GUILD_WIDE_KEY = '__guild_wide__';
 
 interface NotificationFamily {
   id: string;
@@ -34,7 +43,7 @@ const NOTIFICATION_FAMILIES: NotificationFamily[] = [
 
 @Component({
   selector: 'app-guild-notification-settings',
-  imports: [ButtonComponent, CheckboxComponent, FormFieldCardComponent, SelectComponent, TranslocoPipe],
+  imports: [ButtonComponent, IconButtonComponent, CheckboxComponent, FormFieldCardComponent, SelectComponent, TranslocoPipe],
   templateUrl: './guild-notification-settings.component.html',
   styleUrl: './guild-notification-settings.component.scss',
 })
@@ -42,16 +51,42 @@ export class GuildNotificationSettingsComponent implements OnInit {
   readonly guildId = input.required<string>();
 
   readonly #store = inject(GuildNotificationSettingsStore);
+  readonly #branchesStore = inject(GuildBranchesStore);
   readonly #settingsService = inject(GuildSettingsService);
   readonly #snackbar = inject(SnackbarService);
   readonly #transloco = inject(TranslocoService);
   readonly #authStore = inject(AuthStore);
+  readonly #wowBrancheService = inject(WowBrancheService);
+
+  readonly #wowBranches = toSignal(this.#wowBrancheService.getAll(), { initialValue: [] });
 
   readonly families = NOTIFICATION_FAMILIES;
   readonly channels = this.#store.channels;
   readonly submitting = signal(false);
+  /** Event type currently being reset, so only its row's action shows a disabled/busy state. */
+  readonly resetting = signal<GuildNotificationEventType | null>(null);
 
   readonly #rows = signal<Map<GuildNotificationEventType, GuildNotificationSetting>>(new Map());
+
+  /** Guild-wide (`GUILD_WIDE_KEY`) or one active branch's id (as a string, for `app-select`). */
+  readonly scopeKey = signal<string>(GUILD_WIDE_KEY);
+
+  readonly scopeGuildBranchId = computed<number | null>(() => {
+    const key = this.scopeKey();
+    return key === GUILD_WIDE_KEY ? null : Number(key);
+  });
+
+  readonly scopeOptions = computed<SelectOption<string>[]>(() => [
+    { value: GUILD_WIDE_KEY, label: this.#transloco.translate('guildSettings.notificationSettings.scope.guildWide') },
+    ...this.#branchesStore
+      .branches()
+      .filter((b) => b.isActive)
+      .map((b) => ({
+        value: String(b.id),
+        label: b.branchName,
+        iconUrl: expansionIconUrl(this.#wowBranches().find((wb) => wb.id === b.branchId)?.currentExpansionShortCode),
+      })),
+  ]);
 
   // Sorted by category then name so same-category channels stay contiguous — app-select folds
   // consecutive same-`group` options under one header, which is how same-named channels living
@@ -61,7 +96,7 @@ export class GuildNotificationSettingsComponent implements OnInit {
       .sort((a, b) => (a.categoryName ?? '').localeCompare(b.categoryName ?? '') || a.name.localeCompare(b.name))
       .map((channel) => ({
         value: channel.id,
-        label: channel.botCanSendMessages ? channel.name : `⚠️ ${channel.name}`,
+        label: channel.missingPermissions.length === 0 ? channel.name : `⚠️ ${channel.name}`,
         group: channel.categoryName ?? undefined,
       })),
   );
@@ -76,13 +111,19 @@ export class GuildNotificationSettingsComponent implements OnInit {
   constructor() {
     effect(() => {
       const settings = this.#store.settings();
-      if (!settings.length) return;
       this.#rows.set(new Map(settings.map((s) => [s.eventType, s])));
     });
   }
 
   ngOnInit(): void {
-    this.#store.load(this.guildId());
+    this.#branchesStore.load(this.guildId());
+    this.#store.load(this.guildId(), this.scopeGuildBranchId());
+  }
+
+  /** Switches the scope picker and re-points the store at the new branch (or guild-wide). */
+  onScopeChange(key: string | null): void {
+    this.scopeKey.set(key ?? GUILD_WIDE_KEY);
+    this.#store.load(this.guildId(), this.scopeGuildBranchId());
   }
 
   row(eventType: GuildNotificationEventType): GuildNotificationSetting {
@@ -93,9 +134,27 @@ export class GuildNotificationSettingsComponent implements OnInit {
     return this.#transloco.translate(`guildSettings.notificationSettings.events.${eventType}`);
   }
 
+  /**
+   * True once a branch is selected and this row hasn't been explicitly saved for it yet — its
+   * value is only the guild-wide fallback, not a real override.
+   */
+  isInherited(eventType: GuildNotificationEventType): boolean {
+    const scope = this.scopeGuildBranchId();
+    if (scope === null) return false;
+    return (this.row(eventType).guildBranchId ?? null) !== scope;
+  }
+
   channelHasNoPermission(channelId: string | null): boolean {
     if (!channelId) return false;
-    return this.channels().find((c) => c.id === channelId)?.botCanSendMessages === false;
+    return (this.channels().find((c) => c.id === channelId)?.missingPermissions.length ?? 0) > 0;
+  }
+
+  /** Comma-separated, translated list of the permissions the bot lacks in the given channel. */
+  missingPermissionsLabel(channelId: string | null): string {
+    const missing = this.channels().find((c) => c.id === channelId)?.missingPermissions ?? [];
+    return missing
+      .map((flag: DiscordChannelPermissionFlag) => this.#transloco.translate(`guildSettings.notificationSettings.channel.permissionFlags.${flag}`))
+      .join(', ');
   }
 
   channelMissing(eventType: GuildNotificationEventType): boolean {
@@ -115,11 +174,16 @@ export class GuildNotificationSettingsComponent implements OnInit {
     if (!this.canSave()) return;
 
     const settings = this.families.flatMap((family) => family.eventTypes.map((eventType) => this.row(eventType)));
+    const guildBranchId = this.scopeGuildBranchId();
 
     this.submitting.set(true);
     try {
-      await firstValueFrom(this.#settingsService.updateNotificationSettings(this.guildId(), settings));
-      this.#store.patchSettings(this.guildId(), settings);
+      await firstValueFrom(this.#settingsService.updateNotificationSettings(this.guildId(), guildBranchId, settings));
+      // The whole batch was just written at `guildBranchId` — stamp it onto the optimistic patch
+      // so `isInherited()` immediately reflects the new override instead of the stale pre-save
+      // value (`null`/another branch) until the next full reload.
+      const savedSettings = settings.map((s) => ({ ...s, guildBranchId }));
+      this.#store.patchSettings(this.guildId(), guildBranchId, savedSettings);
       // First save clears the "absence notifications not configured" nudge — re-fetch /me so the
       // bell drops it immediately instead of waiting for the next unrelated refresh.
       this.#authStore.loadUser().subscribe();
@@ -128,6 +192,23 @@ export class GuildNotificationSettingsComponent implements OnInit {
       this.#snackbar.error('errors.server');
     } finally {
       this.submitting.set(false);
+    }
+  }
+
+  /** Deletes this one event type's branch override so it falls back to inheriting the guild-wide setting. */
+  async resetToInherited(eventType: GuildNotificationEventType): Promise<void> {
+    const guildBranchId = this.scopeGuildBranchId();
+    if (guildBranchId === null) return;
+
+    this.resetting.set(eventType);
+    try {
+      await firstValueFrom(this.#settingsService.resetNotificationSetting(this.guildId(), guildBranchId, eventType));
+      this.#store.reload();
+      this.#snackbar.success('guildSettings.notificationSettings.scope.resetSuccess');
+    } catch {
+      this.#snackbar.error('errors.server');
+    } finally {
+      this.resetting.set(null);
     }
   }
 }

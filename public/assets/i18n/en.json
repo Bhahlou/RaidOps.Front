@@ -420,10 +420,22 @@
         "AbsenceAdded": "A member adds an absence",
         "AbsenceRemoved": "A member removes an absence"
       },
+      "scope": {
+        "label": "Scope",
+        "guildWide": "Whole guild",
+        "inherited": "Inherited from the guild-wide setting",
+        "resetToInherited": "Revert to inherited",
+        "resetSuccess": "This setting now inherits the guild-wide value again."
+      },
       "channel": {
         "placeholder": "Select a channel",
         "required": "Pick a channel to enable this notification.",
-        "missingPermission": "The bot doesn't have permission to post in this channel."
+        "missingPermission": "The bot is missing: {{ permissions }}.",
+        "permissionFlags": {
+          "ViewChannel": "view channel",
+          "SendMessages": "send messages",
+          "EmbedLinks": "embed links"
+        }
       },
       "save": "Save notification settings",
       "saveSuccess": "Notification settings saved."

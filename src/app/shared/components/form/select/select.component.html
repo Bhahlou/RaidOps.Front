@@ -14,6 +14,9 @@
     [attr.aria-expanded]="isOpen()"
   >
     <span class="select-value" [class.select-value--placeholder]="!selectedLabel()">
+      @if (selectedIconUrl(); as iconUrl) {
+        <img class="select-value-icon" [ngSrc]="iconUrl" alt="" width="20" height="20" />
+      }
       {{ selectedLabel() || placeholder() }}
     </span>
     <span class="material-icons select-chevron">expand_more</span>
@@ -56,7 +59,12 @@
           <li class="select-group-header">{{ grp.group }}</li>
         }
         @for (opt of grp.options; track opt.value) {
-          <li class="select-option" [cdkOption]="opt.value">{{ opt.label }}</li>
+          <li class="select-option" [cdkOption]="opt.value">
+            @if (opt.iconUrl) {
+              <img class="select-option-icon" [ngSrc]="opt.iconUrl" alt="" width="20" height="20" />
+            }
+            {{ opt.label }}
+          </li>
         }
       } @empty {
         <li class="select-empty">—</li>

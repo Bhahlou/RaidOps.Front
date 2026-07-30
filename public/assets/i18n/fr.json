@@ -420,10 +420,22 @@
         "AbsenceAdded": "Un membre ajoute une absence",
         "AbsenceRemoved": "Un membre retire une absence"
       },
+      "scope": {
+        "label": "Portée",
+        "guildWide": "Toute la guilde",
+        "inherited": "Hérité du réglage général de la guilde",
+        "resetToInherited": "Revenir à l'héritage",
+        "resetSuccess": "Ce réglage hérite à nouveau du réglage général de la guilde."
+      },
       "channel": {
         "placeholder": "Sélectionner un salon",
         "required": "Choisis un salon pour activer cette notification.",
-        "missingPermission": "Le bot n'a pas la permission d'écrire dans ce salon."
+        "missingPermission": "Il manque au bot : {{ permissions }}.",
+        "permissionFlags": {
+          "ViewChannel": "voir le salon",
+          "SendMessages": "envoyer des messages",
+          "EmbedLinks": "intégrer des liens"
+        }
       },
       "save": "Enregistrer les notifications",
       "saveSuccess": "Réglages de notifications enregistrés."
