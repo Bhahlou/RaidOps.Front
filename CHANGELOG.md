@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.3.0...raidops-front-v1.4.0) (2026-07-30)
+
+
+### 🚀 Features
+
+* calendar global availability ([#66](https://github.com/Bhahlou/RaidOps.Front/issues/66)) ([16e84d5](https://github.com/Bhahlou/RaidOps.Front/commit/16e84d590af4457e063da9ab38d31e9b9deebeb7))
+* Guilds now support multi-branch. You can now play several wow branches on a single Discord server ([#63](https://github.com/Bhahlou/RaidOps.Front/issues/63)) ([d04e9c1](https://github.com/Bhahlou/RaidOps.Front/commit/d04e9c1b006a4f1f152d0baac9c030d7d9cd173b))
+
+
+### 🐛 Bug Fixes
+
+* Disable Google Translate and sync html lang attribute with active locale ([#65](https://github.com/Bhahlou/RaidOps.Front/issues/65)) ([24cdfe1](https://github.com/Bhahlou/RaidOps.Front/commit/24cdfe1ee214f5275e92a07b1b9c11802d8d22ff))
+
 ## [1.3.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.2.1...raidops-front-v1.3.0) (2026-07-25)
 
 
