@@ -17,7 +17,7 @@ const setting = (overrides?: Partial<GuildNotificationSetting>): GuildNotificati
 const channel = (overrides?: Partial<DiscordChannel>): DiscordChannel => ({
   id: 'chan-1',
   name: 'general',
-  botCanSendMessages: true,
+  missingPermissions: [],
   categoryName: null,
   ...overrides,
 });
@@ -96,6 +96,47 @@ describe('GuildNotificationSettingsStore', () => {
 
       expect(store.settings()).toEqual([setting()]);
     });
+
+    it('sends guildBranchId as a query param when scoped to a branch', async () => {
+      store.load('g1', 7);
+      TestBed.tick();
+
+      const settingsReq = controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings'));
+      expect(settingsReq.request.params.get('guildBranchId')).toBe('7');
+      settingsReq.flush([]);
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-channels')).flush([]);
+      await TestBed.inject(ApplicationRef).whenStable();
+    });
+
+    it('omits the guildBranchId param for the guild-wide scope', async () => {
+      store.load('g1', null);
+      TestBed.tick();
+
+      const settingsReq = controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings'));
+      expect(settingsReq.request.params.has('guildBranchId')).toBe(false);
+      settingsReq.flush([]);
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-channels')).flush([]);
+      await TestBed.inject(ApplicationRef).whenStable();
+    });
+
+    it('re-fetches settings (but not channels) when only the branch scope changes for the same guild', async () => {
+      store.load('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings')).flush([]);
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-channels')).flush([]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.load('g1', 7);
+      TestBed.tick();
+
+      const settingsReq = controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings'));
+      expect(settingsReq.request.params.get('guildBranchId')).toBe('7');
+      settingsReq.flush([setting()]);
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/notification-channels'));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.settings()).toEqual([setting()]);
+    });
   });
 
   // ── patchSettings ─────────────────────────────────────────────────────────
@@ -111,12 +152,48 @@ describe('GuildNotificationSettingsStore', () => {
       await TestBed.inject(ApplicationRef).whenStable();
 
       const settings = [setting({ enabled: false, channelId: null })];
-      store.patchSettings('g1', settings);
+      store.patchSettings('g1', null, settings);
       TestBed.tick();
 
       expect(store.settings()).toEqual(settings);
       controller.expectNone((r) => r.url.endsWith('/guilds/g1/notification-settings'));
       controller.expectNone((r) => r.url.endsWith('/guilds/g1/notification-channels'));
+    });
+
+    it('stamps the given branch id into the cached settings scope', async () => {
+      store.load('g1', 7);
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings')).flush([]);
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-channels')).flush([]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      const settings = [setting()];
+      store.patchSettings('g1', 7, settings);
+      TestBed.tick();
+
+      expect(store.settings()).toEqual(settings);
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/notification-settings'));
+    });
+  });
+
+  // ── reload ────────────────────────────────────────────────────────────────
+
+  describe('reload', () => {
+    it('re-fetches settings only, not channels', async () => {
+      store.load('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings')).flush([]);
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-channels')).flush([]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.reload();
+      TestBed.tick();
+
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/notification-settings')).flush([setting()]);
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/notification-channels'));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.settings()).toEqual([setting()]);
     });
   });
 });

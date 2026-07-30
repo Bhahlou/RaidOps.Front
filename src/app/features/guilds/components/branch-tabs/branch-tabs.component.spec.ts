@@ -133,10 +133,10 @@ describe('BranchTabsComponent', () => {
   });
 
   describe('iconUrl', () => {
-    it('resolves the WoWpedia icon for a branch\'s current expansion short code', () => {
+    it('resolves the local expansion medallion for a branch\'s current expansion short code', () => {
       const c = setup([branch({ id: 1, branchId: 3 })], 'roster', [wowBranch({ id: 3, currentExpansionShortCode: 'TBC' })]);
 
-      expect(c.iconUrl(branch({ id: 1, branchId: 3 }))).toContain('Bc_icon.gif');
+      expect(c.iconUrl(branch({ id: 1, branchId: 3 }))).toBe('/assets/images/expansion-icons/TBC.png');
     });
 
     it('returns null when the branch\'s short code has no mapped icon', () => {

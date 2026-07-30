@@ -116,7 +116,7 @@ describe('GuildBranchesComponent', () => {
       setup([], [wowBranch({ id: 3, name: 'Classic Era', currentExpansionShortCode: 'Classic' })]);
       fixture.detectChanges();
 
-      expect(component.branchOptions()).toEqual([{ value: 3, label: 'Classic Era (Classic)' }]);
+      expect(component.branchOptions()).toEqual([{ value: 3, label: 'Classic Era (Classic)', iconUrl: '/assets/images/expansion-icons/Classic.png' }]);
     });
   });
 
