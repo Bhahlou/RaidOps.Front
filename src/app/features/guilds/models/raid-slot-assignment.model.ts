@@ -1,4 +1,4 @@
-import { DayAvailabilityStatus } from './day-availability-status.enum';
+import { DayAvailabilityStatus } from '../../calendar/models/day-availability-status.enum';
 
 /** A single character assigned to a group/slot coordinate of a `RaidEvent`. */
 export interface RaidSlotAssignment {

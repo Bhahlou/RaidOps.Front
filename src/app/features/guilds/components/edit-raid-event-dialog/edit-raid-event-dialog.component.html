@@ -26,28 +26,16 @@
     />
   </div>
 
-  <div class="field-row">
-    <div class="field-group">
-      <label class="field-label" for="edit-event-branch">{{ 'raidBuilder.eventDialog.branch' | transloco }}</label>
-      <app-select
-        [inputId]="'edit-event-branch'"
-        [options]="branchOptions()"
-        [value]="branchId()"
-        [disabled]="isReadOnly"
-        (valueChange)="setBranchId($any($event))"
-      />
-    </div>
-    <div class="field-group">
-      <label class="field-label" for="edit-event-starts-at">{{ 'raidBuilder.eventDialog.startsAt' | transloco }}</label>
-      <input
-        id="edit-event-starts-at"
-        type="datetime-local"
-        class="datetime-input"
-        [disabled]="isReadOnly"
-        [value]="startsAtLocal()"
-        (change)="startsAtLocal.set($any($event.target).value)"
-      />
-    </div>
+  <div class="field-group">
+    <label class="field-label" for="edit-event-starts-at">{{ 'raidBuilder.eventDialog.startsAt' | transloco }}</label>
+    <input
+      id="edit-event-starts-at"
+      type="datetime-local"
+      class="datetime-input"
+      [disabled]="isReadOnly"
+      [value]="startsAtLocal()"
+      (change)="startsAtLocal.set($any($event.target).value)"
+    />
   </div>
 
   <div class="field-row">

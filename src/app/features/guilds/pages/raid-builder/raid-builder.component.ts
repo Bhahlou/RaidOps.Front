@@ -11,7 +11,7 @@ import { EmptyHintComponent } from '../../../../shared/components/feedback/empty
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildAccessLevel, hasGuildAccess } from '../../../../core/models/guild-access-level.enum';
-import { injectGuildContext } from '../../inject-guild-context';
+import { injectGuildContext, injectGuildBranchContext } from '../../inject-guild-context';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { UnassignedMembersStore } from '../../stores/unassigned-members.store';
 import { RaidSeriesStore } from '../../stores/raid-series.store';
@@ -59,6 +59,7 @@ const RANGE_DAYS = 14;
 })
 export class RaidBuilderComponent {
   readonly #guildContext = injectGuildContext();
+  readonly #branchContext = injectGuildBranchContext();
   readonly #authStore = inject(AuthStore);
   readonly #dialog = inject(Dialog);
   readonly #snackbar = inject(SnackbarService);
@@ -71,6 +72,7 @@ export class RaidBuilderComponent {
   // currentGuildId (not the static guildId snapshot) — this leaf route component is reused
   // (not recreated) when only the parent's :id param changes, e.g. switching guilds.
   readonly guildId = this.#guildContext.currentGuildId;
+  readonly guildBranchId = this.#branchContext.currentBranchId;
   readonly breadcrumbs = computed(() => this.#guildContext.breadcrumbs('sidenav.guild.raidBuilder'));
 
   readonly isOfficer = computed(() => {
@@ -100,11 +102,12 @@ export class RaidBuilderComponent {
   constructor() {
     effect(() => {
       const guildId = this.guildId();
+      const guildBranchId = this.guildBranchId();
       const rangeStart = toIsoDate(this.rangeStart());
       const rangeEnd = toIsoDate(this.rangeEnd());
-      this.boardStore.loadRange(guildId, rangeStart, rangeEnd);
-      this.unassignedStore.loadRange(guildId, rangeStart, rangeEnd);
-      this.seriesStore.load(guildId);
+      this.boardStore.loadRange(guildId, guildBranchId, rangeStart, rangeEnd);
+      this.unassignedStore.loadRange(guildId, guildBranchId, rangeStart, rangeEnd);
+      this.seriesStore.load(guildId, guildBranchId);
     });
 
     // Keeps the active tab valid — defaults to the earliest scheduled event whenever the
@@ -139,7 +142,7 @@ export class RaidBuilderComponent {
     this.#dialog
       .open<boolean>(CreateRaidSeriesDialogComponent, {
         width: 'min(720px, 95vw)',
-        data: { guildId: this.guildId(), series },
+        data: { guildId: this.guildId(), guildBranchId: this.guildBranchId(), series },
       })
       .closed.subscribe((saved) => {
         if (!saved) return;
@@ -149,7 +152,7 @@ export class RaidBuilderComponent {
   }
 
   deactivateSeries(series: RaidSeries): void {
-    this.seriesStore.deactivateSeries(this.guildId(), series.id).subscribe({
+    this.seriesStore.deactivateSeries(this.guildId(), this.guildBranchId(), series.id).subscribe({
       next: () => {
         this.#snackbar.success('raidBuilder.series.deactivateSuccess');
         this.seriesStore.reload();
@@ -162,7 +165,7 @@ export class RaidBuilderComponent {
     this.#dialog
       .open<boolean>(CreateRaidEventDialogComponent, {
         width: 'min(720px, 95vw)',
-        data: { guildId: this.guildId() },
+        data: { guildId: this.guildId(), guildBranchId: this.guildBranchId() },
       })
       .closed.subscribe((saved) => {
         if (saved) this.#reloadBoard();
@@ -173,7 +176,7 @@ export class RaidBuilderComponent {
     this.#dialog
       .open<boolean>(EditRaidEventDialogComponent, {
         width: 'min(720px, 95vw)',
-        data: { guildId: this.guildId(), event },
+        data: { guildId: this.guildId(), guildBranchId: this.guildBranchId(), event },
       })
       .closed.subscribe((saved) => {
         if (saved) this.#reloadBoard();

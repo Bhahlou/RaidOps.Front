@@ -21,10 +21,9 @@ export interface RaidSeries {
   raidZones: RaidZoneSummary[];
 }
 
-/** Payload for creating or replacing a raid series. */
+/** Payload for creating or replacing a raid series — the guild branch (and its WoW game version) is the route's `guildBranchId`, never a client-supplied field. */
 export interface RaidSeriesPayload {
   name: string;
-  branchId: number;
   recurrenceDayOfWeek: string;
   recurrenceStartTimeLocal: string;
   recurrenceIntervalWeeks: number;

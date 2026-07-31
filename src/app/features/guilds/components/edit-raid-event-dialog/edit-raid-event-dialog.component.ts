@@ -1,13 +1,10 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
-import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/dialogs/confirm-dialog/confirm-dialog.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
-import { Branch } from '../../../../shared/models/branch.model';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidEvent, RaidEventPayload } from '../../models/raid-event.model';
@@ -17,6 +14,7 @@ import { raidErrorKey } from '../../utils/raid-error-key.util';
 
 export interface EditRaidEventDialogData {
   guildId: string;
+  guildBranchId: number;
   event: RaidEvent;
 }
 
@@ -28,7 +26,7 @@ export interface EditRaidEventDialogData {
 @Component({
   selector: 'app-edit-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, SelectComponent],
+  imports: [TranslocoPipe, ButtonComponent],
   templateUrl: './edit-raid-event-dialog.component.html',
   styleUrl: './edit-raid-event-dialog.component.scss',
 })
@@ -36,7 +34,6 @@ export class EditRaidEventDialogComponent {
   readonly #dialogRef = inject(DialogRef<boolean>);
   readonly #boardStore = inject(RaidBoardStore);
   readonly #zoneStore = inject(RaidZoneStore);
-  readonly #branchService = inject(WowBrancheService);
   readonly #snackbar = inject(SnackbarService);
   readonly #dialog = inject(Dialog);
   readonly data = inject<EditRaidEventDialogData>(DIALOG_DATA);
@@ -49,13 +46,7 @@ export class EditRaidEventDialogComponent {
   readonly hasAssignments = this.data.event.assignments.length > 0;
   readonly isDraft = this.data.event.publicationStatus === RaidPublicationStatus.Draft;
 
-  readonly branches = signal<Branch[]>([]);
-  readonly branchOptions = computed<SelectOption<number>[]>(() =>
-    this.branches().map((b) => ({ value: b.id, label: b.name })),
-  );
-
   readonly name = signal(this.data.event.name);
-  readonly branchId = signal<number>(this.data.event.branchId);
   readonly startsAtLocal = signal(toDatetimeLocal(this.data.event.startsAtUtc));
   readonly groupCount = signal(this.data.event.groupCount);
   readonly slotsPerGroup = signal(this.data.event.slotsPerGroup);
@@ -75,17 +66,7 @@ export class EditRaidEventDialogComponent {
   );
 
   constructor() {
-    this.#branchService.getAll().subscribe((branches) => this.branches.set(branches));
-
-    effect(() => {
-      const branchId = this.branchId();
-      this.#zoneStore.load(this.data.guildId, branchId);
-    });
-  }
-
-  setBranchId(branchId: number): void {
-    this.branchId.set(branchId);
-    this.selectedZoneIds.set(new Set());
+    this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
   }
 
   toggleZone(zoneId: number): void {
@@ -106,7 +87,6 @@ export class EditRaidEventDialogComponent {
 
     const payload: RaidEventPayload = {
       name: this.name().trim(),
-      branchId: this.branchId(),
       startsAtUtc: new Date(this.startsAtLocal()).toISOString(),
       groupCount: this.groupCount(),
       slotsPerGroup: this.slotsPerGroup(),
@@ -115,7 +95,7 @@ export class EditRaidEventDialogComponent {
     };
 
     this.submitting.set(true);
-    this.#boardStore.updateEvent(this.data.guildId, this.data.event.id, payload).subscribe({
+    this.#boardStore.updateEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id, payload).subscribe({
       next: () => {
         this.#snackbar.success('raidBuilder.eventDialog.saveSuccess');
         this.#dialogRef.close(true);
@@ -143,7 +123,7 @@ export class EditRaidEventDialogComponent {
       .closed.subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.#boardStore.publishEvent(this.data.guildId, this.data.event.id).subscribe({
+        this.#boardStore.publishEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id).subscribe({
           next: () => {
             this.#snackbar.success('raidBuilder.eventDialog.publishSuccess');
             this.#dialogRef.close(true);
@@ -168,7 +148,7 @@ export class EditRaidEventDialogComponent {
       .closed.subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.#boardStore.cancelEvent(this.data.guildId, this.data.event.id).subscribe({
+        this.#boardStore.cancelEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id).subscribe({
           next: () => {
             this.#snackbar.success('raidBuilder.eventDialog.cancelSuccess');
             this.#dialogRef.close(true);
@@ -193,7 +173,7 @@ export class EditRaidEventDialogComponent {
       .closed.subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.#boardStore.deleteEvent(this.data.guildId, this.data.event.id).subscribe({
+        this.#boardStore.deleteEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id).subscribe({
           next: () => {
             this.#snackbar.success('raidBuilder.eventDialog.deleteSuccess');
             this.#dialogRef.close(true);

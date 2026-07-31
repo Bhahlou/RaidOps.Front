@@ -25,8 +25,9 @@ interface SpecOption {
 
 /**
  * Roster pool pinned to the raid builder page, shared across every event tab — drag source only
- * (`CdkDrag` per row, no drop target of its own). Filtered to the active event's branch, with
- * characters already assigned to that event excluded. Availability isn't known for a pool member
+ * (`CdkDrag` per row, no drop target of its own). Scoped to the page's guild branch (server-side,
+ * via `GuildRosterStore`), with characters already assigned to the active event excluded.
+ * Availability isn't known for a pool member
  * until it's actually assigned (the backend only resolves it per slot assignment) — the server
  * still rejects an assignment against a declared absence (`MemberDeclaredAbsent`).
  */
@@ -39,6 +40,7 @@ interface SpecOption {
 })
 export class RaidRosterPoolComponent {
   readonly guildId = input.required<string>();
+  readonly guildBranchId = input.required<number>();
   readonly activeEvent = input<RaidEvent | null>(null);
   /** True for non-officer viewers — rows aren't draggable. */
   readonly disabled = input(false);
@@ -53,12 +55,8 @@ export class RaidRosterPoolComponent {
   readonly specFilter = signal<number | undefined>(undefined);
   readonly rankFilter = signal<CharacterRank | undefined>(undefined);
 
-  /** Members on the active event's branch — unfiltered by branch until an event is selected. */
-  readonly #branchMembers = computed(() => {
-    const members = this.#store.members() ?? [];
-    const branchName = this.activeEvent()?.branchName;
-    return branchName ? members.filter((m) => m.branchName === branchName) : members;
-  });
+  /** The store is already scoped to this guild branch — no client-side branch filtering needed. */
+  readonly #branchMembers = computed(() => this.#store.members() ?? []);
 
   readonly classOptions = computed<ClassOption[]>(() => {
     const byId = new Map<number, ClassOption>();
@@ -119,11 +117,13 @@ export class RaidRosterPoolComponent {
   );
 
   constructor() {
-    // Reloads on first render and whenever guildId changes — this panel stays mounted across
-    // event-tab switches, so only the guild identity (not the active event) should retrigger a fetch.
+    // Reloads on first render and whenever guildId/guildBranchId changes — this panel stays
+    // mounted across event-tab switches, so only the guild/branch identity (not the active
+    // event) should retrigger a fetch.
     effect(() => {
       const guildId = this.guildId();
-      this.#store.loadRoster(guildId);
+      const guildBranchId = this.guildBranchId();
+      this.#store.loadRoster(guildId, guildBranchId);
     });
   }
 

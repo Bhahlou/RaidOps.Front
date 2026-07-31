@@ -5,44 +5,51 @@ import { environment } from '../../../../environments/environment';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
 import { RaidsService } from '../services/raids.service';
 
-/** Raid series (recurring templates) configured for a guild — active and inactive alike. */
+interface SeriesKey {
+  guildId: string;
+  guildBranchId: number;
+}
+
+/** Raid series (recurring templates) configured for a guild branch — active and inactive alike. */
 @Service()
 export class RaidSeriesStore {
   readonly #service = inject(RaidsService);
 
-  readonly #guildId = signal<string | null>(null);
+  readonly #key = signal<SeriesKey | null>(null);
 
   readonly #seriesResource = httpResource<RaidSeries[]>(() => {
-    const guildId = this.#guildId();
-    return guildId ? `${environment.apiUrl}/guilds/${guildId}/raids/series` : undefined;
+    const key = this.#key();
+    return key ? `${environment.apiUrl}/guilds/${key.guildId}/branches/${key.guildBranchId}/raids/series` : undefined;
   });
 
   readonly series = computed(() => this.#seriesResource.value() ?? null);
   readonly isLoading = this.#seriesResource.isLoading;
 
-  /** Points the store at a guild's raid series and forces a fresh fetch. */
-  load(guildId: string): void {
-    if (this.#guildId() === guildId) {
+  /** Points the store at a guild branch's raid series and forces a fresh fetch. */
+  load(guildId: string, guildBranchId: number): void {
+    const next: SeriesKey = { guildId, guildBranchId };
+    const current = this.#key();
+    if (current && current.guildId === next.guildId && current.guildBranchId === next.guildBranchId) {
       this.#seriesResource.reload();
     } else {
-      this.#guildId.set(guildId);
+      this.#key.set(next);
     }
   }
 
-  /** Re-fetches the current guild's series without changing which guild is tracked. */
+  /** Re-fetches the current guild branch's series without changing which one is tracked. */
   reload(): void {
     this.#seriesResource.reload();
   }
 
-  createSeries(guildId: string, payload: RaidSeriesPayload): Observable<void> {
-    return this.#service.createSeries(guildId, payload);
+  createSeries(guildId: string, guildBranchId: number, payload: RaidSeriesPayload): Observable<void> {
+    return this.#service.createSeries(guildId, guildBranchId, payload);
   }
 
-  updateSeries(guildId: string, seriesId: number, payload: RaidSeriesPayload): Observable<void> {
-    return this.#service.updateSeries(guildId, seriesId, payload);
+  updateSeries(guildId: string, guildBranchId: number, seriesId: number, payload: RaidSeriesPayload): Observable<void> {
+    return this.#service.updateSeries(guildId, guildBranchId, seriesId, payload);
   }
 
-  deactivateSeries(guildId: string, seriesId: number): Observable<void> {
-    return this.#service.deactivateSeries(guildId, seriesId);
+  deactivateSeries(guildId: string, guildBranchId: number, seriesId: number): Observable<void> {
+    return this.#service.deactivateSeries(guildId, guildBranchId, seriesId);
   }
 }

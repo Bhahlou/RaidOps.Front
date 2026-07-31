@@ -19,6 +19,7 @@ import { RaidSlotComponent } from '../raid-slot/raid-slot.component';
 })
 export class RaidEventGridComponent {
   readonly guildId = input.required<string>();
+  readonly guildBranchId = input.required<number>();
   readonly event = input.required<RaidEvent>();
   /** True for non-officer viewers — drag/drop and the unassign action are inert. */
   readonly disabled = input(false);
@@ -41,7 +42,7 @@ export class RaidEventGridComponent {
     if (this.disabled()) return;
     // The dropped-on-self case (dragging a chip back onto its own slot) is a harmless no-op
     // re-assign server-side — not worth special-casing here.
-    this.#store.assignSlot(this.guildId(), this.event().id, groupNumber, slotNumber, item.characterId).subscribe({
+    this.#store.assignSlot(this.guildId(), this.guildBranchId(), this.event().id, groupNumber, slotNumber, item.characterId).subscribe({
       next: () => this.#store.reload(),
       error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
     });
@@ -49,7 +50,7 @@ export class RaidEventGridComponent {
 
   onUnassign(groupNumber: number, slotNumber: number): void {
     if (this.disabled()) return;
-    this.#store.unassignSlot(this.guildId(), this.event().id, groupNumber, slotNumber).subscribe({
+    this.#store.unassignSlot(this.guildId(), this.guildBranchId(), this.event().id, groupNumber, slotNumber).subscribe({
       next: () => this.#store.reload(),
       error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
     });

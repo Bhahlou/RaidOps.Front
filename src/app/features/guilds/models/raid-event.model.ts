@@ -31,10 +31,9 @@ export interface RaidBoard {
   events: RaidEvent[];
 }
 
-/** Payload shared by ad-hoc raid event creation and full replacement (PATCH). */
+/** Payload shared by ad-hoc raid event creation and full replacement (PATCH) — the guild branch (and its WoW game version) is the route's `guildBranchId`, never a client-supplied field. */
 export interface RaidEventPayload {
   name: string;
-  branchId: number;
   startsAtUtc: string;
   groupCount: number;
   slotsPerGroup: number;

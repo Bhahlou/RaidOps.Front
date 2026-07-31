@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { WowClassIconComponent } from '../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
 import { RaidSlotAssignment } from '../../models/raid-slot-assignment.model';
 import { RaidDragItem } from '../../models/raid-drag-item.model';
-import { DayAvailabilityStatus } from '../../models/day-availability-status.enum';
+import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
 
 /**
  * A single group/slot coordinate of a raid event's grid — a `CdkDropList` accepting at most one

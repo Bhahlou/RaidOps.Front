@@ -1,12 +1,9 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
-import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
-import { Branch } from '../../../../shared/models/branch.model';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidEventPayload } from '../../models/raid-event.model';
@@ -15,6 +12,7 @@ import { raidErrorKey } from '../../utils/raid-error-key.util';
 
 export interface CreateRaidEventDialogData {
   guildId: string;
+  guildBranchId: number;
 }
 
 /**
@@ -24,7 +22,7 @@ export interface CreateRaidEventDialogData {
 @Component({
   selector: 'app-create-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, SelectComponent],
+  imports: [TranslocoPipe, ButtonComponent],
   templateUrl: './create-raid-event-dialog.component.html',
   styleUrl: './create-raid-event-dialog.component.scss',
 })
@@ -32,19 +30,12 @@ export class CreateRaidEventDialogComponent {
   readonly #dialogRef = inject(DialogRef<boolean>);
   readonly #boardStore = inject(RaidBoardStore);
   readonly #zoneStore = inject(RaidZoneStore);
-  readonly #branchService = inject(WowBrancheService);
   readonly #snackbar = inject(SnackbarService);
   readonly data = inject<CreateRaidEventDialogData>(DIALOG_DATA);
 
   readonly zones = this.#zoneStore.zones;
 
-  readonly branches = signal<Branch[]>([]);
-  readonly branchOptions = computed<SelectOption<number>[]>(() =>
-    this.branches().map((b) => ({ value: b.id, label: b.name })),
-  );
-
   readonly name = signal('');
-  readonly branchId = signal<number | null>(null);
   /** `datetime-local` input value, `"yyyy-MM-ddTHH:mm"` in the browser's local timezone. */
   readonly startsAtLocal = signal('');
   readonly groupCount = signal(5);
@@ -57,7 +48,6 @@ export class CreateRaidEventDialogComponent {
     () =>
       !this.submitting() &&
       this.name().trim().length > 0 &&
-      this.branchId() !== null &&
       this.startsAtLocal().length > 0 &&
       this.selectedZoneIds().size > 0 &&
       this.groupCount() > 0 &&
@@ -65,17 +55,7 @@ export class CreateRaidEventDialogComponent {
   );
 
   constructor() {
-    this.#branchService.getAll().subscribe((branches) => this.branches.set(branches));
-
-    effect(() => {
-      const branchId = this.branchId();
-      if (branchId !== null) this.#zoneStore.load(this.data.guildId, branchId);
-    });
-  }
-
-  setBranchId(branchId: number | null): void {
-    this.branchId.set(branchId);
-    this.selectedZoneIds.set(new Set());
+    this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
   }
 
   toggleZone(zoneId: number): void {
@@ -96,7 +76,6 @@ export class CreateRaidEventDialogComponent {
 
     const payload: RaidEventPayload = {
       name: this.name().trim(),
-      branchId: this.branchId()!,
       startsAtUtc: new Date(this.startsAtLocal()).toISOString(),
       groupCount: this.groupCount(),
       slotsPerGroup: this.slotsPerGroup(),
@@ -105,7 +84,7 @@ export class CreateRaidEventDialogComponent {
     };
 
     this.submitting.set(true);
-    this.#boardStore.createEvent(this.data.guildId, payload).subscribe({
+    this.#boardStore.createEvent(this.data.guildId, this.data.guildBranchId, payload).subscribe({
       next: () => {
         this.#snackbar.success('raidBuilder.eventDialog.createSuccess');
         this.#dialogRef.close(true);

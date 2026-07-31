@@ -18,16 +18,6 @@
 
   <div class="field-row">
     <div class="field-group">
-      <label class="field-label" for="series-branch">{{ 'raidBuilder.seriesDialog.branch' | transloco }}</label>
-      <app-select
-        [inputId]="'series-branch'"
-        [options]="branchOptions()"
-        [value]="branchId()"
-        (valueChange)="setBranchId($any($event))"
-        [placeholder]="'raidBuilder.seriesDialog.branchPlaceholder' | transloco"
-      />
-    </div>
-    <div class="field-group">
       <label class="field-label" for="series-day">{{ 'raidBuilder.seriesDialog.dayOfWeek' | transloco }}</label>
       <app-select [inputId]="'series-day'" [options]="dayOptions()" [value]="recurrenceDayOfWeek()" (valueChange)="recurrenceDayOfWeek.set($any($event))" />
     </div>
@@ -78,9 +68,7 @@
 
   <div class="field-group">
     <span class="field-label">{{ 'raidBuilder.seriesDialog.zones' | transloco }}</span>
-    @if (branchId() === null) {
-      <p class="mode-hint">{{ 'raidBuilder.seriesDialog.pickBranchFirst' | transloco }}</p>
-    } @else if (zones().length === 0) {
+    @if (zones().length === 0) {
       <p class="mode-hint">{{ 'raidBuilder.seriesDialog.noZones' | transloco }}</p>
     } @else {
       <div class="zone-checkboxes">
