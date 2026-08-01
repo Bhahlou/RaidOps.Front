@@ -10,7 +10,7 @@ import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidSeries, RaidSeriesPayload } from '../../models/raid-series.model';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
-import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
+import { RaidZoneFieldComponent } from '../raid-zone-field/raid-zone-field.component';
 
 export interface CreateRaidSeriesDialogData {
   guildId: string;
@@ -29,7 +29,7 @@ const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 @Component({
   selector: 'app-create-raid-series-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, SelectComponent, RaidZonePickerComponent],
+  imports: [TranslocoPipe, ButtonComponent, SelectComponent, RaidZoneFieldComponent],
   templateUrl: './create-raid-series-dialog.component.html',
   styleUrl: './create-raid-series-dialog.component.scss',
 })

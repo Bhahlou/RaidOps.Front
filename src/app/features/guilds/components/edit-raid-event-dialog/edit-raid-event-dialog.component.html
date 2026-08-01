@@ -67,14 +67,7 @@
     </div>
   </div>
 
-  <div class="field-group">
-    <span class="field-label">{{ 'raidBuilder.seriesDialog.zones' | transloco }}</span>
-    @if (zones().length === 0) {
-      <p class="mode-hint">{{ 'raidBuilder.seriesDialog.noZones' | transloco }}</p>
-    } @else {
-      <app-raid-zone-picker [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
-    }
-  </div>
+  <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
 </div>
 
 <div class="dialog-actions">

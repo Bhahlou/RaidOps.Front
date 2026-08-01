@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
@@ -8,8 +7,8 @@ import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidEventPayload } from '../../models/raid-event.model';
 import { SignupMode } from '../../models/signup-mode.enum';
-import { raidErrorKey } from '../../utils/raid-error-key.util';
-import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
+import { submitRaidDialogRequest } from '../../utils/dialog-submit.util';
+import { RaidZoneFieldComponent } from '../raid-zone-field/raid-zone-field.component';
 
 export interface CreateRaidEventDialogData {
   guildId: string;
@@ -23,7 +22,7 @@ export interface CreateRaidEventDialogData {
 @Component({
   selector: 'app-create-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, RaidZonePickerComponent],
+  imports: [TranslocoPipe, ButtonComponent, RaidZoneFieldComponent],
   templateUrl: './create-raid-event-dialog.component.html',
   styleUrl: './create-raid-event-dialog.component.scss',
 })
@@ -71,17 +70,13 @@ export class CreateRaidEventDialogComponent {
       raidZoneIds: [...this.selectedZoneIds()],
     };
 
-    this.submitting.set(true);
-    this.#boardStore.createEvent(this.data.guildId, this.data.guildBranchId, payload).subscribe({
-      next: () => {
-        this.#snackbar.success('raidBuilder.eventDialog.createSuccess');
-        this.#dialogRef.close(true);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.submitting.set(false);
-        this.#snackbar.error(raidErrorKey(err));
-      },
-    });
+    submitRaidDialogRequest(
+      this.submitting,
+      this.#snackbar,
+      this.#dialogRef,
+      'raidBuilder.eventDialog.createSuccess',
+      this.#boardStore.createEvent(this.data.guildId, this.data.guildBranchId, payload),
+    );
   }
 
   cancel(): void {

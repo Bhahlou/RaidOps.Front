@@ -11,7 +11,8 @@ import { RaidEvent, RaidEventPayload } from '../../models/raid-event.model';
 import { RaidEventStatus } from '../../models/raid-event-status.enum';
 import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
-import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
+import { submitRaidDialogRequest } from '../../utils/dialog-submit.util';
+import { RaidZoneFieldComponent } from '../raid-zone-field/raid-zone-field.component';
 
 export interface EditRaidEventDialogData {
   guildId: string;
@@ -27,7 +28,7 @@ export interface EditRaidEventDialogData {
 @Component({
   selector: 'app-edit-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, RaidZonePickerComponent],
+  imports: [TranslocoPipe, ButtonComponent, RaidZoneFieldComponent],
   templateUrl: './edit-raid-event-dialog.component.html',
   styleUrl: './edit-raid-event-dialog.component.scss',
 })
@@ -81,17 +82,13 @@ export class EditRaidEventDialogComponent {
       raidZoneIds: [...this.selectedZoneIds()],
     };
 
-    this.submitting.set(true);
-    this.#boardStore.updateEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id, payload).subscribe({
-      next: () => {
-        this.#snackbar.success('raidBuilder.eventDialog.saveSuccess');
-        this.#dialogRef.close(true);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.submitting.set(false);
-        this.#snackbar.error(raidErrorKey(err));
-      },
-    });
+    submitRaidDialogRequest(
+      this.submitting,
+      this.#snackbar,
+      this.#dialogRef,
+      'raidBuilder.eventDialog.saveSuccess',
+      this.#boardStore.updateEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id, payload),
+    );
   }
 
   publish(): void {
