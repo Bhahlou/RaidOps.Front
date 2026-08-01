@@ -61,6 +61,9 @@
       },
       "guildBranches": {
         "title": "Paramètres - Branches"
+      },
+      "raids": {
+        "title": "Raids"
       }
     }
   },
@@ -72,6 +75,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidBuilder": {
+        "title": "Composez vos groupes de raid en glisser-déposer",
+        "description": "Une nouvelle page Raids permet aux officiers de composer les raids en glissant des personnages depuis un vivier du roster en direct vers une grille de groupes/slots — échangez deux personnages assignés, ou cliquez sur un slot vide pour en chercher et assigner un directement. Configurez une série récurrente pour ne plus avoir à recréer à la main un raid hebdomadaire et ses zones cibles. Un raid reste en brouillon, invisible pour les membres classiques du roster, jusqu'à ce qu'un officier le publie."
+      },
       "branchNotifications": {
         "title": "Notifications Discord personnalisables par branche",
         "description": "Les réglages de notification (en commençant par les absences) peuvent désormais être surchargés pour une branche précise plutôt qu'au niveau de la guilde uniquement, avec une indication claire « hérité du réglage général de la guilde » et un retour en un clic. Les permissions manquantes du bot sont maintenant listées nommément (par exemple « envoyer des messages », « intégrer des liens ») plutôt qu'un avertissement générique."

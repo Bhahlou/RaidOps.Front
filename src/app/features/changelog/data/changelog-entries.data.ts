@@ -31,6 +31,10 @@ export function fix(id: string, date: string, key: string): ChangelogEntry {
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-08-01-raid-builder', '2026-08-01', 'raidBuilder', {
+    category: 'guild',
+    article: 'raid-builder',
+  }),
   feature('2026-07-30-branch-notifications', '2026-07-30', 'branchNotifications', {
     category: 'guild',
     article: 'notifications',

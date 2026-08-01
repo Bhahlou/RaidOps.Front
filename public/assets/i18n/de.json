@@ -61,6 +61,9 @@
       },
       "guildBranches": {
         "title": "Einstellungen - Spielzweige"
+      },
+      "raids": {
+        "title": "Raids"
       }
     }
   },
@@ -72,6 +75,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidBuilder": {
+        "title": "Raidgruppen per Drag & Drop zusammenstellen",
+        "description": "Eine neue Raids-Seite lässt Officer Raidzusammenstellungen erstellen, indem sie Charaktere aus einem live aktualisierten Roster-Pool auf ein Gruppen-/Slot-Raster ziehen — zwei zugewiesene Charaktere tauschen, oder auf einen leeren Slot klicken, um stattdessen einen zu suchen und zuzuweisen. Richten Sie eine wiederkehrende Serie ein, damit ein wöchentlicher Raid samt Zielzonen nicht jedes Mal von Hand neu erstellt werden muss. Ein Raid bleibt ein Entwurf, unsichtbar für reguläre Roster-Mitglieder, bis ein Officer ihn veröffentlicht."
+      },
       "branchNotifications": {
         "title": "Discord-Benachrichtigungen pro Spielzweig überschreibbar",
         "description": "Benachrichtigungseinstellungen (zunächst für Abwesenheiten) können jetzt für einen bestimmten Spielzweig überschrieben werden statt nur gildenweit, mit einem klaren Hinweis „übernommen von der gildenweiten Einstellung\" und einem Zurücksetzen mit einem Klick. Fehlende Bot-Berechtigungen werden jetzt namentlich aufgelistet (z. B. „Nachrichten senden\", „Links einbetten\") statt als allgemeine Warnung."

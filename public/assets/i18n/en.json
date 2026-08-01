@@ -61,6 +61,9 @@
       },
       "guildBranches": {
         "title": "Settings - Branches"
+      },
+      "raids": {
+        "title": "Raids"
       }
     }
   },
@@ -72,6 +75,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidBuilder": {
+        "title": "Compose raid groups by drag & drop",
+        "description": "A new Raids page lets officers build raid compositions by dragging characters from a live roster pool onto a group/slot grid — swap two assigned characters, or click an empty slot to search and assign one instead. Set up a recurring series so a weekly raid and its target zones don't need recreating by hand every time. A raid stays a draft, invisible to regular roster members, until an officer publishes it."
+      },
       "branchNotifications": {
         "title": "Per-branch Discord notification overrides",
         "description": "Notification settings (starting with absences) can now be overridden for a specific branch instead of only guild-wide, with a clear \"inherited from the guild-wide setting\" indicator and one-click revert. Missing bot permissions are now listed by name (e.g. \"send messages\", \"embed links\") instead of a generic warning."
