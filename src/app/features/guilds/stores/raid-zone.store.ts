@@ -26,7 +26,7 @@ export class RaidZoneStore {
   load(guildId: string, guildBranchId: number): void {
     const next: ZoneKey = { guildId, guildBranchId };
     const current = this.#key();
-    if (!current || current.guildId !== next.guildId || current.guildBranchId !== next.guildBranchId) {
+    if (current?.guildId !== next.guildId || current?.guildBranchId !== next.guildBranchId) {
       this.#key.set(next);
     }
   }

@@ -113,7 +113,8 @@ export class RaidSlotComponent {
     if (this.assignment() === null) return true;
 
     const from = drag.data?.fromSlot;
-    if (from == null || from.eventId !== this.eventId()) return false;
+    if (from == null) return false;
+    if (from.eventId !== this.eventId()) return false;
     return from.groupNumber !== this.groupNumber() || from.slotNumber !== this.slotNumber();
   };
 

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RaidZone } from '../models/raid-zone.model';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
-import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
+import { RaidBoard, RaidEventPayload } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 
 /** Thin HTTP wrapper over every `api/v1/guilds/{guildId}/branches/{guildBranchId}/raids/...` endpoint. */

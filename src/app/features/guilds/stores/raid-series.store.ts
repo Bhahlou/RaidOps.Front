@@ -29,7 +29,7 @@ export class RaidSeriesStore {
   load(guildId: string, guildBranchId: number): void {
     const next: SeriesKey = { guildId, guildBranchId };
     const current = this.#key();
-    if (current && current.guildId === next.guildId && current.guildBranchId === next.guildBranchId) {
+    if (current?.guildId === next.guildId && current?.guildBranchId === next.guildBranchId) {
       this.#seriesResource.reload();
     } else {
       this.#key.set(next);
