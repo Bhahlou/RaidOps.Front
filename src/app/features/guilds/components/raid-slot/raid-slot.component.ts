@@ -8,7 +8,7 @@ import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidSlotAssignment } from '../../models/raid-slot-assignment.model';
 import { RaidDragItem } from '../../models/raid-drag-item.model';
 import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
-import { AssignableCharacter } from '../../utils/assignable-characters.util';
+import { AssignableCharacter, LockedCharacterEventIds } from '../../utils/assignable-characters.util';
 
 /**
  * A single group/slot coordinate of a raid event's grid — a `CdkDropList` accepting at most one
@@ -33,8 +33,10 @@ export class RaidSlotComponent {
   readonly dropListId = input.required<string>();
   /** Discord IDs of roster players declared absent for this slot's event — see `RaidEvent.absentPlayerDiscordIds`. */
   readonly absentPlayerDiscordIds = input<string[]>([]);
-  /** Character IDs locked out of this slot's event via a shared raid zone with another loaded event. */
-  readonly lockedCharacterIds = input<ReadonlySet<number>>(new Set());
+  /** Character ID → locking event IDs for this slot's event, via a shared raid zone with another loaded event. */
+  readonly lockedCharacterEventIds = input<LockedCharacterEventIds>(new Map());
+  /** Player → already-seated character in this slot's event — see `isBlockedForDrag`. */
+  readonly playerAssignedCharacterIds = input<ReadonlyMap<string, number>>(new Map());
   /** True when drag/drop and the remove action should be inert (non-officer viewer). */
   readonly disabled = input(false);
   /** Highlights this slot's chip (yellow outline) when it's one of the viewer's own characters. */
@@ -53,16 +55,37 @@ export class RaidSlotComponent {
   private readonly assignSearchInputRef = viewChild<ElementRef<HTMLInputElement>>('assignSearchInput');
 
   /**
-   * True while a drag is in progress for a player declared absent on this slot's event, or for a
+   * True while a drag is in progress for a player declared absent on this slot's event, for a
    * character already locked to this slot's event via a shared raid zone with another loaded
-   * event — both are hard rejects server-side, shown red and inert before the drop is attempted.
+   * event, or for a player who already holds a *different* character's slot in this event (one
+   * character per player per event) — all three are hard rejects server-side, shown red and inert
+   * before the drop is attempted. The player check is keyed on character, not just player, so
+   * repositioning a player's own already-seated character to another slot of the same event isn't
+   * mistaken for the second-character conflict it's meant to catch. The lockout check has a
+   * similar exception: dragging a character straight out of the *one* event that's locking it (a
+   * cross-raid move between two events sharing a zone) clears the lock instead of blocking — see
+   * `RaidEventGridComponent.onDropped`, which retracts the source assignment for that exact case.
    */
   readonly isBlockedForDrag = computed(() => {
     const draggingPlayerId = this.#boardStore.draggingPlayerDiscordId();
     if (draggingPlayerId != null && this.absentPlayerDiscordIds().includes(draggingPlayerId)) return true;
 
     const draggingCharacterId = this.#boardStore.draggingCharacterId();
-    return draggingCharacterId != null && this.lockedCharacterIds().has(draggingCharacterId);
+    if (draggingCharacterId != null) {
+      const lockingEventIds = this.lockedCharacterEventIds().get(draggingCharacterId);
+      if (lockingEventIds && lockingEventIds.size > 0) {
+        const fromSlot = this.#boardStore.draggingFromSlot();
+        const isMoveOutOfTheOnlyLockingEvent = fromSlot != null && lockingEventIds.size === 1 && lockingEventIds.has(fromSlot.eventId);
+        if (!isMoveOutOfTheOnlyLockingEvent) return true;
+      }
+    }
+
+    if (draggingPlayerId != null) {
+      const seatedCharacterId = this.playerAssignedCharacterIds().get(draggingPlayerId);
+      if (seatedCharacterId != null && seatedCharacterId !== draggingCharacterId) return true;
+    }
+
+    return false;
   });
 
   /**
@@ -153,7 +176,11 @@ export class RaidSlotComponent {
   }
 
   onDragStarted(assignment: RaidSlotAssignment): void {
-    this.#boardStore.startDrag(assignment.playerDiscordId, assignment.characterId);
+    this.#boardStore.startDrag(assignment.playerDiscordId, assignment.characterId, {
+      eventId: this.eventId(),
+      groupNumber: this.groupNumber(),
+      slotNumber: this.slotNumber(),
+    });
   }
 
   onDragEnded(): void {

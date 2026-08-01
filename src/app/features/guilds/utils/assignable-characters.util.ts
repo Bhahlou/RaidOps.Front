@@ -11,20 +11,43 @@ export interface AssignableCharacter {
 }
 
 /**
- * Character IDs already locked to one of `event`'s target zones via another event that shares at
- * least one of them (the board only ever loads one lockout week at a time, so any other loaded
- * event is, in practice, within the same lockout window — an accurate stand-in for the back end's
- * full per-zone cadence/anchor comparison without duplicating that math here). Shared by
- * {@link assignableCharactersFor} and the grid's own drag-blocking highlight, so a character reads
- * as locked out consistently everywhere on the board.
+ * Character ID → set of other event IDs it's already locked to via a shared target zone with
+ * `event` (the board only ever loads one lockout week at a time, so any other loaded event is, in
+ * practice, within the same lockout window — an accurate stand-in for the back end's full per-zone
+ * cadence/anchor comparison without duplicating that math here). Keyed per-event (not just a flat
+ * ID set) so the grid's drag-blocking highlight can tell a genuine second-lockout conflict apart
+ * from a same-zone *move*: dragging a character straight out of the one event that's locking it
+ * clears the lock, so that specific drag should read as relocating them, not duplicating them.
  */
-export function lockedCharacterIdsFor(event: RaidEvent, otherEvents: RaidEvent[]): Set<number> {
+export type LockedCharacterEventIds = ReadonlyMap<number, ReadonlySet<number>>;
+
+export function lockedCharacterEventIdsFor(event: RaidEvent, otherEvents: RaidEvent[]): LockedCharacterEventIds {
   const eventZoneIds = new Set(event.raidZones.map((z) => z.id));
-  return new Set(
-    otherEvents
-      .filter((e) => e.id !== event.id && e.raidZones.some((z) => eventZoneIds.has(z.id)))
-      .flatMap((e) => e.assignments.map((a) => a.characterId)),
-  );
+  const result = new Map<number, Set<number>>();
+  for (const other of otherEvents) {
+    if (other.id === event.id || !other.raidZones.some((z) => eventZoneIds.has(z.id))) continue;
+    for (const assignment of other.assignments) {
+      const lockingEventIds = result.get(assignment.characterId) ?? new Set<number>();
+      lockingEventIds.add(other.id);
+      result.set(assignment.characterId, lockingEventIds);
+    }
+  }
+  return result;
+}
+
+/** Flat character-ID view of {@link lockedCharacterEventIdsFor}, for callers that only need membership. */
+export function lockedCharacterIdsFor(event: RaidEvent, otherEvents: RaidEvent[]): Set<number> {
+  return new Set(lockedCharacterEventIdsFor(event, otherEvents).keys());
+}
+
+/**
+ * Per-player character already holding a slot in `event` — the "one character per player per
+ * event" rule, keyed by player so a slot can tell a same-player *repositioning* drag (dragged
+ * character === the one already on file for that player) apart from a genuine second-character
+ * conflict (a different character of a player who already has one seated).
+ */
+export function playerAssignedCharacterIdsFor(event: RaidEvent): ReadonlyMap<string, number> {
+  return new Map(event.assignments.map((a) => [a.playerDiscordId, a.characterId]));
 }
 
 /**

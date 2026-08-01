@@ -41,19 +41,25 @@ export class RaidBoardStore {
    * occupied slot), or `null` when no drag is in progress — shared across every visible panel's
    * grid and the pool so a drop target can show itself as blocked (declared absent, or the
    * character already locked to this event's zones via another loaded event) before the drop is
-   * attempted.
+   * attempted. `draggingFromSlot` is `null` for a roster-pool drag and set to the origin
+   * event/group/slot for a drag starting on an occupied slot — it's what lets a target slot tell a
+   * same-zone-lockout *move* (dragging a character straight out of the one event locking it) apart
+   * from a genuine second-lockout conflict.
    */
   readonly draggingPlayerDiscordId = signal<string | null>(null);
   readonly draggingCharacterId = signal<number | null>(null);
+  readonly draggingFromSlot = signal<{ eventId: number; groupNumber: number; slotNumber: number } | null>(null);
 
-  startDrag(playerDiscordId: string, characterId: number): void {
+  startDrag(playerDiscordId: string, characterId: number, fromSlot: { eventId: number; groupNumber: number; slotNumber: number } | null = null): void {
     this.draggingPlayerDiscordId.set(playerDiscordId);
     this.draggingCharacterId.set(characterId);
+    this.draggingFromSlot.set(fromSlot);
   }
 
   endDrag(): void {
     this.draggingPlayerDiscordId.set(null);
     this.draggingCharacterId.set(null);
+    this.draggingFromSlot.set(null);
   }
 
   /** Materializes any due series occurrence in the range, then points the board at it (forcing a fresh fetch). */

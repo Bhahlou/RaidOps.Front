@@ -8,7 +8,7 @@ import { RaidSlotAssignment } from '../../models/raid-slot-assignment.model';
 import { RaidDragItem } from '../../models/raid-drag-item.model';
 import { GuildRosterMember } from '../../models/guild-roster-member.model';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
-import { assignableCharactersFor, lockedCharacterIdsFor } from '../../utils/assignable-characters.util';
+import { assignableCharactersFor, lockedCharacterEventIdsFor, playerAssignedCharacterIdsFor } from '../../utils/assignable-characters.util';
 import { RaidSlotComponent } from '../raid-slot/raid-slot.component';
 
 /** Groups x slots grid for a single active raid event — the only grid rendered at a time. */
@@ -39,8 +39,10 @@ export class RaidEventGridComponent {
   readonly slotNumbers = computed(() => range(1, this.event().slotsPerGroup));
 
   readonly assignableCharacters = computed(() => assignableCharactersFor(this.event(), this.rosterMembers(), this.allEvents()));
-  /** Character IDs locked out of this event via a shared raid zone with another loaded event — drives the drag-blocking red highlight on every slot. */
-  readonly lockedCharacterIds = computed(() => lockedCharacterIdsFor(this.event(), this.allEvents()));
+  /** Character ID → locking event IDs for this event, via a shared raid zone with another loaded event — drives the drag-blocking red highlight on every slot. */
+  readonly lockedCharacterEventIds = computed(() => lockedCharacterEventIdsFor(this.event(), this.allEvents()));
+  /** Player → already-seated character in this event — drives the drag-blocking red highlight for a player's second character. */
+  readonly playerAssignedCharacterIds = computed(() => playerAssignedCharacterIdsFor(this.event()));
 
   assignmentFor(groupNumber: number, slotNumber: number): RaidSlotAssignment | null {
     return this.event().assignments.find((a) => a.groupNumber === groupNumber && a.slotNumber === slotNumber) ?? null;
@@ -65,7 +67,25 @@ export class RaidEventGridComponent {
       return;
     }
 
-    this.#store.assignSlot(this.guildId(), this.guildBranchId(), this.event().id, groupNumber, slotNumber, item.characterId).subscribe({
+    // A drag arriving from another event that shares a lockout zone with this one only got past
+    // raid-slot's isBlockedForDrag because it's being pulled straight out of the one event locking
+    // it (see that computed's doc comment) — a cross-raid *move*, not a duplicate. Retract the
+    // source assignment first so the character doesn't end up seated in both.
+    const fromEventId = item.fromSlot?.eventId;
+    if (fromEventId != null && fromEventId !== this.event().id && this.lockedCharacterEventIds().get(item.characterId)?.has(fromEventId)) {
+      const { groupNumber: fromGroup, slotNumber: fromSlot } = item.fromSlot!;
+      this.#store.unassignSlot(this.guildId(), this.guildBranchId(), fromEventId, fromGroup, fromSlot).subscribe({
+        next: () => this.#assign(groupNumber, slotNumber, item.characterId),
+        error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
+      });
+      return;
+    }
+
+    this.#assign(groupNumber, slotNumber, item.characterId);
+  }
+
+  #assign(groupNumber: number, slotNumber: number, characterId: number): void {
+    this.#store.assignSlot(this.guildId(), this.guildBranchId(), this.event().id, groupNumber, slotNumber, characterId).subscribe({
       next: () => this.#store.reload(),
       error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
     });
