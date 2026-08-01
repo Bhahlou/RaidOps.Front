@@ -14,6 +14,34 @@
   }
 }
 
+// Chip variant (label() set) — same trigger, but sized to fit a name instead of a bare 28x28
+// icon square, so several filters sitting side by side each say what they filter.
+.filter-btn--chip {
+  width: auto;
+  height: 28px;
+  gap: 5px;
+  padding: 0 8px 0 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-border-subtle);
+  }
+
+  &.filter-active {
+    border-color: var(--color-accent);
+  }
+}
+
+.filter-btn-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
 // Panel — deliberately mirrors .select-panel/.select-filter/.select-option in
 // select.component.scss so every searchable dropdown in the app reads as the same control;
 // change one, change the other.
@@ -78,6 +106,9 @@
 }
 
 .filter-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   padding: 6px 10px;
   border: none;
@@ -100,4 +131,9 @@
     color: var(--color-accent);
     font-weight: 500;
   }
+}
+
+.filter-option-icon {
+  flex-shrink: 0;
+  border-radius: 3px;
 }

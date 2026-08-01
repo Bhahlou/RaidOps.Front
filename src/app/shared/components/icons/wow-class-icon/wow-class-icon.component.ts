@@ -17,6 +17,12 @@ const CLASS_ICON_NAMES: Record<number, string> = {
   13: 'evoker',
 };
 
+/** Blizzard CDN class icon URL for a given class ID, or `null` for an unrecognized one. */
+export function wowClassIconUrl(classId: number): string | null {
+  const name = CLASS_ICON_NAMES[classId];
+  return name ? `https://render.worldofwarcraft.com/us/icons/56/classicon_${name}.jpg` : null;
+}
+
 /** Official Blizzard class colors keyed by class ID. */
 export const CLASS_COLORS: Record<number, string> = {
   1: '#C79C6E',
@@ -53,7 +59,6 @@ export class WowClassIconComponent {
   readonly size = input(24);
 
   get iconUrl(): string {
-    const name = CLASS_ICON_NAMES[this.classId()];
-    return name ? `https://render.worldofwarcraft.com/us/icons/56/classicon_${name}.jpg` : '';
+    return wowClassIconUrl(this.classId()) ?? '';
   }
 }

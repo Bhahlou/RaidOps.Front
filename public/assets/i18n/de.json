@@ -338,6 +338,7 @@
     "guild": {
       "dashboard": "Dashboard",
       "roster": "Roster",
+      "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Einstellungen",
       "auditLog": "Audit-Log",
@@ -416,9 +417,23 @@
         "label": "Officer-Rollen",
         "hint": "Mitglieder mit einer dieser Rollen erhalten Officer-Zugriff auf diesen Spielzweig, unabhängig vom Roster-Zugriff. Discord-Server-Administratoren und der Server-Besitzer behalten unabhängig von dieser Wahl immer vollen Zugriff."
       },
+      "region": {
+        "label": "Region",
+        "hint": "Die Blizzard-Region, in der sich der Realm dieses Spielzweigs befindet — bestimmt, wann seine Raids jede Woche zurückgesetzt werden.",
+        "placeholder": "Region auswählen",
+        "options": {
+          "eu": "Europa",
+          "us": "Amerika / Ozeanien",
+          "kr": "Korea",
+          "tw": "Taiwan"
+        }
+      },
       "save": "Spielzweig-Einstellungen speichern",
       "rosterSettings": {
         "saveSuccess": "Spielzweig-Einstellungen gespeichert."
+      },
+      "regionSettings": {
+        "saveSuccess": "Spielzweig-Region gespeichert."
       }
     },
     "notificationSettings": {
@@ -459,6 +474,7 @@
     "branchOfficerRolesNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Officer-Rollen — wähle im Reiter „Spielzweige“ der Gildeneinstellungen, welche Discord-Rollen Officer-Zugriff gewähren.",
     "guildLanguageNotConfigured": "„{{ guildName }}“ hat noch keine Sprache konfiguriert — wähle in den Einstellungen die Sprache, in der RaidOps mit deiner Gilde kommuniziert.",
     "absenceNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Abwesenheiten noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
+    "branchRegionNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Region — lege sie im Tab Spielzweige der Einstellungen fest, damit die wöchentlichen Raid-Resets zur richtigen Zeit erfolgen.",
     "viewLink": "Konfigurieren",
     "dismiss": "Nie wieder anzeigen"
   },
@@ -710,6 +726,127 @@
       "delete": "Löschen"
     }
   },
+  "raidBuilder": {
+    "previousRange": "Vorheriger Zeitraum",
+    "nextRange": "Nächster Zeitraum",
+    "draft": "Entwurf",
+    "publish": "Veröffentlichen",
+    "publishConfirm": "„{{name}}“ wird für alle Rostermitglieder sichtbar. Dies kann nicht rückgängig gemacht werden.",
+    "board": {
+      "empty": "Noch kein Raid in diesem Zeitraum — erstelle eine Serie oder einen Ad-hoc-Raid, um zu starten."
+    },
+    "tabs": {
+      "empty": "Kein Raid in diesem Zeitraum.",
+      "addEvent": "Raid hinzufügen"
+    },
+    "grid": {
+      "group": "Gruppe {{n}}",
+      "unassign": "Aus diesem Slot entfernen",
+      "changeSpec": "Spezialisierung ändern",
+      "assignSlot": "Charakter zuweisen",
+      "searchCharacter": "Charakter suchen",
+      "noAssignable": "Kein geeigneter Charakter"
+    },
+    "roles": {
+      "tank": "Tank",
+      "heal": "Heiler",
+      "melee": "Nahkampf-DPS",
+      "ranged": "Fernkampf-DPS"
+    },
+    "pool": {
+      "title": "Rosterpool",
+      "searchPlaceholder": "Suchen",
+      "allRaids": "Alle Raids",
+      "filterRaid": "Verfügbar für Raid",
+      "raidLabel": "Raid",
+      "allClasses": "Alle Klassen",
+      "filterClass": "Nach Klasse filtern",
+      "classLabel": "Klasse",
+      "allSpecs": "Alle Spezialisierungen",
+      "filterSpec": "Nach Spezialisierung filtern",
+      "specLabel": "Spez.",
+      "allRanks": "Alle Ränge",
+      "filterRank": "Nach Rang filtern",
+      "rankLabel": "Rang",
+      "noActiveEvent": "Erstelle einen Raid, um die Verfügbarkeit zu sehen.",
+      "empty": "Kein Charakter auf diesem Branch verfügbar.",
+      "emptyFiltered": "Kein Charakter entspricht den aktiven Filtern.",
+      "absent": "Am Datum dieses Raids als abwesend gemeldet",
+      "partial": "Am Datum dieses Raids nur teilweise verfügbar"
+    },
+    "unassigned": {
+      "title": "Nicht zugeteilt",
+      "empty": "Alle Rostermitglieder sind einem Raid in diesem Zeitraum zugeteilt."
+    },
+    "series": {
+      "manage": "Serien",
+      "addSeries": "Neue Serie",
+      "empty": "Noch keine wiederkehrende Serie.",
+      "deactivate": "Diese Serie stoppen",
+      "deactivateConfirmTitle": "Diese Raid-Serie stoppen?",
+      "deactivateConfirmMessage": "„{{name}}“ erstellt keine neuen Raids mehr. Bereits erstellte Termine bleiben unverändert.",
+      "deleteEmptyOccurrences": "Auch die leeren, unveröffentlichten Termine löschen, die diese Serie bereits erstellt hat",
+      "deactivateSuccess": "Serie gestoppt — die Vergangenheit bleibt erhalten."
+    },
+    "seriesDialog": {
+      "createTitle": "Neue Raid-Serie",
+      "editTitle": "Raid-Serie bearbeiten",
+      "name": "Name",
+      "dayOfWeek": "Wochentag",
+      "startTime": "Startzeit",
+      "intervalWeeks": "Alle N Wochen",
+      "groupCount": "Gruppen",
+      "slotsPerGroup": "Slots pro Gruppe",
+      "zones": "Raid-Zonen",
+      "noZones": "Keine Raid-Zone für diesen Branch konfiguriert.",
+      "saveSuccess": "Raid-Serie gespeichert."
+    },
+    "eventDialog": {
+      "createTitle": "Neuer Raid",
+      "editTitle": "Raid bearbeiten",
+      "name": "Name",
+      "startsAt": "Beginnt am",
+      "createSuccess": "Raid erstellt.",
+      "saveSuccess": "Raid gespeichert.",
+      "readOnlyCompleted": "Dieser Raid ist abgeschlossen und kann nicht mehr bearbeitet werden.",
+      "deleteEvent": "Raid löschen",
+      "deleteConfirmTitle": "Diesen Raid löschen?",
+      "deleteConfirmMessage": "„{{name}}“ wird endgültig gelöscht.",
+      "deleteConfirmMessageWithAssignments": "„{{name}}“ und alle zugeteilten Charaktere werden endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      "deleteSuccess": "Raid gelöscht.",
+      "publishConfirmTitle": "Diesen Raid veröffentlichen?",
+      "publishSuccess": "Raid veröffentlicht."
+    },
+    "weekday": {
+      "Monday": "Montag",
+      "Tuesday": "Dienstag",
+      "Wednesday": "Mittwoch",
+      "Thursday": "Donnerstag",
+      "Friday": "Freitag",
+      "Saturday": "Samstag",
+      "Sunday": "Sonntag"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "edit": "Bearbeiten"
+    },
+    "errors": {
+      "raidZoneNotFound": "Diese Raid-Zone existiert nicht mehr.",
+      "raidSeriesNotFound": "Diese Raid-Serie existiert nicht mehr.",
+      "raidEventNotFound": "Dieser Raid existiert nicht mehr.",
+      "slotOccupied": "Dieser Slot ist bereits belegt — zuerst die Zuteilung aufheben.",
+      "bothSlotsMustBeOccupiedToSwap": "Beide Slots müssen belegt sein, um sie zu tauschen.",
+      "invalidGroupOrSlotNumber": "Ungültige Gruppen- oder Slot-Nummer für diesen Raid.",
+      "characterNotOnRoster": "Dieser Charakter steht nicht auf dem Gilden-Roster.",
+      "branchMismatch": "Der Branch dieses Charakters stimmt nicht mit dem des Raids überein.",
+      "playerAlreadyAssignedInEvent": "Dieser Spieler hat bereits einen Charakter in diesem Raid zugeteilt.",
+      "memberDeclaredAbsent": "Dieses Mitglied hat sich am Datum dieses Raids als abwesend gemeldet.",
+      "raidLockoutConflict": "Dieser Charakter ist in einem anderen Raid bereits an diese Raid-Zone gebunden.",
+      "raidEventAlreadyPublished": "Dieser Raid ist bereits veröffentlicht.",
+      "gridShrinkWouldOrphanAssignments": "Zuerst alle Charaktere außerhalb der neuen Rastergröße entfernen."
+    }
+  },
   "home": {
     "title": "Verwalte deine Gilde.",
     "titleAccent": "Beherrsche Azeroth.",
@@ -833,6 +970,21 @@
       "submitError": "Fehler beim Speichern. Bitte versuche es erneut.",
       "importRolledBack": "Spezialisierungen nicht bestätigt — Import wurde abgebrochen."
     }
+  },
+  "classes": {
+    "1": "Krieger",
+    "2": "Paladin",
+    "3": "Jäger",
+    "4": "Schurke",
+    "5": "Priester",
+    "6": "Todesritter",
+    "7": "Schamane",
+    "8": "Magier",
+    "9": "Hexenmeister",
+    "10": "Mönch",
+    "11": "Druide",
+    "12": "Dämonenjäger",
+    "13": "Rufer"
   },
   "specs": {
     "71": "Waffen",

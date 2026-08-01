@@ -7,7 +7,7 @@ import { GuildAccessLevel, hasGuildAccess } from '../../../../core/models/guild-
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { expansionIconUrl } from '../../../../shared/utils/expansion-icon.util';
 
-type BranchLeaf = 'dashboard' | 'roster' | 'loot';
+type BranchLeaf = 'dashboard' | 'roster' | 'loot' | 'raids';
 
 // Mirrors the `data.minAccessLevel` set per leaf in guilds.routes.ts — a tab must never offer a
 // branch the branch-access guard would immediately bounce the user out of.
@@ -15,10 +15,11 @@ const REQUIRED_LEVEL: Record<BranchLeaf, GuildAccessLevel> = {
   dashboard: GuildAccessLevel.Public,
   roster: GuildAccessLevel.Roster,
   loot: GuildAccessLevel.Roster,
+  'raids': GuildAccessLevel.Roster,
 };
 
 /**
- * Branch switcher for Dashboard/Roster/Loot — not Calendar, which stays guild-level (see
+ * Branch switcher for Dashboard/Roster/Loot/Raid builder — not Calendar, which stays guild-level (see
  * guilds.routes.ts). Renders nothing for single-branch guilds: no branch UI for the common case.
  * Reuses the visual language of the shared `app-tabs` component (same `.tabs`/`.tab`/`.tab--active`
  * look) but not the component itself — these are real route links between distinct pages, not a

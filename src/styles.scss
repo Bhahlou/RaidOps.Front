@@ -417,4 +417,9 @@ body::after {
   &.menu-item--danger {
     color: var(--color-error);
   }
+
+  &.menu-item--active {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
 }

@@ -12,6 +12,8 @@ export interface GuildBranch {
   rosterRoleIds: string[];
   /** Discord snowflake IDs of the roles that grant Officer access. Holding any one is sufficient. */
   officerRoleIds: string[];
+  /** Blizzard API region this branch's realm sits in ("eu"/"us"/"kr"/"tw"), or null until an officer configures it. */
+  region: GuildBranchRegion | null;
 }
 
 /** Body of the roster-settings PATCH — guildId/guildBranchId are set by the route, not this payload. */
@@ -20,3 +22,6 @@ export interface GuildBranchRosterSettings {
   rosterRoleIds: string[];
   officerRoleIds: string[];
 }
+
+/** Blizzard API region — determines which weekly raid-lockout reset schedule a guild branch follows. */
+export type GuildBranchRegion = 'eu' | 'us' | 'kr' | 'tw';

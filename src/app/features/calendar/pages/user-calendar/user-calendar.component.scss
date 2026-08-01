@@ -20,7 +20,7 @@
   // .user-calendar-page's (now correctly full-height, see :host above) space unused below both cards.
   grid-template-rows: 1fr;
   gap: 24px;
-  padding: 16px 24px 24px;
+  padding-top: 16px;
   flex: 1;
   min-height: 0;
 
@@ -42,7 +42,7 @@
 
   @media (max-width: 600px) {
     gap: 16px;
-    padding: 10px 10px 16px;
+    padding-top: 10px;
   }
 }
 

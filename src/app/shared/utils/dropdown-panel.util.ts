@@ -5,7 +5,11 @@ import { ElementRef, signal } from '@angular/core';
  * CDK-overlay trigger button — everything about opening/closing the panel that doesn't depend on
  * single- vs multi-select semantics.
  */
-export function createDropdownPanel(disabled: () => boolean, trigger: () => ElementRef<HTMLButtonElement> | undefined) {
+export function createDropdownPanel(
+  disabled: () => boolean,
+  trigger: () => ElementRef<HTMLButtonElement> | undefined,
+  filterInput?: () => ElementRef<HTMLInputElement> | undefined,
+) {
   const isOpen = signal(false);
   const filterQuery = signal('');
   const triggerWidth = signal<number>(200);
@@ -16,6 +20,9 @@ export function createDropdownPanel(disabled: () => boolean, trigger: () => Elem
     if (isOpen()) {
       filterQuery.set('');
       triggerWidth.set(trigger()?.nativeElement.offsetWidth ?? 200);
+      // A macrotask, not a microtask/effect — guaranteed to run after the overlay's own initial
+      // focus handling, which otherwise wins the race and leaves the filter input unfocused.
+      if (filterInput) setTimeout(() => filterInput()?.nativeElement.focus());
     }
   }
 

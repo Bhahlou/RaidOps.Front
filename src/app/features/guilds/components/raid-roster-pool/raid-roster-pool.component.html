@@ -1,0 +1,94 @@
+<div class="pool-panel">
+  <h3 class="pool-title">{{ 'raidBuilder.pool.title' | transloco }}</h3>
+
+  <div class="pool-toolbar">
+    <div class="pool-search">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        [value]="searchQuery()"
+        (input)="setSearch($any($event.target).value)"
+        [placeholder]="'raidBuilder.pool.searchPlaceholder' | transloco"
+        [attr.aria-label]="'raidBuilder.pool.searchPlaceholder' | transloco"
+      />
+    </div>
+    <div class="pool-filters">
+      <app-filter-menu
+        [options]="eventFilterOptions()"
+        [selected]="targetEventFilter()"
+        (selectedChange)="targetEventFilter.set($event)"
+        [allLabel]="'raidBuilder.pool.allRaids' | transloco"
+        [label]="'raidBuilder.pool.raidLabel' | transloco"
+        [searchAriaLabel]="'raidBuilder.pool.filterRaid' | transloco"
+        [triggerTitle]="'raidBuilder.pool.filterRaid' | transloco"
+      />
+      <app-filter-menu
+        [options]="classFilterOptions()"
+        multiple
+        [selectedMany]="classFilter()"
+        (selectedManyChange)="classFilter.set($event)"
+        [allLabel]="'raidBuilder.pool.allClasses' | transloco"
+        [label]="'raidBuilder.pool.classLabel' | transloco"
+        [searchAriaLabel]="'raidBuilder.pool.filterClass' | transloco"
+        [triggerTitle]="'raidBuilder.pool.filterClass' | transloco"
+      />
+      <app-filter-menu
+        [options]="specFilterOptions()"
+        multiple
+        [selectedMany]="specFilter()"
+        (selectedManyChange)="specFilter.set($event)"
+        [allLabel]="'raidBuilder.pool.allSpecs' | transloco"
+        [label]="'raidBuilder.pool.specLabel' | transloco"
+        [searchAriaLabel]="'raidBuilder.pool.filterSpec' | transloco"
+        [triggerTitle]="'raidBuilder.pool.filterSpec' | transloco"
+      />
+      <app-filter-menu
+        [options]="rankFilterOptions()"
+        multiple
+        [selectedMany]="rankFilter()"
+        (selectedManyChange)="rankFilter.set($event)"
+        [allLabel]="'raidBuilder.pool.allRanks' | transloco"
+        [label]="'raidBuilder.pool.rankLabel' | transloco"
+        [searchAriaLabel]="'raidBuilder.pool.filterRank' | transloco"
+        [triggerTitle]="'raidBuilder.pool.filterRank' | transloco"
+      />
+      @if (hasActiveFilters()) {
+        <button type="button" class="icon-btn" (click)="clearFilters()" [attr.aria-label]="'roster.filters.clearAll' | transloco">
+          <span class="material-icons">filter_alt_off</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <span class="spinner pool-spinner"></span>
+  } @else if (events().length === 0) {
+    <app-empty-hint>{{ 'raidBuilder.pool.noActiveEvent' | transloco }}</app-empty-hint>
+  } @else if (poolMembers().length === 0) {
+    <app-empty-hint>{{ (hasActiveFilters() ? 'raidBuilder.pool.emptyFiltered' : 'raidBuilder.pool.empty') | transloco }}</app-empty-hint>
+  } @else {
+    <ul class="pool-list" cdkDropList id="raid-roster-pool-list" [cdkDropListEnterPredicate]="rejectEnter">
+      @for (member of poolMembers(); track member.characterId) {
+        <li
+          class="pool-row"
+          [class.pool-row--own]="isOwnCharacter(member)"
+          cdkDrag
+          [cdkDragData]="dragItem(member)"
+          [cdkDragDisabled]="disabled()"
+          (cdkDragStarted)="onDragStarted(member)"
+          (cdkDragEnded)="onDragEnded()"
+        >
+          <div class="pool-row-info">
+            <span class="pool-row-specs">
+              <app-character-raid-specs [specs]="member.raidSpecs" compact />
+            </span>
+            <span class="pool-row-name" [style.color]="member.classColor">{{ member.characterName }}</span>
+          </div>
+          <span class="rank-badge rank-badge--{{ member.characterRank.toLowerCase() }}">
+            {{ 'roster.list.rank.' + member.characterRank | transloco }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</div>

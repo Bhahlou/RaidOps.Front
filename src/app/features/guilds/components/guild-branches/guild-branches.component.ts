@@ -106,6 +106,14 @@ export class GuildBranchesComponent implements OnInit {
     }
   }
 
+  /**
+   * The sidenav/notifications banner reads AuthStore.user() for "branch not fully configured"
+   * warnings, which would otherwise stay stale until next login after a roster/officer/region save.
+   */
+  onSettingsSaved(): void {
+    this.#authStore.loadUser().subscribe();
+  }
+
   #loadRoles(): void {
     this.rolesLoading.set(true);
     this.#settingsService.getDiscordRoles(this.guildId()).subscribe({

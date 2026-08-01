@@ -1,0 +1,21 @@
+// Copied from the host dialogs' own field-group/field-label/mode-hint rules — Angular's view
+// encapsulation scopes styles per compiled view, so these can't be inherited from the parent
+// dialog now that the field-group markup lives in this component's own template.
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.mode-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}

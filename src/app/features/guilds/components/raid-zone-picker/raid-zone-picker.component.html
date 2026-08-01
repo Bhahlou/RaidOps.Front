@@ -1,0 +1,21 @@
+<div class="zone-picker">
+  @for (zone of zones(); track zone.id) {
+    <button
+      type="button"
+      class="zone-picker-item"
+      [class.zone-picker-item--selected]="isSelected(zone.id)"
+      [disabled]="disabled()"
+      [attr.aria-pressed]="isSelected(zone.id)"
+      [attr.aria-label]="zone.name"
+      [title]="zone.name"
+      (click)="toggle(zone.id)"
+    >
+      @if (iconUrl(zone); as icon) {
+        <img class="zone-picker-icon" [src]="icon" alt="" width="40" height="40" />
+      } @else {
+        <span class="zone-picker-icon zone-picker-icon--fallback">{{ zone.shortCode }}</span>
+      }
+      <span class="zone-picker-code">{{ zone.shortCode }}</span>
+    </button>
+  }
+</div>
