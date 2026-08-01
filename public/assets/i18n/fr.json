@@ -61,6 +61,9 @@
       },
       "guildBranches": {
         "title": "Paramètres - Branches"
+      },
+      "raids": {
+        "title": "Raids"
       }
     }
   },
@@ -72,6 +75,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidBuilder": {
+        "title": "Composez vos groupes de raid en glisser-déposer",
+        "description": "Une nouvelle page Raids permet aux officiers de composer les raids en glissant des personnages depuis un vivier du roster en direct vers une grille de groupes/slots — échangez deux personnages assignés, ou cliquez sur un slot vide pour en chercher et assigner un directement. Configurez une série récurrente pour ne plus avoir à recréer à la main un raid hebdomadaire et ses zones cibles. Un raid reste en brouillon, invisible pour les membres classiques du roster, jusqu'à ce qu'un officier le publie."
+      },
       "branchNotifications": {
         "title": "Notifications Discord personnalisables par branche",
         "description": "Les réglages de notification (en commençant par les absences) peuvent désormais être surchargés pour une branche précise plutôt qu'au niveau de la guilde uniquement, avec une indication claire « hérité du réglage général de la guilde » et un retour en un clic. Les permissions manquantes du bot sont maintenant listées nommément (par exemple « envoyer des messages », « intégrer des liens ») plutôt qu'un avertissement générique."
@@ -338,6 +345,7 @@
     "guild": {
       "dashboard": "Tableau de bord",
       "roster": "Roster",
+      "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Paramètres",
       "auditLog": "Journal d'audit",
@@ -416,9 +424,23 @@
         "label": "Rôles Officier",
         "hint": "Les membres ayant l'un de ces rôles obtiennent l'accès Officier sur cette branche, indépendamment de l'accès au roster. Les administrateurs du serveur Discord et le propriétaire du serveur conservent toujours l'accès complet, quel que soit ce choix."
       },
+      "region": {
+        "label": "Région",
+        "hint": "La région Blizzard sur laquelle se trouve le royaume de cette branche — utilisée pour savoir exactement quand ses raids reset chaque semaine.",
+        "placeholder": "Sélectionner une région",
+        "options": {
+          "eu": "Europe",
+          "us": "Amériques / Océanie",
+          "kr": "Corée",
+          "tw": "Taïwan"
+        }
+      },
       "save": "Enregistrer les réglages de la branche",
       "rosterSettings": {
         "saveSuccess": "Réglages de la branche enregistrés."
+      },
+      "regionSettings": {
+        "saveSuccess": "Région de la branche enregistrée."
       }
     },
     "notificationSettings": {
@@ -459,6 +481,7 @@
     "branchOfficerRolesNotConfigured": "« {{ guildName }} » a une branche active sans rôles Officier configurés — choisis quels rôles Discord donnent accès au statut Officier dans l'onglet Branches des paramètres de la guilde.",
     "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
     "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
+    "branchRegionNotConfigured": "« {{ guildName }} » a une branche active sans région configurée — règle-la dans l'onglet Branches des paramètres pour que les reset hebdomadaires des raids tombent à la bonne heure.",
     "viewLink": "Configurer",
     "dismiss": "Ne plus jamais afficher"
   },
@@ -710,6 +733,127 @@
       "delete": "Supprimer"
     }
   },
+  "raidBuilder": {
+    "previousRange": "Période précédente",
+    "nextRange": "Période suivante",
+    "draft": "Brouillon",
+    "publish": "Publier",
+    "publishConfirm": "« {{name}} » deviendra visible pour tous les membres du roster. Cette action est irréversible.",
+    "board": {
+      "empty": "Aucun raid prévu sur cette période — créez une série ou un raid ponctuel pour commencer."
+    },
+    "tabs": {
+      "empty": "Aucun raid sur cette période.",
+      "addEvent": "Ajouter un raid"
+    },
+    "grid": {
+      "group": "Groupe {{n}}",
+      "unassign": "Retirer de ce slot",
+      "changeSpec": "Changer de spé",
+      "assignSlot": "Assigner un personnage",
+      "searchCharacter": "Rechercher un personnage",
+      "noAssignable": "Aucun personnage éligible"
+    },
+    "roles": {
+      "tank": "Tank",
+      "heal": "Soigneur",
+      "melee": "DPS mêlée",
+      "ranged": "DPS distance"
+    },
+    "pool": {
+      "title": "Personnages disponibles",
+      "searchPlaceholder": "Rechercher",
+      "allRaids": "Tous les raids",
+      "filterRaid": "Disponible pour le raid",
+      "raidLabel": "Raid",
+      "allClasses": "Toutes les classes",
+      "filterClass": "Filtrer par classe",
+      "classLabel": "Classe",
+      "allSpecs": "Toutes les spés",
+      "filterSpec": "Filtrer par spé",
+      "specLabel": "Spé",
+      "allRanks": "Tous les rangs",
+      "filterRank": "Filtrer par rang",
+      "rankLabel": "Rang",
+      "noActiveEvent": "Créez un raid pour voir les disponibilités.",
+      "empty": "Aucun personnage disponible sur cette branche.",
+      "emptyFiltered": "Aucun personnage ne correspond aux filtres actifs.",
+      "absent": "Déclaré absent à la date de ce raid",
+      "partial": "Disponibilité partielle à la date de ce raid"
+    },
+    "unassigned": {
+      "title": "Non affectés",
+      "empty": "Tous les membres du roster sont affectés à un raid sur cette période."
+    },
+    "series": {
+      "manage": "Séries",
+      "addSeries": "Nouvelle série",
+      "empty": "Aucune série récurrente pour le moment.",
+      "deactivate": "Arrêter cette série",
+      "deactivateConfirmTitle": "Arrêter cette série de raids ?",
+      "deactivateConfirmMessage": "« {{name}} » ne générera plus aucun nouveau raid. Les occurrences déjà créées restent telles quelles.",
+      "deleteEmptyOccurrences": "Supprimer aussi les occurrences vides et non publiées déjà créées par cette série",
+      "deactivateSuccess": "Série arrêtée — son historique est conservé."
+    },
+    "seriesDialog": {
+      "createTitle": "Nouvelle série de raid",
+      "editTitle": "Modifier la série de raid",
+      "name": "Nom",
+      "dayOfWeek": "Jour de la semaine",
+      "startTime": "Heure de début",
+      "intervalWeeks": "Toutes les N semaines",
+      "groupCount": "Groupes",
+      "slotsPerGroup": "Slots par groupe",
+      "zones": "Zones de raid",
+      "noZones": "Aucune zone de raid configurée pour cette branche.",
+      "saveSuccess": "Série de raid enregistrée."
+    },
+    "eventDialog": {
+      "createTitle": "Nouveau raid",
+      "editTitle": "Modifier le raid",
+      "name": "Nom",
+      "startsAt": "Débute à",
+      "createSuccess": "Raid créé.",
+      "saveSuccess": "Raid enregistré.",
+      "readOnlyCompleted": "Ce raid est terminé et ne peut plus être modifié.",
+      "deleteEvent": "Supprimer le raid",
+      "deleteConfirmTitle": "Supprimer ce raid ?",
+      "deleteConfirmMessage": "« {{name}} » sera définitivement supprimé.",
+      "deleteConfirmMessageWithAssignments": "« {{name}} » et tous les persos affectés seront définitivement supprimés. Cette action est irréversible.",
+      "deleteSuccess": "Raid supprimé.",
+      "publishConfirmTitle": "Publier ce raid ?",
+      "publishSuccess": "Raid publié."
+    },
+    "weekday": {
+      "Monday": "Lundi",
+      "Tuesday": "Mardi",
+      "Wednesday": "Mercredi",
+      "Thursday": "Jeudi",
+      "Friday": "Vendredi",
+      "Saturday": "Samedi",
+      "Sunday": "Dimanche"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "edit": "Modifier"
+    },
+    "errors": {
+      "raidZoneNotFound": "Cette zone de raid n'existe plus.",
+      "raidSeriesNotFound": "Cette série de raid n'existe plus.",
+      "raidEventNotFound": "Ce raid n'existe plus.",
+      "slotOccupied": "Ce slot est déjà occupé — désaffectez-le d'abord.",
+      "bothSlotsMustBeOccupiedToSwap": "Les deux slots doivent être occupés pour être échangés.",
+      "invalidGroupOrSlotNumber": "Numéro de groupe ou de slot invalide pour ce raid.",
+      "characterNotOnRoster": "Ce personnage n'est pas sur le roster de la guilde.",
+      "branchMismatch": "La branche de ce personnage ne correspond pas à celle du raid.",
+      "playerAlreadyAssignedInEvent": "Ce joueur a déjà un personnage affecté à ce raid.",
+      "memberDeclaredAbsent": "Ce membre s'est déclaré absent à la date de ce raid.",
+      "raidLockoutConflict": "Ce personnage est déjà verrouillé sur cette zone de raid dans un autre raid.",
+      "raidEventAlreadyPublished": "Ce raid est déjà publié.",
+      "gridShrinkWouldOrphanAssignments": "Désaffecte d'abord tous les persos en dehors de la nouvelle taille de grille."
+    }
+  },
   "home": {
     "title": "Gérez votre guilde.",
     "titleAccent": "Dominez Azeroth.",
@@ -833,6 +977,21 @@
       "submitError": "Erreur lors de l'enregistrement des spés. Réessaie.",
       "importRolledBack": "Spés non confirmées — l'import a été annulé."
     }
+  },
+  "classes": {
+    "1": "Guerrier",
+    "2": "Paladin",
+    "3": "Chasseur",
+    "4": "Voleur",
+    "5": "Prêtre",
+    "6": "Chevalier de la mort",
+    "7": "Chaman",
+    "8": "Mage",
+    "9": "Démoniste",
+    "10": "Moine",
+    "11": "Druide",
+    "12": "Chasseur de démons",
+    "13": "Évocateur"
   },
   "specs": {
     "71": "Armes",

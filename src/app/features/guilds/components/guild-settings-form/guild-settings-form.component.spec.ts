@@ -103,6 +103,20 @@ describe('GuildSettingsFormComponent', () => {
     });
   });
 
+  // ── constructor effect ──────────────────────────────────────────────────
+
+  describe('constructor effect', () => {
+    it('leaves the form model untouched while settings have not resolved yet', () => {
+      setup();
+      guildStore.loadSettings.mockImplementation(() => {}); // simulate the httpResource still pending
+
+      fixture.detectChanges();
+
+      expect(guildStore.settings()).toBeNull();
+      expect(component.settingsForm.timezone().value().length).toBeGreaterThan(0); // untouched local default, not blown away
+    });
+  });
+
   // ── languageOptions ───────────────────────────────────────────────────────
 
   describe('languageOptions', () => {

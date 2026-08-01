@@ -33,6 +33,12 @@ describe('NotificationListComponent', () => {
 
       expect(component.messageKey(notification())).toBe('notifications.branchOfficerRolesNotConfigured');
     });
+
+    it('returns the i18n key for BranchRegionNotConfigured', () => {
+      setup();
+
+      expect(component.messageKey(notification({ type: NotificationType.BranchRegionNotConfigured }))).toBe('notifications.branchRegionNotConfigured');
+    });
   });
 
   // ── link ──────────────────────────────────────────────────────────────────
@@ -56,6 +62,13 @@ describe('NotificationListComponent', () => {
 
       expect(component.link(notification({ type: NotificationType.AbsenceNotificationsNotConfigured, guildId: 'g42' })))
         .toEqual(['/guilds', 'g42', 'settings', 'notifications']);
+    });
+
+    it('builds the guild branches settings route for BranchRegionNotConfigured', () => {
+      setup();
+
+      expect(component.link(notification({ type: NotificationType.BranchRegionNotConfigured, guildId: 'g42' })))
+        .toEqual(['/guilds', 'g42', 'settings', 'branches']);
     });
   });
 

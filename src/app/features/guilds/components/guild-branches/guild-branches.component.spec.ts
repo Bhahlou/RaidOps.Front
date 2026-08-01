@@ -231,4 +231,17 @@ describe('GuildBranchesComponent', () => {
       expect(store.reload).not.toHaveBeenCalled();
     });
   });
+
+  // ── onSettingsSaved ───────────────────────────────────────────────────────
+
+  describe('onSettingsSaved', () => {
+    it('resyncs AuthStore after a branch roster/officer/region save', () => {
+      setup();
+      fixture.detectChanges();
+
+      component.onSettingsSaved();
+
+      expect(authStore.loadUser).toHaveBeenCalled();
+    });
+  });
 });

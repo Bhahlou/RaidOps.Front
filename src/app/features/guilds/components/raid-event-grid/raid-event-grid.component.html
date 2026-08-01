@@ -1,0 +1,27 @@
+<div class="raid-grid">
+  @for (group of groupNumbers(); track group) {
+    <div class="raid-group">
+      <span class="raid-group-label">{{ 'raidBuilder.grid.group' | transloco: { n: group } }}</span>
+      <div class="raid-group-slots">
+        @for (slot of slotNumbers(); track slot) {
+          <app-raid-slot
+            [eventId]="event().id"
+            [groupNumber]="group"
+            [slotNumber]="slot"
+            [assignment]="assignmentFor(group, slot)"
+            [dropListId]="slotDropListId(group, slot)"
+            [absentPlayerDiscordIds]="event().absentPlayerDiscordIds"
+            [lockedCharacterEventIds]="lockedCharacterEventIds()"
+            [playerAssignedCharacterIds]="playerAssignedCharacterIds()"
+            [disabled]="disabled()"
+            [currentUserDiscordId]="currentUserDiscordId()"
+            [assignableCharacters]="assignableCharacters()"
+            (dropped)="onDropped($event, group, slot)"
+            (unassign)="onUnassign(group, slot)"
+            (specChanged)="onSpecChanged($event, group, slot)"
+          />
+        }
+      </div>
+    </div>
+  }
+</div>

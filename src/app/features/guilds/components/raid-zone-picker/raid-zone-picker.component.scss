@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.zone-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.zone-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 52px;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--color-bg-tertiary);
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity 0.12s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &--selected {
+    opacity: 1;
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-tertiary));
+
+    .zone-picker-code {
+      color: var(--color-accent);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+}
+
+.zone-picker-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+
+  &--fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+    font-size: 0.6rem;
+    font-weight: 700;
+  }
+}
+
+.zone-picker-code {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}

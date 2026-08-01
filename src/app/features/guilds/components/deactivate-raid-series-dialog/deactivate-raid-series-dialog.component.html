@@ -1,0 +1,18 @@
+<h2 class="dialog-title">{{ 'raidBuilder.series.deactivateConfirmTitle' | transloco }}</h2>
+
+<div class="dialog-content">
+  <p>{{ 'raidBuilder.series.deactivateConfirmMessage' | transloco: { name: data.series.name } }}</p>
+
+  <div class="cleanup-option">
+    <app-checkbox [checked]="deleteEmptyOccurrences()" (checkedChange)="deleteEmptyOccurrences.set($event)">
+      {{ 'raidBuilder.series.deleteEmptyOccurrences' | transloco }}
+    </app-checkbox>
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" [disabled]="submitting()" (click)="cancel()">{{ 'confirmDialog.cancel' | transloco }}</app-button>
+  <app-button variant="danger" [disabled]="submitting()" (click)="confirm()">
+    {{ 'raidBuilder.series.deactivate' | transloco }}
+  </app-button>
+</div>
