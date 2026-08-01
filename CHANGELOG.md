@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.4.0...raidops-front-v1.5.0) (2026-08-01)
+
+
+### 🚀 Features
+
+* Raid planner is here! ([#68](https://github.com/Bhahlou/RaidOps.Front/issues/68)) ([387e5ae](https://github.com/Bhahlou/RaidOps.Front/commit/387e5ae5d7d542f696f63ac41153930e03d3bafe))
+
 ## [1.4.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.3.0...raidops-front-v1.4.0) (2026-07-30)
 
 
