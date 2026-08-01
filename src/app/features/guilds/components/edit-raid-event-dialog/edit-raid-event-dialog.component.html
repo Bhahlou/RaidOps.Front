@@ -1,0 +1,88 @@
+<h2 class="dialog-title">
+  {{ 'raidBuilder.eventDialog.editTitle' | transloco }}
+  @if (isDraft) {
+    <span class="draft-badge">{{ 'raidBuilder.draft' | transloco }}</span>
+  }
+</h2>
+
+@if (isReadOnly) {
+  <p class="mode-hint mode-hint--warning">
+    {{ 'raidBuilder.eventDialog.readOnlyCompleted' | transloco }}
+  </p>
+}
+
+<div class="dialog-content">
+  <div class="field-group">
+    <label class="field-label" for="edit-event-name">{{ 'raidBuilder.eventDialog.name' | transloco }}</label>
+    <input
+      id="edit-event-name"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [disabled]="isReadOnly"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      maxlength="128"
+    />
+  </div>
+
+  <div class="field-group">
+    <label class="field-label" for="edit-event-starts-at">{{ 'raidBuilder.eventDialog.startsAt' | transloco }}</label>
+    <input
+      id="edit-event-starts-at"
+      type="datetime-local"
+      class="datetime-input"
+      [disabled]="isReadOnly"
+      [value]="startsAtLocal()"
+      (change)="startsAtLocal.set($any($event.target).value)"
+    />
+  </div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label class="field-label" for="edit-event-groups">{{ 'raidBuilder.seriesDialog.groupCount' | transloco }}</label>
+      <input
+        id="edit-event-groups"
+        type="number"
+        min="1"
+        max="8"
+        class="number-input"
+        [disabled]="isReadOnly"
+        [value]="groupCount()"
+        (change)="groupCount.set(+$any($event.target).value)"
+      />
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="edit-event-slots">{{ 'raidBuilder.seriesDialog.slotsPerGroup' | transloco }}</label>
+      <input
+        id="edit-event-slots"
+        type="number"
+        min="1"
+        max="10"
+        class="number-input"
+        [disabled]="isReadOnly"
+        [value]="slotsPerGroup()"
+        (change)="slotsPerGroup.set(+$any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
+</div>
+
+<div class="dialog-actions">
+  <div class="dialog-actions-danger">
+    <app-button variant="danger" (click)="deleteEvent()">{{ 'raidBuilder.eventDialog.deleteEvent' | transloco }}</app-button>
+  </div>
+  <div class="dialog-actions-main">
+    @if (isDraft && !isReadOnly) {
+      <app-button variant="stroked" icon="campaign" (click)="publish()">{{ 'raidBuilder.publish' | transloco }}</app-button>
+    }
+    <app-button variant="text" (click)="close()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+    @if (!isReadOnly) {
+      <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+        {{ 'raidBuilder.actions.save' | transloco }}
+      </app-button>
+    }
+  </div>
+</div>

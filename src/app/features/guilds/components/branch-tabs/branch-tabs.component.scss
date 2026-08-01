@@ -11,6 +11,10 @@
   gap: 4px;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 20px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 10px;
+  }
 }
 
 .tab {
@@ -39,6 +43,11 @@
     color: var(--color-accent);
     border-bottom-color: var(--color-accent);
   }
+
+  @media (max-width: 600px) {
+    padding: 6px 10px;
+    gap: 6px;
+  }
 }
 
 .tab-icon {
@@ -46,4 +55,9 @@
   height: 32px;
   object-fit: contain;
   flex-shrink: 0;
+
+  @media (max-width: 600px) {
+    width: 20px;
+    height: 20px;
+  }
 }

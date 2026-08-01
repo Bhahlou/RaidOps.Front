@@ -12,6 +12,11 @@
   // side when content is tall enough to scroll, making everything inside look off-center.
   scrollbar-gutter: stable both-edges;
 
+  // Single source of truth for page-edge padding — child pages should not add their own.
+  @media (max-width: 600px) {
+    padding: 6px;
+  }
+
   &.with-sidenav {
     margin-left: var(--sidebar-rail-width);
 

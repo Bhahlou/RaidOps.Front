@@ -77,4 +77,17 @@ describe('GuildBranchesService', () => {
       req.flush(null);
     });
   });
+
+  // ── updateRegion ──────────────────────────────────────────────────────────
+
+  describe('updateRegion', () => {
+    it('sends PATCH to /guilds/:id/branches/:guildBranchId/region with the region body', () => {
+      service.updateRegion('guild-1', 7, 'eu').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/branches/7/region'));
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ region: 'eu' });
+      req.flush(null);
+    });
+  });
 });

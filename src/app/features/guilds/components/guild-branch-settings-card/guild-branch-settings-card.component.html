@@ -51,6 +51,16 @@
     (valueChange)="officerRoleIds.set($event)"
   />
 
+  <p class="field-label">{{ 'guildSettings.branches.region.label' | transloco }}</p>
+  <p class="field-hint">{{ 'guildSettings.branches.region.hint' | transloco }}</p>
+  <app-select
+    [inputId]="'branch-' + branch().id + '-region'"
+    [options]="regionOptions()"
+    [value]="region()"
+    (valueChange)="region.set($any($event))"
+    [placeholder]="'guildSettings.branches.region.placeholder' | transloco"
+  />
+
   <div class="form-actions">
     <app-button variant="primary" icon="check_circle" [disabled]="submitting() || !canSave()" (click)="save()">
       {{ 'guildSettings.branches.save' | transloco }}

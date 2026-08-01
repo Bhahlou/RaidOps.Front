@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.pool-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+}
+
+.pool-title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.pool-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pool-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+
+  input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+// The card is sized (see .pool-column in raids.component.scss) so all 4 chips plus the clear
+// button fit on one line at their typical unselected width — flex-wrap stays as a safety net for
+// an active filter whose selected label runs long, not the expected layout.
+.pool-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pool-spinner {
+  align-self: center;
+  margin-top: 24px;
+}
+
+.pool-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pool-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 5px;
+  background: var(--color-bg-tertiary);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  // The viewer's own characters — a quick visual anchor when scanning the pool.
+  &--own {
+    border-color: #f5c518;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background: var(--color-bg-elevated);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+
+  &.cdk-drag-disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  &--absent {
+    border-color: color-mix(in srgb, var(--color-error) 55%, var(--color-border-subtle));
+  }
+}
+
+.pool-row-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+// Fixed-width own element (not the conditionally-rendered app-character-raid-specs itself, which
+// renders nothing at all for a 0-spec character) — reserves space for 2 compact 16px icons
+// (16 + 2px gap + 16 = 34px) regardless of how many a given character actually has, so every
+// row's name starts at the same x position instead of shifting left/right with the 1-vs-2-spec
+// count.
+.pool-row-specs {
+  display: flex;
+  align-items: center;
+  min-width: 34px;
+  flex-shrink: 0;
+}
+
+.pool-row-name {
+  min-width: 0;
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Mirrors guild-roster-list's own (component-scoped) .rank-badge, shrunk to fit this list's
+// compact 26px rows.
+.rank-badge {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+
+  &--main {
+    color: var(--color-accent);
+  }
+
+  &--split {
+    color: var(--color-text-primary);
+  }
+
+  &--alt {
+    color: var(--color-text-muted);
+  }
+}

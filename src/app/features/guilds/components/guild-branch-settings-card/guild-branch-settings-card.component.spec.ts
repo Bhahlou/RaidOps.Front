@@ -26,11 +26,11 @@ const branch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
 describe('GuildBranchSettingsCardComponent', () => {
   let fixture: ComponentFixture<GuildBranchSettingsCardComponent>;
   let component: GuildBranchSettingsCardComponent;
-  let branchesService: { updateRosterSettings: ReturnType<typeof vi.fn> };
+  let branchesService: { updateRosterSettings: ReturnType<typeof vi.fn>; updateRegion: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
 
   const setup = (branchInput: GuildBranch = branch(), roles: DiscordRole[] = [], rolesLoading = false) => {
-    branchesService = { updateRosterSettings: vi.fn().mockReturnValue(of(undefined)) };
+    branchesService = { updateRosterSettings: vi.fn().mockReturnValue(of(undefined)), updateRegion: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
 
     TestBed.configureTestingModule({
@@ -113,6 +113,22 @@ describe('GuildBranchSettingsCardComponent', () => {
       component.rosterRoleIds.set(['r1']);
 
       expect(component.canSave()).toBe(true);
+    });
+  });
+
+  // ── regionOptions ─────────────────────────────────────────────────────────
+
+  describe('regionOptions', () => {
+    it('lists every region with a translated label', () => {
+      setup();
+      fixture.detectChanges();
+
+      expect(component.regionOptions()).toEqual([
+        { value: 'eu', label: 'guildSettings.branches.region.options.eu' },
+        { value: 'us', label: 'guildSettings.branches.region.options.us' },
+        { value: 'kr', label: 'guildSettings.branches.region.options.kr' },
+        { value: 'tw', label: 'guildSettings.branches.region.options.tw' },
+      ]);
     });
   });
 
@@ -215,6 +231,46 @@ describe('GuildBranchSettingsCardComponent', () => {
         rosterRoleIds: ['r1'],
         officerRoleIds: ['r2'],
       });
+    });
+
+    it('also updates the region when it was changed from the branch value', async () => {
+      setup(branch({ region: 'eu' }));
+      fixture.detectChanges();
+      component.region.set('us');
+
+      await component.save();
+
+      expect(branchesService.updateRegion).toHaveBeenCalledWith('g1', 7, 'us');
+    });
+
+    it('does not update the region when it is unchanged from the branch value', async () => {
+      setup(branch({ region: 'eu' }));
+      fixture.detectChanges();
+
+      await component.save();
+
+      expect(branchesService.updateRegion).not.toHaveBeenCalled();
+    });
+
+    it('does not update the region while it is still unset', async () => {
+      setup(branch({ region: null }));
+      fixture.detectChanges();
+
+      await component.save();
+
+      expect(branchesService.updateRegion).not.toHaveBeenCalled();
+    });
+
+    it('shows an error snackbar when the region update fails', async () => {
+      setup(branch({ region: 'eu' }));
+      branchesService.updateRegion.mockReturnValue(throwError(() => new Error('failed')));
+      fixture.detectChanges();
+      component.region.set('us');
+
+      await component.save();
+
+      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
+      expect(component.submitting()).toBe(false);
     });
 
     it('shows a success snackbar and emits saved on success', async () => {

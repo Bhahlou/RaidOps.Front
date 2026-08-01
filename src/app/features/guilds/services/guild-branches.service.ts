@@ -2,7 +2,7 @@ import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { GuildBranch, GuildBranchRosterSettings } from '../models/guild-branch.model';
+import { GuildBranch, GuildBranchRegion, GuildBranchRosterSettings } from '../models/guild-branch.model';
 
 @Service()
 export class GuildBranchesService {
@@ -33,6 +33,14 @@ export class GuildBranchesService {
     return this.#http.patch<void>(
       `${this.#api}/guilds/${guildId}/branches/${guildBranchId}/roster-settings`,
       settings,
+    );
+  }
+
+  /** Persists the Blizzard API region for one guild branch — used to resolve its weekly raid-lockout schedule. */
+  updateRegion(guildId: string, guildBranchId: number, region: GuildBranchRegion): Observable<void> {
+    return this.#http.patch<void>(
+      `${this.#api}/guilds/${guildId}/branches/${guildBranchId}/region`,
+      { region },
     );
   }
 }

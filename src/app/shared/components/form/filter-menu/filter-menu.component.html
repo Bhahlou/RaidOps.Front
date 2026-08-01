@@ -1,12 +1,16 @@
 <button
   type="button"
   class="icon-btn filter-btn"
-  [class.filter-active]="selected() !== undefined"
+  [class.filter-btn--chip]="label()"
+  [class.filter-active]="hasSelection()"
   [cdkMenuTriggerFor]="panel"
-  (opened)="onOpened()"
+  (cdkMenuOpened)="onOpened()"
   [title]="triggerTitle()"
 >
   <span class="material-icons">filter_list</span>
+  @if (label()) {
+    <span class="filter-btn-label">{{ selectedSummary() ?? label() }}</span>
+  }
 </button>
 
 <ng-template #panel>
@@ -29,23 +33,42 @@
           type="button"
           class="filter-option"
           cdkMenuItem
-          [class.filter-option--selected]="selected() === undefined"
-          (click)="select(undefined)"
+          [class.filter-option--selected]="multiple() ? !hasSelection() : selected() === undefined"
+          (click)="multiple() ? clearMany() : select(undefined)"
         >
           {{ allLabel() }}
         </button>
       </li>
       @for (opt of filteredOptions(); track opt.value) {
         <li>
-          <button
-            type="button"
-            class="filter-option"
-            cdkMenuItem
-            [class.filter-option--selected]="selected() === opt.value"
-            (click)="select(opt.value)"
-          >
-            {{ opt.label }}
-          </button>
+          @if (multiple()) {
+            <button
+              type="button"
+              class="filter-option"
+              role="menuitemcheckbox"
+              [attr.aria-checked]="isChecked(opt.value)"
+              [class.filter-option--selected]="isChecked(opt.value)"
+              (click)="toggle(opt.value)"
+            >
+              @if (opt.iconUrl) {
+                <img class="filter-option-icon" [src]="opt.iconUrl" alt="" width="16" height="16" />
+              }
+              {{ opt.label }}
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="filter-option"
+              cdkMenuItem
+              [class.filter-option--selected]="selected() === opt.value"
+              (click)="select(opt.value)"
+            >
+              @if (opt.iconUrl) {
+                <img class="filter-option-icon" [src]="opt.iconUrl" alt="" width="16" height="16" />
+              }
+              {{ opt.label }}
+            </button>
+          }
         </li>
       }
     </ul>

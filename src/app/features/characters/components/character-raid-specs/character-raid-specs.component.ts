@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CharacterSpec } from '../../models/character-spec.model';
 
@@ -13,4 +13,6 @@ import { CharacterSpec } from '../../models/character-spec.model';
 })
 export class CharacterRaidSpecsComponent {
   readonly specs = input.required<CharacterSpec[]>();
+  /** Shrinks the badges to 16px/1px-border, for tight contexts like the raid roster pool — full 28px/2px by default. */
+  readonly compact = input(false, { transform: booleanAttribute });
 }
