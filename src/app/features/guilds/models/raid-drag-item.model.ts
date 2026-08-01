@@ -10,6 +10,13 @@ export interface RaidDragItem {
   characterName: string;
   classId: number;
   classColor: string;
-  /** Set when the drag started from an already-occupied slot (repositioning within the grid). */
-  fromSlot?: { groupNumber: number; slotNumber: number };
+  /** The assigned player, so a drop target can tell whether they're declared absent for it while the drag is in progress. */
+  playerDiscordId: string;
+  /**
+   * Set when the drag started from an already-occupied slot (repositioning within the grid, or
+   * swapping with another occupied slot). Carries the origin event's ID so a drop target can tell
+   * a same-event swap (allowed) apart from a cross-event drag onto an occupied slot (rejected —
+   * `SwapSlotAssignmentsCommand` only operates within a single event).
+   */
+  fromSlot?: { eventId: number; groupNumber: number; slotNumber: number };
 }

@@ -71,14 +71,7 @@
     @if (zones().length === 0) {
       <p class="mode-hint">{{ 'raidBuilder.seriesDialog.noZones' | transloco }}</p>
     } @else {
-      <div class="zone-checkboxes">
-        @for (zone of zones(); track zone.id) {
-          <label class="zone-checkbox">
-            <input type="checkbox" [checked]="isZoneSelected(zone.id)" (change)="toggleZone(zone.id)" />
-            {{ zone.name }}
-          </label>
-        }
-      </div>
+      <app-raid-zone-picker [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" />
     }
   </div>
 </div>

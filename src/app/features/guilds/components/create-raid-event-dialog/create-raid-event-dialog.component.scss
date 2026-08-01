@@ -80,24 +80,6 @@
   color: var(--color-text-muted);
 }
 
-.zone-checkboxes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-}
-
-.zone-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--color-text-primary);
-
-  input[type='checkbox'] {
-    accent-color: var(--color-accent);
-  }
-}
-
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

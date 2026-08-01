@@ -49,7 +49,7 @@ export class RaidSeriesStore {
     return this.#service.updateSeries(guildId, guildBranchId, seriesId, payload);
   }
 
-  deactivateSeries(guildId: string, guildBranchId: number, seriesId: number): Observable<void> {
-    return this.#service.deactivateSeries(guildId, guildBranchId, seriesId);
+  deactivateSeries(guildId: string, guildBranchId: number, seriesId: number, deleteEmptyOccurrences: boolean): Observable<void> {
+    return this.#service.deactivateSeries(guildId, guildBranchId, seriesId, deleteEmptyOccurrences);
   }
 }

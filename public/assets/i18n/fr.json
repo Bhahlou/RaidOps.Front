@@ -338,7 +338,7 @@
     "guild": {
       "dashboard": "Tableau de bord",
       "roster": "Roster",
-      "raidBuilder": "Constructeur de raid",
+      "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Paramètres",
       "auditLog": "Journal d'audit",
@@ -417,9 +417,23 @@
         "label": "Rôles Officier",
         "hint": "Les membres ayant l'un de ces rôles obtiennent l'accès Officier sur cette branche, indépendamment de l'accès au roster. Les administrateurs du serveur Discord et le propriétaire du serveur conservent toujours l'accès complet, quel que soit ce choix."
       },
+      "region": {
+        "label": "Région",
+        "hint": "La région Blizzard sur laquelle se trouve le royaume de cette branche — utilisée pour savoir exactement quand ses raids reset chaque semaine.",
+        "placeholder": "Sélectionner une région",
+        "options": {
+          "eu": "Europe",
+          "us": "Amériques / Océanie",
+          "kr": "Corée",
+          "tw": "Taïwan"
+        }
+      },
       "save": "Enregistrer les réglages de la branche",
       "rosterSettings": {
         "saveSuccess": "Réglages de la branche enregistrés."
+      },
+      "regionSettings": {
+        "saveSuccess": "Région de la branche enregistrée."
       }
     },
     "notificationSettings": {
@@ -460,6 +474,7 @@
     "branchOfficerRolesNotConfigured": "« {{ guildName }} » a une branche active sans rôles Officier configurés — choisis quels rôles Discord donnent accès au statut Officier dans l'onglet Branches des paramètres de la guilde.",
     "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
     "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
+    "branchRegionNotConfigured": "« {{ guildName }} » a une branche active sans région configurée — règle-la dans l'onglet Branches des paramètres pour que les reset hebdomadaires des raids tombent à la bonne heure.",
     "viewLink": "Configurer",
     "dismiss": "Ne plus jamais afficher"
   },
@@ -722,22 +737,38 @@
     },
     "tabs": {
       "empty": "Aucun raid sur cette période.",
-      "addEvent": "Ajouter un raid ponctuel"
+      "addEvent": "Ajouter un raid"
     },
     "grid": {
       "group": "Groupe {{n}}",
-      "unassign": "Retirer de ce slot"
+      "unassign": "Retirer de ce slot",
+      "changeSpec": "Changer de spé",
+      "assignSlot": "Assigner un personnage",
+      "searchCharacter": "Rechercher un personnage",
+      "noAssignable": "Aucun personnage éligible"
+    },
+    "roles": {
+      "tank": "Tank",
+      "heal": "Soigneur",
+      "melee": "DPS mêlée",
+      "ranged": "DPS distance"
     },
     "pool": {
-      "title": "Vivier du roster",
-      "searchPlaceholder": "Rechercher un joueur ou un personnage...",
+      "title": "Personnages disponibles",
+      "searchPlaceholder": "Rechercher",
+      "allRaids": "Tous les raids",
+      "filterRaid": "Disponible pour le raid",
+      "raidLabel": "Raid",
       "allClasses": "Toutes les classes",
       "filterClass": "Filtrer par classe",
+      "classLabel": "Classe",
       "allSpecs": "Toutes les spés",
       "filterSpec": "Filtrer par spé",
+      "specLabel": "Spé",
       "allRanks": "Tous les rangs",
       "filterRank": "Filtrer par rang",
-      "noActiveEvent": "Sélectionnez ou créez un raid pour voir les disponibilités.",
+      "rankLabel": "Rang",
+      "noActiveEvent": "Créez un raid pour voir les disponibilités.",
       "empty": "Aucun personnage disponible sur cette branche.",
       "emptyFiltered": "Aucun personnage ne correspond aux filtres actifs.",
       "absent": "Déclaré absent à la date de ce raid",
@@ -752,6 +783,9 @@
       "addSeries": "Nouvelle série",
       "empty": "Aucune série récurrente pour le moment.",
       "deactivate": "Arrêter cette série",
+      "deactivateConfirmTitle": "Arrêter cette série de raids ?",
+      "deactivateConfirmMessage": "« {{name}} » ne générera plus aucun nouveau raid. Les occurrences déjà créées restent telles quelles.",
+      "deleteEmptyOccurrences": "Supprimer aussi les occurrences vides et non publiées déjà créées par cette série",
       "deactivateSuccess": "Série arrêtée — son historique est conservé."
     },
     "seriesDialog": {
@@ -774,15 +808,11 @@
       "startsAt": "Débute à",
       "createSuccess": "Raid créé.",
       "saveSuccess": "Raid enregistré.",
-      "readOnlyCancelled": "Ce raid est annulé et ne peut plus être modifié.",
       "readOnlyCompleted": "Ce raid est terminé et ne peut plus être modifié.",
-      "cancelEvent": "Annuler le raid",
-      "cancelConfirmTitle": "Annuler ce raid ?",
-      "cancelConfirmMessage": "« {{name}} » sera marqué comme annulé. Son historique (affectations comprises) est conservé.",
-      "cancelSuccess": "Raid annulé.",
       "deleteEvent": "Supprimer le raid",
       "deleteConfirmTitle": "Supprimer ce raid ?",
-      "deleteConfirmMessage": "« {{name}} » sera définitivement supprimé. Possible uniquement s'il n'a aucune affectation.",
+      "deleteConfirmMessage": "« {{name}} » sera définitivement supprimé.",
+      "deleteConfirmMessageWithAssignments": "« {{name}} » et tous les persos affectés seront définitivement supprimés. Cette action est irréversible.",
       "deleteSuccess": "Raid supprimé.",
       "publishConfirmTitle": "Publier ce raid ?",
       "publishSuccess": "Raid publié."
@@ -805,16 +835,16 @@
       "raidZoneNotFound": "Cette zone de raid n'existe plus.",
       "raidSeriesNotFound": "Cette série de raid n'existe plus.",
       "raidEventNotFound": "Ce raid n'existe plus.",
-      "raidEventCancelled": "Ce raid est annulé.",
-      "raidEventHasAssignments": "Ce raid a encore des affectations — annulez-le plutôt que de le supprimer.",
       "slotOccupied": "Ce slot est déjà occupé — désaffectez-le d'abord.",
+      "bothSlotsMustBeOccupiedToSwap": "Les deux slots doivent être occupés pour être échangés.",
       "invalidGroupOrSlotNumber": "Numéro de groupe ou de slot invalide pour ce raid.",
       "characterNotOnRoster": "Ce personnage n'est pas sur le roster de la guilde.",
       "branchMismatch": "La branche de ce personnage ne correspond pas à celle du raid.",
       "playerAlreadyAssignedInEvent": "Ce joueur a déjà un personnage affecté à ce raid.",
       "memberDeclaredAbsent": "Ce membre s'est déclaré absent à la date de ce raid.",
       "raidLockoutConflict": "Ce personnage est déjà verrouillé sur cette zone de raid dans un autre raid.",
-      "raidEventAlreadyPublished": "Ce raid est déjà publié."
+      "raidEventAlreadyPublished": "Ce raid est déjà publié.",
+      "gridShrinkWouldOrphanAssignments": "Désaffecte d'abord tous les persos en dehors de la nouvelle taille de grille."
     }
   },
   "home": {
@@ -940,6 +970,21 @@
       "submitError": "Erreur lors de l'enregistrement des spés. Réessaie.",
       "importRolledBack": "Spés non confirmées — l'import a été annulé."
     }
+  },
+  "classes": {
+    "1": "Guerrier",
+    "2": "Paladin",
+    "3": "Chasseur",
+    "4": "Voleur",
+    "5": "Prêtre",
+    "6": "Chevalier de la mort",
+    "7": "Chaman",
+    "8": "Mage",
+    "9": "Démoniste",
+    "10": "Moine",
+    "11": "Druide",
+    "12": "Chasseur de démons",
+    "13": "Évocateur"
   },
   "specs": {
     "71": "Armes",

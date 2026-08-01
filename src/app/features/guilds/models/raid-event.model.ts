@@ -3,8 +3,6 @@ import { RaidEventStatus } from './raid-event-status.enum';
 import { RaidPublicationStatus } from './raid-publication-status.enum';
 import { RaidZoneSummary } from './raid-zone.model';
 import { RaidSlotAssignment } from './raid-slot-assignment.model';
-import { CharacterSpec } from '../../characters/models/character-spec.model';
-import { CharacterRank } from './character-rank.enum';
 
 /** A single raid occurrence — generated from a `RaidSeries` or created ad-hoc. */
 export interface RaidEvent {
@@ -24,6 +22,12 @@ export interface RaidEvent {
   publicationStatus: RaidPublicationStatus;
   raidZones: RaidZoneSummary[];
   assignments: RaidSlotAssignment[];
+  /**
+   * Discord IDs of every roster player (assigned or not) whose declared availability would reject
+   * an assignment to this event — lets the UI mark a drop target as blocked while a drag is still
+   * in progress, before the server would reject the drop.
+   */
+  absentPlayerDiscordIds: string[];
 }
 
 /** Response of the raid board query — every event materialized/created within the requested range. */
@@ -39,20 +43,4 @@ export interface RaidEventPayload {
   slotsPerGroup: number;
   signupMode: SignupMode;
   raidZoneIds: number[];
-}
-
-/** A guild member not assigned to any raid event within the requested date range. */
-export interface UnassignedMember {
-  characterId: number;
-  characterName: string;
-  classId: number;
-  className: string;
-  classColor: string;
-  branchId: number;
-  branchName: string;
-  avatarUrl: string | null;
-  playerDiscordId: string;
-  playerName: string | null;
-  raidSpecs: CharacterSpec[];
-  characterRank: CharacterRank;
 }

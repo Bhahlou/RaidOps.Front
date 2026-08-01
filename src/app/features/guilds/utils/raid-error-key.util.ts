@@ -5,9 +5,8 @@ const RAID_ERROR_KEYS: Record<string, string> = {
   RaidZoneNotFound: 'raidBuilder.errors.raidZoneNotFound',
   RaidSeriesNotFound: 'raidBuilder.errors.raidSeriesNotFound',
   RaidEventNotFound: 'raidBuilder.errors.raidEventNotFound',
-  RaidEventCancelled: 'raidBuilder.errors.raidEventCancelled',
-  RaidEventHasAssignments: 'raidBuilder.errors.raidEventHasAssignments',
   SlotOccupied: 'raidBuilder.errors.slotOccupied',
+  BothSlotsMustBeOccupiedToSwap: 'raidBuilder.errors.bothSlotsMustBeOccupiedToSwap',
   InvalidGroupOrSlotNumber: 'raidBuilder.errors.invalidGroupOrSlotNumber',
   CharacterNotOnRoster: 'raidBuilder.errors.characterNotOnRoster',
   BranchMismatch: 'raidBuilder.errors.branchMismatch',
@@ -15,6 +14,7 @@ const RAID_ERROR_KEYS: Record<string, string> = {
   MemberDeclaredAbsent: 'raidBuilder.errors.memberDeclaredAbsent',
   RaidLockoutConflict: 'raidBuilder.errors.raidLockoutConflict',
   RaidEventAlreadyPublished: 'raidBuilder.errors.raidEventAlreadyPublished',
+  GridShrinkWouldOrphanAssignments: 'raidBuilder.errors.gridShrinkWouldOrphanAssignments',
 };
 
 /** Resolves a failed raid-builder API call to its translated error key, falling back to the generic server error. */

@@ -338,7 +338,7 @@
     "guild": {
       "dashboard": "Dashboard",
       "roster": "Roster",
-      "raidBuilder": "Raid builder",
+      "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Settings",
       "auditLog": "Audit log",
@@ -417,9 +417,23 @@
         "label": "Officer roles",
         "hint": "Members holding any one of these roles get Officer access on this branch, independently of roster access. Discord server administrators and the server owner always keep full access, regardless of this choice."
       },
+      "region": {
+        "label": "Region",
+        "hint": "The Blizzard region your branch's realm sits in — used to know exactly when its raids reset each week.",
+        "placeholder": "Select a region",
+        "options": {
+          "eu": "Europe",
+          "us": "Americas / Oceania",
+          "kr": "Korea",
+          "tw": "Taiwan"
+        }
+      },
       "save": "Save branch settings",
       "rosterSettings": {
         "saveSuccess": "Branch settings saved."
+      },
+      "regionSettings": {
+        "saveSuccess": "Branch region saved."
       }
     },
     "notificationSettings": {
@@ -460,6 +474,7 @@
     "branchOfficerRolesNotConfigured": "\"{{ guildName }}\" has an active branch with no Officer roles configured yet — choose which Discord roles grant Officer access in the Branches tab of the guild settings.",
     "guildLanguageNotConfigured": "\"{{ guildName }}\" has no language configured yet — choose the language RaidOps uses to communicate with your guild in the settings.",
     "absenceNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for absences yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
+    "branchRegionNotConfigured": "\"{{ guildName }}\" has an active branch with no region configured yet — set it in the Branches tab of the guild settings so weekly raid lockouts reset at the right time.",
     "viewLink": "Configure",
     "dismiss": "Never show again"
   },
@@ -722,22 +737,38 @@
     },
     "tabs": {
       "empty": "No raid event in this range.",
-      "addEvent": "Add an ad-hoc raid event"
+      "addEvent": "Add a raid"
     },
     "grid": {
       "group": "Group {{n}}",
-      "unassign": "Remove from this slot"
+      "unassign": "Remove from this slot",
+      "changeSpec": "Change spec",
+      "assignSlot": "Assign a character",
+      "searchCharacter": "Search a character",
+      "noAssignable": "No eligible character"
+    },
+    "roles": {
+      "tank": "Tank",
+      "heal": "Healer",
+      "melee": "Melee DPS",
+      "ranged": "Ranged DPS"
     },
     "pool": {
       "title": "Roster pool",
-      "searchPlaceholder": "Search player or character...",
+      "searchPlaceholder": "Search",
+      "allRaids": "All raids",
+      "filterRaid": "Available for raid",
+      "raidLabel": "Raid",
       "allClasses": "All classes",
       "filterClass": "Filter by class",
+      "classLabel": "Class",
       "allSpecs": "All specs",
       "filterSpec": "Filter by spec",
+      "specLabel": "Spec",
       "allRanks": "All ranks",
       "filterRank": "Filter by rank",
-      "noActiveEvent": "Select or create a raid event to see who's available.",
+      "rankLabel": "Rank",
+      "noActiveEvent": "Create a raid event to see who's available.",
       "empty": "No character available on this branch.",
       "emptyFiltered": "No character matches the active filters.",
       "absent": "Declared absent on this raid's date",
@@ -752,6 +783,9 @@
       "addSeries": "New series",
       "empty": "No recurring series yet.",
       "deactivate": "Stop this series",
+      "deactivateConfirmTitle": "Stop this raid series?",
+      "deactivateConfirmMessage": "\"{{name}}\" will stop generating any new raid. Occurrences already created stay as they are.",
+      "deleteEmptyOccurrences": "Also delete the empty, unpublished occurrences this series already created",
       "deactivateSuccess": "Series stopped — its past events are kept."
     },
     "seriesDialog": {
@@ -774,15 +808,11 @@
       "startsAt": "Starts at",
       "createSuccess": "Raid event created.",
       "saveSuccess": "Raid event saved.",
-      "readOnlyCancelled": "This event is cancelled and can no longer be edited.",
       "readOnlyCompleted": "This event is completed and can no longer be edited.",
-      "cancelEvent": "Cancel event",
-      "cancelConfirmTitle": "Cancel this raid event?",
-      "cancelConfirmMessage": "\"{{name}}\" will be marked cancelled. Its history (assignments included) is kept.",
-      "cancelSuccess": "Raid event cancelled.",
       "deleteEvent": "Delete event",
       "deleteConfirmTitle": "Delete this raid event?",
-      "deleteConfirmMessage": "\"{{name}}\" will be permanently deleted. This is only possible while it has no assignment.",
+      "deleteConfirmMessage": "\"{{name}}\" will be permanently deleted.",
+      "deleteConfirmMessageWithAssignments": "\"{{name}}\" and everyone assigned to it will be permanently deleted. This cannot be undone.",
       "deleteSuccess": "Raid event deleted.",
       "publishConfirmTitle": "Publish this raid event?",
       "publishSuccess": "Raid event published."
@@ -805,16 +835,16 @@
       "raidZoneNotFound": "This raid zone no longer exists.",
       "raidSeriesNotFound": "This raid series no longer exists.",
       "raidEventNotFound": "This raid event no longer exists.",
-      "raidEventCancelled": "This raid event is cancelled.",
-      "raidEventHasAssignments": "This event still has assignments — cancel it instead of deleting it.",
       "slotOccupied": "This slot is already taken — unassign it first.",
+      "bothSlotsMustBeOccupiedToSwap": "Both slots must be occupied to swap them.",
       "invalidGroupOrSlotNumber": "Invalid group or slot number for this event.",
       "characterNotOnRoster": "This character isn't on the guild roster.",
       "branchMismatch": "This character's branch doesn't match the raid's branch.",
       "playerAlreadyAssignedInEvent": "This player already has a character assigned to this raid.",
       "memberDeclaredAbsent": "This member has declared themselves absent on this raid's date.",
       "raidLockoutConflict": "This character is already locked to this raid zone in another event.",
-      "raidEventAlreadyPublished": "This raid event is already published."
+      "raidEventAlreadyPublished": "This raid event is already published.",
+      "gridShrinkWouldOrphanAssignments": "Unassign every character outside the new grid size first."
     }
   },
   "home": {
@@ -940,6 +970,21 @@
       "submitError": "Failed to save specs. Please try again.",
       "importRolledBack": "Specs not confirmed — import was cancelled."
     }
+  },
+  "classes": {
+    "1": "Warrior",
+    "2": "Paladin",
+    "3": "Hunter",
+    "4": "Rogue",
+    "5": "Priest",
+    "6": "Death Knight",
+    "7": "Shaman",
+    "8": "Mage",
+    "9": "Warlock",
+    "10": "Monk",
+    "11": "Druid",
+    "12": "Demon Hunter",
+    "13": "Evoker"
   },
   "specs": {
     "71": "Arms",

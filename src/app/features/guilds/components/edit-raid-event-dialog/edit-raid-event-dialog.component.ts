@@ -11,6 +11,7 @@ import { RaidEvent, RaidEventPayload } from '../../models/raid-event.model';
 import { RaidEventStatus } from '../../models/raid-event-status.enum';
 import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
+import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
 
 export interface EditRaidEventDialogData {
   guildId: string;
@@ -19,14 +20,14 @@ export interface EditRaidEventDialogData {
 }
 
 /**
- * Dialog for editing, cancelling or deleting a single raid event occurrence. Deletion is only
- * offered while the event still has no assignments — the back end rejects it otherwise, and
- * `Cancel` (keeping the historical record) is the right action once slots are filled.
+ * Dialog for editing or deleting a single raid event occurrence. Deletion is always available and
+ * permanently removes the event along with any slot assignments it has — the confirm dialog warns
+ * more strongly when there's roster history to lose (see `hasAssignments`).
  */
 @Component({
   selector: 'app-edit-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent],
+  imports: [TranslocoPipe, ButtonComponent, RaidZonePickerComponent],
   templateUrl: './edit-raid-event-dialog.component.html',
   styleUrl: './edit-raid-event-dialog.component.scss',
 })
@@ -38,7 +39,6 @@ export class EditRaidEventDialogComponent {
   readonly #dialog = inject(Dialog);
   readonly data = inject<EditRaidEventDialogData>(DIALOG_DATA);
 
-  readonly Status = RaidEventStatus;
   readonly Publication = RaidPublicationStatus;
   readonly zones = this.#zoneStore.zones;
 
@@ -67,19 +67,6 @@ export class EditRaidEventDialogComponent {
 
   constructor() {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
-  }
-
-  toggleZone(zoneId: number): void {
-    this.selectedZoneIds.update((ids) => {
-      const next = new Set(ids);
-      if (next.has(zoneId)) next.delete(zoneId);
-      else next.add(zoneId);
-      return next;
-    });
-  }
-
-  isZoneSelected(zoneId: number): boolean {
-    return this.selectedZoneIds().has(zoneId);
   }
 
   submit(): void {
@@ -133,31 +120,6 @@ export class EditRaidEventDialogComponent {
       });
   }
 
-  cancelEvent(): void {
-    this.#dialog
-      .open<boolean>(ConfirmDialogComponent, {
-        width: '420px',
-        maxWidth: '95vw',
-        data: {
-          title: 'raidBuilder.eventDialog.cancelConfirmTitle',
-          message: 'raidBuilder.eventDialog.cancelConfirmMessage',
-          messageParams: { name: this.data.event.name },
-          confirmLabel: 'raidBuilder.eventDialog.cancelEvent',
-        },
-      })
-      .closed.subscribe((confirmed) => {
-        if (!confirmed) return;
-
-        this.#boardStore.cancelEvent(this.data.guildId, this.data.guildBranchId, this.data.event.id).subscribe({
-          next: () => {
-            this.#snackbar.success('raidBuilder.eventDialog.cancelSuccess');
-            this.#dialogRef.close(true);
-          },
-          error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
-        });
-      });
-  }
-
   deleteEvent(): void {
     this.#dialog
       .open<boolean>(ConfirmDialogComponent, {
@@ -165,7 +127,9 @@ export class EditRaidEventDialogComponent {
         maxWidth: '95vw',
         data: {
           title: 'raidBuilder.eventDialog.deleteConfirmTitle',
-          message: 'raidBuilder.eventDialog.deleteConfirmMessage',
+          message: this.hasAssignments
+            ? 'raidBuilder.eventDialog.deleteConfirmMessageWithAssignments'
+            : 'raidBuilder.eventDialog.deleteConfirmMessage',
           messageParams: { name: this.data.event.name },
           confirmLabel: 'raidBuilder.eventDialog.deleteEvent',
         },

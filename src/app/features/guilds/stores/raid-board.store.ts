@@ -3,6 +3,7 @@ import { computed, inject, Service, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
+import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 import { RaidsService } from '../services/raids.service';
 
 interface RangeKey {
@@ -35,6 +36,26 @@ export class RaidBoardStore {
   readonly events = computed<RaidEvent[]>(() => this.#boardResource.value()?.events ?? []);
   readonly isLoading = computed(() => this.#materializing() || this.#boardResource.isLoading());
 
+  /**
+   * Discord ID / character ID of whoever's currently being dragged (from the roster pool or an
+   * occupied slot), or `null` when no drag is in progress — shared across every visible panel's
+   * grid and the pool so a drop target can show itself as blocked (declared absent, or the
+   * character already locked to this event's zones via another loaded event) before the drop is
+   * attempted.
+   */
+  readonly draggingPlayerDiscordId = signal<string | null>(null);
+  readonly draggingCharacterId = signal<number | null>(null);
+
+  startDrag(playerDiscordId: string, characterId: number): void {
+    this.draggingPlayerDiscordId.set(playerDiscordId);
+    this.draggingCharacterId.set(characterId);
+  }
+
+  endDrag(): void {
+    this.draggingPlayerDiscordId.set(null);
+    this.draggingCharacterId.set(null);
+  }
+
   /** Materializes any due series occurrence in the range, then points the board at it (forcing a fresh fetch). */
   loadRange(guildId: string, guildBranchId: number, rangeStart: string, rangeEnd: string): void {
     const next: RangeKey = { guildId, guildBranchId, rangeStart, rangeEnd };
@@ -52,6 +73,11 @@ export class RaidBoardStore {
     this.#boardResource.reload();
   }
 
+  /** One-off fetch of the branch's current weekly lockout window — used to default the board's date range. */
+  getLockoutWeek(guildId: string, guildBranchId: number): Observable<GuildBranchLockoutWeek> {
+    return this.#service.getLockoutWeek(guildId, guildBranchId);
+  }
+
   createEvent(guildId: string, guildBranchId: number, payload: RaidEventPayload): Observable<void> {
     return this.#service.createEvent(guildId, guildBranchId, payload);
   }
@@ -62,10 +88,6 @@ export class RaidBoardStore {
 
   deleteEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
     return this.#service.deleteEvent(guildId, guildBranchId, eventId);
-  }
-
-  cancelEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
-    return this.#service.cancelEvent(guildId, guildBranchId, eventId);
   }
 
   publishEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
@@ -85,6 +107,29 @@ export class RaidBoardStore {
 
   unassignSlot(guildId: string, guildBranchId: number, eventId: number, groupNumber: number, slotNumber: number): Observable<void> {
     return this.#service.unassignSlot(guildId, guildBranchId, eventId, groupNumber, slotNumber);
+  }
+
+  swapSlotAssignments(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    groupNumberA: number,
+    slotNumberA: number,
+    groupNumberB: number,
+    slotNumberB: number,
+  ): Observable<void> {
+    return this.#service.swapSlotAssignments(guildId, guildBranchId, eventId, groupNumberA, slotNumberA, groupNumberB, slotNumberB);
+  }
+
+  updateSlotSpec(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    groupNumber: number,
+    slotNumber: number,
+    specId: number,
+  ): Observable<void> {
+    return this.#service.updateSlotSpec(guildId, guildBranchId, eventId, groupNumber, slotNumber, specId);
   }
 
   #applyKey(next: RangeKey): void {

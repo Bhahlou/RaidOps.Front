@@ -10,6 +10,7 @@ import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidSeries, RaidSeriesPayload } from '../../models/raid-series.model';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
+import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
 
 export interface CreateRaidSeriesDialogData {
   guildId: string;
@@ -28,7 +29,7 @@ const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 @Component({
   selector: 'app-create-raid-series-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, SelectComponent],
+  imports: [TranslocoPipe, ButtonComponent, SelectComponent, RaidZonePickerComponent],
   templateUrl: './create-raid-series-dialog.component.html',
   styleUrl: './create-raid-series-dialog.component.scss',
 })
@@ -70,19 +71,6 @@ export class CreateRaidSeriesDialogComponent {
 
   constructor() {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
-  }
-
-  toggleZone(zoneId: number): void {
-    this.selectedZoneIds.update((ids) => {
-      const next = new Set(ids);
-      if (next.has(zoneId)) next.delete(zoneId);
-      else next.add(zoneId);
-      return next;
-    });
-  }
-
-  isZoneSelected(zoneId: number): boolean {
-    return this.selectedZoneIds().has(zoneId);
   }
 
   submit(): void {

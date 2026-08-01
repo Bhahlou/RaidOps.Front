@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RaidZone } from '../models/raid-zone.model';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
-import { RaidBoard, RaidEvent, RaidEventPayload, UnassignedMember } from '../models/raid-event.model';
+import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
+import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 
 /** Thin HTTP wrapper over every `api/v1/guilds/{guildId}/branches/{guildBranchId}/raids/...` endpoint. */
 @Service()
@@ -21,6 +22,11 @@ export class RaidsService {
     return this.#http.get<RaidZone[]>(`${this.#base(guildId, guildBranchId)}/zones`);
   }
 
+  /** Returns the current weekly raid-lockout window for the branch, or nulls if its region isn't configured yet. */
+  getLockoutWeek(guildId: string, guildBranchId: number): Observable<GuildBranchLockoutWeek> {
+    return this.#http.get<GuildBranchLockoutWeek>(`${this.#base(guildId, guildBranchId)}/lockout-week`);
+  }
+
   /** Returns every raid series (active and inactive) configured for the guild branch. */
   getSeriesList(guildId: string, guildBranchId: number): Observable<RaidSeries[]> {
     return this.#http.get<RaidSeries[]>(`${this.#base(guildId, guildBranchId)}/series`);
@@ -34,9 +40,13 @@ export class RaidsService {
     return this.#http.patch<void>(`${this.#base(guildId, guildBranchId)}/series/${seriesId}`, payload);
   }
 
-  /** Stops a recurring series from generating any further occurrence — past events are untouched. */
-  deactivateSeries(guildId: string, guildBranchId: number, seriesId: number): Observable<void> {
-    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/series/${seriesId}/deactivate`, {});
+  /**
+   * Stops a recurring series from generating any further occurrence. `deleteEmptyOccurrences`
+   * additionally bulk-deletes the ones it already produced that are still draft with no
+   * assignments — anything published or with roster history is always left untouched.
+   */
+  deactivateSeries(guildId: string, guildBranchId: number, seriesId: number, deleteEmptyOccurrences: boolean): Observable<void> {
+    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/series/${seriesId}/deactivate`, { deleteEmptyOccurrences });
   }
 
   /** Idempotently materializes any due series occurrence within the range — call before loading the board. */
@@ -61,13 +71,9 @@ export class RaidsService {
     return this.#http.patch<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`, payload);
   }
 
-  /** Rejected server-side if the event still has assignments — use `cancelEvent` instead. */
+  /** Permanently deletes the event, including any slot assignments it has. */
   deleteEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
     return this.#http.delete<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`);
-  }
-
-  cancelEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
-    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/cancel`, {});
   }
 
   /** Officer-only — makes a draft event visible to every roster member. One-way, no request body. */
@@ -90,6 +96,23 @@ export class RaidsService {
     });
   }
 
+  swapSlotAssignments(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    groupNumberA: number,
+    slotNumberA: number,
+    groupNumberB: number,
+    slotNumberB: number,
+  ): Observable<void> {
+    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/slots/swap`, {
+      groupNumberA,
+      slotNumberA,
+      groupNumberB,
+      slotNumberB,
+    });
+  }
+
   unassignSlot(guildId: string, guildBranchId: number, eventId: number, groupNumber: number, slotNumber: number): Observable<void> {
     return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/slots/unassign`, {
       groupNumber,
@@ -97,10 +120,18 @@ export class RaidsService {
     });
   }
 
-  /** Returns the guild members assigned to no raid event within the given date range. */
-  getUnassignedMembers(guildId: string, guildBranchId: number, rangeStart: string, rangeEnd: string): Observable<UnassignedMember[]> {
-    return this.#http.get<UnassignedMember[]>(`${this.#base(guildId, guildBranchId)}/unassigned-members`, {
-      params: { rangeStart, rangeEnd },
+  updateSlotSpec(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    groupNumber: number,
+    slotNumber: number,
+    specId: number,
+  ): Observable<void> {
+    return this.#http.patch<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/slots/spec`, {
+      groupNumber,
+      slotNumber,
+      specId,
     });
   }
 }

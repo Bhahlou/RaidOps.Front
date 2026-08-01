@@ -1,9 +1,9 @@
 @if (specs().length > 0) {
-  <div class="char-specs">
+  <div class="char-specs" [class.char-specs--compact]="compact()">
     @for (spec of specs(); track spec.specId) {
-      <div class="spec" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
+      <div class="spec" [class.spec--compact]="compact()" [class.spec--main]="spec.isMain" [title]="'specs.' + spec.specId | transloco">
         @if (spec.iconUrl) {
-          <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="28" height="28" />
+          <img class="spec-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" [width]="compact() ? 16 : 28" [height]="compact() ? 16 : 28" />
         } @else {
           <span class="spec-name">{{ 'specs.' + spec.specId | transloco }}</span>
         }

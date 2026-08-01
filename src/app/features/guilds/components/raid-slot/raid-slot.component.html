@@ -1,15 +1,58 @@
 <div
   class="raid-slot"
   [class.raid-slot--empty]="!assignment()"
+  [class.raid-slot--blocked]="isBlockedForDrag()"
   cdkDropList
   [id]="dropListId()"
   [cdkDropListData]="assignment()"
   [cdkDropListDisabled]="dropDisabled()"
+  [cdkDropListEnterPredicate]="canReceiveDrop"
   (cdkDropListDropped)="onDropped($event)"
 >
   @if (assignment(); as a) {
-    <div class="slot-chip" cdkDrag [cdkDragData]="dragItem(a)" [cdkDragDisabled]="disabled()">
-      <app-wow-class-icon [classId]="a.classId" [size]="26" />
+    <div
+      class="slot-chip"
+      [class.slot-chip--own]="isOwnCharacter(a)"
+      cdkDrag
+      [cdkDragData]="dragItem(a)"
+      [cdkDragDisabled]="disabled()"
+      (cdkDragStarted)="onDragStarted(a)"
+      (cdkDragEnded)="onDragEnded()"
+    >
+      @if (canChangeSpec(a)) {
+        <button
+          type="button"
+          class="slot-chip-spec-btn"
+          [cdkMenuTriggerFor]="specMenu"
+          [attr.aria-label]="'raidBuilder.grid.changeSpec' | transloco"
+          (mousedown)="$event.stopPropagation()"
+          (touchstart)="$event.stopPropagation()"
+        >
+          @if (a.spec.iconUrl) {
+            <img class="slot-chip-icon" [ngSrc]="a.spec.iconUrl" [alt]="a.spec.name" width="16" height="16" />
+          } @else {
+            <app-wow-class-icon [classId]="a.classId" [size]="16" />
+          }
+        </button>
+        <ng-template #specMenu>
+          <div class="menu-panel" cdkMenu>
+            @for (spec of a.availableSpecs; track spec.id) {
+              <button type="button" class="menu-item" cdkMenuItem [class.menu-item--active]="spec.id === a.spec.id" (click)="onSpecSelected(spec.id)">
+                @if (spec.iconUrl) {
+                  <img class="menu-item-icon" [ngSrc]="spec.iconUrl" [alt]="spec.name" width="16" height="16" />
+                }
+                <span>{{ spec.name }}</span>
+              </button>
+            }
+          </div>
+        </ng-template>
+      } @else {
+        @if (a.spec.iconUrl) {
+          <img class="slot-chip-icon" [ngSrc]="a.spec.iconUrl" [alt]="a.spec.name" width="16" height="16" />
+        } @else {
+          <app-wow-class-icon [classId]="a.classId" [size]="16" />
+        }
+      }
       <div class="slot-chip-info">
         <span class="slot-chip-name" [style.color]="a.classColor">{{ a.characterName }}</span>
         @if (a.availabilityStatus === Availability.Absent) {
@@ -33,6 +76,42 @@
         </button>
       }
     </div>
+  } @else if (!disabled()) {
+    <button
+      type="button"
+      class="slot-empty-btn"
+      [cdkMenuTriggerFor]="assignMenu"
+      (cdkMenuOpened)="onAssignMenuOpened()"
+      [attr.aria-label]="'raidBuilder.grid.assignSlot' | transloco"
+    >
+      <span class="slot-empty-label">{{ groupNumber() }}.{{ slotNumber() }}</span>
+    </button>
+    <ng-template #assignMenu>
+      <div class="menu-panel assign-menu-panel" cdkMenu>
+        <div class="assign-search" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+          <span class="material-icons assign-search-icon">search</span>
+          <input
+            #assignSearchInput
+            type="text"
+            [attr.aria-label]="'raidBuilder.grid.searchCharacter' | transloco"
+            [placeholder]="'raidBuilder.grid.searchCharacter' | transloco"
+            [value]="assignQuery()"
+            (input)="assignQuery.set(assignSearchInput.value)"
+          />
+        </div>
+        <ul class="assign-options">
+          @for (c of filteredAssignableCharacters(); track c.characterId) {
+            <li>
+              <button type="button" class="menu-item" cdkMenuItem (click)="onCharacterPicked(c)">
+                <span [style.color]="c.classColor">{{ c.characterName }}</span>
+              </button>
+            </li>
+          } @empty {
+            <li class="assign-options-empty">{{ 'raidBuilder.grid.noAssignable' | transloco }}</li>
+          }
+        </ul>
+      </div>
+    </ng-template>
   } @else {
     <span class="slot-empty-label">{{ groupNumber() }}.{{ slotNumber() }}</span>
   }

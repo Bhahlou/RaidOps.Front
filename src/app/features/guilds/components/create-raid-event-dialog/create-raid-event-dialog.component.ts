@@ -9,6 +9,7 @@ import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { RaidEventPayload } from '../../models/raid-event.model';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
+import { RaidZonePickerComponent } from '../raid-zone-picker/raid-zone-picker.component';
 
 export interface CreateRaidEventDialogData {
   guildId: string;
@@ -22,7 +23,7 @@ export interface CreateRaidEventDialogData {
 @Component({
   selector: 'app-create-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent],
+  imports: [TranslocoPipe, ButtonComponent, RaidZonePickerComponent],
   templateUrl: './create-raid-event-dialog.component.html',
   styleUrl: './create-raid-event-dialog.component.scss',
 })
@@ -56,19 +57,6 @@ export class CreateRaidEventDialogComponent {
 
   constructor() {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
-  }
-
-  toggleZone(zoneId: number): void {
-    this.selectedZoneIds.update((ids) => {
-      const next = new Set(ids);
-      if (next.has(zoneId)) next.delete(zoneId);
-      else next.add(zoneId);
-      return next;
-    });
-  }
-
-  isZoneSelected(zoneId: number): boolean {
-    return this.selectedZoneIds().has(zoneId);
   }
 
   submit(): void {

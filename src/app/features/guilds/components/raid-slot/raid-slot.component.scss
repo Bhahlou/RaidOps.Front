@@ -3,9 +3,9 @@
 }
 
 .raid-slot {
-  min-height: 52px;
+  min-height: 26px;
   border: 1px dashed var(--color-border);
-  border-radius: 6px;
+  border-radius: 5px;
   background: var(--color-bg-tertiary);
   display: flex;
   align-items: center;
@@ -20,23 +20,118 @@
     // only empty slots (the real drop targets) should react.
     opacity: 1;
   }
+
+  // The dragged player is declared absent for this slot's event — shown red and inert before the
+  // drop is even attempted, rather than letting the drop happen and rejecting it server-side.
+  &--blocked {
+    border-style: solid;
+    border-color: var(--color-error);
+    background: color-mix(in srgb, var(--color-error) 14%, var(--color-bg-tertiary));
+    cursor: not-allowed;
+  }
 }
 
 .slot-empty-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.slot-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover .slot-empty-label {
+    color: var(--color-accent);
+  }
+}
+
+// Mirrors .filter-search in filter-menu.component.scss so every searchable dropdown reads the same.
+.assign-menu-panel {
+  min-width: 220px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.assign-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+
+  .assign-search-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+.assign-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.assign-options-empty {
+  padding: 8px 10px;
+  font-size: 0.8rem;
   color: var(--color-text-muted);
 }
 
 .slot-chip {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   width: 100%;
-  padding: 4px 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
   cursor: grab;
 
   &:active {
     cursor: grabbing;
+  }
+
+  // The viewer's own characters — a quick visual anchor when scanning a busy grid.
+  &--own {
+    outline: 1px solid #f5c518;
+    outline-offset: -1px;
   }
 
   &.cdk-drag-preview {
@@ -50,16 +145,42 @@
   }
 }
 
+.slot-chip-icon {
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.slot-chip-spec-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    outline: 1px solid var(--color-accent);
+  }
+}
+
+.menu-item-icon {
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
 .slot-chip-info {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
   min-width: 0;
   flex: 1;
 }
 
 .slot-chip-name {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -70,9 +191,10 @@
   display: inline-flex;
   align-items: center;
   width: fit-content;
+  flex-shrink: 0;
 
   .material-icons {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   &--absent {
@@ -84,27 +206,42 @@
   }
 }
 
+// Absolutely positioned overlay, revealed on hover, so the row's persistent width doesn't need to
+// permanently reserve space for an action that's only relevant while pointing at this exact slot —
+// with a hard 12-character WoW name cap, that reclaimed width matters for fitting more groups on
+// screen at once.
 .slot-chip-remove {
-  flex-shrink: 0;
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 15px;
+  height: 15px;
   border: none;
   border-radius: 50%;
-  background: none;
+  background: var(--color-bg-tertiary);
   color: var(--color-text-muted);
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
 
   .material-icons {
-    font-size: 16px;
+    font-size: 12px;
   }
 
   &:hover {
     background: var(--color-bg-secondary);
     color: var(--color-error);
   }
+}
+
+.slot-chip:hover .slot-chip-remove {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 // Drop-target highlight when a compatible drag is hovering an empty slot.

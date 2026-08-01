@@ -26,6 +26,7 @@ export class SidenavComponent {
   readonly user = this.#authStore.user;
   readonly iconTypeUser = DiscordIconType.User;
   readonly iconTypeGuild = DiscordIconType.Guild;
+  readonly AccessLevel = GuildAccessLevel;
 
   /** Desktop hover-to-expand — irrelevant on touch, where mouseenter/leave never fire. */
   readonly #hoverExpanded = signal(false);
@@ -102,15 +103,19 @@ export class SidenavComponent {
   }
 
   /**
-   * Branch-scoped leaves (dashboard/roster/loot) need a concrete branch id in their URL — the
-   * sidenav doesn't offer a branch picker (see `app-branch-tabs`, used on the pages themselves),
-   * so it always links to the same branch `guildDefaultBranchGuard` would resolve on a bare
-   * `/guilds/:id`: the last one actually visited, falling back to the first active branch.
-   * Null only for the 0-active-branch edge case, where callers should hide the link entirely.
+   * Branch-scoped leaves (dashboard/roster/loot/raids) need a concrete branch id in their URL —
+   * the sidenav doesn't offer a branch picker (see `app-branch-tabs`, used on the pages
+   * themselves). Prefers the last-visited branch, like `guildDefaultBranchGuard` does for a bare
+   * `/guilds/:id`, but only among branches that actually grant `requiredLevel` — "last visited"
+   * can otherwise point at a branch the user only has Public access to (e.g. simply viewing its
+   * Public-tier dashboard already records it as last-visited), which would silently carry a
+   * Public-only branch id into a Roster-gated link and get it bounced straight back by
+   * `guildBranchAccessGuard`. Null when no branch qualifies — callers should hide the link then.
    */
-  defaultBranchId(guild: UserGuild): number | null {
-    if (guild.branches.length === 0) return null;
+  defaultBranchId(guild: UserGuild, requiredLevel: GuildAccessLevel = GuildAccessLevel.Public): number | null {
+    const eligible = guild.branches.filter((b) => hasGuildAccess(b.accessLevel, requiredLevel));
+    if (eligible.length === 0) return null;
     const lastVisited = getLastVisitedBranchId(guild.id);
-    return guild.branches.find((b) => b.id === lastVisited)?.id ?? guild.branches[0].id;
+    return eligible.find((b) => b.id === lastVisited)?.id ?? eligible[0].id;
   }
 }

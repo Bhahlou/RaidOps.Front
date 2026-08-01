@@ -1,0 +1,185 @@
+<div class="guild-page">
+  <app-page-header
+    [items]="breadcrumbs()"
+    [manualLink]="{ category: 'guild', article: 'raid-builder' }"
+  />
+  <app-branch-tabs [guildId]="guildId()" leaf="raids" />
+
+  <div class="raids-page">
+    <header class="board-header">
+      <div class="range-nav">
+        <app-icon-button
+          icon="chevron_left"
+          [ariaLabel]="'raidBuilder.previousRange' | transloco"
+          (click)="prevRange()"
+        />
+        <span class="range-label">{{ rangeLabel() }}</span>
+        <app-icon-button
+          icon="chevron_right"
+          [ariaLabel]="'raidBuilder.nextRange' | transloco"
+          (click)="nextRange()"
+        />
+        <app-button variant="stroked" icon="today" (click)="goToday()">{{
+          'calendar.today' | transloco
+        }}</app-button>
+      </div>
+
+      <div class="board-actions">
+        @if (isOfficer()) {
+          <button type="button" class="btn btn-stroked" [cdkMenuTriggerFor]="seriesMenu">
+            <span class="material-icons">repeat</span>
+            {{ 'raidBuilder.series.manage' | transloco }}
+          </button>
+          <ng-template #seriesMenu>
+            <div class="menu-panel" cdkMenu>
+              @for (s of activeSeries(); track s.id) {
+                <div
+                  class="menu-item series-menu-item"
+                  cdkMenuItem
+                  (click)="openCreateSeriesDialog(s)"
+                >
+                  <span class="series-menu-name">{{ s.name }}</span>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    [title]="'raidBuilder.series.deactivate' | transloco"
+                    (click)="$event.stopPropagation(); openDeactivateSeriesDialog(s)"
+                  >
+                    <span class="material-icons">stop_circle</span>
+                  </button>
+                </div>
+              }
+              @if (activeSeries().length === 0) {
+                <p class="series-menu-empty">{{ 'raidBuilder.series.empty' | transloco }}</p>
+              }
+              <button
+                type="button"
+                class="menu-item"
+                cdkMenuItem
+                (click)="openCreateSeriesDialog(null)"
+              >
+                <span class="material-icons">add</span>
+                {{ 'raidBuilder.series.addSeries' | transloco }}
+              </button>
+            </div>
+          </ng-template>
+          <app-button variant="stroked" icon="add" (click)="openCreateEventDialog()">{{
+            'raidBuilder.tabs.addEvent' | transloco
+          }}</app-button>
+        }
+      </div>
+    </header>
+
+    <div class="board-body" cdkDropListGroup>
+      <section class="board-main">
+        @if (isLoading() && visibleEvents().length === 0) {
+          <span class="spinner board-spinner"></span>
+        } @else if (visibleEvents().length === 0) {
+          <app-empty-hint>{{ 'raidBuilder.board.empty' | transloco }}</app-empty-hint>
+        } @else {
+          @if (visibleEvents().length > 1) {
+            <div class="event-switcher">
+              @for (event of visibleEvents(); track event.id) {
+                <button
+                  type="button"
+                  class="event-switcher-item"
+                  [class.event-switcher-item--active]="isActiveEvent(event.id)"
+                  (click)="selectEvent(event.id)"
+                >
+                  @for (zone of event.raidZones; track zone.id) {
+                    @if (zoneIcon(zone.shortCode); as icon) {
+                      <img class="event-switcher-icon" [src]="icon" alt="" width="18" height="18" />
+                    } @else {
+                      <span class="event-switcher-icon event-switcher-icon--fallback">{{ zone.shortCode }}</span>
+                    }
+                  }
+                  <span class="event-switcher-label">{{ eventLabel(event) }}</span>
+                </button>
+              }
+            </div>
+          }
+          <div class="event-panels">
+            @for (event of visibleEvents(); track event.id) {
+              <div class="event-panel" [class.event-panel--inactive]="!isActiveEvent(event.id)">
+                <div class="active-event-header">
+                  <div class="active-event-info">
+                    <h2>
+                      {{ event.name }}
+                      @if (event.publicationStatus === PublicationStatus.Draft) {
+                        <span class="active-event-draft-badge">{{
+                          'raidBuilder.draft' | transloco
+                        }}</span>
+                      }
+                    </h2>
+                    <span class="active-event-meta">{{ eventLabel(event) }}</span>
+                  </div>
+                  <div class="active-event-icons-group">
+                    <div class="active-event-zones">
+                      @for (zone of event.raidZones; track zone.id) {
+                        @if (zoneIcon(zone.shortCode); as icon) {
+                          <img
+                            class="zone-icon"
+                            [src]="icon"
+                            [alt]="zone.name"
+                            [title]="zone.name"
+                            width="28"
+                            height="28"
+                          />
+                        } @else {
+                          <span class="zone-icon zone-icon--fallback" [title]="zone.name">{{
+                            zone.shortCode
+                          }}</span>
+                        }
+                      }
+                    </div>
+                    <div class="role-counters">
+                      @for (role of roleOrder; track role) {
+                        <span class="role-counter" [title]="'raidBuilder.roles.' + role | transloco">
+                          <img
+                            class="role-counter-icon"
+                            [src]="roleIcon[role]"
+                            alt=""
+                            width="16"
+                            height="16"
+                          />
+                          {{ roleCounts(event)[role] }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  @if (isOfficer()) {
+                    <app-icon-button
+                      icon="edit"
+                      [ariaLabel]="'raidBuilder.actions.edit' | transloco"
+                      (click)="openEditEventDialog(event)"
+                    />
+                  }
+                </div>
+
+                <app-raid-event-grid
+                  [guildId]="guildId()"
+                  [guildBranchId]="guildBranchId()"
+                  [event]="event"
+                  [disabled]="!isOfficer()"
+                  [currentUserDiscordId]="currentUserDiscordId()"
+                  [rosterMembers]="rosterMembers()"
+                  [allEvents]="events()"
+                />
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <aside class="pool-column">
+        <app-raid-roster-pool
+          [guildId]="guildId()"
+          [guildBranchId]="guildBranchId()"
+          [events]="visibleEvents()"
+          [disabled]="!isOfficer()"
+          [currentUserDiscordId]="currentUserDiscordId()"
+        />
+      </aside>
+    </div>
+  </div>
+</div>

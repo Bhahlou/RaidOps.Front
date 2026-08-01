@@ -1,5 +1,4 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
@@ -8,36 +7,44 @@ import { PageHeaderComponent } from '../../../../shared/components/layout/page-h
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import { EmptyHintComponent } from '../../../../shared/components/feedback/empty-hint/empty-hint.component';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildAccessLevel, hasGuildAccess } from '../../../../core/models/guild-access-level.enum';
 import { injectGuildContext, injectGuildBranchContext } from '../../inject-guild-context';
+import { BranchTabsComponent } from '../../components/branch-tabs/branch-tabs.component';
 import { RaidBoardStore } from '../../stores/raid-board.store';
-import { UnassignedMembersStore } from '../../stores/unassigned-members.store';
 import { RaidSeriesStore } from '../../stores/raid-series.store';
+import { GuildRosterStore } from '../../stores/guild-roster.store';
 import { RaidEvent } from '../../models/raid-event.model';
-import { RaidEventStatus } from '../../models/raid-event-status.enum';
+import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { RaidSeries } from '../../models/raid-series.model';
-import { raidErrorKey } from '../../utils/raid-error-key.util';
+import { countRaidRoles, RAID_ROLE_ICON, RAID_ROLE_ORDER, RaidRole } from '../../utils/raid-role.util';
+import { raidZoneIconUrl } from '../../utils/raid-zone-icon.util';
 import { RaidRosterPoolComponent } from '../../components/raid-roster-pool/raid-roster-pool.component';
-import { RaidEventTabsComponent } from '../../components/raid-event-tabs/raid-event-tabs.component';
 import { RaidEventGridComponent } from '../../components/raid-event-grid/raid-event-grid.component';
-import { UnassignedMembersPanelComponent } from '../../components/unassigned-members-panel/unassigned-members-panel.component';
 import { CreateRaidSeriesDialogComponent } from '../../components/create-raid-series-dialog/create-raid-series-dialog.component';
+import { DeactivateRaidSeriesDialogComponent } from '../../components/deactivate-raid-series-dialog/deactivate-raid-series-dialog.component';
 import { CreateRaidEventDialogComponent } from '../../components/create-raid-event-dialog/create-raid-event-dialog.component';
 import { EditRaidEventDialogComponent } from '../../components/edit-raid-event-dialog/edit-raid-event-dialog.component';
+import { parseIsoDate } from '../../../calendar/utils/iso-date.util';
 
-const RANGE_DAYS = 14;
+// One page = one weekly lockout window (region reset to region reset) — see rangeStart's default below.
+const RANGE_DAYS = 7;
+// Side-by-side raid panels are readable up to about this many at once — beyond that the grids get too cramped.
+const MAX_VISIBLE_EVENTS = 4;
 
 /**
- * Raid builder page host — tabbed layout (one tab per raid event in the visible date range, see
- * the layout decision in the feature plan): roster pool pinned left (shared across tabs),
- * collapsible unassigned-members drawer on the right, and only the active event's group/slot
- * grid mounted at a time so `CdkDropList`s stay few and simple to wire (a single
- * `cdkDropListGroup` connects the pool and every slot of the active grid).
+ * Raids page host — shared by roster members (read-only) and officers (drag & drop composition),
+ * gated per-action via `isOfficer()` rather than a separate route. Up to `MAX_VISIBLE_EVENTS`
+ * events (earliest first) render stacked one under the other as full group/slot grids, each panel
+ * carrying its own date/zones/status — no manual picking, matching how a split raid night reads
+ * better with every group visible at once than tabbed one at a time. The roster pool is a single
+ * shared drag source across every visible grid (`cdkDropListGroup` connects them all). Below the
+ * narrow container tier (see raids.component.scss), every panel still renders (drag/drop keeps
+ * working identically) but only `activeEventId()`'s panel is shown, with a pill switcher to jump
+ * between events — one raid at a time reads far better than a long vertical scroll on a phone.
  */
 @Component({
-  selector: 'app-raid-builder',
+  selector: 'app-raids',
   standalone: true,
   imports: [
     PageHeaderComponent,
@@ -49,25 +56,23 @@ const RANGE_DAYS = 14;
     CdkMenuTrigger,
     CdkDropListGroup,
     RaidRosterPoolComponent,
-    RaidEventTabsComponent,
     RaidEventGridComponent,
-    UnassignedMembersPanelComponent,
+    BranchTabsComponent,
     TranslocoPipe,
   ],
-  templateUrl: './raid-builder.component.html',
-  styleUrl: './raid-builder.component.scss',
+  templateUrl: './raids.component.html',
+  styleUrl: './raids.component.scss',
 })
-export class RaidBuilderComponent {
+export class RaidsComponent {
   readonly #guildContext = injectGuildContext();
   readonly #branchContext = injectGuildBranchContext();
   readonly #authStore = inject(AuthStore);
   readonly #dialog = inject(Dialog);
-  readonly #snackbar = inject(SnackbarService);
   readonly #transloco = inject(TranslocoService);
 
   readonly boardStore = inject(RaidBoardStore);
-  readonly unassignedStore = inject(UnassignedMembersStore);
   readonly seriesStore = inject(RaidSeriesStore);
+  readonly #rosterStore = inject(GuildRosterStore);
 
   // currentGuildId (not the static guildId snapshot) — this leaf route component is reused
   // (not recreated) when only the parent's :id param changes, e.g. switching guilds.
@@ -80,6 +85,13 @@ export class RaidBuilderComponent {
     return guild ? hasGuildAccess(guild.accessLevel, GuildAccessLevel.Officer) : false;
   });
 
+  /** Highlights the viewer's own characters (yellow outline) wherever a character chip is rendered. */
+  readonly currentUserDiscordId = computed(() => this.#authStore.user()?.discordId ?? null);
+
+  readonly PublicationStatus = RaidPublicationStatus;
+  readonly roleOrder = RAID_ROLE_ORDER;
+  readonly roleIcon = RAID_ROLE_ICON;
+
   readonly rangeStart = signal(startOfWeek(new Date()));
   readonly rangeEnd = computed(() => addDays(this.rangeStart(), RANGE_DAYS - 1));
 
@@ -91,13 +103,27 @@ export class RaidBuilderComponent {
 
   readonly events = this.boardStore.events;
   readonly isLoading = this.boardStore.isLoading;
-  readonly unassignedMembers = this.unassignedStore.members;
-  readonly unassignedLoading = this.unassignedStore.isLoading;
   readonly activeSeries = computed(() => (this.seriesStore.series() ?? []).filter((s) => s.isActive));
+  readonly rosterMembers = computed(() => this.#rosterStore.members() ?? []);
 
-  readonly panelCollapsed = signal(false);
-  readonly activeEventId = signal<number | null>(null);
-  readonly activeEvent = computed(() => this.events().find((e) => e.id === this.activeEventId()) ?? null);
+  /** Up to MAX_VISIBLE_EVENTS events (earliest first). */
+  readonly visibleEvents = computed(() =>
+    [...this.events()].sort((a, b) => a.startsAtUtc.localeCompare(b.startsAtUtc)).slice(0, MAX_VISIBLE_EVENTS),
+  );
+
+  /**
+   * Which panel shows alone in the narrow (single-panel) container tier — irrelevant above that
+   * width, where every visible event stacks. Tracked by event id (not index) so it survives a
+   * board reload untouched as long as the same event is still in range; falls back to the
+   * earliest visible event once the stored id no longer matches anything (range change, or the
+   * event itself got deleted), rather than leaving every panel hidden.
+   */
+  readonly #activeEventId = signal<number | null>(null);
+  readonly activeEventId = computed(() => {
+    const events = this.visibleEvents();
+    const stored = this.#activeEventId();
+    return events.some((e) => e.id === stored) ? stored : (events[0]?.id ?? null);
+  });
 
   constructor() {
     effect(() => {
@@ -106,19 +132,19 @@ export class RaidBuilderComponent {
       const rangeStart = toIsoDate(this.rangeStart());
       const rangeEnd = toIsoDate(this.rangeEnd());
       this.boardStore.loadRange(guildId, guildBranchId, rangeStart, rangeEnd);
-      this.unassignedStore.loadRange(guildId, guildBranchId, rangeStart, rangeEnd);
       this.seriesStore.load(guildId, guildBranchId);
+      this.#rosterStore.loadRoster(guildId, guildBranchId);
     });
 
-    // Keeps the active tab valid — defaults to the earliest scheduled event whenever the
-    // currently selected one disappears (range navigated away, event cancelled/deleted, first load...).
+    // Defaults the view to the branch's current weekly lockout window (region reset to region
+    // reset) instead of an arbitrary Monday-based week. Falls back to the initial Monday default
+    // when the branch has no region configured yet (weekStartLocal comes back null).
     effect(() => {
-      const events = this.events();
-      const currentId = untracked(() => this.activeEventId());
-      if (events.some((e) => e.id === currentId)) return;
-
-      const next = pickDefaultEvent(events);
-      untracked(() => this.activeEventId.set(next));
+      const guildId = this.guildId();
+      const guildBranchId = this.guildBranchId();
+      this.boardStore.getLockoutWeek(guildId, guildBranchId).subscribe((week) => {
+        if (week.weekStartLocal) this.rangeStart.set(parseIsoDate(week.weekStartLocal));
+      });
     });
   }
 
@@ -134,10 +160,6 @@ export class RaidBuilderComponent {
     this.rangeStart.set(startOfWeek(new Date()));
   }
 
-  selectEvent(id: number): void {
-    this.activeEventId.set(id);
-  }
-
   openCreateSeriesDialog(series: RaidSeries | null): void {
     this.#dialog
       .open<boolean>(CreateRaidSeriesDialogComponent, {
@@ -147,18 +169,26 @@ export class RaidBuilderComponent {
       .closed.subscribe((saved) => {
         if (!saved) return;
         this.seriesStore.reload();
-        this.#reloadBoard();
+        // A series creates no RaidEvent rows by itself — occurrences only appear once
+        // materialized. `#reloadBoard` alone (a plain re-fetch) would keep showing the same
+        // empty range, so re-run `loadRange` for the currently viewed week to materialize the
+        // new series' occurrence(s) in it before reloading.
+        this.boardStore.loadRange(this.guildId(), this.guildBranchId(), toIsoDate(this.rangeStart()), toIsoDate(this.rangeEnd()));
       });
   }
 
-  deactivateSeries(series: RaidSeries): void {
-    this.seriesStore.deactivateSeries(this.guildId(), this.guildBranchId(), series.id).subscribe({
-      next: () => {
-        this.#snackbar.success('raidBuilder.series.deactivateSuccess');
+  openDeactivateSeriesDialog(series: RaidSeries): void {
+    this.#dialog
+      .open<boolean>(DeactivateRaidSeriesDialogComponent, {
+        width: '420px',
+        maxWidth: '95vw',
+        data: { guildId: this.guildId(), guildBranchId: this.guildBranchId(), series },
+      })
+      .closed.subscribe((confirmed) => {
+        if (!confirmed) return;
         this.seriesStore.reload();
-      },
-      error: (err: HttpErrorResponse) => this.#snackbar.error(raidErrorKey(err)),
-    });
+        this.#reloadBoard();
+      });
   }
 
   openCreateEventDialog(): void {
@@ -185,15 +215,32 @@ export class RaidBuilderComponent {
 
   #reloadBoard(): void {
     this.boardStore.reload();
-    this.unassignedStore.reload();
   }
-}
 
-/** Earliest scheduled event, falling back to the earliest event of any status, or `null` if empty. */
-function pickDefaultEvent(events: RaidEvent[]): number | null {
-  if (events.length === 0) return null;
-  const sorted = [...events].sort((a, b) => a.startsAtUtc.localeCompare(b.startsAtUtc));
-  return (sorted.find((e) => e.status === RaidEventStatus.Scheduled) ?? sorted[0]).id;
+  eventLabel(event: RaidEvent): string {
+    this.#transloco.activeLang(); // depend on language changes so the label stays in sync
+    const lang = this.#transloco.getActiveLang();
+    const date = new Date(event.startsAtUtc);
+    const dayFormatter = new Intl.DateTimeFormat(lang, { weekday: 'short', day: '2-digit', month: '2-digit' });
+    const timeFormatter = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
+    return `${dayFormatter.format(date)} ${timeFormatter.format(date)}`;
+  }
+
+  zoneIcon(shortCode: string): string | null {
+    return raidZoneIconUrl(shortCode);
+  }
+
+  roleCounts(event: RaidEvent): Record<RaidRole, number> {
+    return countRaidRoles(event.assignments);
+  }
+
+  selectEvent(eventId: number): void {
+    this.#activeEventId.set(eventId);
+  }
+
+  isActiveEvent(eventId: number): boolean {
+    return eventId === this.activeEventId();
+  }
 }
 
 /** Monday of the week containing `date`. */

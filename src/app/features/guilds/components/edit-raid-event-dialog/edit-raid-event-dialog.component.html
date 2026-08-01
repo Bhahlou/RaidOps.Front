@@ -7,7 +7,7 @@
 
 @if (isReadOnly) {
   <p class="mode-hint mode-hint--warning">
-    {{ (data.event.status === Status.Cancelled ? 'raidBuilder.eventDialog.readOnlyCancelled' : 'raidBuilder.eventDialog.readOnlyCompleted') | transloco }}
+    {{ 'raidBuilder.eventDialog.readOnlyCompleted' | transloco }}
   </p>
 }
 
@@ -72,26 +72,14 @@
     @if (zones().length === 0) {
       <p class="mode-hint">{{ 'raidBuilder.seriesDialog.noZones' | transloco }}</p>
     } @else {
-      <div class="zone-checkboxes">
-        @for (zone of zones(); track zone.id) {
-          <label class="zone-checkbox">
-            <input type="checkbox" [disabled]="isReadOnly" [checked]="isZoneSelected(zone.id)" (change)="toggleZone(zone.id)" />
-            {{ zone.name }}
-          </label>
-        }
-      </div>
+      <app-raid-zone-picker [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
     }
   </div>
 </div>
 
 <div class="dialog-actions">
   <div class="dialog-actions-danger">
-    @if (data.event.status === Status.Scheduled) {
-      <app-button variant="danger" (click)="cancelEvent()">{{ 'raidBuilder.eventDialog.cancelEvent' | transloco }}</app-button>
-    }
-    @if (!hasAssignments) {
-      <app-button variant="danger" (click)="deleteEvent()">{{ 'raidBuilder.eventDialog.deleteEvent' | transloco }}</app-button>
-    }
+    <app-button variant="danger" (click)="deleteEvent()">{{ 'raidBuilder.eventDialog.deleteEvent' | transloco }}</app-button>
   </div>
   <div class="dialog-actions-main">
     @if (isDraft && !isReadOnly) {

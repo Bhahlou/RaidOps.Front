@@ -2,5 +2,4 @@
 export enum RaidEventStatus {
   Scheduled = 'Scheduled',
   Completed = 'Completed',
-  Cancelled = 'Cancelled',
 }

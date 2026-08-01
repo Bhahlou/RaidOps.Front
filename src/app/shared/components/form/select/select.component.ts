@@ -45,8 +45,9 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   readonly dropdownPositions = STANDARD_DROPDOWN_BELOW_POSITIONS;
 
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('triggerButton');
+  private readonly filterInput = viewChild<ElementRef<HTMLInputElement>>('filterInput');
 
-  readonly #panel = createDropdownPanel(this.disabled, this.trigger);
+  readonly #panel = createDropdownPanel(this.disabled, this.trigger, this.filterInput);
   readonly isOpen = this.#panel.isOpen;
   readonly filterQuery = this.#panel.filterQuery;
   readonly triggerWidth = this.#panel.triggerWidth;

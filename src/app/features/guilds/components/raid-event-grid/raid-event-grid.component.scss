@@ -2,23 +2,28 @@
   display: block;
 }
 
+// Grid, not flex-wrap: every column track is shared across rows, so a lone group left on the
+// last row (e.g. 5 groups wrapping to a 2-column layout) keeps the same width as the others
+// instead of a flex item stretching to fill the whole row by itself.
 .raid-grid {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  // Sized for a full 12-character WoW character name (the hard cap) plus the class icon — no
+  // need to reserve more, the unassign button is a hover-only overlay (see raid-slot).
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 8px;
 }
 
 .raid-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 180px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .raid-group-label {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  line-height: 1.2;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -27,5 +32,5 @@
 .raid-group-slots {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }

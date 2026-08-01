@@ -75,10 +75,10 @@
               <span class="material-icons item-icon">home</span>
               <span class="sidenav-label">{{ 'sidenav.guild.dashboard' | transloco }}</span>
             </a>
-            @if (hasRosterAccess(guild)) {
+            @if (hasRosterAccess(guild) && defaultBranchId(guild, AccessLevel.Roster); as rosterBranchId) {
               <a
                 class="sidenav-item"
-                [routerLink]="['/guilds', guild.id, branchId, 'roster']"
+                [routerLink]="['/guilds', guild.id, rosterBranchId, 'roster']"
                 routerLinkActive="active-link"
               >
                 <span class="material-icons item-icon">groups</span>
@@ -86,7 +86,7 @@
               </a>
               <a
                 class="sidenav-item"
-                [routerLink]="['/guilds', guild.id, branchId, 'raid-builder']"
+                [routerLink]="['/guilds', guild.id, rosterBranchId, 'raids']"
                 routerLinkActive="active-link"
               >
                 <span class="material-icons item-icon">grid_view</span>
@@ -94,7 +94,7 @@
               </a>
               <a
                 class="sidenav-item"
-                [routerLink]="['/guilds', guild.id, branchId, 'loot']"
+                [routerLink]="['/guilds', guild.id, rosterBranchId, 'loot']"
                 routerLinkActive="active-link"
               >
                 <span class="material-icons item-icon">diamond</span>
