@@ -86,6 +86,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         contentPath: (lang) => `assets/manual/${lang}/guild/roster.md`,
       },
       {
+        id: 'raid-builder',
+        labelKey: 'manual.article.raids.title',
+        requiredAccessLevel: GuildAccessLevel.Roster,
+        contentPath: (lang) => `assets/manual/${lang}/guild/raid-builder.md`,
+      },
+      {
         id: 'audit-log',
         labelKey: 'manual.article.auditLog.title',
         requiredAccessLevel: GuildAccessLevel.Officer,
