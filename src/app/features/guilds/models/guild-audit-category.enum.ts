@@ -5,4 +5,5 @@ export enum GuildAuditCategory {
   Roster = 'Roster',
   Availability = 'Availability',
   Branches = 'Branches',
+  Raids = 'Raids',
 }

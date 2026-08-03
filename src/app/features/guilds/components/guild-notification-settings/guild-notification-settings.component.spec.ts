@@ -435,6 +435,117 @@ describe('GuildNotificationSettingsComponent', () => {
     });
   });
 
+  // ── families / accordion (isFamilyExpanded, toggleFamily, enabledCount) ────
+
+  describe('families', () => {
+    it('declares Absences, Raid changes and Raid composition changes, in that order', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      expect(component.families.map((f) => f.id)).toEqual(['absences', 'raids', 'raidComposition']);
+    });
+
+    it('groups the raid event types under "raids" and the composition ones under "raidComposition"', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      const raids = component.families.find((f) => f.id === 'raids')!;
+      const raidComposition = component.families.find((f) => f.id === 'raidComposition')!;
+
+      expect(raids.eventTypes).toEqual([
+        GuildNotificationEventType.RaidPublished,
+        GuildNotificationEventType.RaidCancelled,
+        GuildNotificationEventType.RaidRescheduled,
+      ]);
+      expect(raidComposition.eventTypes).toEqual([
+        GuildNotificationEventType.RaidSlotAssigned,
+        GuildNotificationEventType.RaidSlotUnassigned,
+        GuildNotificationEventType.RaidSlotsSwapped,
+        GuildNotificationEventType.RaidSlotSpecChanged,
+      ]);
+    });
+  });
+
+  describe('isFamilyExpanded / toggleFamily', () => {
+    it('starts every family collapsed', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      for (const family of component.families) {
+        expect(component.isFamilyExpanded(family.id)).toBe(false);
+      }
+    });
+
+    it('expands only the toggled family, leaving the others collapsed', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      component.toggleFamily('raids', true);
+
+      expect(component.isFamilyExpanded('raids')).toBe(true);
+      expect(component.isFamilyExpanded('absences')).toBe(false);
+      expect(component.isFamilyExpanded('raidComposition')).toBe(false);
+    });
+
+    it('collapses a family back when toggled with false', () => {
+      setup('g1');
+      fixture.detectChanges();
+      component.toggleFamily('raids', true);
+
+      component.toggleFamily('raids', false);
+
+      expect(component.isFamilyExpanded('raids')).toBe(false);
+    });
+
+    it('tracks multiple expanded families independently', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      component.toggleFamily('raids', true);
+      component.toggleFamily('raidComposition', true);
+
+      expect(component.isFamilyExpanded('raids')).toBe(true);
+      expect(component.isFamilyExpanded('raidComposition')).toBe(true);
+      expect(component.isFamilyExpanded('absences')).toBe(false);
+    });
+  });
+
+  describe('enabledCount', () => {
+    it('counts zero when no event in the family is enabled', () => {
+      setup('g1', []);
+      fixture.detectChanges();
+
+      const raids = component.families.find((f) => f.id === 'raids')!;
+      expect(component.enabledCount(raids)).toBe(0);
+    });
+
+    it('counts only the enabled event types within that family', () => {
+      setup('g1', [
+        setting({ eventType: GuildNotificationEventType.RaidPublished, enabled: true, channelId: 'chan-1' }),
+        setting({ eventType: GuildNotificationEventType.RaidCancelled, enabled: false, channelId: null }),
+        // Enabled, but in a different family — must not leak into "raids"'s count.
+        setting({ eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' }),
+      ]);
+      fixture.detectChanges();
+
+      const raids = component.families.find((f) => f.id === 'raids')!;
+      expect(component.enabledCount(raids)).toBe(1);
+    });
+
+    it('counts every event type in the family when all are enabled', () => {
+      setup('g1', [
+        setting({ eventType: GuildNotificationEventType.RaidSlotAssigned, enabled: true, channelId: 'chan-1' }),
+        setting({ eventType: GuildNotificationEventType.RaidSlotUnassigned, enabled: true, channelId: 'chan-1' }),
+        setting({ eventType: GuildNotificationEventType.RaidSlotsSwapped, enabled: true, channelId: 'chan-1' }),
+        setting({ eventType: GuildNotificationEventType.RaidSlotSpecChanged, enabled: true, channelId: 'chan-1' }),
+      ]);
+      fixture.detectChanges();
+
+      const raidComposition = component.families.find((f) => f.id === 'raidComposition')!;
+      expect(component.enabledCount(raidComposition)).toBe(4);
+    });
+  });
+
   // ── save ──────────────────────────────────────────────────────────────────
 
   describe('save', () => {
@@ -453,14 +564,24 @@ describe('GuildNotificationSettingsComponent', () => {
 
       await component.save();
 
-      expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', null, [
+      // 3 families (Absences, Raid changes, Raid composition changes), 9 event types total — only
+      // AbsenceAdded has a stored setting, every other row falls back to its disabled default.
+      const expectedRows = [
         { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
         { eventType: GuildNotificationEventType.AbsenceRemoved, enabled: false, channelId: null },
-      ]);
-      expect(store.patchSettings).toHaveBeenCalledWith('g1', null, [
-        { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1', guildBranchId: null },
-        { eventType: GuildNotificationEventType.AbsenceRemoved, enabled: false, channelId: null, guildBranchId: null },
-      ]);
+        { eventType: GuildNotificationEventType.RaidPublished, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidCancelled, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidRescheduled, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidSlotAssigned, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidSlotUnassigned, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidSlotsSwapped, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidSlotSpecChanged, enabled: false, channelId: null },
+      ];
+      expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', null, expectedRows);
+      expect(store.patchSettings).toHaveBeenCalledWith(
+        'g1', null,
+        expectedRows.map((row) => ({ ...row, guildBranchId: null })),
+      );
       expect(authStore.loadUser).toHaveBeenCalledOnce();
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.notificationSettings.saveSuccess');
       expect(component.submitting()).toBe(false);
