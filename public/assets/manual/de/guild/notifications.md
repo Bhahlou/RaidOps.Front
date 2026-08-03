@@ -6,6 +6,11 @@ Ein „Abwesenheit"-Ereignis umfasst sowohl eine einmalige Eintragung als auch e
 
 ![Übersicht des Tabs Benachrichtigungen](/assets/manual/de/guild/notifications-settings-overview.png)
 
+Raid-Ereignisse haben zwei getrennte Gruppen, die du unabhängig voneinander aktivieren kannst:
+
+- **Raid-Änderungen** postet, wenn ein Raid veröffentlicht wird, wenn ein bereits veröffentlichter Raid abgesagt (gelöscht) wird, oder wenn seine Startzeit verschoben wird.
+- **Zusammensetzungsänderungen** postet, wenn ein Charakter auf einem **bereits veröffentlichten** Raid zugewiesen, entfernt, getauscht wird oder seine Skillung geändert wird — Änderungen, die noch im Entwurfsstadium vorgenommen werden, werden nie gepostet, da außer den Officern noch niemand den Raid sehen kann.
+
 ### Einen Geltungsbereich wählen
 
 Die Auswahl **Geltungsbereich** oben im Panel wechselt zwischen **Ganze Gilde** und einem bestimmten Spielzweig der Gilde. Die Einstellungen eines Spielzweigs übernehmen standardmäßig für jedes Ereignis den gildenweiten Wert — ein Hinweis „Übernommen von der gildenweiten Einstellung" erscheint neben jedem Ereignis, das für diesen Spielzweig noch nicht überschrieben wurde. Änderst du den Kanal oder den Schalter für diesen Spielzweig, entsteht eine explizite Überschreibung; **Vererbung wiederherstellen** entfernt sie und übernimmt wieder den gildenweiten Wert.

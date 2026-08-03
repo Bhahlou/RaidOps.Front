@@ -1,11 +1,11 @@
 import { Component, computed, effect, inject, input, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { CdkAccordion, CdkAccordionItem } from '@angular/cdk/accordion';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
-import { FormFieldCardComponent } from '../../../../shared/components/form/form-field-card/form-field-card.component';
 import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
 import { DiscordChannelPermissionFlag } from '../../../../shared/models/discord-channel.model';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
@@ -39,11 +39,32 @@ const NOTIFICATION_FAMILIES: NotificationFamily[] = [
     hintKey: 'guildSettings.notificationSettings.families.absences.hint',
     eventTypes: [GuildNotificationEventType.AbsenceAdded, GuildNotificationEventType.AbsenceRemoved],
   },
+  {
+    id: 'raids',
+    labelKey: 'guildSettings.notificationSettings.families.raids.label',
+    hintKey: 'guildSettings.notificationSettings.families.raids.hint',
+    eventTypes: [
+      GuildNotificationEventType.RaidPublished,
+      GuildNotificationEventType.RaidCancelled,
+      GuildNotificationEventType.RaidRescheduled,
+    ],
+  },
+  {
+    id: 'raidComposition',
+    labelKey: 'guildSettings.notificationSettings.families.raidComposition.label',
+    hintKey: 'guildSettings.notificationSettings.families.raidComposition.hint',
+    eventTypes: [
+      GuildNotificationEventType.RaidSlotAssigned,
+      GuildNotificationEventType.RaidSlotUnassigned,
+      GuildNotificationEventType.RaidSlotsSwapped,
+      GuildNotificationEventType.RaidSlotSpecChanged,
+    ],
+  },
 ];
 
 @Component({
   selector: 'app-guild-notification-settings',
-  imports: [ButtonComponent, IconButtonComponent, CheckboxComponent, FormFieldCardComponent, SelectComponent, TranslocoPipe],
+  imports: [CdkAccordion, CdkAccordionItem, ButtonComponent, IconButtonComponent, CheckboxComponent, SelectComponent, TranslocoPipe],
   templateUrl: './guild-notification-settings.component.html',
   styleUrl: './guild-notification-settings.component.scss',
 })
@@ -67,6 +88,9 @@ export class GuildNotificationSettingsComponent implements OnInit {
   readonly resetting = signal<GuildNotificationEventType | null>(null);
 
   readonly #rows = signal<Map<GuildNotificationEventType, GuildNotificationSetting>>(new Map());
+
+  /** Families the user has explicitly expanded — every family starts collapsed so the page opens compact. */
+  readonly #expandedFamilies = signal<Set<string>>(new Set());
 
   /** Guild-wide (`GUILD_WIDE_KEY`) or one active branch's id (as a string, for `app-select`). */
   readonly scopeKey = signal<string>(GUILD_WIDE_KEY);
@@ -128,6 +152,21 @@ export class GuildNotificationSettingsComponent implements OnInit {
 
   row(eventType: GuildNotificationEventType): GuildNotificationSetting {
     return this.#rows().get(eventType) ?? { eventType, enabled: false, channelId: null };
+  }
+
+  isFamilyExpanded(familyId: string): boolean {
+    return this.#expandedFamilies().has(familyId);
+  }
+
+  toggleFamily(familyId: string, expanded: boolean): void {
+    const set = new Set(this.#expandedFamilies());
+    expanded ? set.add(familyId) : set.delete(familyId);
+    this.#expandedFamilies.set(set);
+  }
+
+  /** "N/M" summary shown in the collapsed header so a family's state is readable without opening it. */
+  enabledCount(family: NotificationFamily): number {
+    return family.eventTypes.filter((eventType) => this.row(eventType).enabled).length;
   }
 
   eventLabel(eventType: GuildNotificationEventType): string {

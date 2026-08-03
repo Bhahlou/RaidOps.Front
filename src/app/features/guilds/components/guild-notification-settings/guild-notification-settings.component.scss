@@ -1,11 +1,117 @@
-.full-width {
-  width: 100%;
-}
-
 .scope-select {
   display: block;
   max-width: 320px;
   margin-bottom: 16px;
+}
+
+// ── Accordion panels (same visual identity as character-activation-panel's) ──────────────────
+
+.families-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.expansion-panel {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+}
+
+.expansion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-bg-tertiary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}
+
+.expansion-chevron {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 0.12s ease;
+
+  &--expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.expansion-body {
+  padding: 10px 12px 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 0 0 8px 8px;
+}
+
+.family-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.family-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+// ── Rows (dense list, no per-row card) ────────────────────────────────────────────────────────
+
+.field-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+// Shared grid across every row of a family so the channel picker column lines up regardless of
+// how long each row's checkbox label is — each .notification-row becomes `display: contents` so
+// its 3 children (checkbox, select, extra) slot directly into the parent's column tracks instead
+// of each row sizing its own columns independently.
+.notification-rows {
+  display: grid;
+  grid-template-columns: minmax(200px, 340px) 260px 1fr;
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 2px;
+}
+
+.notification-row {
+  display: contents;
+
+  &:last-child > * {
+    border-bottom: none;
+  }
+}
+
+.notification-row-checkbox,
+.notification-row-channel-select,
+.notification-row-extra {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.notification-row-extra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-height: 100%;
 }
 
 .channel-hint {
@@ -17,38 +123,6 @@
 
 .reset-icon-button {
   flex-shrink: 0;
-}
-
-.field-hint {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  margin: 0 0 12px;
-  line-height: 1.5;
-}
-
-.notification-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.notification-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px 16px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  background: var(--color-bg-elevated);
-}
-
-.notification-row-checkbox {
-  flex: 0 1 auto;
-}
-
-.notification-row-channel-select {
-  flex: 0 1 300px;
-  width: 300px;
 }
 
 .channel-warning {
@@ -64,6 +138,41 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
+  }
+}
+
+// Narrow viewports: the 3-column grid stops making sense — stack each row's cells back into a
+// single column, same as the pre-alignment layout.
+@media (max-width: 640px) {
+  .notification-rows {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0;
+  }
+
+  .notification-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .notification-row-checkbox,
+  .notification-row-channel-select,
+  .notification-row-extra {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .notification-row-channel-select {
+    width: 100%;
+    max-width: 320px;
   }
 }
 
