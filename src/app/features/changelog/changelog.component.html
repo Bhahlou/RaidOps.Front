@@ -6,23 +6,69 @@
 
   <h1>{{ 'changelog.pageTitle' | transloco }}</h1>
 
-  @for (entry of entries; track entry.id) {
-    <article class="entry" [class.entry--unseen]="isUnseen(entry)">
-      <div class="entry-header">
-        <span class="entry-type" [class.entry-type--feature]="entry.type === EntryType.Feature">
-          {{ (entry.type === EntryType.Feature ? 'changelog.type.feature' : 'changelog.type.fix') | transloco }}
-        </span>
-        <time class="entry-date" [attr.datetime]="entry.date.toISOString()">{{ formatDate(entry.date) }}</time>
+  <div cdkAccordion [multi]="true" class="epochs-accordion">
+    @for (groupedEpoch of groupedEntries; track groupedEpoch.epoch.id) {
+      <div
+        cdkAccordionItem
+        #epochItem="cdkAccordionItem"
+        class="epoch-panel"
+        [expanded]="isEpochExpanded(groupedEpoch.epoch.id)"
+        (opened)="setEpochExpanded(groupedEpoch.epoch.id, true)"
+        (closed)="setEpochExpanded(groupedEpoch.epoch.id, false)"
+      >
+        <button type="button" class="epoch-header" (click)="epochItem.toggle()">
+          <span class="material-icons epoch-chevron" [class.epoch-chevron--expanded]="epochItem.expanded">expand_more</span>
+          <span class="epoch-label">{{ groupedEpoch.epoch.labelKey | transloco }}</span>
+        </button>
+
+        @if (epochItem.expanded) {
+          <div class="epoch-body" cdkAccordion [multi]="true">
+            @for (groupedGroup of groupedEpoch.groups; track groupedGroup.group.id) {
+              <div
+                cdkAccordionItem
+                #groupItem="cdkAccordionItem"
+                class="group-panel"
+                [expanded]="isGroupExpanded(groupedGroup.group.id)"
+                (opened)="setGroupExpanded(groupedGroup.group.id, true)"
+                (closed)="setGroupExpanded(groupedGroup.group.id, false)"
+              >
+                <button type="button" class="group-header" (click)="groupItem.toggle()">
+                  <span class="material-icons group-chevron" [class.group-chevron--expanded]="groupItem.expanded">expand_more</span>
+                  <span class="group-label">{{ groupedGroup.group.labelKey | transloco }}</span>
+                </button>
+
+                @if (groupItem.expanded) {
+                  <div class="group-body">
+                    @for (entry of groupedGroup.entries; track entry.id) {
+                      <article class="entry" [class.entry--unseen]="isUnseen(entry)">
+                        <div class="entry-header">
+                          <span
+                            class="entry-type"
+                            [class.entry-type--feature]="entry.type === EntryType.Feature"
+                            [class.entry-type--improvement]="entry.type === EntryType.Improvement"
+                          >
+                            {{ typeLabelKey(entry) | transloco }}
+                          </span>
+                          <time class="entry-date" [attr.datetime]="entry.date.toISOString()">{{ formatDate(entry.date) }}</time>
+                        </div>
+
+                        <h2 class="entry-title">{{ entry.titleKey | transloco }}</h2>
+                        <p class="entry-description">{{ entry.descriptionKey | transloco }}</p>
+
+                        @if (entry.type === EntryType.Feature || entry.type === EntryType.Improvement) {
+                          <a class="entry-guide-link" [routerLink]="['/manual', entry.manualLink.category, entry.manualLink.article]">
+                            {{ 'changelog.viewGuide' | transloco }}
+                          </a>
+                        }
+                      </article>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
       </div>
-
-      <h2 class="entry-title">{{ entry.titleKey | transloco }}</h2>
-      <p class="entry-description">{{ entry.descriptionKey | transloco }}</p>
-
-      @if (entry.type === EntryType.Feature) {
-        <a class="entry-guide-link" [routerLink]="['/manual', entry.manualLink.category, entry.manualLink.article]">
-          {{ 'changelog.viewGuide' | transloco }}
-        </a>
-      }
-    </article>
-  }
+    }
+  </div>
 </div>

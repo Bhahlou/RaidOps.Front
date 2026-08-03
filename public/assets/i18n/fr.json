@@ -70,11 +70,28 @@
   "changelog": {
     "pageTitle": "Nouveautés",
     "type": {
-      "feature": "Nouveauté",
+      "feature": "Fonctionnalité",
+      "improvement": "Amélioration",
       "fix": "Correction"
+    },
+    "epochs": {
+      "foundations": "Fondations"
+    },
+    "groups": {
+      "authentication": "Authentification",
+      "guildManagementPersonal": "Gestion de ses guildes",
+      "characterManagement": "Gestion des personnages",
+      "availabilityManagement": "Gestion des disponibilités",
+      "guildManagement": "Gestion d'une guilde",
+      "raidManagement": "Gestion des raids",
+      "userExperience": "Expérience utilisateur"
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "changelogRework": {
+        "title": "Nouveautés organisées par thème et synchronisées entre appareils",
+        "description": "La page Nouveautés regroupe maintenant les entrées par catégorie (elles-mêmes réparties par grande période), avec une distinction Fonctionnalité / Amélioration / Correction. Ton suivi de lecture est désormais lié à ton compte, pas à ton navigateur : ce que tu as vu reste vu, même en changeant d'appareil."
+      },
       "raidNotifications": {
         "title": "Notifications Discord pour les changements de raid et de composition",
         "description": "Deux nouveaux réglages de notification : « Changements de raid » poste quand un raid est publié, annulé ou reprogrammé, et « Changements de composition » poste à chaque modification du roster d'un raid déjà publié (assignation, désassignation, échange, changement de spé) — les tâtonnements en brouillon restent silencieux. Le journal d'audit de la guilde trace désormais aussi chacune de ces actions."

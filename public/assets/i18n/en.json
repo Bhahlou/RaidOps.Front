@@ -70,11 +70,28 @@
   "changelog": {
     "pageTitle": "What's new",
     "type": {
-      "feature": "New",
+      "feature": "Feature",
+      "improvement": "Improvement",
       "fix": "Fix"
+    },
+    "epochs": {
+      "foundations": "Foundations"
+    },
+    "groups": {
+      "authentication": "Authentication",
+      "guildManagementPersonal": "Managing your guilds",
+      "characterManagement": "Character management",
+      "availabilityManagement": "Availability management",
+      "guildManagement": "Guild management",
+      "raidManagement": "Raid management",
+      "userExperience": "User experience"
     },
     "viewGuide": "View guide →",
     "entries": {
+      "changelogRework": {
+        "title": "Changelog reorganized by theme and synced across devices",
+        "description": "The What's New page now groups entries into categories (themselves grouped under broader eras), with a Feature / Improvement / Fix distinction. Your read status is now tied to your account instead of your browser, so what you've seen stays seen even on a different device."
+      },
       "raidNotifications": {
         "title": "Discord notifications for raid changes and composition edits",
         "description": "Two new notification settings: \"Raid changes\" posts when a raid is published, cancelled, or rescheduled, and \"Raid composition changes\" posts whenever an already-published raid's roster is edited (assign, unassign, swap, spec change) — draft-stage tinkering stays silent. The guild audit log also now tracks every one of these actions."
