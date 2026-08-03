@@ -529,6 +529,77 @@ describe('GuildAuditLogComponent', () => {
 
       expect(component.characterChangeDisplay(entry({ actionType: GuildAuditAction.GuildRegistered }))).toBeNull();
     });
+
+    it.each([
+      GuildAuditAction.SlotAssigned,
+      GuildAuditAction.SlotUnassigned,
+      GuildAuditAction.SlotAssignmentSpecChanged,
+    ])('also resolves the character for %s (raid composition entries)', (actionType) => {
+      const component = setup();
+
+      expect(component.characterChangeDisplay(entry({
+        actionType,
+        variables: { characterName: 'Arthas', characterClassId: '6' },
+      }))).toEqual({ name: 'Arthas', classId: 6, color: '#C41F3B' });
+    });
+
+    it('returns null for SlotsSwapped — it names two characters, not one', () => {
+      const component = setup();
+
+      expect(component.characterChangeDisplay(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: { characterAName: 'Arthas', characterBName: 'Jaina' },
+      }))).toBeNull();
+    });
+  });
+
+  describe('slotsSwappedDisplay', () => {
+    it('returns both characters with class color and (group-slot) folded into the name', () => {
+      const component = setup();
+
+      expect(component.slotsSwappedDisplay(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: {
+          characterAName: 'Arthas', characterAClassId: '6', groupNumberA: '1', slotNumberA: '3',
+          characterBName: 'Jaina', characterBClassId: '8', groupNumberB: '2', slotNumberB: '1',
+          eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00',
+        },
+      }))).toEqual({
+        a: { name: 'Arthas (1-3)', classId: 6, color: '#C41F3B' },
+        b: { name: 'Jaina (2-1)', classId: 8, color: '#69CCF0' },
+        suffix: ' — Split 1 · 05/08/2026 20:00',
+      });
+    });
+
+    it('omits the (group-slot) suffix when coordinates are missing', () => {
+      const component = setup();
+
+      const result = component.slotsSwappedDisplay(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: { characterAName: 'Arthas', characterBName: 'Jaina' },
+      }));
+
+      expect(result?.a.name).toBe('Arthas');
+      expect(result?.b.name).toBe('Jaina');
+    });
+
+    it('returns null when either character name is missing', () => {
+      const component = setup();
+
+      expect(component.slotsSwappedDisplay(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: { characterAName: 'Arthas' },
+      }))).toBeNull();
+    });
+
+    it('returns null for action types other than SlotsSwapped', () => {
+      const component = setup();
+
+      expect(component.slotsSwappedDisplay(entry({
+        actionType: GuildAuditAction.SlotAssigned,
+        variables: { characterName: 'Arthas' },
+      }))).toBeNull();
+    });
   });
 
   describe('changeSuffix', () => {
@@ -558,6 +629,48 @@ describe('GuildAuditLogComponent', () => {
         actionType: GuildAuditAction.MemberRankUpdated,
         variables: { characterName: 'Arthas' },
       }))).toBeNull();
+    });
+
+    it.each([GuildAuditAction.SlotAssigned, GuildAuditAction.SlotUnassigned])(
+      'appends the (group-slot) coordinate and event context for %s',
+      (actionType) => {
+        const component = setup();
+
+        expect(component.changeSuffix(entry({
+          actionType,
+          variables: { characterName: 'Arthas', groupNumber: '2', slotNumber: '3', eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00' },
+        }))).toBe(' (2-3) — Split 1 · 05/08/2026 20:00');
+      },
+    );
+
+    it.each([GuildAuditAction.SlotAssigned, GuildAuditAction.SlotUnassigned])(
+      'omits the coordinate for %s when group/slot are missing, keeping just the event context',
+      (actionType) => {
+        const component = setup();
+
+        expect(component.changeSuffix(entry({
+          actionType,
+          variables: { characterName: 'Arthas', eventName: 'Split 1' },
+        }))).toBe(' — Split 1');
+      },
+    );
+
+    it('appends the old/new spec transition and event context for SlotAssignmentSpecChanged', () => {
+      const component = setup();
+
+      expect(component.changeSuffix(entry({
+        actionType: GuildAuditAction.SlotAssignmentSpecChanged,
+        variables: { characterName: 'Arthas', oldSpecName: 'Blood', newSpecName: 'Frost', eventName: 'Split 1' },
+      }))).toBe(' : Blood → Frost — Split 1');
+    });
+
+    it('omits the spec transition for SlotAssignmentSpecChanged when oldSpecName/newSpecName are missing', () => {
+      const component = setup();
+
+      expect(component.changeSuffix(entry({
+        actionType: GuildAuditAction.SlotAssignmentSpecChanged,
+        variables: { characterName: 'Arthas', eventName: 'Split 1' },
+      }))).toBe(' — Split 1');
     });
   });
 
@@ -763,6 +876,7 @@ describe('GuildAuditLogComponent', () => {
       GuildAuditAction.BranchActivated,
       GuildAuditAction.BranchDeactivated,
       GuildAuditAction.BranchRosterSettingsUpdated,
+      GuildAuditAction.BranchRegionUpdated,
     ])('shows the branch name for %s', (actionType) => {
       const component = setup();
 
@@ -776,6 +890,7 @@ describe('GuildAuditLogComponent', () => {
       GuildAuditAction.BranchActivated,
       GuildAuditAction.BranchDeactivated,
       GuildAuditAction.BranchRosterSettingsUpdated,
+      GuildAuditAction.BranchRegionUpdated,
     ])('falls back to an em dash for %s when branchName is missing', (actionType) => {
       const component = setup();
 
@@ -1025,6 +1140,188 @@ describe('GuildAuditLogComponent', () => {
       }));
 
       expect(result).toBe('calendar.patternDialog.unnamed (calendar.patternDialog.cycleSummary)');
+    });
+
+    it.each([
+      GuildAuditAction.RaidSeriesCreated,
+      GuildAuditAction.RaidSeriesUpdated,
+      GuildAuditAction.RaidSeriesDeactivated,
+    ])('shows the event name for %s', (actionType) => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType, variables: { eventName: 'Split 1' } }))).toBe('Split 1');
+    });
+
+    it.each([
+      GuildAuditAction.RaidSeriesCreated,
+      GuildAuditAction.RaidSeriesUpdated,
+      GuildAuditAction.RaidSeriesDeactivated,
+    ])('falls back to an em dash for %s when eventName is missing', (actionType) => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType }))).toBe('—');
+    });
+
+    it.each([
+      GuildAuditAction.RaidEventCreated,
+      GuildAuditAction.RaidEventDeleted,
+      GuildAuditAction.RaidEventPublished,
+    ])('shows event name, guild-local time and zone names for %s', (actionType) => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType,
+        variables: { eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00', raidZoneNames: 'Serpentshrine Cavern, Tempest Keep' },
+      }));
+
+      expect(result).toBe('Split 1 — 05/08/2026 20:00 · Serpentshrine Cavern, Tempest Keep');
+    });
+
+    it('shows just the event name when startsAtLocal/raidZoneNames are absent (RaidEventCreated)', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.RaidEventCreated,
+        variables: { eventName: 'Split 1' },
+      }))).toBe('Split 1');
+    });
+
+    it('falls back to an em dash for RaidEventPublished when eventName is missing', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.RaidEventPublished }))).toBe('—');
+    });
+
+    it('shows only the date diff for RaidEventUpdated when only the time changed', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RaidEventUpdated,
+        variables: {
+          eventName: 'Split 1',
+          oldStartsAtLocal: '2026-08-05 20:00', newStartsAtLocal: '2026-08-05 21:00',
+          oldRaidZoneNames: 'Serpentshrine Cavern', newRaidZoneNames: 'Serpentshrine Cavern',
+        },
+      }));
+
+      expect(result).toBe('Split 1 — auditLog.raidEventFields.date : 05/08/2026 20:00 → 05/08/2026 21:00');
+    });
+
+    it('shows only the zone diff for RaidEventUpdated when only the target zones changed', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RaidEventUpdated,
+        variables: {
+          eventName: 'Split 1',
+          oldStartsAtLocal: '2026-08-05 20:00', newStartsAtLocal: '2026-08-05 20:00',
+          oldRaidZoneNames: 'Serpentshrine Cavern', newRaidZoneNames: 'Serpentshrine Cavern, Tempest Keep',
+        },
+      }));
+
+      expect(result).toBe('Split 1 — auditLog.raidEventFields.raids : Serpentshrine Cavern → Serpentshrine Cavern, Tempest Keep');
+    });
+
+    it('joins both the date and zone diffs for RaidEventUpdated when both changed', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RaidEventUpdated,
+        variables: {
+          eventName: 'Split 1',
+          oldStartsAtLocal: '2026-08-05 20:00', newStartsAtLocal: '2026-08-05 21:00',
+          oldRaidZoneNames: 'Serpentshrine Cavern', newRaidZoneNames: 'Tempest Keep',
+        },
+      }));
+
+      expect(result).toBe(
+        'Split 1 — auditLog.raidEventFields.date : 05/08/2026 20:00 → 05/08/2026 21:00 · auditLog.raidEventFields.raids : Serpentshrine Cavern → Tempest Keep',
+      );
+    });
+
+    it('shows just the event name for RaidEventUpdated when neither date nor zones actually changed (grid-size-only edit)', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.RaidEventUpdated,
+        variables: {
+          eventName: 'Split 1',
+          oldStartsAtLocal: '2026-08-05 20:00', newStartsAtLocal: '2026-08-05 20:00',
+          oldRaidZoneNames: 'Serpentshrine Cavern', newRaidZoneNames: 'Serpentshrine Cavern',
+        },
+      }));
+
+      expect(result).toBe('Split 1');
+    });
+
+    it('falls back to an em dash for RaidEventUpdated when eventName is missing', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.RaidEventUpdated }))).toBe('—');
+    });
+
+    it.each([GuildAuditAction.SlotAssigned, GuildAuditAction.SlotUnassigned])(
+      'shows character, (group-slot) and event context for %s',
+      (actionType) => {
+        const component = setup();
+
+        const result = component.changeSummary(entry({
+          actionType,
+          variables: { characterName: 'Arthas', groupNumber: '2', slotNumber: '3', eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00' },
+        }));
+
+        expect(result).toBe('Arthas (2-3) — Split 1 · 05/08/2026 20:00');
+      },
+    );
+
+    it.each([GuildAuditAction.SlotAssigned, GuildAuditAction.SlotUnassigned])(
+      'falls back to an em dash for %s when characterName is missing',
+      (actionType) => {
+        const component = setup();
+
+        expect(component.changeSummary(entry({ actionType }))).toBe('—');
+      },
+    );
+
+    it('shows character with old/new spec and event context for SlotAssignmentSpecChanged', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.SlotAssignmentSpecChanged,
+        variables: { characterName: 'Arthas', oldSpecName: 'Blood', newSpecName: 'Frost', eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00' },
+      }));
+
+      expect(result).toBe('Arthas : Blood → Frost — Split 1 · 05/08/2026 20:00');
+    });
+
+    it('falls back to an em dash for SlotAssignmentSpecChanged when characterName is missing', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.SlotAssignmentSpecChanged }))).toBe('—');
+    });
+
+    it('shows both characters, coordinates and event context for SlotsSwapped', () => {
+      const component = setup();
+
+      const result = component.changeSummary(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: {
+          characterAName: 'Arthas', groupNumberA: '1', slotNumberA: '3',
+          characterBName: 'Jaina', groupNumberB: '2', slotNumberB: '1',
+          eventName: 'Split 1', startsAtLocal: '2026-08-05 20:00',
+        },
+      }));
+
+      expect(result).toBe('Arthas (1-3) ↔ Jaina (2-1) — Split 1 · 05/08/2026 20:00');
+    });
+
+    it('falls back to an em dash for SlotsSwapped when either character name is missing', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.SlotsSwapped,
+        variables: { characterAName: 'Arthas' },
+      }))).toBe('—');
     });
   });
 
