@@ -524,10 +524,19 @@ describe('GuildAuditLogComponent', () => {
       }))).toEqual({ name: 'Arthas', classId: 99, color: null });
     });
 
-    it('returns null when characterName is missing, regardless of action type', () => {
+    it('returns null for an action type outside CharacterChangeActionTypes, regardless of variables', () => {
       const component = setup();
 
       expect(component.characterChangeDisplay(entry({ actionType: GuildAuditAction.GuildRegistered }))).toBeNull();
+    });
+
+    it('returns null when characterName is missing even for an action type that does carry a character (e.g. SlotAssigned)', () => {
+      const component = setup();
+
+      expect(component.characterChangeDisplay(entry({
+        actionType: GuildAuditAction.SlotAssigned,
+        variables: { characterClassId: '6' },
+      }))).toBeNull();
     });
 
     it.each([
