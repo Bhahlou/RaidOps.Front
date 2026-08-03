@@ -1,6 +1,7 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { Observable, shareReplay, tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { ChangelogService } from '../services/changelog.service';
 import { NotificationService } from '../services/notification.service';
 import { NotificationType } from '../models/notification.model';
 import { User } from '../models/user.model';
@@ -11,6 +12,7 @@ const STORAGE_KEY = 'raidops_user';
 export class AuthStore {
   readonly #authService = inject(AuthService);
   readonly #notificationService = inject(NotificationService);
+  readonly #changelogService = inject(ChangelogService);
 
   readonly #user = signal<User | null>(null);
   readonly user = this.#user.asReadonly();
@@ -82,6 +84,27 @@ export class AuthStore {
           notifications: current.notifications.filter(
             (n) => !(n.type === type && n.guildId === guildId),
           ),
+        };
+        this.#user.set(updated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      }),
+    );
+  }
+
+  /**
+   * Records that the current user has acknowledged the given changelog entries: persists it
+   * server-side, then optimistically updates the cached user so the "what's new" badge clears
+   * immediately.
+   */
+  markChangelogSeen(entryIds: string[]): Observable<void> {
+    return this.#changelogService.markSeen(entryIds).pipe(
+      tap(() => {
+        const current = this.#user();
+        if (current === null) return;
+
+        const updated: User = {
+          ...current,
+          seenChangelogEntryIds: [...new Set([...current.seenChangelogEntryIds, ...entryIds])],
         };
         this.#user.set(updated);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));

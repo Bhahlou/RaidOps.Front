@@ -70,11 +70,28 @@
   "changelog": {
     "pageTitle": "Neuigkeiten",
     "type": {
-      "feature": "Neu",
+      "feature": "Funktion",
+      "improvement": "Verbesserung",
       "fix": "Korrektur"
+    },
+    "epochs": {
+      "foundations": "Grundlagen"
+    },
+    "groups": {
+      "authentication": "Authentifizierung",
+      "guildManagementPersonal": "Eigene Gilden verwalten",
+      "characterManagement": "Charakterverwaltung",
+      "availabilityManagement": "Verfügbarkeitsverwaltung",
+      "guildManagement": "Gildenverwaltung",
+      "raidManagement": "Raid-Verwaltung",
+      "userExperience": "Benutzererfahrung"
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "changelogRework": {
+        "title": "Neuigkeiten nach Themen geordnet und geräteübergreifend synchronisiert",
+        "description": "Die Neuigkeiten-Seite gruppiert Einträge jetzt nach Kategorie (die wiederum größeren Epochen zugeordnet sind), mit einer Unterscheidung zwischen Funktion / Verbesserung / Korrektur. Dein Lesestatus ist jetzt an deinen Account gebunden statt an deinen Browser — bereits Gesehenes bleibt auch auf einem anderen Gerät als gesehen markiert."
+      },
       "raidNotifications": {
         "title": "Discord-Benachrichtigungen für Raid- und Zusammensetzungsänderungen",
         "description": "Zwei neue Benachrichtigungseinstellungen: „Raid-Änderungen“ postet, wenn ein Raid veröffentlicht, abgesagt oder verschoben wird, und „Zusammensetzungsänderungen“ postet bei jeder Änderung des Rosters eines bereits veröffentlichten Raids (zuweisen, entfernen, tauschen, Skillung ändern) — Bearbeitungen im Entwurf bleiben stumm. Das Gilden-Audit-Log erfasst nun auch jede dieser Aktionen."
