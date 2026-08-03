@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.5.0...raidops-front-v1.6.0) (2026-08-03)
+
+
+### 🚀 Features
+
+* Raid changes are now able to notify on discord and audit logs show main changes ([#72](https://github.com/Bhahlou/RaidOps.Front/issues/72)) ([f94e16d](https://github.com/Bhahlou/RaidOps.Front/commit/f94e16d15ac42b1f31f58f1548e6463f5eec4463))
+
 ## [1.5.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.4.0...raidops-front-v1.5.0) (2026-08-01)
 
 
