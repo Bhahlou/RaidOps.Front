@@ -75,6 +75,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidNotifications": {
+        "title": "Notifications Discord pour les changements de raid et de composition",
+        "description": "Deux nouveaux réglages de notification : « Changements de raid » poste quand un raid est publié, annulé ou reprogrammé, et « Changements de composition » poste à chaque modification du roster d'un raid déjà publié (assignation, désassignation, échange, changement de spé) — les tâtonnements en brouillon restent silencieux. Le journal d'audit de la guilde trace désormais aussi chacune de ces actions."
+      },
       "raidBuilder": {
         "title": "Composez vos groupes de raid en glisser-déposer",
         "description": "Une nouvelle page Raids permet aux officiers de composer les raids en glissant des personnages depuis un vivier du roster en direct vers une grille de groupes/slots — échangez deux personnages assignés, ou cliquez sur un slot vide pour en chercher et assigner un directement. Configurez une série récurrente pour ne plus avoir à recréer à la main un raid hebdomadaire et ses zones cibles. Un raid reste en brouillon, invisible pour les membres classiques du roster, jusqu'à ce qu'un officier le publie."
@@ -217,7 +221,7 @@
       },
       "discordNotifications": {
         "title": "Notifications Discord",
-        "description": "Notifications par salon Discord par évènement (absences, puis évènements de raid)."
+        "description": "Notifications par salon Discord par évènement : absences, changements de raid (publié/annulé/reprogrammé) et changements de composition."
       },
       "getStarted": {
         "title": "Parcours d'onboarding",
@@ -448,11 +452,26 @@
         "absences": {
           "label": "Absences",
           "hint": "Notifier quand la disponibilité déclarée d'un membre change."
+        },
+        "raids": {
+          "label": "Changements de raid",
+          "hint": "Notifier quand un raid est publié, annulé ou reprogrammé."
+        },
+        "raidComposition": {
+          "label": "Changements de composition",
+          "hint": "Notifier quand la composition d'un raid déjà publié est modifiée (assignation, désassignation, échange, changement de spé)."
         }
       },
       "events": {
         "AbsenceAdded": "Un membre ajoute une absence",
-        "AbsenceRemoved": "Un membre retire une absence"
+        "AbsenceRemoved": "Un membre retire une absence",
+        "RaidPublished": "Un raid est publié",
+        "RaidCancelled": "Un raid publié est annulé",
+        "RaidRescheduled": "Un raid publié est reprogrammé",
+        "RaidSlotAssigned": "Un personnage est assigné à un emplacement",
+        "RaidSlotUnassigned": "Un personnage est désassigné d'un emplacement",
+        "RaidSlotsSwapped": "Deux personnages sont échangés",
+        "RaidSlotSpecChanged": "La spécialisation d'un emplacement change"
       },
       "scope": {
         "label": "Portée",
@@ -482,6 +501,8 @@
     "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
     "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "branchRegionNotConfigured": "« {{ guildName }} » a une branche active sans région configurée — règle-la dans l'onglet Branches des paramètres pour que les reset hebdomadaires des raids tombent à la bonne heure.",
+    "raidNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les changements de raid — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
+    "raidCompositionNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les changements de composition — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "viewLink": "Configurer",
     "dismiss": "Ne plus jamais afficher"
   },
@@ -509,7 +530,8 @@
       "Settings": "Paramètres",
       "Roster": "Roster",
       "Availability": "Disponibilité",
-      "Branches": "Branches"
+      "Branches": "Branches",
+      "Raids": "Raids"
     },
     "settingsFields": {
       "timezone": "Fuseau horaire",
@@ -517,6 +539,10 @@
       "rosterMode": "Accès au roster",
       "minRosterRoleId": "Seuil de rôle Discord modifié",
       "minOfficerRoleId": "Seuil d'accès Officier modifié"
+    },
+    "raidEventFields": {
+      "date": "Date",
+      "raids": "Raids"
     },
     "actionLabels": {
       "GuildRegistered": "Enregistrement",
@@ -534,7 +560,20 @@
       "NotificationSettingsUpdated": "Réglages de notifications modifiés",
       "BranchActivated": "Branche activée",
       "BranchDeactivated": "Branche désactivée",
-      "BranchRosterSettingsUpdated": "Réglages de roster de branche modifiés"
+      "BranchRosterSettingsUpdated": "Réglages de roster de branche modifiés",
+      "NotificationSettingsReset": "Surcharge de notification réinitialisée",
+      "RaidSeriesCreated": "Série de raid créée",
+      "RaidSeriesUpdated": "Série de raid modifiée",
+      "RaidSeriesDeactivated": "Série de raid désactivée",
+      "RaidEventCreated": "Événement de raid créé",
+      "RaidEventUpdated": "Événement de raid modifié",
+      "RaidEventDeleted": "Événement de raid supprimé",
+      "RaidEventPublished": "Événement de raid publié",
+      "BranchRegionUpdated": "Région de branche modifiée",
+      "SlotAssigned": "Personnage ajouté",
+      "SlotUnassigned": "Personnage supprimé",
+      "SlotsSwapped": "Personnages échangés",
+      "SlotAssignmentSpecChanged": "Spécialisation changée"
     }
   },
   "noGuild": {

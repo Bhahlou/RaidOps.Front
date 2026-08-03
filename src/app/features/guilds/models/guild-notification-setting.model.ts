@@ -1,6 +1,13 @@
 export enum GuildNotificationEventType {
   AbsenceAdded = 'AbsenceAdded',
   AbsenceRemoved = 'AbsenceRemoved',
+  RaidPublished = 'RaidPublished',
+  RaidCancelled = 'RaidCancelled',
+  RaidRescheduled = 'RaidRescheduled',
+  RaidSlotAssigned = 'RaidSlotAssigned',
+  RaidSlotUnassigned = 'RaidSlotUnassigned',
+  RaidSlotsSwapped = 'RaidSlotsSwapped',
+  RaidSlotSpecChanged = 'RaidSlotSpecChanged',
 }
 
 export interface GuildNotificationSetting {

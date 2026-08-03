@@ -6,7 +6,7 @@ Das **Audit-Log** listet den Verlauf der wichtigen Aktionen auf, die auf der Gil
 
 ### Spalten
 
-Jeder Eintrag zeigt den **Autor** der Aktion, ihre **Kategorie** (Gilde, Einstellungen, Roster), die durchgeführte **Aktion**, eine Zusammenfassung **Vorher / Nachher** der Änderung und das **Datum**.
+Jeder Eintrag zeigt den **Autor** der Aktion, ihre **Kategorie** (Gilde, Einstellungen, Roster, Verfügbarkeit, Spielzweige, Raids), die durchgeführte **Aktion**, eine Zusammenfassung **Vorher / Nachher** der Änderung und das **Datum**.
 
 ### Filtern und sortieren
 

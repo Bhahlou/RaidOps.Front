@@ -6,7 +6,7 @@ Le **Journal d'audit** liste l'historique des actions notables effectuées sur l
 
 ### Colonnes
 
-Chaque entrée affiche l'**Auteur** de l'action, sa **Catégorie** (Guilde, Paramètres, Roster), l'**Action** effectuée, un résumé **Avant / Après** du changement, et la **Date**.
+Chaque entrée affiche l'**Auteur** de l'action, sa **Catégorie** (Guilde, Paramètres, Roster, Disponibilité, Branches, Raids), l'**Action** effectuée, un résumé **Avant / Après** du changement, et la **Date**.
 
 ### Filtrer et trier
 

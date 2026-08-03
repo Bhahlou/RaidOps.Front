@@ -75,6 +75,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidNotifications": {
+        "title": "Discord-Benachrichtigungen für Raid- und Zusammensetzungsänderungen",
+        "description": "Zwei neue Benachrichtigungseinstellungen: „Raid-Änderungen“ postet, wenn ein Raid veröffentlicht, abgesagt oder verschoben wird, und „Zusammensetzungsänderungen“ postet bei jeder Änderung des Rosters eines bereits veröffentlichten Raids (zuweisen, entfernen, tauschen, Skillung ändern) — Bearbeitungen im Entwurf bleiben stumm. Das Gilden-Audit-Log erfasst nun auch jede dieser Aktionen."
+      },
       "raidBuilder": {
         "title": "Raidgruppen per Drag & Drop zusammenstellen",
         "description": "Eine neue Raids-Seite lässt Officer Raidzusammenstellungen erstellen, indem sie Charaktere aus einem live aktualisierten Roster-Pool auf ein Gruppen-/Slot-Raster ziehen — zwei zugewiesene Charaktere tauschen, oder auf einen leeren Slot klicken, um stattdessen einen zu suchen und zuzuweisen. Richten Sie eine wiederkehrende Serie ein, damit ein wöchentlicher Raid samt Zielzonen nicht jedes Mal von Hand neu erstellt werden muss. Ein Raid bleibt ein Entwurf, unsichtbar für reguläre Roster-Mitglieder, bis ein Officer ihn veröffentlicht."
@@ -217,7 +221,7 @@
       },
       "discordNotifications": {
         "title": "Discord-Benachrichtigungen",
-        "description": "Discord-Kanalbenachrichtigungen pro Ereignis (Abwesenheiten, später Raid-Ereignisse)."
+        "description": "Discord-Kanalbenachrichtigungen pro Ereignis: Abwesenheiten, Raid-Änderungen (veröffentlicht/abgesagt/verschoben) und Zusammensetzungsänderungen."
       },
       "getStarted": {
         "title": "Onboarding-Ablauf",
@@ -448,11 +452,26 @@
         "absences": {
           "label": "Abwesenheiten",
           "hint": "Benachrichtigen, wenn sich die eingetragene Verfügbarkeit eines Mitglieds ändert."
+        },
+        "raids": {
+          "label": "Raid-Änderungen",
+          "hint": "Benachrichtigen, wenn ein Raid veröffentlicht, abgesagt oder verschoben wird."
+        },
+        "raidComposition": {
+          "label": "Zusammensetzungsänderungen",
+          "hint": "Benachrichtigen, wenn die Zusammensetzung eines bereits veröffentlichten Raids geändert wird (zuweisen, entfernen, tauschen, Skillung ändern)."
         }
       },
       "events": {
         "AbsenceAdded": "Ein Mitglied trägt eine Abwesenheit ein",
-        "AbsenceRemoved": "Ein Mitglied entfernt eine Abwesenheit"
+        "AbsenceRemoved": "Ein Mitglied entfernt eine Abwesenheit",
+        "RaidPublished": "Ein Raid wird veröffentlicht",
+        "RaidCancelled": "Ein veröffentlichter Raid wird abgesagt",
+        "RaidRescheduled": "Ein veröffentlichter Raid wird verschoben",
+        "RaidSlotAssigned": "Ein Charakter wird einem Slot zugewiesen",
+        "RaidSlotUnassigned": "Ein Charakter wird von einem Slot entfernt",
+        "RaidSlotsSwapped": "Zwei Charaktere werden getauscht",
+        "RaidSlotSpecChanged": "Die Skillung eines Slots wird geändert"
       },
       "scope": {
         "label": "Geltungsbereich",
@@ -482,6 +501,8 @@
     "guildLanguageNotConfigured": "„{{ guildName }}“ hat noch keine Sprache konfiguriert — wähle in den Einstellungen die Sprache, in der RaidOps mit deiner Gilde kommuniziert.",
     "absenceNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Abwesenheiten noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "branchRegionNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Region — lege sie im Tab Spielzweige der Einstellungen fest, damit die wöchentlichen Raid-Resets zur richtigen Zeit erfolgen.",
+    "raidNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Raid-Änderungen noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
+    "raidCompositionNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Zusammensetzungsänderungen noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "viewLink": "Konfigurieren",
     "dismiss": "Nie wieder anzeigen"
   },
@@ -509,7 +530,8 @@
       "Settings": "Einstellungen",
       "Roster": "Roster",
       "Availability": "Verfügbarkeit",
-      "Branches": "Spielzweige"
+      "Branches": "Spielzweige",
+      "Raids": "Raids"
     },
     "settingsFields": {
       "timezone": "Zeitzone",
@@ -517,6 +539,10 @@
       "rosterMode": "Roster-Zugriff",
       "minRosterRoleId": "Discord-Rollenschwelle geändert",
       "minOfficerRoleId": "Officer-Zugriffsschwelle geändert"
+    },
+    "raidEventFields": {
+      "date": "Datum",
+      "raids": "Raids"
     },
     "actionLabels": {
       "GuildRegistered": "Registrierung",
@@ -534,7 +560,20 @@
       "NotificationSettingsUpdated": "Benachrichtigungseinstellungen geändert",
       "BranchActivated": "Spielzweig aktiviert",
       "BranchDeactivated": "Spielzweig deaktiviert",
-      "BranchRosterSettingsUpdated": "Roster-Einstellungen des Spielzweigs geändert"
+      "BranchRosterSettingsUpdated": "Roster-Einstellungen des Spielzweigs geändert",
+      "NotificationSettingsReset": "Benachrichtigungs-Override zurückgesetzt",
+      "RaidSeriesCreated": "Raid-Serie erstellt",
+      "RaidSeriesUpdated": "Raid-Serie geändert",
+      "RaidSeriesDeactivated": "Raid-Serie deaktiviert",
+      "RaidEventCreated": "Raid-Termin erstellt",
+      "RaidEventUpdated": "Raid-Termin geändert",
+      "RaidEventDeleted": "Raid-Termin gelöscht",
+      "RaidEventPublished": "Raid-Termin veröffentlicht",
+      "BranchRegionUpdated": "Spielzweig-Region geändert",
+      "SlotAssigned": "Charakter hinzugefügt",
+      "SlotUnassigned": "Charakter entfernt",
+      "SlotsSwapped": "Charaktere getauscht",
+      "SlotAssignmentSpecChanged": "Slot-Skillung geändert"
     }
   },
   "noGuild": {
