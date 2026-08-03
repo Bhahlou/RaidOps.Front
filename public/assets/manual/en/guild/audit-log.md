@@ -6,7 +6,7 @@ The **Audit log** lists the history of notable actions performed on the guild: s
 
 ### Columns
 
-Each entry shows the **Actor** behind the action, its **Category** (Guild, Settings, Roster), the **Action** taken, a **Before / After** summary of the change, and the **Date**.
+Each entry shows the **Actor** behind the action, its **Category** (Guild, Settings, Roster, Availability, Branches, Raids), the **Action** taken, a **Before / After** summary of the change, and the **Date**.
 
 ### Filter and sort
 

@@ -6,6 +6,11 @@ An "absence" event covers both a one-off declaration and a recurring pattern (we
 
 ![Notifications tab overview](/assets/manual/en/guild/notifications-settings-overview.png)
 
+Raid events have two separate families, so you can enable one without the other:
+
+- **Raid changes** posts when a raid is published, when an already-published raid is cancelled (deleted), or when its start time is rescheduled.
+- **Raid composition changes** posts when a character is assigned, unassigned, swapped, or has its spec changed on an **already-published** raid — edits made while a raid is still a draft never post, since nobody outside officers can see it yet.
+
 ### Choosing a scope
 
 The **Scope** selector at the top switches the panel between **Whole guild** and one of the guild's branches. A branch's settings default to inheriting the guild-wide value for every event — an "Inherited from the guild-wide setting" hint appears next to any event that hasn't been overridden for that branch yet. Changing the channel or toggle for that branch creates an explicit override; **Revert to inherited** removes it and falls back to the guild-wide value again.

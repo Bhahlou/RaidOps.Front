@@ -174,6 +174,21 @@
                         <span>{{ suffix }}</span>
                       }
                     </span>
+                  } @else if (slotsSwappedDisplay(entry); as swap) {
+                    <span class="change-with-icon">
+                      @if (swap.a.classId !== null) {
+                        <app-wow-class-icon [classId]="swap.a.classId" [size]="18" />
+                      }
+                      <span [style.color]="swap.a.color">{{ swap.a.name }}</span>
+                      <span>↔</span>
+                      @if (swap.b.classId !== null) {
+                        <app-wow-class-icon [classId]="swap.b.classId" [size]="18" />
+                      }
+                      <span [style.color]="swap.b.color">{{ swap.b.name }}</span>
+                      @if (swap.suffix) {
+                        <span>{{ swap.suffix }}</span>
+                      }
+                    </span>
                   } @else {
                     {{ changeSummary(entry) }}
                   }

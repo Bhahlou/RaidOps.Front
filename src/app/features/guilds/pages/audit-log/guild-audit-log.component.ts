@@ -64,6 +64,13 @@ interface CharacterChangeDisplay {
   color: string | null;
 }
 
+/** Both sides of a `SlotsSwapped` entry, each colored by class like `CharacterChangeDisplay`. */
+interface SlotsSwappedDisplay {
+  a: CharacterChangeDisplay;
+  b: CharacterChangeDisplay;
+  suffix: string;
+}
+
 @Component({
   selector: 'app-guild-audit-log',
   imports: [
@@ -320,26 +327,89 @@ export class GuildAuditLogComponent {
     return { name, iconHash: entry.variables?.['guildIconHash'] ?? null };
   }
 
+  /**
+   * Every single-character action that carries `characterName` (+ optionally `characterClassId`)
+   * and should render as a class-colored icon + name, with any extra detail (rank change, raid/
+   * date/slot, spec change) appended by `changeSuffix()` rather than baked into the name text.
+   * `SlotsSwapped` is excluded — two characters need `slotsSwappedDisplay()` instead.
+   */
+  private static readonly CharacterChangeActionTypes: ReadonlySet<GuildAuditAction> = new Set([
+    GuildAuditAction.MemberJoined,
+    GuildAuditAction.MemberLeft,
+    GuildAuditAction.MemberExcluded,
+    GuildAuditAction.MemberRankUpdated,
+    GuildAuditAction.SlotAssigned,
+    GuildAuditAction.SlotUnassigned,
+    GuildAuditAction.SlotAssignmentSpecChanged,
+  ]);
+
   /** Character name/class to render for any entry that names a character, or null otherwise. */
   characterChangeDisplay(entry: AuditLogEntry): CharacterChangeDisplay | null {
+    if (!GuildAuditLogComponent.CharacterChangeActionTypes.has(entry.actionType)) return null;
+
     const name = entry.variables?.['characterName'];
     if (!name) return null;
 
-    const classIdRaw = entry.variables?.['characterClassId'];
-    const classId = classIdRaw ? Number(classIdRaw) : null;
+    return this.#characterDisplay(name, entry.variables?.['characterClassId']);
+  }
 
+  /**
+   * Both swapped characters (class-colored, each with its own (group-slot) coordinate folded into
+   * the name) + the same event/date suffix the single-character rows use.
+   */
+  slotsSwappedDisplay(entry: AuditLogEntry): SlotsSwappedDisplay | null {
+    if (entry.actionType !== GuildAuditAction.SlotsSwapped) return null;
+
+    const nameA = entry.variables?.['characterAName'];
+    const nameB = entry.variables?.['characterBName'];
+    if (!nameA || !nameB) return null;
+
+    const groupNumberA = entry.variables?.['groupNumberA'];
+    const slotNumberA = entry.variables?.['slotNumberA'];
+    const groupNumberB = entry.variables?.['groupNumberB'];
+    const slotNumberB = entry.variables?.['slotNumberB'];
+    const labelA = groupNumberA && slotNumberA ? `${nameA} (${groupNumberA}-${slotNumberA})` : nameA;
+    const labelB = groupNumberB && slotNumberB ? `${nameB} (${groupNumberB}-${slotNumberB})` : nameB;
+
+    return {
+      a: this.#characterDisplay(labelA, entry.variables?.['characterAClassId']),
+      b: this.#characterDisplay(labelB, entry.variables?.['characterBClassId']),
+      suffix: this.#eventContextSuffix(entry),
+    };
+  }
+
+  #characterDisplay(name: string, classIdRaw: string | undefined): CharacterChangeDisplay {
+    const classId = classIdRaw ? Number(classIdRaw) : null;
     return { name, classId, color: classId === null ? null : (CLASS_COLORS[classId] ?? null) };
   }
 
-  /** Trailing text shown after the character name/icon — only MemberRankUpdated needs one. */
+  /** Trailing text shown after the character name/icon in `characterChangeDisplay()` rows. */
   changeSuffix(entry: AuditLogEntry): string | null {
-    if (entry.actionType !== GuildAuditAction.MemberRankUpdated) return null;
+    switch (entry.actionType) {
+      case GuildAuditAction.MemberRankUpdated: {
+        const oldRank = entry.variables?.['oldRank'];
+        const newRank = entry.variables?.['newRank'];
+        return oldRank && newRank ? ` : ${oldRank} → ${newRank}` : null;
+      }
 
-    const oldRank = entry.variables?.['oldRank'];
-    const newRank = entry.variables?.['newRank'];
-    if (!oldRank || !newRank) return null;
+      case GuildAuditAction.SlotAssigned:
+      case GuildAuditAction.SlotUnassigned: {
+        const groupNumber = entry.variables?.['groupNumber'];
+        const slotNumber = entry.variables?.['slotNumber'];
+        const coord = groupNumber && slotNumber ? ` (${groupNumber}-${slotNumber})` : '';
+        return coord + this.#eventContextSuffix(entry);
+      }
 
-    return ` : ${oldRank} → ${newRank}`;
+      case GuildAuditAction.SlotAssignmentSpecChanged: {
+        const oldSpecName = entry.variables?.['oldSpecName'];
+        const newSpecName = entry.variables?.['newSpecName'];
+        const spec = oldSpecName && newSpecName ? ` : ${oldSpecName} → ${newSpecName}` : '';
+        return spec + this.#eventContextSuffix(entry);
+      }
+
+      default:
+        return null;
+    }
   }
 
   /** Content of the "before / after" column — the one piece of state the action actually changed. */
@@ -379,11 +449,241 @@ export class GuildAuditLogComponent {
       case GuildAuditAction.BranchActivated:
       case GuildAuditAction.BranchDeactivated:
       case GuildAuditAction.BranchRosterSettingsUpdated:
+      case GuildAuditAction.BranchRegionUpdated:
         return entry.variables?.['branchName'] ?? '—';
+
+      case GuildAuditAction.RaidSeriesCreated:
+      case GuildAuditAction.RaidSeriesUpdated:
+      case GuildAuditAction.RaidSeriesDeactivated:
+        return entry.variables?.['eventName'] ?? '—';
+
+      case GuildAuditAction.RaidEventCreated:
+      case GuildAuditAction.RaidEventDeleted:
+      case GuildAuditAction.RaidEventPublished:
+        return this.#raidEventSummary(entry);
+
+      case GuildAuditAction.RaidEventUpdated:
+        return this.#raidEventUpdateSummary(entry);
+
+      case GuildAuditAction.SlotAssigned:
+      case GuildAuditAction.SlotUnassigned:
+        return this.#slotChangeSummary(entry, characterName);
+
+      case GuildAuditAction.SlotAssignmentSpecChanged:
+        return this.#slotSpecChangeSummary(entry, characterName);
+
+      case GuildAuditAction.SlotsSwapped:
+        return this.#slotsSwappedSummary(entry);
 
       default:
         return characterName ?? '—';
     }
+  }
+
+  /** e.g. "Split 1 — 05/08/2026 20:00 · Serpentshrine Cavern, Tempest Keep" for a create/delete/publish entry. Time is the guild's configured local time, not UTC. */
+  #raidEventSummary(entry: AuditLogEntry): string {
+    const eventName = entry.variables?.['eventName'];
+    if (!eventName) return '—';
+
+    const parts = [eventName];
+    const startsAtLocal = entry.variables?.['startsAtLocal'];
+    if (startsAtLocal) parts.push(this.#formatGuildLocalDateTime(startsAtLocal));
+    const raidZoneNames = entry.variables?.['raidZoneNames'];
+    if (raidZoneNames) parts.push(raidZoneNames);
+
+    return parts.length > 1 ? `${parts[0]} — ${parts.slice(1).join(' · ')}` : parts[0];
+  }
+
+  /**
+   * e.g. "Split 1 — date : 05/08/2026 20:00 → 05/08/2026 21:00 · raids : SSC → SSC, TK" — only
+   * the fields that actually moved are shown, so an update that only touched the grid size (no
+   * date/zone change) still reads as just the event name instead of a no-op-looking diff. Times are
+   * the guild's configured local time, not UTC.
+   */
+  #raidEventUpdateSummary(entry: AuditLogEntry): string {
+    const eventName = entry.variables?.['eventName'];
+    if (!eventName) return '—';
+
+    const changes: string[] = [];
+
+    const oldStartsAtLocal = entry.variables?.['oldStartsAtLocal'];
+    const newStartsAtLocal = entry.variables?.['newStartsAtLocal'];
+    if (oldStartsAtLocal && newStartsAtLocal && oldStartsAtLocal !== newStartsAtLocal) {
+      const oldLabel = this.#formatGuildLocalDateTime(oldStartsAtLocal);
+      const newLabel = this.#formatGuildLocalDateTime(newStartsAtLocal);
+      changes.push(`${this.#transloco.translate('auditLog.raidEventFields.date')} : ${oldLabel} → ${newLabel}`);
+    }
+
+    const oldRaidZoneNames = entry.variables?.['oldRaidZoneNames'];
+    const newRaidZoneNames = entry.variables?.['newRaidZoneNames'];
+    if (oldRaidZoneNames && newRaidZoneNames && oldRaidZoneNames !== newRaidZoneNames) {
+      changes.push(`${this.#transloco.translate('auditLog.raidEventFields.raids')} : ${oldRaidZoneNames} → ${newRaidZoneNames}`);
+    }
+
+    return changes.length > 0 ? `${eventName} — ${changes.join(' · ')}` : eventName;
+  }
+
+  /**
+   * Formats a backend "yyyy-MM-dd HH:mm" guild-local wall-clock string (from `startsAtLocal` et al.)
+   * using the viewer's active UI language, e.g. "05/08/2026 20:00" (fr) vs "8/5/2026, 8:00 PM" (en).
+   * Parses the components manually and formats with `timeZone: 'UTC'` rather than doing
+   * `new Date(raw)` — that string carries no timezone info, so letting the browser interpret it in
+   * its own local zone would silently shift the hour for any viewer not in the guild's timezone.
+   */
+  #formatGuildLocalDateTime(raw: string): string {
+    const [datePart, timePart] = raw.split(' ');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour, minute] = (timePart ?? '00:00').split(':').map(Number);
+    const asUtc = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+    return new Intl.DateTimeFormat(this.#transloco.getActiveLang(), {
+      dateStyle: 'short',
+      timeStyle: 'short',
+      timeZone: 'UTC',
+    }).format(asUtc);
+  }
+
+  /** e.g. "Arthas (2-3) — Split 1 · 05/08/2026 20:00" for a character added/removed entry. */
+  #slotChangeSummary(entry: AuditLogEntry, characterName: string | undefined): string {
+    if (!characterName) return '—';
+
+    const groupNumber = entry.variables?.['groupNumber'];
+    const slotNumber = entry.variables?.['slotNumber'];
+    const who = groupNumber && slotNumber ? `${characterName} (${groupNumber}-${slotNumber})` : characterName;
+
+    return this.#appendEventContext(who, entry);
+  }
+
+  /** e.g. "Arthas : Frost → Unholy — Split 1 · 05/08/2026 20:00" for a spec-change entry. */
+  #slotSpecChangeSummary(entry: AuditLogEntry, characterName: string | undefined): string {
+    if (!characterName) return '—';
+
+    const oldSpecName = entry.variables?.['oldSpecName'];
+    const newSpecName = entry.variables?.['newSpecName'];
+    const who = oldSpecName && newSpecName ? `${characterName} : ${oldSpecName} → ${newSpecName}` : characterName;
+
+    return this.#appendEventContext(who, entry);
+  }
+
+  /** e.g. "Arthas (2-3) ↔ Jaina (1-1) — Split 1 · 05/08/2026 20:00" for a swap entry. */
+  #slotsSwappedSummary(entry: AuditLogEntry): string {
+    const characterAName = entry.variables?.['characterAName'];
+    const characterBName = entry.variables?.['characterBName'];
+    if (!characterAName || !characterBName) return '—';
+
+    const groupNumberA = entry.variables?.['groupNumberA'];
+    const slotNumberA = entry.variables?.['slotNumberA'];
+    const groupNumberB = entry.variables?.['groupNumberB'];
+    const slotNumberB = entry.variables?.['slotNumberB'];
+    const labelA = groupNumberA && slotNumberA ? `${characterAName} (${groupNumberA}-${slotNumberA})` : characterAName;
+    const labelB = groupNumberB && slotNumberB ? `${characterBName} (${groupNumberB}-${slotNumberB})` : characterBName;
+
+    return this.#appendEventContext(`${labelA} ↔ ${labelB}`, entry);
+  }
+
+  /** Appends " — {eventName} · {date}" to a summary when both are present on the entry. */
+  #appendEventContext(summary: string, entry: AuditLogEntry): string {
+    const suffix = this.#eventContextSuffix(entry);
+    return suffix ? `${summary}${suffix}` : summary;
+  }
+
+  /** " — {eventName} · {date}" (or " — {eventName}" without a date), or '' when there's no event name. */
+  #eventContextSuffix(entry: AuditLogEntry): string {
+    const eventName = entry.variables?.['eventName'];
+    if (!eventName) return '';
+
+    const startsAtLocal = entry.variables?.['startsAtLocal'];
+    const context = startsAtLocal ? `${eventName} · ${this.#formatGuildLocalDateTime(startsAtLocal)}` : eventName;
+    return ` — ${context}`;
+  }
+
+  /**
+   * e.g. "23 juil. : Absent" or "23 juil. – 24 juil. : dès 21h30" for an availability exception
+   * entry — a bare "Partiel" says nothing useful on its own, so a Partial entry is broken down into
+   * the same late-arrival/early-leave/bounded-window wording the calendar page itself uses.
+   */
+  #exceptionSummary(entry: AuditLogEntry): string {
+    const startDate = entry.variables?.['startDate'];
+    const endDate = entry.variables?.['endDate'];
+    const status = entry.variables?.['status'];
+    if (!startDate || !endDate || !status) return '—';
+
+    const lang = this.#transloco.getActiveLang();
+    const formatter = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' });
+    const range =
+      startDate === endDate
+        ? formatter.format(new Date(startDate))
+        : `${formatter.format(new Date(startDate))} – ${formatter.format(new Date(endDate))}`;
+
+    const statusLabel = this.#statusLabel(
+      status,
+      entry.variables?.['availableFrom'] ?? null,
+      entry.variables?.['availableUntil'] ?? null,
+      lang,
+    );
+
+    return `${range} : ${statusLabel}`;
+  }
+
+  /** Same late/early-leave/window breakdown as `#exceptionSummary`, factored out so pattern days can reuse it. */
+  #statusLabel(status: string, availableFrom: string | null, availableUntil: string | null, lang: string): string {
+    if (status === DayAvailabilityStatus.Partial) {
+      const info = describePartialTime(availableFrom || null, availableUntil || null, lang);
+      if (info) return formatPartialTimeLabel(info, (key, params) => this.#transloco.translate(key, params));
+    }
+
+    return this.#transloco.translate(`calendar.status.${status.toLowerCase()}`);
+  }
+
+  /**
+   * e.g. "Rotation 5x8 — Lun : Absent · Ven : dès 18h00" for a weekly pattern, or
+   * "Cycle 5x8 — Jour 1 : Absent · Jour 2 : Absent" for a shift rotation — a bare cycle-length
+   * count ("tous les 7 jours") says nothing about which days actually changed, so every day the
+   * pattern actually marks (Absent/Partial) is broken out individually. Falls back to the plain
+   * cycle-length summary only for entries logged before this day-level detail existed.
+   */
+  #patternSummary(entry: AuditLogEntry): string {
+    const label = entry.variables?.['label'];
+    const cycleLengthDays = entry.variables?.['cycleLengthDays'];
+    if (!cycleLengthDays) return '—';
+
+    const header = label || this.#transloco.translate('calendar.patternDialog.unnamed');
+    const anchorDate = entry.variables?.['anchorDate'];
+    const days = this.#parsePatternDays(entry.variables?.['days']);
+
+    if (days.length === 0 || !anchorDate) {
+      const cycleSummary = this.#transloco.translate('calendar.patternDialog.cycleSummary', { days: cycleLengthDays });
+      return `${header} (${cycleSummary})`;
+    }
+
+    const lang = this.#transloco.getActiveLang();
+    const isWeekly = Number(cycleLengthDays) === 7;
+    const dayEntries = [...days]
+      .sort((a, b) => a.offsetInCycle - b.offsetInCycle)
+      .map((day) => {
+        const dayLabel = isWeekly
+          ? this.#weekdayLabel(anchorDate, day.offsetInCycle, lang)
+          : this.#transloco.translate('calendar.patternDialog.dayNumber', { n: day.offsetInCycle + 1 });
+        return `${dayLabel} : ${this.#statusLabel(day.status, day.availableFrom, day.availableUntil, lang)}`;
+      });
+
+    return `${header} — ${dayEntries.join(' · ')}`;
+  }
+
+  #parsePatternDays(daysJson: string | undefined): AuditPatternDay[] {
+    if (!daysJson) return [];
+    try {
+      return JSON.parse(daysJson) as AuditPatternDay[];
+    } catch {
+      return [];
+    }
+  }
+
+  /** Short weekday name (e.g. "lun.") for `offsetInCycle` days after `anchorDateIso` — only meaningful for a 7-day cycle. */
+  #weekdayLabel(anchorDateIso: string, offsetInCycle: number, lang: string): string {
+    const [y, m, d] = anchorDateIso.split('-').map(Number);
+    const date = new Date(y, m - 1, d + offsetInCycle);
+    return new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(date);
   }
 
   /**

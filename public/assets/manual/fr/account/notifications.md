@@ -4,7 +4,14 @@ La cloche 🔔 en haut de l'application signale les actions à mener de ton côt
 
 ### Aujourd'hui
 
-Le seul cas actif pour le moment : si tu es administrateur d'une guilde dont le **seuil d'accès Officier** n'a pas encore été configuré, une notification te le rappelle avec un lien direct vers les paramètres de la guilde concernée.
+Si tu administres une guilde, une notification te le rappelle — avec un lien direct vers le réglage concerné — dès que l'un de ces points n'est pas encore configuré :
+
+- Une branche active n'a aucun **rôle Officier** mappé.
+- La guilde n'a pas de **langue** définie.
+- Les notifications Discord pour les **absences** ne sont pas configurées.
+- Une branche active n'a pas de **région** définie.
+- Les notifications Discord pour les **changements de raid** ne sont pas configurées.
+- Les notifications Discord pour les **changements de composition** ne sont pas configurées.
 
 ![Dropdown de notifications ouvert](/assets/manual/fr/account/notification-dropdown.png)
 

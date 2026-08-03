@@ -6,6 +6,11 @@ Un évènement « absence » couvre aussi bien une déclaration ponctuelle qu'un
 
 ![Vue d'ensemble de l'onglet Notifications](/assets/manual/fr/guild/notifications-settings-overview.png)
 
+Les évènements de raid ont deux familles distinctes, activables indépendamment l'une de l'autre :
+
+- **Changements de raid** poste quand un raid est publié, quand un raid déjà publié est annulé (supprimé), ou quand son horaire est reprogrammé.
+- **Changements de composition** poste quand un personnage est assigné, désassigné, échangé, ou change de spé sur un raid **déjà publié** — les modifications faites pendant qu'un raid est encore en brouillon ne postent jamais, puisque personne en dehors des officiers ne peut encore le voir.
+
 ### Choisir une portée
 
 Le sélecteur **Portée** en haut du panneau bascule entre **Toute la guilde** et une branche précise de la guilde. Les réglages d'une branche héritent par défaut de la valeur de toute la guilde pour chaque évènement — une indication « Hérité du réglage général de la guilde » apparaît près de tout évènement pas encore surchargé pour cette branche. Changer le salon ou l'interrupteur pour cette branche crée une surcharge explicite ; **Revenir à l'héritage** la supprime et repasse sur la valeur générale de la guilde.

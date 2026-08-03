@@ -75,6 +75,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidNotifications": {
+        "title": "Discord notifications for raid changes and composition edits",
+        "description": "Two new notification settings: \"Raid changes\" posts when a raid is published, cancelled, or rescheduled, and \"Raid composition changes\" posts whenever an already-published raid's roster is edited (assign, unassign, swap, spec change) — draft-stage tinkering stays silent. The guild audit log also now tracks every one of these actions."
+      },
       "raidBuilder": {
         "title": "Compose raid groups by drag & drop",
         "description": "A new Raids page lets officers build raid compositions by dragging characters from a live roster pool onto a group/slot grid — swap two assigned characters, or click an empty slot to search and assign one instead. Set up a recurring series so a weekly raid and its target zones don't need recreating by hand every time. A raid stays a draft, invisible to regular roster members, until an officer publishes it."
@@ -217,7 +221,7 @@
       },
       "discordNotifications": {
         "title": "Discord notifications",
-        "description": "Per-event Discord channel notifications (absences, and later raid events)."
+        "description": "Per-event Discord channel notifications: absences, raid changes (published/cancelled/rescheduled), and raid composition changes."
       },
       "getStarted": {
         "title": "Onboarding flow",
@@ -448,11 +452,26 @@
         "absences": {
           "label": "Absences",
           "hint": "Notify when a member's declared availability changes."
+        },
+        "raids": {
+          "label": "Raid changes",
+          "hint": "Notify when a raid is published, cancelled, or rescheduled."
+        },
+        "raidComposition": {
+          "label": "Raid composition changes",
+          "hint": "Notify when the roster of an already-published raid is edited (assign, unassign, swap, spec change)."
         }
       },
       "events": {
         "AbsenceAdded": "A member adds an absence",
-        "AbsenceRemoved": "A member removes an absence"
+        "AbsenceRemoved": "A member removes an absence",
+        "RaidPublished": "A raid is published",
+        "RaidCancelled": "A published raid is cancelled",
+        "RaidRescheduled": "A published raid is rescheduled",
+        "RaidSlotAssigned": "A character is assigned to a slot",
+        "RaidSlotUnassigned": "A character is unassigned from a slot",
+        "RaidSlotsSwapped": "Two characters' slots are swapped",
+        "RaidSlotSpecChanged": "A slot's spec is changed"
       },
       "scope": {
         "label": "Scope",
@@ -482,6 +501,8 @@
     "guildLanguageNotConfigured": "\"{{ guildName }}\" has no language configured yet — choose the language RaidOps uses to communicate with your guild in the settings.",
     "absenceNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for absences yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "branchRegionNotConfigured": "\"{{ guildName }}\" has an active branch with no region configured yet — set it in the Branches tab of the guild settings so weekly raid lockouts reset at the right time.",
+    "raidNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for raid changes yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
+    "raidCompositionNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for raid composition changes yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "viewLink": "Configure",
     "dismiss": "Never show again"
   },
@@ -509,7 +530,8 @@
       "Settings": "Settings",
       "Roster": "Roster",
       "Availability": "Availability",
-      "Branches": "Branches"
+      "Branches": "Branches",
+      "Raids": "Raids"
     },
     "settingsFields": {
       "timezone": "Timezone",
@@ -517,6 +539,10 @@
       "rosterMode": "Roster access",
       "minRosterRoleId": "Discord role threshold changed",
       "minOfficerRoleId": "Officer access threshold changed"
+    },
+    "raidEventFields": {
+      "date": "Date",
+      "raids": "Raids"
     },
     "actionLabels": {
       "GuildRegistered": "Registration",
@@ -534,7 +560,20 @@
       "NotificationSettingsUpdated": "Notification settings updated",
       "BranchActivated": "Branch activated",
       "BranchDeactivated": "Branch deactivated",
-      "BranchRosterSettingsUpdated": "Branch roster settings updated"
+      "BranchRosterSettingsUpdated": "Branch roster settings updated",
+      "NotificationSettingsReset": "Notification override reset",
+      "RaidSeriesCreated": "Raid series created",
+      "RaidSeriesUpdated": "Raid series updated",
+      "RaidSeriesDeactivated": "Raid series deactivated",
+      "RaidEventCreated": "Raid event created",
+      "RaidEventUpdated": "Raid event updated",
+      "RaidEventDeleted": "Raid event deleted",
+      "RaidEventPublished": "Raid event published",
+      "BranchRegionUpdated": "Branch region updated",
+      "SlotAssigned": "Character added",
+      "SlotUnassigned": "Character removed",
+      "SlotsSwapped": "Characters swapped",
+      "SlotAssignmentSpecChanged": "Slot spec changed"
     }
   },
   "noGuild": {

@@ -4,7 +4,14 @@ Die Glocke 🔔 oben in der App zeigt an, wenn auf deiner Seite etwas zu tun ist
 
 ### Aktuell
 
-Der einzige aktive Fall im Moment: Bist du Administrator einer Gilde, deren **Officer-Zugriffsschwelle** noch nicht konfiguriert wurde, erinnert dich eine Benachrichtigung daran — mit einem direkten Link zu den Einstellungen dieser Gilde.
+Wenn du eine Gilde verwaltest, erinnert dich eine Benachrichtigung — mit einem direkten Link zur betreffenden Einstellung — sobald einer dieser Punkte noch nicht konfiguriert ist:
+
+- Ein aktiver Spielzweig hat keine **Officer-Rollen** zugeordnet.
+- Die Gilde hat keine **Sprache** festgelegt.
+- Discord-Benachrichtigungen für **Abwesenheiten** sind nicht konfiguriert.
+- Ein aktiver Spielzweig hat keine **Region** festgelegt.
+- Discord-Benachrichtigungen für **Raid-Änderungen** sind nicht konfiguriert.
+- Discord-Benachrichtigungen für **Zusammensetzungsänderungen** sind nicht konfiguriert.
 
 ![Geöffnetes Benachrichtigungsmenü](/assets/manual/de/account/notification-dropdown.png)
 

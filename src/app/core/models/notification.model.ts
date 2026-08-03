@@ -3,6 +3,8 @@ export enum NotificationType {
   GuildLanguageNotConfigured = 'GuildLanguageNotConfigured',
   AbsenceNotificationsNotConfigured = 'AbsenceNotificationsNotConfigured',
   BranchRegionNotConfigured = 'BranchRegionNotConfigured',
+  RaidNotificationsNotConfigured = 'RaidNotificationsNotConfigured',
+  RaidCompositionNotificationsNotConfigured = 'RaidCompositionNotificationsNotConfigured',
 }
 
 export interface Notification {

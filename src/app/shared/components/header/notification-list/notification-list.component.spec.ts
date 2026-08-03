@@ -39,6 +39,18 @@ describe('NotificationListComponent', () => {
 
       expect(component.messageKey(notification({ type: NotificationType.BranchRegionNotConfigured }))).toBe('notifications.branchRegionNotConfigured');
     });
+
+    it('returns the i18n key for RaidNotificationsNotConfigured', () => {
+      setup();
+
+      expect(component.messageKey(notification({ type: NotificationType.RaidNotificationsNotConfigured }))).toBe('notifications.raidNotificationsNotConfigured');
+    });
+
+    it('returns the i18n key for RaidCompositionNotificationsNotConfigured', () => {
+      setup();
+
+      expect(component.messageKey(notification({ type: NotificationType.RaidCompositionNotificationsNotConfigured }))).toBe('notifications.raidCompositionNotificationsNotConfigured');
+    });
   });
 
   // ── link ──────────────────────────────────────────────────────────────────
@@ -69,6 +81,20 @@ describe('NotificationListComponent', () => {
 
       expect(component.link(notification({ type: NotificationType.BranchRegionNotConfigured, guildId: 'g42' })))
         .toEqual(['/guilds', 'g42', 'settings', 'branches']);
+    });
+
+    it('builds the guild notifications settings route for RaidNotificationsNotConfigured', () => {
+      setup();
+
+      expect(component.link(notification({ type: NotificationType.RaidNotificationsNotConfigured, guildId: 'g42' })))
+        .toEqual(['/guilds', 'g42', 'settings', 'notifications']);
+    });
+
+    it('builds the guild notifications settings route for RaidCompositionNotificationsNotConfigured', () => {
+      setup();
+
+      expect(component.link(notification({ type: NotificationType.RaidCompositionNotificationsNotConfigured, guildId: 'g42' })))
+        .toEqual(['/guilds', 'g42', 'settings', 'notifications']);
     });
   });
 
