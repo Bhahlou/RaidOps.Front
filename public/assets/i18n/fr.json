@@ -561,6 +561,7 @@
       "minRosterRoleId": "Seuil de rôle Discord modifié",
       "minOfficerRoleId": "Seuil d'accès Officier modifié"
     },
+    "notificationOff": "Désactivé",
     "raidEventFields": {
       "date": "Date",
       "raids": "Raids"

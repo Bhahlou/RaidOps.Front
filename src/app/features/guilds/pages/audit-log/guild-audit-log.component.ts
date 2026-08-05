@@ -295,7 +295,10 @@ export class GuildAuditLogComponent {
    * without repeating it.
    */
   tableActionLabel(entry: AuditLogEntry): string {
-    if (entry.actionType === GuildAuditAction.SettingsUpdated) {
+    if (
+      entry.actionType === GuildAuditAction.SettingsUpdated ||
+      entry.actionType === GuildAuditAction.NotificationSettingsUpdated
+    ) {
       const changes = this.settingsFieldChanges(entry);
       if (changes.length === 1) return this.#transloco.translate(changes[0].labelKey);
     }
@@ -421,7 +424,9 @@ export class GuildAuditLogComponent {
         return entry.variables?.['guildName'] ?? '—';
 
       case GuildAuditAction.SettingsUpdated:
-      case GuildAuditAction.OfficerThresholdUpdated: {
+      case GuildAuditAction.OfficerThresholdUpdated:
+      case GuildAuditAction.NotificationSettingsUpdated:
+      case GuildAuditAction.NotificationSettingsReset: {
         const changes = this.settingsFieldChanges(entry);
         if (changes.length === 0) return '—';
         if (changes.length === 1) return changes[0].summary;
@@ -695,10 +700,40 @@ export class GuildAuditLogComponent {
     const v = entry.variables;
     if (!v) return [];
 
+    if (
+      entry.actionType === GuildAuditAction.NotificationSettingsUpdated ||
+      entry.actionType === GuildAuditAction.NotificationSettingsReset
+    ) {
+      const events = v['changedEvents']?.split(',') ?? [];
+      return events
+        .map((eventType) => this.#notificationEventChange(eventType, v))
+        .filter((c): c is SettingsFieldChange => c !== null);
+    }
+
     const fields = v['changedFields']?.split(',') ?? [];
     return fields
       .map((field) => this.#settingsFieldChange(field, v))
       .filter((c): c is SettingsFieldChange => c !== null);
+  }
+
+  /**
+   * Builds one change entry for a notification event type, driven by the back end's
+   * `changedEvents` list — `old{EventType}Enabled`/`new{EventType}Enabled` (always present) and
+   * `old{EventType}ChannelName`/`new{EventType}ChannelName` (present only while enabled).
+   */
+  #notificationEventChange(eventType: string, v: Record<string, string>): SettingsFieldChange | null {
+    if (!(v[`old${eventType}Enabled`] || v[`new${eventType}Enabled`])) return null;
+
+    const oldEnabled = v[`old${eventType}Enabled`] === 'true';
+    const newEnabled = v[`new${eventType}Enabled`] === 'true';
+    const off = this.#transloco.translate('auditLog.notificationOff');
+    const oldLabel = oldEnabled ? (v[`old${eventType}ChannelName`] ?? '—') : off;
+    const newLabel = newEnabled ? (v[`new${eventType}ChannelName`] ?? '—') : off;
+
+    return {
+      labelKey: `guildSettings.notificationSettings.events.${eventType}`,
+      summary: `${oldLabel} → ${newLabel}`,
+    };
   }
 
   #settingsFieldChange(field: string, v: Record<string, string>): SettingsFieldChange | null {
