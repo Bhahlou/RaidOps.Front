@@ -39,6 +39,7 @@ const branch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
   rosterMode: RosterMode.Open,
   rosterRoleIds: [],
   officerRoleIds: [],
+  region: null,
   ...overrides,
 });
 

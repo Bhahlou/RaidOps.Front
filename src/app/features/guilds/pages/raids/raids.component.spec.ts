@@ -90,6 +90,7 @@ const fakeUser = (accessLevel: GuildAccessLevel = GuildAccessLevel.Officer): Use
   avatarHash: null,
   guilds: [userGuild(accessLevel)],
   notifications: [],
+  seenChangelogEntryIds: [],
 });
 
 describe('RaidsComponent', () => {

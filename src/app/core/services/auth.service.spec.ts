@@ -36,6 +36,7 @@ describe('AuthService', () => {
         avatarHash: 'abc123',
         guilds: [],
         notifications: [],
+        seenChangelogEntryIds: [],
       };
 
       let result: User | undefined;
