@@ -13,6 +13,7 @@ const entry = (overrides?: Partial<AuditLogEntry>): AuditLogEntry => ({
   actorDiscordId: 'actor-1',
   actorUsername: 'Bhahlou',
   actorAvatarHash: null,
+  actorGuildAvatarUrl: null,
   actionType: GuildAuditAction.GuildRegistered,
   category: GuildAuditCategory.Guild,
   variables: null,

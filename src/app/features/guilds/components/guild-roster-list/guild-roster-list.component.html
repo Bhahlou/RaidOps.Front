@@ -161,7 +161,13 @@
               </td>
               <td>
                 <div class="player-cell">
-                  <app-discord-icon [id]="member.playerDiscordId" [hash]="member.playerAvatarHash" [type]="DiscordIconType.User" [size]="24" />
+                  <app-discord-icon
+                    [id]="member.playerDiscordId"
+                    [hash]="member.playerAvatarHash"
+                    [overrideUrl]="member.playerGuildAvatarUrl"
+                    [type]="DiscordIconType.User"
+                    [size]="24"
+                  />
                   <span class="player-name">{{ member.playerName ?? member.playerDiscordId }}</span>
                 </div>
               </td>

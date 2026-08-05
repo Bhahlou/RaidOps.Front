@@ -25,6 +25,7 @@ const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
   playerDiscordId: 'player-1',
   playerName: 'Dah Boo',
   playerAvatarHash: null,
+  playerGuildAvatarUrl: null,
   raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }],
   characterRank: CharacterRank.Main,
   joinedAt: '2026-01-01T00:00:00Z',
