@@ -561,6 +561,7 @@
       "minRosterRoleId": "Discord role threshold changed",
       "minOfficerRoleId": "Officer access threshold changed"
     },
+    "notificationOff": "Off",
     "raidEventFields": {
       "date": "Date",
       "raids": "Raids"

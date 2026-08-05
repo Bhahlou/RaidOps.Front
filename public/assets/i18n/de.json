@@ -561,6 +561,7 @@
       "minRosterRoleId": "Discord-Rollenschwelle geändert",
       "minOfficerRoleId": "Officer-Zugriffsschwelle geändert"
     },
+    "notificationOff": "Aus",
     "raidEventFields": {
       "date": "Datum",
       "raids": "Raids"

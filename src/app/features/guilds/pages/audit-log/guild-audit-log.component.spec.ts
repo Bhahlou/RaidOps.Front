@@ -864,6 +864,128 @@ describe('GuildAuditLogComponent', () => {
 
       expect(changes).toEqual([]);
     });
+
+    it('returns nothing for legacy NotificationSettingsUpdated entries that predate changedEvents', () => {
+      const component = setup();
+
+      expect(component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: { eventCount: '3' },
+      }))).toEqual([]);
+    });
+
+    it('returns nothing for legacy NotificationSettingsReset entries that predate changedEvents', () => {
+      const component = setup();
+
+      expect(component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsReset,
+        variables: { guildBranchId: '7', eventType: 'AbsenceAdded' },
+      }))).toEqual([]);
+    });
+
+    it('builds a notification event change for NotificationSettingsUpdated, from Off to a channel', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: {
+          changedEvents: 'AbsenceAdded',
+          oldAbsenceAddedEnabled: 'false',
+          newAbsenceAddedEnabled: 'true',
+          newAbsenceAddedChannelName: 'general',
+        },
+      }));
+
+      expect(changes).toEqual([{
+        labelKey: 'guildSettings.notificationSettings.events.AbsenceAdded',
+        summary: 'auditLog.notificationOff → general',
+      }]);
+    });
+
+    it('builds a notification event change for NotificationSettingsUpdated, from a channel to Off', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: {
+          changedEvents: 'AbsenceRemoved',
+          oldAbsenceRemovedEnabled: 'true',
+          oldAbsenceRemovedChannelName: 'mod-log',
+          newAbsenceRemovedEnabled: 'false',
+        },
+      }));
+
+      expect(changes).toEqual([{
+        labelKey: 'guildSettings.notificationSettings.events.AbsenceRemoved',
+        summary: 'mod-log → auditLog.notificationOff',
+      }]);
+    });
+
+    it('builds a notification event change for a channel swap while staying enabled', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: {
+          changedEvents: 'RaidPublished',
+          oldRaidPublishedEnabled: 'true',
+          oldRaidPublishedChannelName: 'general',
+          newRaidPublishedEnabled: 'true',
+          newRaidPublishedChannelName: 'raid-announce',
+        },
+      }));
+
+      expect(changes[0].summary).toBe('general → raid-announce');
+    });
+
+    it('falls back to an em dash when a notification event is enabled but its channel name is unresolved', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: { changedEvents: 'AbsenceAdded', oldAbsenceAddedEnabled: 'true', newAbsenceAddedEnabled: 'true' },
+      }));
+
+      expect(changes[0].summary).toBe('— → —');
+    });
+
+    it('returns one entry per event, in changedEvents order', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: {
+          changedEvents: 'AbsenceAdded,RaidPublished',
+          oldAbsenceAddedEnabled: 'false', newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'general',
+          oldRaidPublishedEnabled: 'true', oldRaidPublishedChannelName: 'raids', newRaidPublishedEnabled: 'false',
+        },
+      }));
+
+      expect(changes.map((c) => c.labelKey)).toEqual([
+        'guildSettings.notificationSettings.events.AbsenceAdded',
+        'guildSettings.notificationSettings.events.RaidPublished',
+      ]);
+    });
+
+    it('reads NotificationSettingsReset the same way, via changedEvents', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsReset,
+        variables: {
+          changedEvents: 'AbsenceAdded',
+          oldAbsenceAddedEnabled: 'true',
+          oldAbsenceAddedChannelName: 'branch-log',
+          newAbsenceAddedEnabled: 'true',
+          newAbsenceAddedChannelName: 'guild-log',
+        },
+      }));
+
+      expect(changes).toEqual([{
+        labelKey: 'guildSettings.notificationSettings.events.AbsenceAdded',
+        summary: 'branch-log → guild-log',
+      }]);
+    });
   });
 
   describe('changeSummary', () => {
@@ -954,6 +1076,50 @@ describe('GuildAuditLogComponent', () => {
           newMinOfficerRoleName: 'Raiders',
         },
       }))).toBe('Officiers → Raiders');
+    });
+
+    it('shows the single event summary without a label prefix for NotificationSettingsUpdated', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: { changedEvents: 'AbsenceAdded', oldAbsenceAddedEnabled: 'false', newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'general' },
+      }))).toBe('auditLog.notificationOff → general');
+    });
+
+    it('joins multiple changed notification events with a label prefix and separator', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: {
+          changedEvents: 'AbsenceAdded,RaidPublished',
+          oldAbsenceAddedEnabled: 'false', newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'general',
+          oldRaidPublishedEnabled: 'true', oldRaidPublishedChannelName: 'raids', newRaidPublishedEnabled: 'false',
+        },
+      }))).toBe(
+        'guildSettings.notificationSettings.events.AbsenceAdded: auditLog.notificationOff → general · ' +
+        'guildSettings.notificationSettings.events.RaidPublished: raids → auditLog.notificationOff',
+      );
+    });
+
+    it('shows the event summary for NotificationSettingsReset the same way as NotificationSettingsUpdated', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({
+        actionType: GuildAuditAction.NotificationSettingsReset,
+        variables: {
+          changedEvents: 'AbsenceAdded',
+          oldAbsenceAddedEnabled: 'true', oldAbsenceAddedChannelName: 'branch-log',
+          newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'guild-log',
+        },
+      }))).toBe('branch-log → guild-log');
+    });
+
+    it('shows an em dash for NotificationSettingsReset when nothing was actually overridden', () => {
+      const component = setup();
+
+      expect(component.changeSummary(entry({ actionType: GuildAuditAction.NotificationSettingsReset }))).toBe('—');
     });
 
     it('shows the raw (untranslated) rank transition for MemberRankUpdated', () => {
@@ -1447,6 +1613,32 @@ describe('GuildAuditLogComponent', () => {
       const label = component.tableActionLabel(entry({ actionType: GuildAuditAction.MemberJoined }));
 
       expect(label).toBe('auditLog.actionLabels.MemberJoined');
+    });
+
+    it('tableActionLabel shows the specific event name when exactly one notification event changed', () => {
+      const component = setup();
+
+      const label = component.tableActionLabel(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: { changedEvents: 'AbsenceAdded', oldAbsenceAddedEnabled: 'false', newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'general' },
+      }));
+
+      expect(label).toBe('guildSettings.notificationSettings.events.AbsenceAdded');
+    });
+
+    it('tableActionLabel keeps the generic "reset" label for NotificationSettingsReset, even with detail available', () => {
+      const component = setup();
+
+      const label = component.tableActionLabel(entry({
+        actionType: GuildAuditAction.NotificationSettingsReset,
+        variables: {
+          changedEvents: 'AbsenceAdded',
+          oldAbsenceAddedEnabled: 'true', oldAbsenceAddedChannelName: 'branch-log',
+          newAbsenceAddedEnabled: 'true', newAbsenceAddedChannelName: 'guild-log',
+        },
+      }));
+
+      expect(label).toBe('auditLog.actionLabels.NotificationSettingsReset');
     });
   });
 });
