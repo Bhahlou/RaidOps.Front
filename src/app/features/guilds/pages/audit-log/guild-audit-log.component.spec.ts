@@ -949,17 +949,6 @@ describe('GuildAuditLogComponent', () => {
       ]);
     });
 
-    it('ignores an event with neither old nor new enabled data', () => {
-      const component = setup();
-
-      const changes = component.settingsFieldChanges(entry({
-        actionType: GuildAuditAction.NotificationSettingsUpdated,
-        variables: { changedEvents: 'AbsenceAdded' },
-      }));
-
-      expect(changes).toEqual([]);
-    });
-
     it('reads NotificationSettingsReset the same way, via changedEvents', () => {
       const component = setup();
 

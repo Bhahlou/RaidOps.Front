@@ -705,9 +705,7 @@ export class GuildAuditLogComponent {
       entry.actionType === GuildAuditAction.NotificationSettingsReset
     ) {
       const events = v['changedEvents']?.split(',') ?? [];
-      return events
-        .map((eventType) => this.#notificationEventChange(eventType, v))
-        .filter((c): c is SettingsFieldChange => c !== null);
+      return events.map((eventType) => this.#notificationEventChange(eventType, v));
     }
 
     const fields = v['changedFields']?.split(',') ?? [];
@@ -721,9 +719,7 @@ export class GuildAuditLogComponent {
    * `changedEvents` list — `old{EventType}Enabled`/`new{EventType}Enabled` (always present) and
    * `old{EventType}ChannelName`/`new{EventType}ChannelName` (present only while enabled).
    */
-  #notificationEventChange(eventType: string, v: Record<string, string>): SettingsFieldChange | null {
-    if (!(v[`old${eventType}Enabled`] || v[`new${eventType}Enabled`])) return null;
-
+  #notificationEventChange(eventType: string, v: Record<string, string>): SettingsFieldChange {
     const oldEnabled = v[`old${eventType}Enabled`] === 'true';
     const newEnabled = v[`new${eventType}Enabled`] === 'true';
     const off = this.#transloco.translate('auditLog.notificationOff');
