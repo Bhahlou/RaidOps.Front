@@ -61,6 +61,7 @@ describe('ListHeaderComponent', () => {
         avatarHash: 'abc',
         guilds: [],
         notifications: [],
+        seenChangelogEntryIds: [],
       };
 
       const [first] = setup(user).breadcrumbs();

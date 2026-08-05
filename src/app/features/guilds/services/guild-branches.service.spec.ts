@@ -25,7 +25,7 @@ describe('GuildBranchesService', () => {
   describe('getBranches', () => {
     it('sends GET to /guilds/:id/branches and returns the list', () => {
       const expected: GuildBranch[] = [
-        { id: 1, branchId: 3, branchName: 'Classic Era', isActive: true, rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [] },
+        { id: 1, branchId: 3, branchName: 'Classic Era', isActive: true, rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [], region: null },
       ];
       let result: GuildBranch[] | undefined;
 

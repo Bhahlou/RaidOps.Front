@@ -51,11 +51,11 @@ describe('GetStartedComponent', () => {
   let routeGet: ReturnType<typeof vi.fn>;
 
   const setup = (
-    userInput: Omit<User, 'notifications'> | null,
+    userInput: Omit<User, 'notifications' | 'seenChangelogEntryIds'> | null,
     characters: Character[] = [],
     errorParam: string | null = null,
   ) => {
-    const user: User | null = userInput ? { ...userInput, notifications: [] } : null;
+    const user: User | null = userInput ? { ...userInput, notifications: [], seenChangelogEntryIds: [] } : null;
     userSignal = signal(user);
     isBnetLinkedSignal = signal(characters.length > 0);
     characterListSignal = signal(characters);

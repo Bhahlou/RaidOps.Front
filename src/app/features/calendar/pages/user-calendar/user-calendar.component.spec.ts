@@ -47,6 +47,7 @@ const fakeUser: User = {
     },
   ],
   notifications: [],
+  seenChangelogEntryIds: [],
 };
 
 describe('UserCalendarComponent', () => {

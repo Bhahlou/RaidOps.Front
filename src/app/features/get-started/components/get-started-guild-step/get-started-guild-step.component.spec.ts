@@ -29,7 +29,7 @@ describe('GetStartedGuildStepComponent', () => {
   let loadUser: ReturnType<typeof vi.fn>;
 
   const setup = (guilds: UserGuild[]) => {
-    userSignal = signal<User | null>({ discordId: '1', name: 'Test', avatarHash: null, guilds, notifications: [] });
+    userSignal = signal<User | null>({ discordId: '1', name: 'Test', avatarHash: null, guilds, notifications: [], seenChangelogEntryIds: [] });
     assign = vi.fn();
     loadUser = vi.fn().mockReturnValue(of(userSignal()));
 

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
 
 import { AuthStore } from './auth.store';
+import { AuthHubService } from '../services/auth-hub.service';
 import { AuthService } from '../services/auth.service';
 import { ChangelogService } from '../services/changelog.service';
 import { NotificationService } from '../services/notification.service';
@@ -25,11 +26,14 @@ describe('AuthStore', () => {
   let logout: ReturnType<typeof vi.fn>;
   let dismiss: ReturnType<typeof vi.fn>;
   let markSeen: ReturnType<typeof vi.fn>;
+  let hubStart: ReturnType<typeof vi.fn>;
+  let hubStop: ReturnType<typeof vi.fn>;
 
   const setup = () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthService, useValue: { getMe, refresh, logout } },
+        { provide: AuthHubService, useValue: { start: hubStart, stop: hubStop } },
         { provide: NotificationService, useValue: { dismiss } },
         { provide: ChangelogService, useValue: { markSeen } },
       ],
@@ -44,6 +48,8 @@ describe('AuthStore', () => {
     logout = vi.fn().mockReturnValue(of(undefined));
     dismiss = vi.fn().mockReturnValue(of(undefined));
     markSeen = vi.fn().mockReturnValue(of(undefined));
+    hubStart = vi.fn();
+    hubStop = vi.fn();
   });
 
   // ── Constructor ───────────────────────────────────────────────────────────
@@ -167,6 +173,74 @@ describe('AuthStore', () => {
 
       expect(store.user()).toBeNull();
       expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    });
+  });
+
+  // ── auth hub lifecycle ────────────────────────────────────────────────────
+
+  describe('auth hub lifecycle', () => {
+    it('does not start the hub when localStorage is empty', () => {
+      setup();
+
+      expect(hubStart).not.toHaveBeenCalled();
+    });
+
+    it('starts the hub when restoring a cached user from localStorage', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
+
+      setup();
+
+      expect(hubStart).toHaveBeenCalledOnce();
+    });
+
+    it('starts the hub after loadUser succeeds', () => {
+      const store = setup();
+
+      store.loadUser().subscribe();
+
+      expect(hubStart).toHaveBeenCalledOnce();
+    });
+
+    it('starts the hub after refresh succeeds', () => {
+      const store = setup();
+
+      store.refresh().subscribe();
+
+      expect(hubStart).toHaveBeenCalledOnce();
+    });
+
+    it('stops the hub on logout', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
+      const store = setup();
+
+      store.logout().subscribe();
+
+      expect(hubStop).toHaveBeenCalledOnce();
+    });
+
+    it('reacts to a hub push by refreshing the token then reloading the user', () => {
+      const store = setup();
+      store.loadUser().subscribe();
+      const onDiscordDataChanged = hubStart.mock.calls.at(-1)![0] as () => void;
+      refresh.mockClear();
+      getMe.mockClear();
+
+      onDiscordDataChanged();
+
+      expect(refresh).toHaveBeenCalledOnce();
+      expect(getMe).toHaveBeenCalledOnce();
+    });
+
+    it('does not reload the user if the push-triggered refresh fails', () => {
+      const store = setup();
+      store.loadUser().subscribe();
+      const onDiscordDataChanged = hubStart.mock.calls.at(-1)![0] as () => void;
+      refresh.mockReturnValue(throwError(() => new Error('refresh failed')));
+      getMe.mockClear();
+
+      onDiscordDataChanged();
+
+      expect(getMe).not.toHaveBeenCalled();
     });
   });
 

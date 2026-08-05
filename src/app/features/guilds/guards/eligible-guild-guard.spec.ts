@@ -13,6 +13,7 @@ const makeUser = (guilds: User['guilds']): User => ({
   avatarHash: null,
   guilds,
   notifications: [],
+  seenChangelogEntryIds: [],
 });
 
 describe('eligibleGuildGuard', () => {

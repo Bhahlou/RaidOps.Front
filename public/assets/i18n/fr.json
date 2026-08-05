@@ -88,6 +88,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "liveRoleRefresh": {
+        "title": "Les changements de rôles, permissions et accès aux guildes s'appliquent maintenant en direct",
+        "description": "Quand un officier modifiait tes rôles Discord, ou que tu rejoignais/quittais le serveur Discord d'une guilde, RaidOps attendait jusqu'à 15 minutes (l'expiration de ta session) avant d'en tenir compte. Ta session est désormais notifiée instantanément et rafraîchit ton profil en arrière-plan, tes permissions et accès aux guildes sont donc à jour immédiatement."
+      },
       "changelogRework": {
         "title": "Nouveautés organisées par thème et synchronisées entre appareils",
         "description": "La page Nouveautés regroupe maintenant les entrées par catégorie (elles-mêmes réparties par grande période), avec une distinction Fonctionnalité / Amélioration / Correction. Ton suivi de lecture est désormais lié à ton compte, pas à ton navigateur : ce que tu as vu reste vu, même en changeant d'appareil."
