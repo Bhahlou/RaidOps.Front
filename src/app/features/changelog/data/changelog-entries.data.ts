@@ -73,6 +73,10 @@ export const CHANGELOG_GROUPS: ChangelogGroup[] = [
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  improvement('2026-08-05-live-role-refresh', '1.1', '2026-08-05', 'liveRoleRefresh', {
+    category: 'account',
+    article: 'discord-auth',
+  }),
   improvement('2026-08-04-changelog-rework', '1.7', '2026-08-04', 'changelogRework', {
     category: 'account',
     article: 'whats-new',

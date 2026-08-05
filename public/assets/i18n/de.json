@@ -88,6 +88,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "liveRoleRefresh": {
+        "title": "Rollen-, Berechtigungs- und Gildenzugriffsänderungen werden jetzt sofort übernommen",
+        "description": "Wenn ein Offizier deine Discord-Rollen änderte, oder du dem Discord-Server einer Gilde beigetreten bist oder ihn verlassen hast, wartete RaidOps bisher bis zu 15 Minuten (bis dein Sitzungstoken ablief), bevor die Änderung übernommen wurde. Deine Sitzung wird jetzt sofort benachrichtigt und aktualisiert dein Profil im Hintergrund, sodass neue Berechtigungen und Gildenzugriffe sofort gelten."
+      },
       "changelogRework": {
         "title": "Neuigkeiten nach Themen geordnet und geräteübergreifend synchronisiert",
         "description": "Die Neuigkeiten-Seite gruppiert Einträge jetzt nach Kategorie (die wiederum größeren Epochen zugeordnet sind), mit einer Unterscheidung zwischen Funktion / Verbesserung / Korrektur. Dein Lesestatus ist jetzt an deinen Account gebunden statt an deinen Browser — bereits Gesehenes bleibt auch auf einem anderen Gerät als gesehen markiert."
