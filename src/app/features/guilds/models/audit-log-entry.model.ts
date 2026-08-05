@@ -7,6 +7,8 @@ export interface AuditLogEntry {
   actorDiscordId: string;
   actorUsername: string | null;
   actorAvatarHash: string | null;
+  /** Server-specific avatar override, or null if the actor has none set for this guild. */
+  actorGuildAvatarUrl: string | null;
   actionType: GuildAuditAction;
   category: GuildAuditCategory;
   variables: Record<string, string> | null;

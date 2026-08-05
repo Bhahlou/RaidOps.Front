@@ -59,6 +59,7 @@ const rosterMember = (overrides?: Partial<GuildRosterMember>): GuildRosterMember
   playerDiscordId: 'player-1',
   playerName: 'Dah Boo',
   playerAvatarHash: null,
+  playerGuildAvatarUrl: null,
   raidSpecs: [],
   characterRank: CharacterRank.Main,
   joinedAt: '2026-01-01T00:00:00Z',
