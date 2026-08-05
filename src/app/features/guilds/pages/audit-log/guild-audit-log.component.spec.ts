@@ -865,6 +865,24 @@ describe('GuildAuditLogComponent', () => {
       expect(changes).toEqual([]);
     });
 
+    it('returns nothing for legacy NotificationSettingsUpdated entries that predate changedEvents', () => {
+      const component = setup();
+
+      expect(component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsUpdated,
+        variables: { eventCount: '3' },
+      }))).toEqual([]);
+    });
+
+    it('returns nothing for legacy NotificationSettingsReset entries that predate changedEvents', () => {
+      const component = setup();
+
+      expect(component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.NotificationSettingsReset,
+        variables: { guildBranchId: '7', eventType: 'AbsenceAdded' },
+      }))).toEqual([]);
+    });
+
     it('builds a notification event change for NotificationSettingsUpdated, from Off to a channel', () => {
       const component = setup();
 
