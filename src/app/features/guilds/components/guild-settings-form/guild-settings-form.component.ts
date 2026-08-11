@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, output, signal, untracked } from '@angular/core';
 import { form, FormField, FormRoot, required, submit as submitForm } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
@@ -46,6 +46,13 @@ const ALL_TIMEZONE_OPTIONS: TimezoneOption[] =
 })
 export class GuildSettingsFormComponent implements OnInit {
   readonly guildId = input.required<string>();
+  /**
+   * When true, saves as soon as the user picks a value — no Save button. Only safe for contexts
+   * where accepting the pre-filled browser guess without interacting is a valid end state (the
+   * settings page); the get-started wizard and register flow keep the explicit button, since there
+   * the click is what confirms/advances past a guessed default the officer never touched.
+   */
+  readonly autoSave = input(false);
   readonly saved = output<void>();
 
   readonly #settingsService = inject(GuildSettingsService);
@@ -126,6 +133,23 @@ export class GuildSettingsFormComponent implements OnInit {
         ...(settings.timezone ? { timezone: settings.timezone } : {}),
         ...(settings.language ? { language: settings.language } : {}),
       }));
+    });
+
+    // Auto-save mode: `dirty()` only turns true from a real interaction with a bound control,
+    // never from the effect above (a programmatic model write) nor from the constructor's initial
+    // browser-guessed default — so this can never silently persist a guess nobody confirmed.
+    effect(() => {
+      if (!this.autoSave()) return;
+      // Read the values so this effect re-runs on every subsequent pick, not just the first one.
+      this.settingsForm.timezone().value();
+      this.settingsForm.language().value();
+      if (!this.settingsForm().dirty()) return;
+      // untracked: submitting() flips false the instant an auto-save completes, and reading it
+      // as a tracked dependency here would re-run this effect on that very transition — calling
+      // submit() again and again forever. submit() already no-ops on a concurrent in-flight call,
+      // so this is a defensive check only, not the actual re-entrancy guard.
+      if (untracked(() => this.submitting())) return;
+      void this.submit();
     });
   }
 

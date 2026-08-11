@@ -235,6 +235,66 @@ describe('GuildSettingsFormComponent', () => {
     });
   });
 
+  // ── autoSave mode ─────────────────────────────────────────────────────────
+
+  describe('autoSave mode', () => {
+    it('does not auto-submit when autoSave is off, even once dirty', () => {
+      setup();
+      fixture.detectChanges();
+
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.timezone().markAsDirty();
+      fixture.detectChanges();
+
+      expect(settingsService.updateSettings).not.toHaveBeenCalled();
+    });
+
+    it('does not auto-submit a value pick that has not been marked dirty', () => {
+      setup();
+      fixture.componentRef.setInput('autoSave', true);
+      fixture.detectChanges();
+
+      component.settingsForm.timezone().value.set('UTC');
+      fixture.detectChanges();
+
+      expect(settingsService.updateSettings).not.toHaveBeenCalled();
+    });
+
+    it('auto-submits once a bound control is picked and marked dirty', () => {
+      setup();
+      fixture.componentRef.setInput('autoSave', true);
+      fixture.detectChanges();
+
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.timezone().markAsDirty();
+      fixture.detectChanges();
+
+      expect(settingsService.updateSettings).toHaveBeenCalledWith('g1', expect.objectContaining({ timezone: 'UTC' }));
+    });
+
+    it('does not fire a second auto-submit while one is still in flight', () => {
+      setup();
+      const pending = new Subject<void>();
+      settingsService.updateSettings.mockReturnValue(pending.asObservable());
+      fixture.componentRef.setInput('autoSave', true);
+      fixture.detectChanges();
+
+      component.settingsForm.timezone().value.set('UTC');
+      component.settingsForm.timezone().markAsDirty();
+      fixture.detectChanges();
+      // A second pick while the first save is still pending re-runs the effect (value read
+      // changed again) — submitting() is read untracked, so this must not re-trigger submit().
+      component.settingsForm.language().value.set('fr');
+      component.settingsForm.language().markAsDirty();
+      fixture.detectChanges();
+
+      expect(settingsService.updateSettings).toHaveBeenCalledTimes(1);
+
+      pending.next();
+      pending.complete();
+    });
+  });
+
   // ── real <form> submission wiring ────────────────────────────────────────
   //
   // Every test above overrides the template to '', so none of them exercise the actual <form>

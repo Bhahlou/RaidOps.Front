@@ -774,6 +774,30 @@ describe('GuildAuditLogComponent', () => {
       expect(changes[0].summary).toBe('— → guildSettings.branches.rosterMode.open');
     });
 
+    it('translates signup mode labels', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: { changedFields: 'signupMode', oldSignupMode: 'DefaultPresent', newSignupMode: 'Signup' },
+      }));
+
+      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.branches.signupMode.defaultPresent');
+      expect(transloco.translate).toHaveBeenCalledWith('guildSettings.branches.signupMode.signup');
+      expect(changes[0].summary).toBe('guildSettings.branches.signupMode.defaultPresent → guildSettings.branches.signupMode.signup');
+    });
+
+    it('shows an em dash for the signup mode field when oldSignupMode is missing (first-time configuration)', () => {
+      const component = setup();
+
+      const changes = component.settingsFieldChanges(entry({
+        actionType: GuildAuditAction.SettingsUpdated,
+        variables: { changedFields: 'signupMode', newSignupMode: 'DefaultPresent' },
+      }));
+
+      expect(changes[0].summary).toBe('— → guildSettings.branches.signupMode.defaultPresent');
+    });
+
     it('builds a role change with resolved name and color for minRosterRoleId', () => {
       const component = setup();
 

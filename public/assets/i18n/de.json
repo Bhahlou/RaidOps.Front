@@ -68,11 +68,14 @@
       "guildNotifications": {
         "title": "Einstellungen - Benachrichtigungen"
       },
-      "guildBranches": {
-        "title": "Einstellungen - Spielzweige"
-      },
       "raids": {
         "title": "Raids"
+      },
+      "rosterSettings": {
+        "title": "Einstellungen - Roster"
+      },
+      "raidSettings": {
+        "title": "Einstellungen - Raids"
       }
     }
   },
@@ -97,6 +100,18 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidGrouping": {
+        "title": "Gruppierungs-Ping, von der Website oder aus Discord",
+        "description": "Auf der Seite eines veröffentlichten Raids postet der Button „Gruppierung anpingen“ (nur für Officer) eine einmalige Nachricht im Ankündigungskanal, die alle zugewiesenen Spieler erwähnt und angibt, welchen Charakter sie für eine Einladung anflüstern sollen, mit einem Schnappschuss der Zusammensetzung als Embed. Dieselbe Aktion ist auch aus Discord über den Befehl /raid invite verfügbar, mit Raid-Auswahl per Autovervollständigung und optionalem Charakter."
+      },
+      "raidCompositionAnnouncement": {
+        "title": "Dauerhafte Discord-Ankündigung der Raid-Zusammensetzung",
+        "description": "Eine neue Einstellung „Zusammensetzungsankündigung“ (Tab Benachrichtigungen) postet ein Embed mit allen Slots eines veröffentlichten Raids, Gruppe für Gruppe — dieselbe Nachricht wird bei jeder Zuweisung, Entfernung, jedem Tausch oder Skillungswechsel bearbeitet, nie neu gepostet. Eine separate DM-Einstellung benachrichtigt zusätzlich jeden hinzugefügten oder entfernten Spieler, mit Charakter und einem Link zum Raid."
+      },
+      "guildSettingsReorg": {
+        "title": "Gildeneinstellungen in 4 Tabs neu organisiert, mit automatischem Speichern",
+        "description": "Der alte Tab „Spielzweige“ ist jetzt in drei aufgeteilt: Allgemein (Aktivierung der Spielzweige, Region, Zeitzone, Sprache), Roster (Roster-Zugriffsmodus und Officer-Rollen pro Spielzweig) und Raids (eine neue Einstellung „Raid-Modus“, noch ohne Wirkung — Vorarbeit für eine zukünftige explizite Anmeldefunktion). Jedes Feld in allen 4 Tabs speichert jetzt automatisch, kein Speichern-Button mehr."
+      },
       "pwaInstall": {
         "title": "RaidOps lässt sich jetzt als App installieren und aktualisiert sich von selbst",
         "description": "Du kannst RaidOps jetzt aus deinem Browser (Chrome/Edge) installieren, um es in einem eigenen Fenster zu öffnen — wie eine echte App. Ob installiert oder nicht, sie prüft bei jedem Öffnen automatisch auf neue Versionen, lädt sie im Hintergrund herunter, ohne deine Arbeit zu unterbrechen, und bietet dir dann an, neu zu laden, um sie zu nutzen."
@@ -285,6 +300,14 @@
         "title": "Raid-Builder",
         "description": "Raid-Zusammensetzungen, mit automatischem Aufbau."
       },
+      "raidCompositionAnnouncement": {
+        "title": "Discord-Kompositionsankündigung",
+        "description": "Ein dauerhaftes Embed beim Veröffentlichen eines Raids, plus DMs an hinzugefügte oder entfernte Spieler."
+      },
+      "raidGrouping": {
+        "title": "Gruppierungs-Ping",
+        "description": "Ein Button (oder Discord-Befehl), um alle zugewiesenen Spieler zu informieren, dass es Zeit ist, sich zu gruppieren."
+      },
       "raidAssignments": {
         "title": "Raid-Zuweisungen",
         "description": "Wer macht was während des Raids (Dispel, Soak, Interrupt…)."
@@ -435,12 +458,15 @@
     },
     "save": "Einstellungen speichern",
     "saveSuccess": "Einstellungen gespeichert.",
+    "saving": "Wird gespeichert…",
     "tabs": {
       "general": "Allgemein",
-      "branches": "Spielzweige",
+      "roster": "Roster",
+      "raids": "Raids",
       "notifications": "Benachrichtigungen"
     },
     "branches": {
+      "noActiveBranches": "Noch kein aktiver Spielzweig — aktiviere zuerst einen im Tab Allgemein.",
       "activation": {
         "label": "Aktive Spielzweige",
         "hint": "Aktiviere die Spielzweige, die deine Gilde derzeit spielt. Das Deaktivieren eines Spielzweigs löscht nie seinen Roster oder seine Rolleneinstellungen — reaktiviere ihn später, um genau dort weiterzumachen, wo du aufgehört hast.",
@@ -473,12 +499,21 @@
           "tw": "Taiwan"
         }
       },
-      "save": "Spielzweig-Einstellungen speichern",
+      "signupMode": {
+        "label": "Raid-Modus",
+        "defaultPresent": "Automatisch",
+        "defaultPresentDescription": "Spieler gelten standardmäßig als anwesend, sofern sie keine Abwesenheit eingetragen haben. Für Raids ist keine Anmeldung erforderlich.",
+        "signup": "Planer",
+        "signupDescription": "Spieler müssen sich über einen Raid-Planer anmelden (noch nicht implementiert)."
+      },
       "rosterSettings": {
         "saveSuccess": "Spielzweig-Einstellungen gespeichert."
       },
       "regionSettings": {
         "saveSuccess": "Spielzweig-Region gespeichert."
+      },
+      "raidSettings": {
+        "saveSuccess": "Raid-Modus des Spielzweigs gespeichert."
       }
     },
     "notificationSettings": {
@@ -494,6 +529,10 @@
         "raidComposition": {
           "label": "Zusammensetzungsänderungen",
           "hint": "Benachrichtigen, wenn die Zusammensetzung eines bereits veröffentlichten Raids geändert wird (zuweisen, entfernen, tauschen, Skillung ändern)."
+        },
+        "raidCompositionAnnouncement": {
+          "label": "Zusammensetzungsankündigung",
+          "hint": "Postet ein dauerhaftes Embed mit der aktuellen vollständigen Zusammensetzung eines veröffentlichten Raids (wird bei jeder Änderung bearbeitet), und/oder sendet eine DM an hinzugefügte oder entfernte Spieler."
         }
       },
       "events": {
@@ -505,7 +544,9 @@
         "RaidSlotAssigned": "Ein Charakter wird einem Slot zugewiesen",
         "RaidSlotUnassigned": "Ein Charakter wird von einem Slot entfernt",
         "RaidSlotsSwapped": "Zwei Charaktere werden getauscht",
-        "RaidSlotSpecChanged": "Die Skillung eines Slots wird geändert"
+        "RaidSlotSpecChanged": "Die Skillung eines Slots wird geändert",
+        "RaidCompositionAnnouncementPosted": "Zusammensetzung als Embed posten",
+        "RaidCompositionAnnouncementDm": "DM an hinzugefügte oder entfernte Spieler"
       },
       "scope": {
         "label": "Geltungsbereich",
@@ -517,6 +558,7 @@
       "channel": {
         "placeholder": "Kanal auswählen",
         "required": "Wähle einen Kanal, um diese Benachrichtigung zu aktivieren.",
+        "dmHint": "Wird als Direktnachricht an den betroffenen Spieler gesendet.",
         "missingPermission": "Dem Bot fehlt: {{ permissions }}.",
         "permissionFlags": {
           "ViewChannel": "Kanal ansehen",
@@ -524,17 +566,16 @@
           "EmbedLinks": "Links einbetten"
         }
       },
-      "save": "Benachrichtigungseinstellungen speichern",
       "saveSuccess": "Benachrichtigungseinstellungen gespeichert."
     }
   },
   "notifications": {
     "title": "Benachrichtigungen",
     "empty": "Keine Benachrichtigungen.",
-    "branchOfficerRolesNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Officer-Rollen — wähle im Reiter „Spielzweige“ der Gildeneinstellungen, welche Discord-Rollen Officer-Zugriff gewähren.",
+    "branchOfficerRolesNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Officer-Rollen — wähle im Reiter „Roster“ der Gildeneinstellungen, welche Discord-Rollen Officer-Zugriff gewähren.",
     "guildLanguageNotConfigured": "„{{ guildName }}“ hat noch keine Sprache konfiguriert — wähle in den Einstellungen die Sprache, in der RaidOps mit deiner Gilde kommuniziert.",
     "absenceNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Abwesenheiten noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
-    "branchRegionNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Region — lege sie im Tab Spielzweige der Einstellungen fest, damit die wöchentlichen Raid-Resets zur richtigen Zeit erfolgen.",
+    "branchRegionNotConfigured": "„{{ guildName }}“ hat einen aktiven Spielzweig ohne konfigurierte Region — lege sie im Tab Allgemein der Einstellungen fest, damit die wöchentlichen Raid-Resets zur richtigen Zeit erfolgen.",
     "raidNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Raid-Änderungen noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "raidCompositionNotificationsNotConfigured": "„{{ guildName }}“ hat die Discord-Benachrichtigungen für Zusammensetzungsänderungen noch nicht konfiguriert — wähle im Tab Benachrichtigungen der Einstellungen einen Kanal aus (oder deaktiviere sie ausdrücklich).",
     "viewLink": "Konfigurieren",
@@ -572,7 +613,8 @@
       "language": "Sprache",
       "rosterMode": "Roster-Zugriff",
       "minRosterRoleId": "Discord-Rollenschwelle geändert",
-      "minOfficerRoleId": "Officer-Zugriffsschwelle geändert"
+      "minOfficerRoleId": "Officer-Zugriffsschwelle geändert",
+      "signupMode": "Raid-Modus"
     },
     "notificationOff": "Aus",
     "raidEventFields": {
@@ -815,6 +857,18 @@
     "publishConfirm": "„{{name}}“ wird für alle Rostermitglieder sichtbar. Dies kann nicht rückgängig gemacht werden.",
     "board": {
       "empty": "Noch kein Raid in diesem Zeitraum — erstelle eine Serie oder einen Ad-hoc-Raid, um zu starten."
+    },
+    "detail": {
+      "breadcrumb": "Raid",
+      "comingSoon": "Raid-Details kommen bald — Anwesenheit, Loot und Log-Analyse werden hier zu finden sein.",
+      "triggerGrouping": "Gruppierung anpingen",
+      "groupingSent": "Gruppierungs-Ping gesendet.",
+      "groupingFailed": "Der Gruppierungs-Ping konnte nicht gesendet werden — prüfe, ob der Raid veröffentlicht ist und ein Ankündigungskanal konfiguriert ist.",
+      "groupingCharacterNotFound": "Es wurde kein zugewiesener Charakter mit diesem Namen in diesem Raid gefunden.",
+      "groupingCharacterDialogTitle": "Wen sollen die Spieler anflüstern?",
+      "groupingCharacterDialogHint": "Du hast keinen Charakter, der diesem Raid zugewiesen ist — wähle, welchen zugewiesenen Charakter der Ping referenzieren soll.",
+      "groupingCharacterDialogLabel": "Charakter",
+      "groupingCharacterDialogSubmit": "Ping senden"
     },
     "tabs": {
       "empty": "Kein Raid in diesem Zeitraum.",

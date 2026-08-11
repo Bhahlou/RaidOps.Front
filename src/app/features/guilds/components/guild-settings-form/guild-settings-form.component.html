@@ -37,15 +37,22 @@
   </div>
 
   <!-- Submit -->
-  <div class="form-actions">
-    <app-button
-      variant="primary"
-      [type]="'submit'"
-      icon="check_circle"
-      [disabled]="settingsForm().invalid() || submitting()"
-    >
-      {{ 'guildSettings.save' | transloco }}
-    </app-button>
-  </div>
+  @if (!autoSave()) {
+    <div class="form-actions">
+      <app-button
+        variant="primary"
+        [type]="'submit'"
+        icon="check_circle"
+        [disabled]="settingsForm().invalid() || submitting()"
+      >
+        {{ 'guildSettings.save' | transloco }}
+      </app-button>
+    </div>
+  } @else if (submitting()) {
+    <p class="autosave-status">
+      <span class="spinner"></span>
+      {{ 'guildSettings.saving' | transloco }}
+    </p>
+  }
 
 </form>

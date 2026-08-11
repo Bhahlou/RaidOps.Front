@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
@@ -59,6 +60,7 @@ const MAX_VISIBLE_EVENTS = 4;
     RaidEventGridComponent,
     BranchTabsComponent,
     TranslocoPipe,
+    RouterLink,
   ],
   templateUrl: './raids.component.html',
   styleUrl: './raids.component.scss',

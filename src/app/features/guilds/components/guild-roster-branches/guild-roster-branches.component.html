@@ -1,0 +1,15 @@
+@if (activeBranches().length > 0) {
+  <div class="branch-settings-list">
+    @for (branch of activeBranches(); track branch.id) {
+      <app-guild-branch-roster-settings-card
+        [guildId]="guildId()"
+        [branch]="branch"
+        [roles]="availableRoles()"
+        [rolesLoading]="rolesLoading()"
+        (saved)="onSettingsSaved()"
+      />
+    }
+  </div>
+} @else {
+  <p class="empty-hint">{{ 'guildSettings.branches.noActiveBranches' | transloco }}</p>
+}

@@ -13,13 +13,7 @@
 @if (activeBranches().length > 0) {
   <div class="branch-settings-list">
     @for (branch of activeBranches(); track branch.id) {
-      <app-guild-branch-settings-card
-        [guildId]="guildId()"
-        [branch]="branch"
-        [roles]="availableRoles()"
-        [rolesLoading]="rolesLoading()"
-        (saved)="onSettingsSaved()"
-      />
+      <app-guild-branch-region-card [guildId]="guildId()" [branch]="branch" (saved)="onSettingsSaved()" />
     }
   </div>
 }

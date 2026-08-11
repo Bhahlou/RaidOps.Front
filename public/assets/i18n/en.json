@@ -68,11 +68,14 @@
       "guildNotifications": {
         "title": "Settings - Notifications"
       },
-      "guildBranches": {
-        "title": "Settings - Branches"
-      },
       "raids": {
         "title": "Raids"
+      },
+      "rosterSettings": {
+        "title": "Settings - Roster"
+      },
+      "raidSettings": {
+        "title": "Settings - Raids"
       }
     }
   },
@@ -97,6 +100,18 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidGrouping": {
+        "title": "Grouping ping, from the site or Discord",
+        "description": "On a published raid's page, the \"Ping to group up\" button (Officer only) posts a one-off message in the announcement channel, mentioning every assigned player and stating which character to whisper for an invite, with a snapshot of the composition attached as an embed. The same action is available from Discord via the /raid invite command, with autocomplete raid selection and an optional character."
+      },
+      "raidCompositionAnnouncement": {
+        "title": "A standing Discord announcement of a raid's composition",
+        "description": "A new \"Raid composition announcement\" setting (Notifications tab) posts an embed listing every slot of a published raid, group by group — that same message is edited in place on every assignment, unassignment, swap, or spec change, never reposted. A separate DM setting also notifies each player added or removed, with their character and a link to the raid."
+      },
+      "guildSettingsReorg": {
+        "title": "Guild settings reorganized into 4 tabs, with autosave",
+        "description": "The old \"Branches\" tab is now split into three: General (branch activation, region, timezone, language), Roster (per-branch roster access mode and Officer roles), and Raids (a new \"Raid mode\" setting, not yet functional — groundwork for a future explicit sign-up feature). Every field across all 4 tabs now saves automatically, no Save button."
+      },
       "pwaInstall": {
         "title": "RaidOps can now be installed as an app, and updates itself automatically",
         "description": "You can now install RaidOps from your browser (Chrome/Edge) to open it in its own window, like a real app. Whether installed or not, it automatically checks for new versions every time you open it, downloads them in the background without interrupting your work, then offers to reload so you can use them."
@@ -285,6 +300,14 @@
         "title": "Raid builder",
         "description": "Raid compositions, with automatic building."
       },
+      "raidCompositionAnnouncement": {
+        "title": "Discord composition announcement",
+        "description": "A standing embed posted when a raid is published, plus DMs to players added or removed."
+      },
+      "raidGrouping": {
+        "title": "Grouping ping",
+        "description": "A button (or Discord command) to tell every assigned player it's time to group up."
+      },
       "raidAssignments": {
         "title": "Raid assignments",
         "description": "Who does what during the raid (dispel, soak, interrupt…)."
@@ -435,12 +458,15 @@
     },
     "save": "Save settings",
     "saveSuccess": "Settings saved.",
+    "saving": "Saving…",
     "tabs": {
       "general": "General",
-      "branches": "Branches",
+      "roster": "Roster",
+      "raids": "Raids",
       "notifications": "Notifications"
     },
     "branches": {
+      "noActiveBranches": "No active branch yet — activate one in the General tab first.",
       "activation": {
         "label": "Active branches",
         "hint": "Activate the WoW branches your guild currently runs. Deactivating a branch never deletes its roster or role settings — reactivate it later to pick up right where you left off.",
@@ -473,12 +499,21 @@
           "tw": "Taiwan"
         }
       },
-      "save": "Save branch settings",
+      "signupMode": {
+        "label": "Raid mode",
+        "defaultPresent": "Auto",
+        "defaultPresentDescription": "Players are assumed present by default, unless they've declared an absence. No sign-up is required for raids.",
+        "signup": "Planner",
+        "signupDescription": "Players must sign up on a raid planner (not implemented yet)."
+      },
       "rosterSettings": {
         "saveSuccess": "Branch settings saved."
       },
       "regionSettings": {
         "saveSuccess": "Branch region saved."
+      },
+      "raidSettings": {
+        "saveSuccess": "Branch raid mode saved."
       }
     },
     "notificationSettings": {
@@ -494,6 +529,10 @@
         "raidComposition": {
           "label": "Raid composition changes",
           "hint": "Notify when the roster of an already-published raid is edited (assign, unassign, swap, spec change)."
+        },
+        "raidCompositionAnnouncement": {
+          "label": "Raid composition announcement",
+          "hint": "Post a standing embed with the full current composition of a published raid (edited in place as it changes), and/or DM players when they're added to or removed from it."
         }
       },
       "events": {
@@ -505,7 +544,9 @@
         "RaidSlotAssigned": "A character is assigned to a slot",
         "RaidSlotUnassigned": "A character is unassigned from a slot",
         "RaidSlotsSwapped": "Two characters' slots are swapped",
-        "RaidSlotSpecChanged": "A slot's spec is changed"
+        "RaidSlotSpecChanged": "A slot's spec is changed",
+        "RaidCompositionAnnouncementPosted": "Post the composition as an embed",
+        "RaidCompositionAnnouncementDm": "DM players added to or removed from the raid"
       },
       "scope": {
         "label": "Scope",
@@ -517,6 +558,7 @@
       "channel": {
         "placeholder": "Select a channel",
         "required": "Pick a channel to enable this notification.",
+        "dmHint": "Sent as a direct message to the affected player.",
         "missingPermission": "The bot is missing: {{ permissions }}.",
         "permissionFlags": {
           "ViewChannel": "view channel",
@@ -524,17 +566,16 @@
           "EmbedLinks": "embed links"
         }
       },
-      "save": "Save notification settings",
       "saveSuccess": "Notification settings saved."
     }
   },
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications.",
-    "branchOfficerRolesNotConfigured": "\"{{ guildName }}\" has an active branch with no Officer roles configured yet — choose which Discord roles grant Officer access in the Branches tab of the guild settings.",
+    "branchOfficerRolesNotConfigured": "\"{{ guildName }}\" has an active branch with no Officer roles configured yet — choose which Discord roles grant Officer access in the Roster tab of the guild settings.",
     "guildLanguageNotConfigured": "\"{{ guildName }}\" has no language configured yet — choose the language RaidOps uses to communicate with your guild in the settings.",
     "absenceNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for absences yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
-    "branchRegionNotConfigured": "\"{{ guildName }}\" has an active branch with no region configured yet — set it in the Branches tab of the guild settings so weekly raid lockouts reset at the right time.",
+    "branchRegionNotConfigured": "\"{{ guildName }}\" has an active branch with no region configured yet — set it in the General tab of the guild settings so weekly raid lockouts reset at the right time.",
     "raidNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for raid changes yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "raidCompositionNotificationsNotConfigured": "\"{{ guildName }}\" hasn't configured Discord notifications for raid composition changes yet — pick a channel to post them in (or explicitly turn them off) in the Notifications tab of the settings.",
     "viewLink": "Configure",
@@ -572,7 +613,8 @@
       "language": "Language",
       "rosterMode": "Roster access",
       "minRosterRoleId": "Discord role threshold changed",
-      "minOfficerRoleId": "Officer access threshold changed"
+      "minOfficerRoleId": "Officer access threshold changed",
+      "signupMode": "Raid mode"
     },
     "notificationOff": "Off",
     "raidEventFields": {
@@ -815,6 +857,18 @@
     "publishConfirm": "\"{{name}}\" will become visible to every roster member. This can't be undone.",
     "board": {
       "empty": "No raid event in this range yet — create a series or an ad-hoc event to get started."
+    },
+    "detail": {
+      "breadcrumb": "Raid",
+      "comingSoon": "Raid details are coming soon — attendance, loot, and log analysis will live here.",
+      "triggerGrouping": "Ping to group up",
+      "groupingSent": "Grouping ping sent.",
+      "groupingFailed": "Couldn't send the grouping ping — check that the raid is published and an announcement channel is configured.",
+      "groupingCharacterNotFound": "No assigned character with that name was found in this raid.",
+      "groupingCharacterDialogTitle": "Who should players whisper?",
+      "groupingCharacterDialogHint": "You don't have a character assigned to this raid — pick which assigned character the ping should reference.",
+      "groupingCharacterDialogLabel": "Character",
+      "groupingCharacterDialogSubmit": "Send ping"
     },
     "tabs": {
       "empty": "No raid event in this range.",

@@ -4,8 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RaidZone } from '../models/raid-zone.model';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
-import { RaidBoard, RaidEventPayload } from '../models/raid-event.model';
+import { RaidBoard, RaidEventPayload, RaidEventSummary } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
+import { RaidEventAssignedCharacter } from '../models/raid-event-assigned-character.model';
 
 /** Thin HTTP wrapper over every `api/v1/guilds/{guildId}/branches/{guildBranchId}/raids/...` endpoint. */
 @Service()
@@ -63,6 +64,11 @@ export class RaidsService {
     });
   }
 
+  /** Minimal identity (id + name) of a single raid event — backs the raid detail page's breadcrumb. */
+  getEventSummary(guildId: string, guildBranchId: number, eventId: number): Observable<RaidEventSummary> {
+    return this.#http.get<RaidEventSummary>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`);
+  }
+
   createEvent(guildId: string, guildBranchId: number, payload: RaidEventPayload): Observable<void> {
     return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events`, payload);
   }
@@ -79,6 +85,21 @@ export class RaidsService {
   /** Officer-only — makes a draft event visible to every roster member. One-way, no request body. */
   publish(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
     return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/publish`, {});
+  }
+
+  /** Officer-only — lists the characters currently assigned to a raid event, for the grouping-ping character picker. */
+  getAssignedCharacters(guildId: string, guildBranchId: number, eventId: number): Observable<RaidEventAssignedCharacter[]> {
+    return this.#http.get<RaidEventAssignedCharacter[]>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/assigned-characters`);
+  }
+
+  /**
+   * Officer-only — posts a one-off "whisper this character for an invite" ping. Without
+   * `characterName`, the backend resolves the requester's own assigned character in this raid and
+   * fails with `RaidGroupingRequesterHasNoCharacter` if they don't have one. Fails if the event
+   * isn't published or no composition announcement channel is configured.
+   */
+  announceGrouping(guildId: string, guildBranchId: number, eventId: number, characterName?: string): Observable<void> {
+    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/announce-grouping`, { characterName: characterName ?? null });
   }
 
   assignSlot(

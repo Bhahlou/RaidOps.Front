@@ -35,21 +35,28 @@
                 <app-checkbox
                   class="notification-row-checkbox"
                   [checked]="row(eventType).enabled"
+                  [disabled]="submitting()"
                   (checkedChange)="toggleEnabled(eventType, $event)"
                 >
                   {{ eventLabel(eventType) }}
                 </app-checkbox>
 
-                <app-select
-                  class="notification-row-channel-select"
-                  [inputId]="'notification-channel-' + eventType"
-                  [options]="channelOptions()"
-                  [filterable]="true"
-                  [placeholder]="'guildSettings.notificationSettings.channel.placeholder' | transloco"
-                  [value]="row(eventType).channelId"
-                  [disabled]="!row(eventType).enabled"
-                  (valueChange)="setChannel(eventType, $event)"
-                />
+                @if (isChannelless(eventType)) {
+                  <p class="notification-row-channel-select channel-hint">
+                    {{ 'guildSettings.notificationSettings.channel.dmHint' | transloco }}
+                  </p>
+                } @else {
+                  <app-select
+                    class="notification-row-channel-select"
+                    [inputId]="'notification-channel-' + eventType"
+                    [options]="channelOptions()"
+                    [filterable]="true"
+                    [placeholder]="'guildSettings.notificationSettings.channel.placeholder' | transloco"
+                    [value]="row(eventType).channelId"
+                    [disabled]="!row(eventType).enabled || submitting()"
+                    (valueChange)="setChannel(eventType, $event)"
+                  />
+                }
 
                 <div class="notification-row-extra">
                   @if (isInherited(eventType)) {
@@ -83,10 +90,4 @@
       }
     </div>
   }
-</div>
-
-<div class="form-actions">
-  <app-button variant="primary" icon="check_circle" [disabled]="submitting() || !canSave()" (click)="save()">
-    {{ 'guildSettings.notificationSettings.save' | transloco }}
-  </app-button>
 </div>

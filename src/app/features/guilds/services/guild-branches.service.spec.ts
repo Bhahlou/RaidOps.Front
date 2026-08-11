@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuildBranch, GuildBranchRosterSettings } from '../models/guild-branch.model';
 import { RosterMode } from '../models/roster-mode.enum';
+import { SignupMode } from '../models/signup-mode.enum';
 import { GuildBranchesService } from './guild-branches.service';
 
 describe('GuildBranchesService', () => {
@@ -87,6 +88,19 @@ describe('GuildBranchesService', () => {
       const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/branches/7/region'));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toEqual({ region: 'eu' });
+      req.flush(null);
+    });
+  });
+
+  // ── updateSignupMode ──────────────────────────────────────────────────────
+
+  describe('updateSignupMode', () => {
+    it('sends PATCH to /guilds/:id/branches/:guildBranchId/signup-mode with the signupMode body', () => {
+      service.updateSignupMode('guild-1', 7, SignupMode.Signup).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/branches/7/signup-mode'));
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ signupMode: SignupMode.Signup });
       req.flush(null);
     });
   });
