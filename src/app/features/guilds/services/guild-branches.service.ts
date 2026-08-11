@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { GuildBranch, GuildBranchRegion, GuildBranchRosterSettings } from '../models/guild-branch.model';
+import { SignupMode } from '../models/signup-mode.enum';
 
 @Service()
 export class GuildBranchesService {
@@ -41,6 +42,14 @@ export class GuildBranchesService {
     return this.#http.patch<void>(
       `${this.#api}/guilds/${guildId}/branches/${guildBranchId}/region`,
       { region },
+    );
+  }
+
+  /** Persists the default signup mode for new raid events created on one guild branch. */
+  updateSignupMode(guildId: string, guildBranchId: number, signupMode: SignupMode): Observable<void> {
+    return this.#http.patch<void>(
+      `${this.#api}/guilds/${guildId}/branches/${guildBranchId}/signup-mode`,
+      { signupMode },
     );
   }
 }

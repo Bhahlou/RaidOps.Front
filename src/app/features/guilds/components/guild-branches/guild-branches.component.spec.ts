@@ -6,14 +6,12 @@ import { of, throwError } from 'rxjs';
 import { GuildBranchesComponent } from './guild-branches.component';
 import { GuildBranchesService } from '../../services/guild-branches.service';
 import { GuildBranchesStore } from '../../stores/guild-branches.store';
-import { GuildSettingsService } from '../../services/guild-settings.service';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildBranch } from '../../models/guild-branch.model';
 import { RosterMode } from '../../models/roster-mode.enum';
 import { Branch } from '../../../../shared/models/branch.model';
-import { DiscordRole } from '../../../../shared/models/discord-role.model';
 
 const wowBranch = (overrides?: Partial<Branch>): Branch => ({
   id: 3,
@@ -40,12 +38,11 @@ describe('GuildBranchesComponent', () => {
   let component: GuildBranchesComponent;
   let branchesService: { activateBranch: ReturnType<typeof vi.fn>; deactivateBranch: ReturnType<typeof vi.fn> };
   let store: { branches: ReturnType<typeof signal<GuildBranch[]>>; isLoading: ReturnType<typeof signal<boolean>>; load: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
-  let settingsService: { getDiscordRoles: ReturnType<typeof vi.fn> };
   let wowBranchService: { getAll: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
   let authStore: { loadUser: ReturnType<typeof vi.fn> };
 
-  const setup = (branches: GuildBranch[] = [], wowBranches: Branch[] = [wowBranch()], roles: DiscordRole[] = []) => {
+  const setup = (branches: GuildBranch[] = [], wowBranches: Branch[] = [wowBranch()]) => {
     branchesService = {
       activateBranch: vi.fn().mockReturnValue(of(undefined)),
       deactivateBranch: vi.fn().mockReturnValue(of(undefined)),
@@ -56,7 +53,6 @@ describe('GuildBranchesComponent', () => {
       load: vi.fn(),
       reload: vi.fn(),
     };
-    settingsService = { getDiscordRoles: vi.fn().mockReturnValue(of(roles)) };
     wowBranchService = { getAll: vi.fn().mockReturnValue(of(wowBranches)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
     authStore = { loadUser: vi.fn().mockReturnValue(of(undefined)) };
@@ -66,7 +62,6 @@ describe('GuildBranchesComponent', () => {
       providers: [
         { provide: GuildBranchesService, useValue: branchesService },
         { provide: GuildBranchesStore, useValue: store },
-        { provide: GuildSettingsService, useValue: settingsService },
         { provide: WowBrancheService, useValue: wowBranchService },
         { provide: SnackbarService, useValue: snackbar },
         { provide: AuthStore, useValue: authStore },
@@ -83,13 +78,12 @@ describe('GuildBranchesComponent', () => {
   // ── ngOnInit ──────────────────────────────────────────────────────────────
 
   describe('ngOnInit', () => {
-    it('loads guild branches, WoW branches and Discord roles', () => {
+    it('loads guild branches and WoW branches', () => {
       setup();
       fixture.detectChanges();
 
       expect(store.load).toHaveBeenCalledWith('g1');
       expect(wowBranchService.getAll).toHaveBeenCalled();
-      expect(settingsService.getDiscordRoles).toHaveBeenCalledWith('g1');
     });
 
     it('populates wowBranches from the service', () => {
@@ -97,16 +91,6 @@ describe('GuildBranchesComponent', () => {
       fixture.detectChanges();
 
       expect(component.wowBranches()).toEqual([wowBranch({ id: 5, name: 'MoP Classic' })]);
-    });
-
-    it('shows a snackbar error and clears loading when the role fetch fails', () => {
-      setup();
-      settingsService.getDiscordRoles.mockReturnValue(throwError(() => new Error('failed')));
-
-      fixture.detectChanges();
-
-      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
-      expect(component.rolesLoading()).toBe(false);
     });
   });
 

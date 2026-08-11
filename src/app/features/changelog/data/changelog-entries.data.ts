@@ -73,6 +73,18 @@ export const CHANGELOG_GROUPS: ChangelogGroup[] = [
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-08-11-raid-grouping', '1.6', '2026-08-11', 'raidGrouping', {
+    category: 'guild',
+    article: 'raid-builder',
+  }),
+  feature('2026-08-11-raid-composition-announcement', '1.6', '2026-08-11', 'raidCompositionAnnouncement', {
+    category: 'guild',
+    article: 'notifications',
+  }),
+  improvement('2026-08-11-guild-settings-reorg', '1.5', '2026-08-11', 'guildSettingsReorg', {
+    category: 'guild',
+    article: 'settings',
+  }),
   feature('2026-08-08-pwa-install', '1.7', '2026-08-08', 'pwaInstall', {
     category: 'account',
     article: 'install-app',
@@ -103,7 +115,7 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   }),
   feature('2026-07-28-guild-branches', '1.5', '2026-07-28', 'guildBranches', {
     category: 'guild',
-    article: 'branches',
+    article: 'settings',
   }),
   feature('2026-07-23-guild-notifications', '1.5', '2026-07-23', 'guildNotifications', {
     category: 'guild',

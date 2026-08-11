@@ -3,7 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { CdkAccordion, CdkAccordionItem } from '@angular/cdk/accordion';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../shared/components/buttons/icon-button/icon-button.component';
 import { CheckboxComponent } from '../../../../shared/components/form/checkbox/checkbox.component';
 import { SelectComponent, SelectOption } from '../../../../shared/components/form/select/select.component';
@@ -60,11 +59,23 @@ const NOTIFICATION_FAMILIES: NotificationFamily[] = [
       GuildNotificationEventType.RaidSlotSpecChanged,
     ],
   },
+  {
+    id: 'raidCompositionAnnouncement',
+    labelKey: 'guildSettings.notificationSettings.families.raidCompositionAnnouncement.label',
+    hintKey: 'guildSettings.notificationSettings.families.raidCompositionAnnouncement.hint',
+    eventTypes: [
+      GuildNotificationEventType.RaidCompositionAnnouncementPosted,
+      GuildNotificationEventType.RaidCompositionAnnouncementDm,
+    ],
+  },
 ];
+
+/** Event types that notify a player directly (DM) rather than posting to a channel — no channel picker for these rows. */
+const CHANNELLESS_EVENT_TYPES = new Set<GuildNotificationEventType>([GuildNotificationEventType.RaidCompositionAnnouncementDm]);
 
 @Component({
   selector: 'app-guild-notification-settings',
-  imports: [CdkAccordion, CdkAccordionItem, ButtonComponent, IconButtonComponent, CheckboxComponent, SelectComponent, TranslocoPipe],
+  imports: [CdkAccordion, CdkAccordionItem, IconButtonComponent, CheckboxComponent, SelectComponent, TranslocoPipe],
   templateUrl: './guild-notification-settings.component.html',
   styleUrl: './guild-notification-settings.component.scss',
 })
@@ -125,10 +136,12 @@ export class GuildNotificationSettingsComponent implements OnInit {
       })),
   );
 
-  /** An enabled event with no channel picked can't be saved — there'd be nowhere to post to. */
+  /** An enabled event with no channel picked can't be saved — there'd be nowhere to post to. Channelless (DM) events are exempt, they don't post to a channel at all. */
   readonly canSave = computed(() =>
     this.families.every((family) =>
-      family.eventTypes.every((eventType) => !this.row(eventType).enabled || this.row(eventType).channelId !== null),
+      family.eventTypes.every(
+        (eventType) => this.isChannelless(eventType) || !this.row(eventType).enabled || this.row(eventType).channelId !== null,
+      ),
     ),
   );
 
@@ -197,19 +210,33 @@ export class GuildNotificationSettingsComponent implements OnInit {
   }
 
   channelMissing(eventType: GuildNotificationEventType): boolean {
+    if (this.isChannelless(eventType)) return false;
     const row = this.row(eventType);
     return row.enabled && row.channelId === null;
   }
 
+  /** DM-style events notify a player directly — there's no channel to pick for them. */
+  isChannelless(eventType: GuildNotificationEventType): boolean {
+    return CHANNELLESS_EVENT_TYPES.has(eventType);
+  }
+
+  /**
+   * Row checkbox/channel changes auto-save immediately (gated by `canSave()` — an enabled row
+   * with no channel picked yet simply doesn't save until one is chosen, same pattern as the
+   * Roster tab's Discord-role mode requiring at least one role). Both handlers only ever fire
+   * from a real user interaction, never from the constructor's store-sync effect.
+   */
   toggleEnabled(eventType: GuildNotificationEventType, enabled: boolean): void {
     this.#rows.update((rows) => new Map(rows).set(eventType, { ...this.row(eventType), enabled }));
+    void this.save();
   }
 
   setChannel(eventType: GuildNotificationEventType, channelId: string | null): void {
     this.#rows.update((rows) => new Map(rows).set(eventType, { ...this.row(eventType), channelId }));
+    void this.save();
   }
 
-  async save(): Promise<void> {
+  private async save(): Promise<void> {
     if (!this.canSave()) return;
 
     const settings = this.families.flatMap((family) => family.eventTypes.map((eventType) => this.row(eventType)));

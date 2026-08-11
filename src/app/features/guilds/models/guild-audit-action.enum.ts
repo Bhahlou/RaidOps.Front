@@ -29,4 +29,5 @@ export enum GuildAuditAction {
   SlotUnassigned = 'SlotUnassigned',
   SlotsSwapped = 'SlotsSwapped',
   SlotAssignmentSpecChanged = 'SlotAssignmentSpecChanged',
+  BranchSignupModeUpdated = 'BranchSignupModeUpdated',
 }

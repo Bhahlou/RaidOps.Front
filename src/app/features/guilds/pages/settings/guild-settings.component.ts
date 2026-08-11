@@ -4,13 +4,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { GuildNotificationSettingsComponent } from '../../components/guild-notification-settings/guild-notification-settings.component';
 import { GuildBranchesComponent } from '../../components/guild-branches/guild-branches.component';
+import { GuildRosterBranchesComponent } from '../../components/guild-roster-branches/guild-roster-branches.component';
+import { GuildRaidBranchesComponent } from '../../components/guild-raid-branches/guild-raid-branches.component';
 import { PageHeaderComponent } from '../../../../shared/components/layout/page-header/page-header.component';
 import { TabDefinition, TabsComponent } from '../../../../shared/components/layout/tabs/tabs.component';
 import { injectGuildContext } from '../../inject-guild-context';
 
-type SettingsTabId = 'general' | 'branches' | 'notifications';
+type SettingsTabId = 'general' | 'roster' | 'raids' | 'notifications';
 
-const TAB_IDS = new Set<SettingsTabId>(['general', 'branches', 'notifications']);
+const TAB_IDS = new Set<SettingsTabId>(['general', 'roster', 'raids', 'notifications']);
 
 @Component({
   selector: 'app-guild-settings',
@@ -18,6 +20,8 @@ const TAB_IDS = new Set<SettingsTabId>(['general', 'branches', 'notifications'])
     GuildSettingsFormComponent,
     GuildNotificationSettingsComponent,
     GuildBranchesComponent,
+    GuildRosterBranchesComponent,
+    GuildRaidBranchesComponent,
     PageHeaderComponent,
     TabsComponent,
   ],
@@ -35,7 +39,8 @@ export class GuildSettingsComponent {
 
   readonly tabs: TabDefinition[] = [
     { id: 'general', labelKey: 'guildSettings.tabs.general' },
-    { id: 'branches', labelKey: 'guildSettings.tabs.branches' },
+    { id: 'roster', labelKey: 'guildSettings.tabs.roster' },
+    { id: 'raids', labelKey: 'guildSettings.tabs.raids' },
     { id: 'notifications', labelKey: 'guildSettings.tabs.notifications' },
   ];
 

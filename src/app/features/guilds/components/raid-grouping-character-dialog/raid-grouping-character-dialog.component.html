@@ -1,0 +1,29 @@
+<h2 class="dialog-title">{{ 'raidBuilder.detail.groupingCharacterDialogTitle' | transloco }}</h2>
+
+<div class="dialog-content">
+  <p>{{ 'raidBuilder.detail.groupingCharacterDialogHint' | transloco }}</p>
+
+  <div class="field-group">
+    <label class="field-label" for="grouping-character-select">{{ 'raidBuilder.detail.groupingCharacterDialogLabel' | transloco }}</label>
+    <app-select
+      [inputId]="'grouping-character-select'"
+      [options]="characterOptions()"
+      [value]="selectedCharacterName()"
+      (valueChange)="selectedCharacterName.set($any($event))"
+      [disabled]="loadingCharacters()"
+    />
+  </div>
+
+  @if (errorKey()) {
+    <p class="field-error">{{ errorKey()! | transloco }}</p>
+  }
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" [disabled]="submitting()" (click)="cancel()">
+    {{ 'raidBuilder.actions.cancel' | transloco }}
+  </app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'raidBuilder.detail.groupingCharacterDialogSubmit' | transloco }}
+  </app-button>
+</div>

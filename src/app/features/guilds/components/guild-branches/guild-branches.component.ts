@@ -3,7 +3,6 @@ import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MultiSelectComponent, MultiSelectOption } from '../../../../shared/components/form/multi-select/multi-select.component';
 import { FormFieldCardComponent } from '../../../../shared/components/form/form-field-card/form-field-card.component';
-import { DiscordRole } from '../../../../shared/models/discord-role.model';
 import { Branch } from '../../../../shared/models/branch.model';
 import { WowBrancheService } from '../../../../shared/services/wow-branche.service';
 import { expansionIconUrl } from '../../../../shared/utils/expansion-icon.util';
@@ -11,12 +10,11 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { GuildBranchesService } from '../../services/guild-branches.service';
 import { GuildBranchesStore } from '../../stores/guild-branches.store';
-import { GuildSettingsService } from '../../services/guild-settings.service';
-import { GuildBranchSettingsCardComponent } from '../guild-branch-settings-card/guild-branch-settings-card.component';
+import { GuildBranchRegionCardComponent } from '../guild-branch-region-card/guild-branch-region-card.component';
 
 @Component({
   selector: 'app-guild-branches',
-  imports: [MultiSelectComponent, FormFieldCardComponent, TranslocoPipe, GuildBranchSettingsCardComponent],
+  imports: [MultiSelectComponent, FormFieldCardComponent, TranslocoPipe, GuildBranchRegionCardComponent],
   templateUrl: './guild-branches.component.html',
   styleUrl: './guild-branches.component.scss',
 })
@@ -26,14 +24,11 @@ export class GuildBranchesComponent implements OnInit {
   readonly #store = inject(GuildBranchesStore);
   readonly #branchesService = inject(GuildBranchesService);
   readonly #wowBranchService = inject(WowBrancheService);
-  readonly #settingsService = inject(GuildSettingsService);
   readonly #snackbar = inject(SnackbarService);
   readonly #authStore = inject(AuthStore);
   readonly #transloco = inject(TranslocoService);
 
   readonly wowBranches = signal<Branch[]>([]);
-  readonly availableRoles = signal<DiscordRole[]>([]);
-  readonly rolesLoading = signal(true);
 
   readonly guildBranches = this.#store.branches;
   readonly isLoading = this.#store.isLoading;
@@ -63,7 +58,6 @@ export class GuildBranchesComponent implements OnInit {
   ngOnInit(): void {
     this.#store.load(this.guildId());
     this.#wowBranchService.getAll().subscribe((branches) => this.wowBranches.set(branches));
-    this.#loadRoles();
   }
 
   /**
@@ -108,23 +102,9 @@ export class GuildBranchesComponent implements OnInit {
 
   /**
    * The sidenav/notifications banner reads AuthStore.user() for "branch not fully configured"
-   * warnings, which would otherwise stay stale until next login after a roster/officer/region save.
+   * warnings, which would otherwise stay stale until next login after a region save.
    */
   onSettingsSaved(): void {
     this.#authStore.loadUser().subscribe();
-  }
-
-  #loadRoles(): void {
-    this.rolesLoading.set(true);
-    this.#settingsService.getDiscordRoles(this.guildId()).subscribe({
-      next: (roles) => {
-        this.availableRoles.set(roles);
-        this.rolesLoading.set(false);
-      },
-      error: () => {
-        this.rolesLoading.set(false);
-        this.#snackbar.error('errors.server');
-      },
-    });
   }
 }

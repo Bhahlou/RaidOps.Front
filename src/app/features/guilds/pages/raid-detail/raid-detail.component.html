@@ -1,0 +1,19 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" />
+  <app-branch-tabs [guildId]="guildId()" leaf="raids" />
+
+  @if (isOfficer()) {
+    <div class="detail-actions">
+      <app-button
+        variant="stroked"
+        icon="campaign"
+        [disabled]="triggeringGrouping()"
+        (click)="triggerGrouping()"
+      >
+        {{ 'raidBuilder.detail.triggerGrouping' | transloco }}
+      </app-button>
+    </div>
+  }
+
+  <app-empty-hint>{{ 'raidBuilder.detail.comingSoon' | transloco }}</app-empty-hint>
+</div>

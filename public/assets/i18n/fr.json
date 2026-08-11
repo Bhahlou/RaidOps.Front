@@ -68,11 +68,14 @@
       "guildNotifications": {
         "title": "Paramètres - Notifications"
       },
-      "guildBranches": {
-        "title": "Paramètres - Branches"
-      },
       "raids": {
         "title": "Raids"
+      },
+      "rosterSettings": {
+        "title": "Paramètres - Roster"
+      },
+      "raidSettings": {
+        "title": "Paramètres - Raids"
       }
     }
   },
@@ -97,6 +100,18 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidGrouping": {
+        "title": "Annonce de groupage, depuis le site ou Discord",
+        "description": "Sur la page d'un raid publié, le bouton « Annoncer le groupage » (réservé aux Officiers) poste un message ponctuel dans le salon d'annonce, mentionnant tous les joueurs assignés et indiquant sur quel personnage les whisper pour une invitation, avec un instantané de la composition en embed. La même action est disponible depuis Discord via la commande /raid invite, avec un choix de raid par autocomplétion et un personnage optionnel."
+      },
+      "raidCompositionAnnouncement": {
+        "title": "Annonce Discord vivante de la composition d'un raid",
+        "description": "Un nouveau réglage « Annonce de composition » (onglet Notifications) poste un embed listant tous les slots d'un raid publié, groupe par groupe — ce même message est réédité en place à chaque assignation, désassignation, échange ou changement de spé, jamais republié. Un réglage DM séparé prévient en plus chaque joueur ajouté ou retiré, avec son personnage et un lien vers le raid."
+      },
+      "guildSettingsReorg": {
+        "title": "Paramètres de guilde réorganisés en 4 onglets, avec sauvegarde automatique",
+        "description": "L'ancien onglet « Branches » est éclaté en trois : Général (activation des branches, région, fuseau horaire, langue), Roster (mode d'accès et rôles Officier par branche) et Raids (nouveau réglage « Mode de raid », pour l'instant sans effet — prépare une future fonctionnalité d'inscription explicite). Tous les champs des 4 onglets s'enregistrent désormais automatiquement, sans bouton Enregistrer."
+      },
       "pwaInstall": {
         "title": "RaidOps s'installe comme une application, et se met à jour toute seule",
         "description": "Tu peux désormais installer RaidOps depuis ton navigateur (Chrome/Edge) pour l'ouvrir dans sa propre fenêtre, comme une vraie application. Installée ou non, elle vérifie automatiquement les nouvelles versions à chaque ouverture, les télécharge en tâche de fond sans interrompre ton travail, puis te propose de recharger pour en profiter."
@@ -285,6 +300,14 @@
         "title": "Raid builder",
         "description": "Compositions de raid, avec construction automatique."
       },
+      "raidCompositionAnnouncement": {
+        "title": "Annonce de composition Discord",
+        "description": "Embed toujours à jour posté à la publication d'un raid, plus DM aux joueurs ajoutés ou retirés."
+      },
+      "raidGrouping": {
+        "title": "Annonce de groupage",
+        "description": "Un bouton (ou une commande Discord) pour prévenir tous les joueurs assignés qu'il est temps de se grouper."
+      },
       "raidAssignments": {
         "title": "Assignations de raid",
         "description": "Qui doit faire quoi pendant le raid (dispel, soak, interrupt…)."
@@ -435,12 +458,15 @@
     },
     "save": "Enregistrer les réglages",
     "saveSuccess": "Réglages enregistrés.",
+    "saving": "Enregistrement…",
     "tabs": {
       "general": "Général",
-      "branches": "Branches",
+      "roster": "Roster",
+      "raids": "Raids",
       "notifications": "Notifications"
     },
     "branches": {
+      "noActiveBranches": "Aucune branche active pour l'instant — active-en une dans l'onglet Général.",
       "activation": {
         "label": "Branches actives",
         "hint": "Active les branches WoW gérées par ta guilde. Désactiver une branche ne supprime jamais son roster ni ses réglages de rôles — réactive-la plus tard pour reprendre là où tu t'étais arrêté.",
@@ -473,12 +499,21 @@
           "tw": "Taïwan"
         }
       },
-      "save": "Enregistrer les réglages de la branche",
+      "signupMode": {
+        "label": "Mode de raid",
+        "defaultPresent": "Auto",
+        "defaultPresentDescription": "Les joueurs sont considérés présents par défaut, à moins d'avoir déclaré une absence. Aucune inscription n'est requise pour les raids.",
+        "signup": "Planificateur",
+        "signupDescription": "Les joueurs doivent s'inscrire sur un planificateur de raid (pas encore implémenté)."
+      },
       "rosterSettings": {
         "saveSuccess": "Réglages de la branche enregistrés."
       },
       "regionSettings": {
         "saveSuccess": "Région de la branche enregistrée."
+      },
+      "raidSettings": {
+        "saveSuccess": "Mode de raid de la branche enregistré."
       }
     },
     "notificationSettings": {
@@ -494,6 +529,10 @@
         "raidComposition": {
           "label": "Changements de composition",
           "hint": "Notifier quand la composition d'un raid déjà publié est modifiée (assignation, désassignation, échange, changement de spé)."
+        },
+        "raidCompositionAnnouncement": {
+          "label": "Annonce de composition",
+          "hint": "Poste un embed permanent avec la composition actuelle complète d'un raid publié (édité en place à chaque changement), et/ou envoie un DM aux joueurs ajoutés ou retirés."
         }
       },
       "events": {
@@ -505,7 +544,9 @@
         "RaidSlotAssigned": "Un personnage est assigné à un emplacement",
         "RaidSlotUnassigned": "Un personnage est désassigné d'un emplacement",
         "RaidSlotsSwapped": "Deux personnages sont échangés",
-        "RaidSlotSpecChanged": "La spécialisation d'un emplacement change"
+        "RaidSlotSpecChanged": "La spécialisation d'un emplacement change",
+        "RaidCompositionAnnouncementPosted": "Poster la composition en embed",
+        "RaidCompositionAnnouncementDm": "DM aux joueurs ajoutés ou retirés du raid"
       },
       "scope": {
         "label": "Portée",
@@ -517,6 +558,7 @@
       "channel": {
         "placeholder": "Sélectionner un salon",
         "required": "Choisis un salon pour activer cette notification.",
+        "dmHint": "Envoyé en message privé au joueur concerné.",
         "missingPermission": "Il manque au bot : {{ permissions }}.",
         "permissionFlags": {
           "ViewChannel": "voir le salon",
@@ -524,17 +566,16 @@
           "EmbedLinks": "intégrer des liens"
         }
       },
-      "save": "Enregistrer les notifications",
       "saveSuccess": "Réglages de notifications enregistrés."
     }
   },
   "notifications": {
     "title": "Notifications",
     "empty": "Aucune notification.",
-    "branchOfficerRolesNotConfigured": "« {{ guildName }} » a une branche active sans rôles Officier configurés — choisis quels rôles Discord donnent accès au statut Officier dans l'onglet Branches des paramètres de la guilde.",
+    "branchOfficerRolesNotConfigured": "« {{ guildName }} » a une branche active sans rôles Officier configurés — choisis quels rôles Discord donnent accès au statut Officier dans l'onglet Roster des paramètres de la guilde.",
     "guildLanguageNotConfigured": "« {{ guildName }} » n'a pas encore de langue configurée — choisis la langue utilisée par RaidOps pour communiquer avec ta guilde dans les paramètres.",
     "absenceNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les absences — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
-    "branchRegionNotConfigured": "« {{ guildName }} » a une branche active sans région configurée — règle-la dans l'onglet Branches des paramètres pour que les reset hebdomadaires des raids tombent à la bonne heure.",
+    "branchRegionNotConfigured": "« {{ guildName }} » a une branche active sans région configurée — règle-la dans l'onglet Général des paramètres pour que les reset hebdomadaires des raids tombent à la bonne heure.",
     "raidNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les changements de raid — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "raidCompositionNotificationsNotConfigured": "« {{ guildName }} » n'a pas encore configuré les notifications Discord pour les changements de composition — choisis dans quel salon les poster (ou désactive-les explicitement) dans l'onglet Notifications des paramètres.",
     "viewLink": "Configurer",
@@ -572,7 +613,8 @@
       "language": "Langue",
       "rosterMode": "Accès au roster",
       "minRosterRoleId": "Seuil de rôle Discord modifié",
-      "minOfficerRoleId": "Seuil d'accès Officier modifié"
+      "minOfficerRoleId": "Seuil d'accès Officier modifié",
+      "signupMode": "Mode de raid"
     },
     "notificationOff": "Désactivé",
     "raidEventFields": {
@@ -815,6 +857,18 @@
     "publishConfirm": "« {{name}} » deviendra visible pour tous les membres du roster. Cette action est irréversible.",
     "board": {
       "empty": "Aucun raid prévu sur cette période — créez une série ou un raid ponctuel pour commencer."
+    },
+    "detail": {
+      "breadcrumb": "Raid",
+      "comingSoon": "Les détails du raid arrivent bientôt — présence, loot et analyse de logs vivront ici.",
+      "triggerGrouping": "Annoncer le groupage",
+      "groupingSent": "Message de groupage envoyé.",
+      "groupingFailed": "Impossible d'envoyer le message de groupage — vérifiez que le raid est publié et qu'un salon d'annonce est configuré.",
+      "groupingCharacterNotFound": "Aucun personnage assigné avec ce nom n'a été trouvé dans ce raid.",
+      "groupingCharacterDialogTitle": "Qui les joueurs doivent-ils whisper ?",
+      "groupingCharacterDialogHint": "Tu n'as pas de personnage assigné à ce raid — choisis quel personnage assigné le message doit référencer.",
+      "groupingCharacterDialogLabel": "Personnage",
+      "groupingCharacterDialogSubmit": "Envoyer l'annonce"
     },
     "tabs": {
       "empty": "Aucun raid sur cette période.",

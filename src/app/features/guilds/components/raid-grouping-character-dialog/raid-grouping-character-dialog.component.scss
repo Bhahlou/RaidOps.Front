@@ -1,0 +1,20 @@
+.dialog-content p {
+  margin: 0 0 12px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.field-error {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--mat-sys-error);
+}

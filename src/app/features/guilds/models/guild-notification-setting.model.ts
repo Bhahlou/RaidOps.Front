@@ -8,6 +8,8 @@ export enum GuildNotificationEventType {
   RaidSlotUnassigned = 'RaidSlotUnassigned',
   RaidSlotsSwapped = 'RaidSlotsSwapped',
   RaidSlotSpecChanged = 'RaidSlotSpecChanged',
+  RaidCompositionAnnouncementPosted = 'RaidCompositionAnnouncementPosted',
+  RaidCompositionAnnouncementDm = 'RaidCompositionAnnouncementDm',
 }
 
 export interface GuildNotificationSetting {

@@ -56,10 +56,10 @@ describe('NotificationListComponent', () => {
   // ── link ──────────────────────────────────────────────────────────────────
 
   describe('link', () => {
-    it('builds the guild branches settings route for BranchOfficerRolesNotConfigured', () => {
+    it('builds the guild roster settings route for BranchOfficerRolesNotConfigured', () => {
       setup();
 
-      expect(component.link(notification({ guildId: 'g42' }))).toEqual(['/guilds', 'g42', 'settings', 'branches']);
+      expect(component.link(notification({ guildId: 'g42' }))).toEqual(['/guilds', 'g42', 'settings', 'roster']);
     });
 
     it('builds the guild settings route for GuildLanguageNotConfigured', () => {
@@ -76,11 +76,11 @@ describe('NotificationListComponent', () => {
         .toEqual(['/guilds', 'g42', 'settings', 'notifications']);
     });
 
-    it('builds the guild branches settings route for BranchRegionNotConfigured', () => {
+    it('builds the guild general settings route for BranchRegionNotConfigured', () => {
       setup();
 
       expect(component.link(notification({ type: NotificationType.BranchRegionNotConfigured, guildId: 'g42' })))
-        .toEqual(['/guilds', 'g42', 'settings', 'branches']);
+        .toEqual(['/guilds', 'g42', 'settings', 'general']);
     });
 
     it('builds the guild notifications settings route for RaidNotificationsNotConfigured', () => {

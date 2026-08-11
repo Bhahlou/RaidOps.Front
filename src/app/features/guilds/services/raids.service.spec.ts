@@ -126,6 +126,16 @@ describe('RaidsService', () => {
     });
   });
 
+  describe('getEventSummary', () => {
+    it('sends GET to .../events/:id', () => {
+      service.getEventSummary('guild-1', 7, 11).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`));
+      expect(req.request.method).toBe('GET');
+      req.flush({ id: 11, name: 'Split 1' });
+    });
+  });
+
   describe('createEvent', () => {
     it('sends POST to .../events with the payload', () => {
       const payload: RaidEventPayload = { name: 'SSC/TK/Gruul', startsAtUtc: '2026-08-05T19:00:00Z', groupCount: 5, slotsPerGroup: 5, signupMode: SignupMode.DefaultPresent, raidZoneIds: [10] };
@@ -169,6 +179,35 @@ describe('RaidsService', () => {
       const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/publish`));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({});
+      req.flush(null);
+    });
+  });
+
+  describe('getAssignedCharacters', () => {
+    it('sends GET to .../events/:id/assigned-characters', () => {
+      service.getAssignedCharacters('guild-1', 7, 11).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/assigned-characters`));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
+  describe('announceGrouping', () => {
+    it('sends POST to .../events/:id/announce-grouping with the given character name', () => {
+      service.announceGrouping('guild-1', 7, 11, 'Arthas').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/announce-grouping`));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ characterName: 'Arthas' });
+      req.flush(null);
+    });
+
+    it('sends null characterName when omitted, letting the backend resolve the requester\'s own', () => {
+      service.announceGrouping('guild-1', 7, 11).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/announce-grouping`));
+      expect(req.request.body).toEqual({ characterName: null });
       req.flush(null);
     });
   });

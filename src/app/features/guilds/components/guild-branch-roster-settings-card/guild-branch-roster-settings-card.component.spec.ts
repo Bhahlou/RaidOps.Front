@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
-import { GuildBranchSettingsCardComponent } from './guild-branch-settings-card.component';
+import { GuildBranchRosterSettingsCardComponent } from './guild-branch-roster-settings-card.component';
 import { GuildBranchesService } from '../../services/guild-branches.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GuildBranch } from '../../models/guild-branch.model';
@@ -24,26 +24,26 @@ const branch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
   ...overrides,
 });
 
-describe('GuildBranchSettingsCardComponent', () => {
-  let fixture: ComponentFixture<GuildBranchSettingsCardComponent>;
-  let component: GuildBranchSettingsCardComponent;
-  let branchesService: { updateRosterSettings: ReturnType<typeof vi.fn>; updateRegion: ReturnType<typeof vi.fn> };
+describe('GuildBranchRosterSettingsCardComponent', () => {
+  let fixture: ComponentFixture<GuildBranchRosterSettingsCardComponent>;
+  let component: GuildBranchRosterSettingsCardComponent;
+  let branchesService: { updateRosterSettings: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn> };
 
   const setup = (branchInput: GuildBranch = branch(), roles: DiscordRole[] = [], rolesLoading = false) => {
-    branchesService = { updateRosterSettings: vi.fn().mockReturnValue(of(undefined)), updateRegion: vi.fn().mockReturnValue(of(undefined)) };
+    branchesService = { updateRosterSettings: vi.fn().mockReturnValue(of(undefined)) };
     snackbar = { error: vi.fn(), success: vi.fn() };
 
     TestBed.configureTestingModule({
-      imports: [GuildBranchSettingsCardComponent],
+      imports: [GuildBranchRosterSettingsCardComponent],
       providers: [
         { provide: GuildBranchesService, useValue: branchesService },
         { provide: SnackbarService, useValue: snackbar },
         { provide: TranslocoService, useValue: { translate: vi.fn((key: string) => key) } },
       ],
-    }).overrideComponent(GuildBranchSettingsCardComponent, { set: { template: '', imports: [] } });
+    }).overrideComponent(GuildBranchRosterSettingsCardComponent, { set: { template: '', imports: [] } });
 
-    fixture = TestBed.createComponent(GuildBranchSettingsCardComponent);
+    fixture = TestBed.createComponent(GuildBranchRosterSettingsCardComponent);
     fixture.componentRef.setInput('guildId', 'g1');
     fixture.componentRef.setInput('branch', branchInput);
     fixture.componentRef.setInput('roles', roles);
@@ -117,22 +117,6 @@ describe('GuildBranchSettingsCardComponent', () => {
     });
   });
 
-  // ── regionOptions ─────────────────────────────────────────────────────────
-
-  describe('regionOptions', () => {
-    it('lists every region with a translated label', () => {
-      setup();
-      fixture.detectChanges();
-
-      expect(component.regionOptions()).toEqual([
-        { value: 'eu', label: 'guildSettings.branches.region.options.eu' },
-        { value: 'us', label: 'guildSettings.branches.region.options.us' },
-        { value: 'kr', label: 'guildSettings.branches.region.options.kr' },
-        { value: 'tw', label: 'guildSettings.branches.region.options.tw' },
-      ]);
-    });
-  });
-
   // ── roleOptions ───────────────────────────────────────────────────────────
 
   describe('roleOptions', () => {
@@ -178,38 +162,37 @@ describe('GuildBranchSettingsCardComponent', () => {
     });
   });
 
-  // ── onRosterModeChange ────────────────────────────────────────────────────
+  // ── onRosterModeChange / onRosterRoleIdsChange / onOfficerRoleIdsChange ────
 
   describe('onRosterModeChange', () => {
-    it('updates rosterMode', () => {
+    it('updates rosterMode and auto-saves', async () => {
       setup();
       fixture.detectChanges();
 
       component.onRosterModeChange(RosterMode.DiscordRoleOnly);
+      await Promise.resolve();
 
       expect(component.rosterMode()).toBe(RosterMode.DiscordRoleOnly);
     });
-  });
 
-  // ── save ──────────────────────────────────────────────────────────────────
-
-  describe('save', () => {
-    it('does nothing when canSave is false', async () => {
+    it('does not save while canSave is false (Discord-role mode, no roster roles yet)', async () => {
       setup();
       fixture.detectChanges();
-      component.rosterMode.set(RosterMode.DiscordRoleOnly);
 
-      await component.save();
+      component.onRosterModeChange(RosterMode.DiscordRoleOnly);
+      await Promise.resolve();
 
       expect(branchesService.updateRosterSettings).not.toHaveBeenCalled();
     });
+  });
 
-    it('clears rosterRoleIds in the payload when rosterMode is Open', async () => {
+  describe('onRosterRoleIdsChange', () => {
+    it('clears rosterRoleIds from the saved payload when rosterMode is Open', async () => {
       setup();
       fixture.detectChanges();
-      component.rosterRoleIds.set(['stale-role']);
 
-      await component.save();
+      component.onRosterRoleIdsChange(['stale-role']);
+      await Promise.resolve();
 
       expect(branchesService.updateRosterSettings).toHaveBeenCalledWith('g1', 7, {
         rosterMode: RosterMode.Open,
@@ -222,56 +205,31 @@ describe('GuildBranchSettingsCardComponent', () => {
       setup();
       fixture.detectChanges();
       component.rosterMode.set(RosterMode.DiscordRoleOnly);
-      component.rosterRoleIds.set(['r1']);
-      component.officerRoleIds.set(['r2']);
 
-      await component.save();
+      component.onRosterRoleIdsChange(['r1']);
+      await Promise.resolve();
 
       expect(branchesService.updateRosterSettings).toHaveBeenCalledWith('g1', 7, {
         rosterMode: RosterMode.DiscordRoleOnly,
         rosterRoleIds: ['r1'],
-        officerRoleIds: ['r2'],
+        officerRoleIds: [],
       });
     });
+  });
 
-    it('also updates the region when it was changed from the branch value', async () => {
-      setup(branch({ region: 'eu' }));
-      fixture.detectChanges();
-      component.region.set('us');
-
-      await component.save();
-
-      expect(branchesService.updateRegion).toHaveBeenCalledWith('g1', 7, 'us');
-    });
-
-    it('does not update the region when it is unchanged from the branch value', async () => {
-      setup(branch({ region: 'eu' }));
+  describe('onOfficerRoleIdsChange', () => {
+    it('updates officerRoleIds and auto-saves', async () => {
+      setup();
       fixture.detectChanges();
 
-      await component.save();
+      component.onOfficerRoleIdsChange(['r2']);
+      await Promise.resolve();
 
-      expect(branchesService.updateRegion).not.toHaveBeenCalled();
-    });
-
-    it('does not update the region while it is still unset', async () => {
-      setup(branch({ region: null }));
-      fixture.detectChanges();
-
-      await component.save();
-
-      expect(branchesService.updateRegion).not.toHaveBeenCalled();
-    });
-
-    it('shows an error snackbar when the region update fails', async () => {
-      setup(branch({ region: 'eu' }));
-      branchesService.updateRegion.mockReturnValue(throwError(() => new Error('failed')));
-      fixture.detectChanges();
-      component.region.set('us');
-
-      await component.save();
-
-      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
-      expect(component.submitting()).toBe(false);
+      expect(branchesService.updateRosterSettings).toHaveBeenCalledWith('g1', 7, {
+        rosterMode: RosterMode.Open,
+        rosterRoleIds: [],
+        officerRoleIds: ['r2'],
+      });
     });
 
     it('shows a success snackbar and emits saved on success', async () => {
@@ -279,7 +237,8 @@ describe('GuildBranchSettingsCardComponent', () => {
       fixture.detectChanges();
       const savedSpy = vi.spyOn(component.saved, 'emit');
 
-      await component.save();
+      component.onOfficerRoleIdsChange(['r2']);
+      await Promise.resolve();
 
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.branches.rosterSettings.saveSuccess');
       expect(savedSpy).toHaveBeenCalled();
@@ -291,7 +250,8 @@ describe('GuildBranchSettingsCardComponent', () => {
       branchesService.updateRosterSettings.mockReturnValue(throwError(() => new Error('failed')));
       fixture.detectChanges();
 
-      await component.save();
+      component.onOfficerRoleIdsChange(['r2']);
+      await Promise.resolve();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.submitting()).toBe(false);

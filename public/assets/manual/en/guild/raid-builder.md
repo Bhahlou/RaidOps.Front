@@ -16,6 +16,26 @@ Officers without a mouse handy for dragging can click an empty slot to search an
 
 Up to four raids can be composed side by side for a given week — either one-off events, or occurrences generated automatically by a recurring **series** (same day of week, time, group size, and target raid zones every week or every N weeks). A raid starts as a **draft**, invisible to regular roster members, until an officer **publishes** it. Deleting an event also removes every assignment it holds; deactivating a series stops it from generating new occurrences going forward, with the option to also clean up its already-generated empty, unpublished ones.
 
-The week shown defaults to the guild branch's actual weekly raid-lockout reset window once its region is configured in the branch settings.
+The week shown defaults to the guild branch's actual weekly raid-lockout reset window once its region is configured in the General tab of guild settings.
 
 ![Edit raid event dialog: name, schedule, grid size, and raid zones](/assets/manual/en/guild/raid-builder-edit-dialog.png)
+
+### Raid detail page
+
+Once a raid is **published**, its name becomes clickable in the grid and opens its dedicated detail page (breadcrumb: Guild > Raids > raid name) — for now, this is where attendance, loot, and log analysis will live later. A raid still in draft keeps a plain, unlinked name.
+
+### Discord composition announcement
+
+Once the **Raid composition announcement** channel is configured in the Notifications tab (see the dedicated guide), publishing a raid posts an embed listing every slot group by group. That same message is then edited in place on every assignment, unassignment, swap, or spec change — never reposted, so it stays current without spamming the channel. Each player added or removed can also get a DM detailing which character, if that separate setting is enabled.
+
+![Discord embed of the composition announcement](/assets/manual/en/guild/raid-composition-announcement.png)
+
+### Ping to group up
+
+> Officer only.
+
+On a published raid's detail page, the **Ping to group up** button posts a one-off message in the announcement channel, mentioning every assigned player and stating which character to whisper for an invite — with a snapshot of the current composition attached as an embed (unlike the standing announcement, this one isn't updated afterward). The character referenced is your own if you're assigned to that raid yourself; otherwise, a **Who should players whisper?** dialog asks you to pick one from the assigned characters.
+
+The same action is available directly from Discord via the `/raid invite <raid> [character]` command — the raid is chosen via autocomplete, and the character parameter is optional (same resolution logic as the button).
+
+![Discord grouping message, with the composition as an embed](/assets/manual/en/guild/raid-grouping-announcement.png)

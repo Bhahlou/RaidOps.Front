@@ -104,8 +104,14 @@
                 <div class="active-event-header">
                   <div class="active-event-info">
                     <h2>
-                      {{ event.name }}
-                      @if (event.publicationStatus === PublicationStatus.Draft) {
+                      @if (event.publicationStatus === PublicationStatus.Published) {
+                        <a
+                          class="raid-name-link"
+                          [routerLink]="['/guilds', guildId(), guildBranchId(), 'raids', event.id]"
+                          >{{ event.name }}</a
+                        >
+                      } @else {
+                        {{ event.name }}
                         <span class="active-event-draft-badge">{{
                           'raidBuilder.draft' | transloco
                         }}</span>

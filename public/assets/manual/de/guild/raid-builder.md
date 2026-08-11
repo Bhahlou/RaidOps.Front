@@ -16,6 +16,26 @@ Officer ohne Lust auf Drag & Drop können auch auf einen leeren Slot klicken, um
 
 Bis zu vier Raids können für eine gegebene Woche nebeneinander zusammengestellt werden — entweder einmalige Events oder Vorkommen, die automatisch von einer wiederkehrenden **Serie** erzeugt werden (gleicher Wochentag, Uhrzeit, Gruppengröße und Zielraidzonen jede Woche oder alle N Wochen). Ein Raid startet als **Entwurf**, unsichtbar für reguläre Roster-Mitglieder, bis ein Officer ihn **veröffentlicht**. Das Löschen eines Events entfernt auch alle seine Einteilungen; das Deaktivieren einer Serie stoppt die Erzeugung neuer Vorkommen, mit der Option, bereits erzeugte, aber noch leere und unveröffentlichte Vorkommen gleich mit aufzuräumen.
 
-Die standardmäßig angezeigte Woche entspricht dem tatsächlichen wöchentlichen Raid-Lockout-Reset-Fenster des Gilden-Zweigs, sobald dessen Region in den Zweig-Einstellungen konfiguriert ist.
+Die standardmäßig angezeigte Woche entspricht dem tatsächlichen wöchentlichen Raid-Lockout-Reset-Fenster des Gilden-Zweigs, sobald dessen Region im Tab Allgemein der Gildeneinstellungen konfiguriert ist.
 
 ![Dialog „Raid-Event bearbeiten": Name, Zeitplan, Rastergröße und Raidzonen](/assets/manual/de/guild/raid-builder-edit-dialog.png)
+
+### Detailseite eines Raids
+
+Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und öffnet seine eigene Detailseite (Breadcrumb: Gilde > Raids > Raid-Name) — hier werden später Anwesenheit, Loot und Log-Analyse zu finden sein. Ein noch im Entwurf befindlicher Raid behält einen einfachen, nicht verlinkten Namen.
+
+### Discord-Kompositions-Ankündigung
+
+Sobald der Kanal **Zusammensetzungsankündigung** im Tab Benachrichtigungen konfiguriert ist (siehe die eigene Anleitung), postet das Veröffentlichen eines Raids ein Embed mit allen Slots, Gruppe für Gruppe. Dieselbe Nachricht wird danach bei jeder Zuweisung, Entfernung, jedem Tausch oder Skillungswechsel bearbeitet — nie neu gepostet, sodass sie stets aktuell bleibt, ohne den Kanal zuzuspammen. Jeder hinzugefügte oder entfernte Spieler kann zusätzlich eine DM erhalten, die angibt, mit welchem Charakter — sofern diese separate Einstellung aktiviert ist.
+
+![Discord-Embed der Zusammensetzungsankündigung](/assets/manual/de/guild/raid-composition-announcement.png)
+
+### Gruppierung anpingen
+
+> Nur für Officer.
+
+Auf der Detailseite eines veröffentlichten Raids postet der Button **Gruppierung anpingen** eine einmalige Nachricht im Ankündigungskanal, die alle zugewiesenen Spieler erwähnt und angibt, welchen Charakter sie für eine Einladung anflüstern sollen — mit einem Schnappschuss der aktuellen Zusammensetzung als Embed (im Gegensatz zur dauerhaften Ankündigung wird dieser danach nicht aktualisiert). Referenziert wird dein eigener Charakter, falls du selbst diesem Raid zugewiesen bist; andernfalls fragt dich ein Dialog **Wen sollen die Spieler anflüstern?**, welchen zugewiesenen Charakter du wählst.
+
+Dieselbe Aktion ist auch direkt über Discord per Befehl `/raid invite <raid> [charakter]` verfügbar — der Raid wird per Autovervollständigung ausgewählt, und der Charakter-Parameter ist optional (gleiche Auflösungslogik wie der Button).
+
+![Discord-Gruppierungsnachricht, mit der Zusammensetzung als Embed](/assets/manual/de/guild/raid-grouping-announcement.png)

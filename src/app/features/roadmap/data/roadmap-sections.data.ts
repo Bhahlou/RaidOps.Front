@@ -47,6 +47,8 @@ export const ROADMAP_SECTIONS: RoadmapSection[] = [
       done('guildMultiBranch'),
       done('branchNotifications'),
       done('raidBuilder'),
+      done('raidCompositionAnnouncement'),
+      done('raidGrouping'),
       item('raidAssignments'),
       item('raidHistory'),
       item('guildDashboard'),

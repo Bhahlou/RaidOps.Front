@@ -22,6 +22,7 @@ import { AuditLogEntry } from '../../models/audit-log-entry.model';
 import { GuildAuditAction } from '../../models/guild-audit-action.enum';
 import { GuildAuditCategory } from '../../models/guild-audit-category.enum';
 import { RosterMode } from '../../models/roster-mode.enum';
+import { SignupMode } from '../../models/signup-mode.enum';
 import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
 import { describePartialTime, formatPartialTimeLabel } from '../../../calendar/models/availability.model';
 
@@ -455,6 +456,7 @@ export class GuildAuditLogComponent {
       case GuildAuditAction.BranchDeactivated:
       case GuildAuditAction.BranchRosterSettingsUpdated:
       case GuildAuditAction.BranchRegionUpdated:
+      case GuildAuditAction.BranchSignupModeUpdated:
         return entry.variables?.['branchName'] ?? '—';
 
       case GuildAuditAction.RaidSeriesCreated:
@@ -754,6 +756,14 @@ export class GuildAuditLogComponent {
         };
       }
 
+      case 'signupMode': {
+        const oldLabel = v['oldSignupMode'] ? this.#signupModeLabel(v['oldSignupMode']) : '—';
+        return {
+          labelKey: 'auditLog.settingsFields.signupMode',
+          summary: `${oldLabel} → ${this.#signupModeLabel(v['newSignupMode'])}`,
+        };
+      }
+
       case 'minRosterRoleId': {
         const oldRole = this.#roleDisplay(v, 'oldMinRosterRole');
         const newRole = this.#roleDisplay(v, 'newMinRosterRole');
@@ -784,6 +794,14 @@ export class GuildAuditLogComponent {
       rosterMode === RosterMode.DiscordRoleOnly
         ? 'guildSettings.branches.rosterMode.discordRoleOnly'
         : 'guildSettings.branches.rosterMode.open',
+    );
+  }
+
+  #signupModeLabel(signupMode: string): string {
+    return this.#transloco.translate(
+      signupMode === SignupMode.Signup
+        ? 'guildSettings.branches.signupMode.signup'
+        : 'guildSettings.branches.signupMode.defaultPresent',
     );
   }
 

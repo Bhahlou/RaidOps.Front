@@ -216,6 +216,31 @@ describe('GuildNotificationSettingsComponent', () => {
 
       expect(component.canSave()).toBe(true);
     });
+
+    it('is true when a channelless (DM) event is enabled with no channel', () => {
+      setup('g1', [setting({ eventType: GuildNotificationEventType.RaidCompositionAnnouncementDm, enabled: true, channelId: null })]);
+      fixture.detectChanges();
+
+      expect(component.canSave()).toBe(true);
+    });
+  });
+
+  // ── isChannelless ─────────────────────────────────────────────────────────
+
+  describe('isChannelless', () => {
+    it('is true for the composition announcement DM event', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      expect(component.isChannelless(GuildNotificationEventType.RaidCompositionAnnouncementDm)).toBe(true);
+    });
+
+    it('is false for a channel-posting event', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      expect(component.isChannelless(GuildNotificationEventType.RaidCompositionAnnouncementPosted)).toBe(false);
+    });
   });
 
   // ── eventLabel ────────────────────────────────────────────────────────────
@@ -296,6 +321,13 @@ describe('GuildNotificationSettingsComponent', () => {
       fixture.detectChanges();
 
       expect(component.channelMissing(GuildNotificationEventType.AbsenceAdded)).toBe(false);
+    });
+
+    it('is false for a channelless (DM) event even when enabled with no channel', () => {
+      setup('g1', [setting({ eventType: GuildNotificationEventType.RaidCompositionAnnouncementDm, enabled: true, channelId: null })]);
+      fixture.detectChanges();
+
+      expect(component.channelMissing(GuildNotificationEventType.RaidCompositionAnnouncementDm)).toBe(false);
     });
   });
 
@@ -439,11 +471,11 @@ describe('GuildNotificationSettingsComponent', () => {
   // ── families / accordion (isFamilyExpanded, toggleFamily, enabledCount) ────
 
   describe('families', () => {
-    it('declares Absences, Raid changes and Raid composition changes, in that order', () => {
+    it('declares Absences, Raid changes, Raid composition changes and Raid composition announcement, in that order', () => {
       setup('g1');
       fixture.detectChanges();
 
-      expect(component.families.map((f) => f.id)).toEqual(['absences', 'raids', 'raidComposition']);
+      expect(component.families.map((f) => f.id)).toEqual(['absences', 'raids', 'raidComposition', 'raidCompositionAnnouncement']);
     });
 
     it('groups the raid event types under "raids" and the composition ones under "raidComposition"', () => {
@@ -463,6 +495,18 @@ describe('GuildNotificationSettingsComponent', () => {
         GuildNotificationEventType.RaidSlotUnassigned,
         GuildNotificationEventType.RaidSlotsSwapped,
         GuildNotificationEventType.RaidSlotSpecChanged,
+      ]);
+    });
+
+    it('groups the composition announcement event types under "raidCompositionAnnouncement"', () => {
+      setup('g1');
+      fixture.detectChanges();
+
+      const raidCompositionAnnouncement = component.families.find((f) => f.id === 'raidCompositionAnnouncement')!;
+
+      expect(raidCompositionAnnouncement.eventTypes).toEqual([
+        GuildNotificationEventType.RaidCompositionAnnouncementPosted,
+        GuildNotificationEventType.RaidCompositionAnnouncementDm,
       ]);
     });
   });
@@ -565,8 +609,9 @@ describe('GuildNotificationSettingsComponent', () => {
 
       await component.save();
 
-      // 3 families (Absences, Raid changes, Raid composition changes), 9 event types total — only
-      // AbsenceAdded has a stored setting, every other row falls back to its disabled default.
+      // 4 families (Absences, Raid changes, Raid composition changes, Raid composition
+      // announcement), 11 event types total — only AbsenceAdded has a stored setting, every
+      // other row falls back to its disabled default.
       const expectedRows = [
         { eventType: GuildNotificationEventType.AbsenceAdded, enabled: true, channelId: 'chan-1' },
         { eventType: GuildNotificationEventType.AbsenceRemoved, enabled: false, channelId: null },
@@ -577,6 +622,8 @@ describe('GuildNotificationSettingsComponent', () => {
         { eventType: GuildNotificationEventType.RaidSlotUnassigned, enabled: false, channelId: null },
         { eventType: GuildNotificationEventType.RaidSlotsSwapped, enabled: false, channelId: null },
         { eventType: GuildNotificationEventType.RaidSlotSpecChanged, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidCompositionAnnouncementPosted, enabled: false, channelId: null },
+        { eventType: GuildNotificationEventType.RaidCompositionAnnouncementDm, enabled: false, channelId: null },
       ];
       expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', null, expectedRows);
       expect(store.patchSettings).toHaveBeenCalledWith(

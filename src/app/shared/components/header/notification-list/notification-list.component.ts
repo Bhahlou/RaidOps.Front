@@ -21,10 +21,10 @@ export const NOTIFICATION_MESSAGE_KEYS: Partial<Record<NotificationType, string>
 /** Route the notification's call-to-action link points to. */
 const LINK_BUILDERS: Partial<Record<NotificationType, (notification: Notification) => unknown[]>> =
   {
-    [NotificationType.BranchOfficerRolesNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'branches'],
+    [NotificationType.BranchOfficerRolesNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'roster'],
     [NotificationType.GuildLanguageNotConfigured]: (n) => ['/guilds', n.guildId, 'settings'],
     [NotificationType.AbsenceNotificationsNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'notifications'],
-    [NotificationType.BranchRegionNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'branches'],
+    [NotificationType.BranchRegionNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'general'],
     [NotificationType.RaidNotificationsNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'notifications'],
     [NotificationType.RaidCompositionNotificationsNotConfigured]: (n) => ['/guilds', n.guildId, 'settings', 'notifications'],
   };
