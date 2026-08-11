@@ -73,6 +73,10 @@ export const CHANGELOG_GROUPS: ChangelogGroup[] = [
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-08-08-pwa-install', '1.7', '2026-08-08', 'pwaInstall', {
+    category: 'account',
+    article: 'install-app',
+  }),
   improvement('2026-08-05-live-role-refresh', '1.1', '2026-08-05', 'liveRoleRefresh', {
     category: 'account',
     article: 'discord-auth',

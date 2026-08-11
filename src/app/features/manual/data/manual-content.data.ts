@@ -41,6 +41,11 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         requiresAuth: true,
         contentPath: (lang) => `assets/manual/${lang}/account/calendar.md`,
       },
+      {
+        id: 'install-app',
+        labelKey: 'manual.article.installApp.title',
+        contentPath: (lang) => `assets/manual/${lang}/account/install-app.md`,
+      },
     ],
   },
   {

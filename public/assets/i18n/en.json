@@ -10,6 +10,12 @@
     "confirm": "Confirm",
     "cancel": "Cancel"
   },
+  "pwaUpdate": {
+    "title": "New version available",
+    "message": "A new version of RaidOps is available. If you don't reload now, some features may stop working correctly until you reload the page.",
+    "reload": "Reload",
+    "later": "Later"
+  },
   "manual": {
     "back": "Back",
     "toc": "Contents",
@@ -56,6 +62,9 @@
       "calendar": {
         "title": "Manage my availability"
       },
+      "installApp": {
+        "title": "Install RaidOps"
+      },
       "guildNotifications": {
         "title": "Settings - Notifications"
       },
@@ -88,6 +97,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "pwaInstall": {
+        "title": "RaidOps can now be installed as an app, and updates itself automatically",
+        "description": "You can now install RaidOps from your browser (Chrome/Edge) to open it in its own window, like a real app. Whether installed or not, it automatically checks for new versions every time you open it, downloads them in the background without interrupting your work, then offers to reload so you can use them."
+      },
       "liveRoleRefresh": {
         "title": "Role, permission, and guild access changes now apply live, no more waiting",
         "description": "When an officer updated your Discord roles, or you joined/left a guild's Discord server, RaidOps used to wait until your session token expired (up to 15 minutes) before picking it up. Your session is now notified instantly and refreshes your profile in the background, so updated permissions and guild access apply right away."

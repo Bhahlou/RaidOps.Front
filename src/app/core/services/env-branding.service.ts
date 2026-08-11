@@ -7,6 +7,12 @@ export const LOGO_BY_ENV: Record<string, string> = {
   development: 'assets/Logo no background DEV.svg',
 };
 
+export const MANIFEST_BY_ENV: Record<string, string> = {
+  production: 'manifest.webmanifest',
+  acceptance: 'manifest-acceptance.webmanifest',
+  development: 'manifest-development.webmanifest',
+};
+
 export const BADGE_LABEL_BY_ENV: Record<string, string> = {
   acceptance: 'Acc',
   development: 'Dev',
@@ -20,6 +26,7 @@ export const ACCENT_COLOR_BY_ENV: Record<string, string> = {
 
 export interface EnvBranding {
   logoPath: string;
+  manifestPath: string;
   badgeLabel: string | null;
   accentColor: string | null;
 }
@@ -32,12 +39,13 @@ export interface EnvBranding {
 export function resolveEnvBranding(envName: string): EnvBranding {
   return {
     logoPath: LOGO_BY_ENV[envName] ?? LOGO_BY_ENV['production'],
+    manifestPath: MANIFEST_BY_ENV[envName] ?? MANIFEST_BY_ENV['production'],
     badgeLabel: BADGE_LABEL_BY_ENV[envName] ?? null,
     accentColor: ACCENT_COLOR_BY_ENV[envName] ?? null,
   };
 }
 
-/** Centralizes the env-dependent branding (favicon, header logo, header badge) so app.ts and HeaderComponent stay in sync. */
+/** Centralizes the env-dependent branding (favicon, PWA manifest, header logo, header badge) so app.ts and HeaderComponent stay in sync. */
 @Service()
 export class EnvBrandingService {
   readonly envName = environment.envName;
@@ -45,6 +53,7 @@ export class EnvBrandingService {
   private readonly branding = resolveEnvBranding(this.envName);
 
   readonly logoPath = this.branding.logoPath;
+  readonly manifestPath = this.branding.manifestPath;
   readonly badgeLabel = this.branding.badgeLabel;
   readonly accentColor = this.branding.accentColor;
 }
