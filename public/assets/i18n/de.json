@@ -10,6 +10,12 @@
     "confirm": "Bestätigen",
     "cancel": "Abbrechen"
   },
+  "pwaUpdate": {
+    "title": "Neue Version verfügbar",
+    "message": "Eine neue Version von RaidOps ist verfügbar. Wenn du jetzt nicht neu lädst, funktionieren manche Funktionen möglicherweise nicht mehr richtig, bis du die Seite neu lädst.",
+    "reload": "Neu laden",
+    "later": "Später"
+  },
   "manual": {
     "back": "Zurück",
     "toc": "Inhalt",
@@ -56,6 +62,9 @@
       "calendar": {
         "title": "Meine Verfügbarkeit verwalten"
       },
+      "installApp": {
+        "title": "RaidOps installieren"
+      },
       "guildNotifications": {
         "title": "Einstellungen - Benachrichtigungen"
       },
@@ -88,6 +97,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "pwaInstall": {
+        "title": "RaidOps lässt sich jetzt als App installieren und aktualisiert sich von selbst",
+        "description": "Du kannst RaidOps jetzt aus deinem Browser (Chrome/Edge) installieren, um es in einem eigenen Fenster zu öffnen — wie eine echte App. Ob installiert oder nicht, sie prüft bei jedem Öffnen automatisch auf neue Versionen, lädt sie im Hintergrund herunter, ohne deine Arbeit zu unterbrechen, und bietet dir dann an, neu zu laden, um sie zu nutzen."
+      },
       "liveRoleRefresh": {
         "title": "Rollen-, Berechtigungs- und Gildenzugriffsänderungen werden jetzt sofort übernommen",
         "description": "Wenn ein Offizier deine Discord-Rollen änderte, oder du dem Discord-Server einer Gilde beigetreten bist oder ihn verlassen hast, wartete RaidOps bisher bis zu 15 Minuten (bis dein Sitzungstoken ablief), bevor die Änderung übernommen wurde. Deine Sitzung wird jetzt sofort benachrichtigt und aktualisiert dein Profil im Hintergrund, sodass neue Berechtigungen und Gildenzugriffe sofort gelten."

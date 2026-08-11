@@ -10,6 +10,12 @@
     "confirm": "Confirmer",
     "cancel": "Annuler"
   },
+  "pwaUpdate": {
+    "title": "Nouvelle version disponible",
+    "message": "Une nouvelle version de RaidOps est disponible. Si tu ne recharges pas maintenant, certaines fonctionnalités pourraient cesser de fonctionner correctement tant que tu n'auras pas rechargé la page.",
+    "reload": "Recharger",
+    "later": "Plus tard"
+  },
   "manual": {
     "back": "Retour",
     "toc": "Sommaire",
@@ -56,6 +62,9 @@
       "calendar": {
         "title": "Gérer mes disponibilités"
       },
+      "installApp": {
+        "title": "Installer RaidOps"
+      },
       "guildNotifications": {
         "title": "Paramètres - Notifications"
       },
@@ -88,6 +97,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "pwaInstall": {
+        "title": "RaidOps s'installe comme une application, et se met à jour toute seule",
+        "description": "Tu peux désormais installer RaidOps depuis ton navigateur (Chrome/Edge) pour l'ouvrir dans sa propre fenêtre, comme une vraie application. Installée ou non, elle vérifie automatiquement les nouvelles versions à chaque ouverture, les télécharge en tâche de fond sans interrompre ton travail, puis te propose de recharger pour en profiter."
+      },
       "liveRoleRefresh": {
         "title": "Les changements de rôles, permissions et accès aux guildes s'appliquent maintenant en direct",
         "description": "Quand un officier modifiait tes rôles Discord, ou que tu rejoignais/quittais le serveur Discord d'une guilde, RaidOps attendait jusqu'à 15 minutes (l'expiration de ta session) avant d'en tenir compte. Ta session est désormais notifiée instantanément et rafraîchit ton profil en arrière-plan, tes permissions et accès aux guildes sont donc à jour immédiatement."
