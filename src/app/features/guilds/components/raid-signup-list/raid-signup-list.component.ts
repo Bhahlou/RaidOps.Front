@@ -80,7 +80,7 @@ export class RaidSignupListComponent implements OnDestroy {
       }));
   });
 
-  #unsubscribeSignupChanged: (() => void) | null = null;
+  readonly #unsubscribeSignupChanged: () => void;
 
   constructor() {
     // `event()` is a brand-new object reference on every board reload (a fresh HTTP response
@@ -112,7 +112,7 @@ export class RaidSignupListComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.#unsubscribeSignupChanged?.();
+    this.#unsubscribeSignupChanged();
     this.#boardStore.leaveRaidSignupUpdates(this.guildBranchId(), this.event().id);
   }
 

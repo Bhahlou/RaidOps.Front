@@ -184,28 +184,6 @@ describe('RaidSignupListComponent', () => {
       expect(boardStore.leaveRaidSignupUpdates).toHaveBeenCalledWith(10, 1);
     });
 
-    it('does not throw when no unsubscribe function was ever returned', () => {
-      boardStore = {
-        getSignups: vi.fn().mockReturnValue(of([])),
-        joinRaidSignupUpdates: vi.fn(),
-        leaveRaidSignupUpdates: vi.fn(),
-        onRaidSignupChanged: vi.fn().mockReturnValue(undefined as unknown as () => void),
-        reload: vi.fn(),
-        startDrag: vi.fn(),
-        endDrag: vi.fn(),
-      };
-      TestBed.configureTestingModule({
-        imports: [RaidSignupListComponent],
-        providers: [{ provide: RaidBoardStore, useValue: boardStore }],
-      }).overrideComponent(RaidSignupListComponent, { set: { template: '', imports: [] } });
-      fixture = TestBed.createComponent(RaidSignupListComponent);
-      fixture.componentRef.setInput('event', raidEvent());
-      fixture.componentRef.setInput('guildId', 'g1');
-      fixture.componentRef.setInput('guildBranchId', 10);
-      fixture.detectChanges();
-
-      expect(() => fixture.componentInstance.ngOnDestroy()).not.toThrow();
-    });
   });
 
   // ── status buckets ────────────────────────────────────────────────────────

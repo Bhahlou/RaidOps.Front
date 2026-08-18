@@ -150,7 +150,8 @@
                     </div>
                   </div>
                   <div class="active-event-signup" [class.active-event-signup--placeholder]="event.signupMode !== SignupMode.Signup">
-                    <div class="active-event-signup-buttons" role="group" [attr.aria-label]="'raidBuilder.signup.myResponse' | transloco">
+                    <fieldset class="active-event-signup-buttons">
+                      <legend class="visually-hidden">{{ 'raidBuilder.signup.myResponse' | transloco }}</legend>
                       <app-icon-button
                         icon="check_circle"
                         [extraClass]="'signup-btn signup-btn--accept' + (event.mySignupStatus === SignupStatus.Accepted ? ' signup-btn--active' : '')"
@@ -175,7 +176,7 @@
                         [disabled]="event.signupMode !== SignupMode.Signup"
                         (click)="setSignup(event, SignupStatus.Declined)"
                       />
-                    </div>
+                    </fieldset>
                     @if (
                       (event.mySignupStatus === SignupStatus.Accepted || event.mySignupStatus === SignupStatus.Tentative) &&
                       mySignupCharacter(event);

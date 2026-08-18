@@ -18,7 +18,8 @@
   @if (signupMode() === SignupMode.Signup) {
     <div class="detail-signup">
       <h2 class="detail-signup-title">{{ 'raidBuilder.signup.myResponse' | transloco }}</h2>
-      <div class="detail-signup-buttons" role="group" [attr.aria-label]="'raidBuilder.signup.myResponse' | transloco">
+      <fieldset class="detail-signup-buttons">
+        <legend class="visually-hidden">{{ 'raidBuilder.signup.myResponse' | transloco }}</legend>
         <app-button
           variant="stroked"
           icon="check_circle"
@@ -46,7 +47,7 @@
         >
           {{ 'raidBuilder.signup.decline' | transloco }}
         </app-button>
-      </div>
+      </fieldset>
 
       @if (isOfficer()) {
         <div class="detail-signup-roster">
