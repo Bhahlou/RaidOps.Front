@@ -67,6 +67,29 @@
   </div>
 
   <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" />
+
+  @if (showSignupOverride()) {
+    <div class="field-group">
+      <app-checkbox [checked]="signupOverride()" (checkedChange)="signupOverride.set($event)">
+        {{ 'raidBuilder.eventDialog.signupOverride' | transloco }}
+      </app-checkbox>
+    </div>
+  }
+
+  @if (showChannelField()) {
+    <app-raid-channel-field
+      [channels]="channels()"
+      [categories]="categories()"
+      [canCreateRootChannel]="canCreateRootChannel()"
+      [showNewChannelName]="false"
+      [newChannelHint]="'raidBuilder.seriesDialog.newChannelPerOccurrenceHint' | transloco"
+      [(channelMode)]="channelMode"
+      [(selectedChannelId)]="selectedChannelId"
+      [(selectedCategoryId)]="selectedCategoryId"
+      [(newChannelName)]="newChannelName"
+      (canCreateAtSelectionChange)="canCreateChannelAtSelection.set($event)"
+    />
+  }
 </div>
 
 <div class="dialog-actions">

@@ -54,24 +54,33 @@ export function playerAssignedCharacterIdsFor(event: RaidEvent): ReadonlyMap<str
  * Characters eligible to be assigned to `event`, mirroring
  * `AssignCharacterToSlotCommandHandler`'s own validation order so the search list only ever
  * offers choices the server will actually accept:
- * - declared absent for the event's date (`event.absentPlayerDiscordIds`)
+ * - currently ineligible for this event (`event.ineligiblePlayerDiscordIds`) — declared absent
+ *   (`DefaultPresent` mode) or hasn't accepted the signup (`Signup` mode)
  * - the player already holds another slot in this same event (one character per player per event)
  * - the character is already locked to a target zone shared with this event via another
  *   currently loaded event (see {@link lockedCharacterIdsFor})
+ * - for `Signup`-mode events, the character isn't the one the player actually signed up with
+ *   (`event.acceptedCharacterIdsByPlayerDiscordId`) — a player may have other alts on the
+ *   roster, but only the character they RSVP'd with is offered here
  */
 export function assignableCharactersFor(
   event: RaidEvent,
   roster: GuildRosterMember[],
   otherEvents: RaidEvent[],
 ): AssignableCharacter[] {
-  const absentPlayerIds = new Set(event.absentPlayerDiscordIds);
+  const ineligiblePlayerIds = new Set(event.ineligiblePlayerDiscordIds);
   const playersInEvent = new Set(event.assignments.map((a) => a.playerDiscordId));
   const lockedCharacterIds = lockedCharacterIdsFor(event, otherEvents);
+  const acceptedCharacterIdsByPlayer = event.acceptedCharacterIdsByPlayerDiscordId;
 
   return roster
-    .filter((m) => !absentPlayerIds.has(m.playerDiscordId))
+    .filter((m) => !ineligiblePlayerIds.has(m.playerDiscordId))
     .filter((m) => !playersInEvent.has(m.playerDiscordId))
     .filter((m) => !lockedCharacterIds.has(m.characterId))
+    .filter((m) => {
+      const signedUpCharacterId = acceptedCharacterIdsByPlayer[m.playerDiscordId];
+      return signedUpCharacterId === undefined || signedUpCharacterId === m.characterId;
+    })
     .map((m) => ({
       characterId: m.characterId,
       characterName: m.characterName,

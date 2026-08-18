@@ -68,6 +68,12 @@ const NOTIFICATION_FAMILIES: NotificationFamily[] = [
       GuildNotificationEventType.RaidCompositionAnnouncementDm,
     ],
   },
+  {
+    id: 'raidSignupCall',
+    labelKey: 'guildSettings.notificationSettings.families.raidSignupCall.label',
+    hintKey: 'guildSettings.notificationSettings.families.raidSignupCall.hint',
+    eventTypes: [GuildNotificationEventType.RaidSignupCallPosted],
+  },
 ];
 
 /** Event types that notify a player directly (DM) rather than posting to a channel — no channel picker for these rows. */

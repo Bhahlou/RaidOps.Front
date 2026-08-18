@@ -50,8 +50,6 @@ export class RaidRosterPoolComponent {
   readonly #boardStore = inject(RaidBoardStore);
   readonly #transloco = inject(TranslocoService);
 
-  readonly isLoading = this.#store.isLoading;
-
   readonly searchQuery = signal('');
   // Every pool filter is multi-select — several classes/specs/ranks can be picked at once.
   readonly classFilter = signal<number[]>([]);

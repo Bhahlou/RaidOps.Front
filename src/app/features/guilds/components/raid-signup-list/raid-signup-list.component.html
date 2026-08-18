@@ -1,0 +1,82 @@
+<div class="signup-list">
+  <button type="button" class="signup-list-toggle" (click)="toggleExpanded()">
+    <span class="material-icons">{{ expanded() ? 'expand_less' : 'expand_more' }}</span>
+    <span class="signup-list-toggle-label">{{ 'raidBuilder.signup.listTitle' | transloco }}</span>
+    <span class="signup-list-counts">
+      <span class="signup-list-count signup-list-count--accept">✅ {{ acceptedSignups().length }}</span>
+      <span class="signup-list-count signup-list-count--tentative">❓ {{ tentativeSignups().length }}</span>
+      <span class="signup-list-count signup-list-count--decline">❌ {{ declinedSignups().length }}</span>
+    </span>
+  </button>
+
+  @if (expanded()) {
+    <div
+      class="signup-class-grid"
+      cdkDropList
+      [id]="'raid-signup-list-' + event().id"
+      [cdkDropListEnterPredicate]="rejectEnter"
+    >
+      @for (group of acceptedByClass(); track group.classId) {
+        <div class="signup-class-column">
+          <h4 class="signup-class-column-title">
+            @if (group.iconUrl) {
+              <img class="signup-class-icon" [src]="group.iconUrl" alt="" width="16" height="16" />
+            }
+            {{ 'classes.' + group.classId | transloco }} ({{ group.signups.length }})
+          </h4>
+          @for (s of group.signups; track s.userDiscordId) {
+            <div
+              class="signup-row"
+              [class.signup-row--own]="isOwnSignup(s)"
+              [class.signup-row--assigned]="isAlreadyAssigned(s)"
+              [title]="isAlreadyAssigned(s) ? ('raidBuilder.signup.alreadyAssigned' | transloco) : ''"
+              cdkDrag
+              [cdkDragData]="dragItem(s)"
+              [cdkDragDisabled]="disabled() || isAlreadyAssigned(s)"
+              (cdkDragStarted)="onDragStarted(s)"
+              (cdkDragEnded)="onDragEnded()"
+            >
+              @if (s.specIconUrl) {
+                <img class="signup-row-spec-icon" [src]="s.specIconUrl" [alt]="s.specName ?? ''" [title]="s.specName ?? ''" width="16" height="16" />
+              }
+              <span class="signup-row-name" [style.color]="classColor(s)">{{ s.characterName }}</span>
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="signup-list-empty">{{ 'raidBuilder.signup.noOneYet' | transloco }}</p>
+      }
+    </div>
+
+    <div class="signup-status-section">
+      <h4>{{ 'raidBuilder.signup.tentative' | transloco }} ({{ tentativeSignups().length }})</h4>
+      @if (tentativeSignups().length === 0) {
+        <p class="signup-list-empty">{{ 'raidBuilder.signup.noOneYet' | transloco }}</p>
+      } @else {
+        <div class="signup-tentative-list">
+          @for (s of tentativeSignups(); track s.userDiscordId) {
+            <span class="signup-tentative-item">
+              @if (s.specIconUrl) {
+                <img class="signup-row-spec-icon" [src]="s.specIconUrl" [alt]="s.specName ?? ''" [title]="s.specName ?? ''" width="14" height="14" />
+              }
+              {{ s.characterName ?? s.playerName ?? s.userDiscordId }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="signup-status-section">
+      <h4>{{ 'raidBuilder.signup.decline' | transloco }} ({{ declinedSignups().length }})</h4>
+      @if (declinedSignups().length === 0) {
+        <p class="signup-list-empty">{{ 'raidBuilder.signup.noOneYet' | transloco }}</p>
+      } @else {
+        <p class="signup-status-names">
+          @for (s of declinedSignups(); track s.userDiscordId) {
+            <span class="signup-status-name">{{ s.playerName ?? s.userDiscordId }}</span>
+          }
+        </p>
+      }
+    </div>
+  }
+</div>

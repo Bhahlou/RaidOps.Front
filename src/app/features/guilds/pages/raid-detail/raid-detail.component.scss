@@ -10,3 +10,57 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.detail-signup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-secondary);
+}
+
+.detail-signup-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.detail-signup-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-signup-roster {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 12px;
+}
+
+.detail-signup-roster-title {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.detail-signup-roster-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.detail-signup-roster-column h4 {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.detail-signup-roster-column p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.signup-character {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}

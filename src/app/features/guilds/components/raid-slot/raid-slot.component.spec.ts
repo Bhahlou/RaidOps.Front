@@ -49,7 +49,7 @@ describe('RaidSlotComponent', () => {
     groupNumber?: number;
     slotNumber?: number;
     assignment?: RaidSlotAssignment | null;
-    absentPlayerDiscordIds?: string[];
+    ineligiblePlayerDiscordIds?: string[];
     lockedCharacterEventIds?: LockedCharacterEventIds;
     playerAssignedCharacterIds?: ReadonlyMap<string, number>;
     disabled?: boolean;
@@ -75,7 +75,7 @@ describe('RaidSlotComponent', () => {
     fixture.componentRef.setInput('slotNumber', inputs?.slotNumber ?? 1);
     fixture.componentRef.setInput('dropListId', 'slot-1-1-1');
     if (inputs?.assignment !== undefined) fixture.componentRef.setInput('assignment', inputs.assignment);
-    if (inputs?.absentPlayerDiscordIds) fixture.componentRef.setInput('absentPlayerDiscordIds', inputs.absentPlayerDiscordIds);
+    if (inputs?.ineligiblePlayerDiscordIds) fixture.componentRef.setInput('ineligiblePlayerDiscordIds', inputs.ineligiblePlayerDiscordIds);
     if (inputs?.lockedCharacterEventIds) fixture.componentRef.setInput('lockedCharacterEventIds', inputs.lockedCharacterEventIds);
     if (inputs?.playerAssignedCharacterIds) fixture.componentRef.setInput('playerAssignedCharacterIds', inputs.playerAssignedCharacterIds);
     if (inputs?.disabled !== undefined) fixture.componentRef.setInput('disabled', inputs.disabled);
@@ -96,7 +96,7 @@ describe('RaidSlotComponent', () => {
     });
 
     it('is true when the dragging player is declared absent for this event', () => {
-      setup({ absentPlayerDiscordIds: ['player-1'] });
+      setup({ ineligiblePlayerDiscordIds: ['player-1'] });
       boardStore.draggingPlayerDiscordId.set('player-1');
 
       expect(component.isBlockedForDrag()).toBe(true);
@@ -168,7 +168,7 @@ describe('RaidSlotComponent', () => {
     });
 
     it('rejects when the drop target is blocked for the current drag', () => {
-      setup({ absentPlayerDiscordIds: ['player-1'] });
+      setup({ ineligiblePlayerDiscordIds: ['player-1'] });
       boardStore.draggingPlayerDiscordId.set('player-1');
 
       expect(component.canReceiveDrop(drag({ characterId: 1 }))).toBe(false);

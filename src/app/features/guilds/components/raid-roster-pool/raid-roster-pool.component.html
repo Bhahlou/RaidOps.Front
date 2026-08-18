@@ -60,9 +60,7 @@
     </div>
   </div>
 
-  @if (isLoading()) {
-    <span class="spinner pool-spinner"></span>
-  } @else if (events().length === 0) {
+  @if (events().length === 0) {
     <app-empty-hint>{{ 'raidBuilder.pool.noActiveEvent' | transloco }}</app-empty-hint>
   } @else if (poolMembers().length === 0) {
     <app-empty-hint>{{ (hasActiveFilters() ? 'raidBuilder.pool.emptyFiltered' : 'raidBuilder.pool.empty') | transloco }}</app-empty-hint>

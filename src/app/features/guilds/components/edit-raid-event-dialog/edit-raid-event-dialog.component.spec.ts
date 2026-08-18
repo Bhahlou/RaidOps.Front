@@ -7,6 +7,9 @@ import { of, throwError } from 'rxjs';
 import { EditRaidEventDialogComponent, EditRaidEventDialogData } from './edit-raid-event-dialog.component';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
+import { GuildStore } from '../../stores/guild.store';
+import { RaidsService } from '../../services/raids.service';
+import { GuildSettingsService } from '../../services/guild-settings.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DayAvailabilityStatus } from '../../../calendar/models/day-availability-status.enum';
 import { RaidEvent } from '../../models/raid-event.model';
@@ -56,13 +59,19 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [zone()],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
   ...overrides,
 });
 
 describe('EditRaidEventDialogComponent', () => {
   let boardStore: { updateEvent: ReturnType<typeof vi.fn>; publishEvent: ReturnType<typeof vi.fn>; deleteEvent: ReturnType<typeof vi.fn> };
   let zoneStore: { zones: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn> };
+  let guildStore: { settings: ReturnType<typeof signal>; loadSettings: ReturnType<typeof vi.fn> };
+  let raidsService: { createAnnouncementChannel: ReturnType<typeof vi.fn> };
+  let guildSettingsService: { getNotificationChannels: ReturnType<typeof vi.fn>; getCategories: ReturnType<typeof vi.fn> };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialogRef: { close: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
@@ -74,6 +83,12 @@ describe('EditRaidEventDialogComponent', () => {
       deleteEvent: vi.fn().mockReturnValue(of(undefined)),
     };
     zoneStore = { zones: signal([zone()]), load: vi.fn() };
+    guildStore = { settings: signal({ language: 'en' }), loadSettings: vi.fn() };
+    raidsService = { createAnnouncementChannel: vi.fn().mockReturnValue(of({ body: { id: 'c-new', name: 'raid-name', missingPermissions: [], categoryName: null } })) };
+    guildSettingsService = {
+      getNotificationChannels: vi.fn().mockReturnValue(of([])),
+      getCategories: vi.fn().mockReturnValue(of({ canCreateRootChannel: true, categories: [] })),
+    };
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialogRef = { close: vi.fn() };
     dialog = { open: vi.fn().mockReturnValue({ closed: of(confirmed) }) };
@@ -85,6 +100,9 @@ describe('EditRaidEventDialogComponent', () => {
       providers: [
         { provide: RaidBoardStore, useValue: boardStore },
         { provide: RaidZoneStore, useValue: zoneStore },
+        { provide: GuildStore, useValue: guildStore },
+        { provide: RaidsService, useValue: raidsService },
+        { provide: GuildSettingsService, useValue: guildSettingsService },
         { provide: SnackbarService, useValue: snackbar },
         { provide: DIALOG_DATA, useValue: data },
         { provide: DialogRef, useValue: dialogRef },
@@ -183,6 +201,89 @@ describe('EditRaidEventDialogComponent', () => {
       component.slotsPerGroup.set(0);
       expect(component.canSubmit()).toBe(false);
     });
+
+    describe('with the channel field shown (Signup-mode event)', () => {
+      it('is false in "existing" mode with no channel selected', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: null }));
+        component.channelMode.set('existing');
+        expect(component.canSubmit()).toBe(false);
+      });
+
+      it('is true in "existing" mode with a channel already selected', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: 'c1' }));
+        component.channelMode.set('existing');
+        expect(component.canSubmit()).toBe(true);
+      });
+
+      it('is false in "new" mode with no new channel name', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup }));
+        component.channelMode.set('new');
+        expect(component.canSubmit()).toBe(false);
+      });
+
+      it('is false in "new" mode with a name but no create permission there', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup }));
+        component.channelMode.set('new');
+        component.newChannelName.set('raid-name');
+        component.canCreateChannelAtSelection.set(false);
+        expect(component.canSubmit()).toBe(false);
+      });
+
+      it('is true in "new" mode with a name and create permission', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup }));
+        component.channelMode.set('new');
+        component.newChannelName.set('raid-name');
+        component.canCreateChannelAtSelection.set(true);
+        expect(component.canSubmit()).toBe(true);
+      });
+    });
+  });
+
+  // ── showChannelField / constructor loading ──────────────────────────────
+
+  describe('showChannelField', () => {
+    it('is true for a Signup-mode event', () => {
+      expect(setup(raidEvent({ signupMode: SignupMode.Signup })).showChannelField).toBe(true);
+    });
+
+    it('is false for a DefaultPresent event', () => {
+      expect(setup(raidEvent({ signupMode: SignupMode.DefaultPresent })).showChannelField).toBe(false);
+    });
+
+    it('loads guild settings, notification channels and categories for a Signup-mode event', () => {
+      setup(raidEvent({ signupMode: SignupMode.Signup }));
+
+      expect(guildStore.loadSettings).toHaveBeenCalledWith('g1');
+      expect(guildSettingsService.getNotificationChannels).toHaveBeenCalledWith('g1');
+      expect(guildSettingsService.getCategories).toHaveBeenCalledWith('g1');
+    });
+
+    it('does not load any of that for a DefaultPresent event', () => {
+      setup(raidEvent({ signupMode: SignupMode.DefaultPresent }));
+
+      expect(guildStore.loadSettings).not.toHaveBeenCalled();
+      expect(guildSettingsService.getNotificationChannels).not.toHaveBeenCalled();
+      expect(guildSettingsService.getCategories).not.toHaveBeenCalled();
+    });
+
+    it('preselects the event\'s current channel id', () => {
+      expect(setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: 'c1' })).selectedChannelId()).toBe('c1');
+    });
+  });
+
+  // ── guildLanguage ────────────────────────────────────────────────────────
+
+  describe('guildLanguage', () => {
+    it('reads the language from the guild settings', () => {
+      const component = setup(raidEvent());
+      expect(component.guildLanguage()).toBe('en');
+    });
+
+    it('falls back to English when the guild settings have not loaded yet', () => {
+      const component = setup(raidEvent());
+      guildStore.settings.set(null);
+      expect(component.guildLanguage()).toBe('en');
+    });
   });
 
   // ── submit ───────────────────────────────────────────────────────────────
@@ -219,6 +320,76 @@ describe('EditRaidEventDialogComponent', () => {
       expect(component.submitting()).toBe(false);
       expect(snackbar.error).toHaveBeenCalledWith('raidBuilder.errors.branchMismatch');
       expect(dialogRef.close).not.toHaveBeenCalled();
+    });
+
+    describe('channel field (Signup-mode event)', () => {
+      it('sends dedicatedAnnouncementChannelId null when the event is not Signup-mode', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.DefaultPresent }));
+
+        component.submit();
+
+        expect(boardStore.updateEvent).toHaveBeenCalledWith('g1', 7, 1, expect.objectContaining({ dedicatedAnnouncementChannelId: null, dedicatedAnnouncementChannelIsBotOwned: false }));
+      });
+
+      it('creates a new channel first, then submits with the returned channel id and botOwned true', async () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: null }));
+        component.channelMode.set('new');
+        component.newChannelName.set('raid-name');
+        component.selectedCategoryId.set('cat1');
+
+        await component.submit();
+
+        expect(raidsService.createAnnouncementChannel).toHaveBeenCalledWith('g1', 7, 'raid-name', 'cat1');
+        expect(component.selectedChannelId()).toBe('c-new');
+        expect(boardStore.updateEvent).toHaveBeenCalledWith(
+          'g1', 7, 1,
+          expect.objectContaining({ dedicatedAnnouncementChannelId: 'c-new', dedicatedAnnouncementChannelIsBotOwned: true }),
+        );
+      });
+
+      it('shows an error and never calls updateEvent when channel creation fails', async () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup }));
+        component.channelMode.set('new');
+        component.newChannelName.set('raid-name');
+        raidsService.createAnnouncementChannel.mockReturnValue(throwError(() => new Error('403')));
+
+        await component.submit();
+
+        expect(component.submitting()).toBe(false);
+        expect(snackbar.error).toHaveBeenCalledWith('raidBuilder.eventDialog.createChannelFailed');
+        expect(boardStore.updateEvent).not.toHaveBeenCalled();
+      });
+
+      it('reuses an existing channel selection without creating a new one', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: 'c1' }));
+        component.channelMode.set('existing');
+        component.selectedChannelId.set('c2');
+
+        component.submit();
+
+        expect(raidsService.createAnnouncementChannel).not.toHaveBeenCalled();
+        expect(boardStore.updateEvent).toHaveBeenCalledWith('g1', 7, 1, expect.objectContaining({ dedicatedAnnouncementChannelId: 'c2' }));
+      });
+
+      it('preserves dedicatedAnnouncementChannelIsBotOwned true when re-saving the same bot-owned channel', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: 'c1', dedicatedAnnouncementChannelIsBotOwned: true }));
+        component.channelMode.set('existing');
+        component.selectedChannelId.set('c1');
+
+        component.submit();
+
+        expect(boardStore.updateEvent).toHaveBeenCalledWith('g1', 7, 1, expect.objectContaining({ dedicatedAnnouncementChannelIsBotOwned: true }));
+      });
+
+      it('flips dedicatedAnnouncementChannelIsBotOwned to false when switching to a different existing channel', () => {
+        const component = setup(raidEvent({ signupMode: SignupMode.Signup, dedicatedAnnouncementChannelId: 'c1', dedicatedAnnouncementChannelIsBotOwned: true }));
+        component.channelMode.set('existing');
+        component.selectedChannelId.set('c2');
+
+        component.submit();
+
+        expect(boardStore.updateEvent).toHaveBeenCalledWith('g1', 7, 1, expect.objectContaining({ dedicatedAnnouncementChannelIsBotOwned: false }));
+      });
     });
   });
 

@@ -5,6 +5,9 @@ import { environment } from '../../../../environments/environment';
 import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 import { RaidsService } from '../services/raids.service';
+import { RaidSignupHubService } from '../services/raid-signup-hub.service';
+import { SignupStatus } from '../models/signup-status.enum';
+import { RaidSignup } from '../models/raid-signup.model';
 
 interface RangeKey {
   guildId: string;
@@ -23,6 +26,7 @@ interface RangeKey {
 @Service()
 export class RaidBoardStore {
   readonly #service = inject(RaidsService);
+  readonly #signupHub = inject(RaidSignupHubService);
 
   readonly #key = signal<RangeKey | null>(null);
   readonly #materializing = signal(false);
@@ -98,6 +102,37 @@ export class RaidBoardStore {
 
   publishEvent(guildId: string, guildBranchId: number, eventId: number): Observable<void> {
     return this.#service.publish(guildId, guildBranchId, eventId);
+  }
+
+  setMySignup(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    status: SignupStatus,
+    characterId: number | null = null,
+    specId: number | null = null,
+  ): Observable<void> {
+    return this.#service.setMySignup(guildId, guildBranchId, eventId, status, characterId, specId);
+  }
+
+  /** Every roster member's current response to a Signup-mode raid event — see `RaidsService.getSignups`. */
+  getSignups(guildId: string, guildBranchId: number, eventId: number): Observable<RaidSignup[]> {
+    return this.#service.getSignups(guildId, guildBranchId, eventId);
+  }
+
+  /** Joins the live-push group for one raid event's signups — see `RaidSignupHubService.joinEvent`. */
+  joinRaidSignupUpdates(guildId: string, guildBranchId: number, eventId: number): Promise<void> {
+    return this.#signupHub.joinEvent(guildId, guildBranchId, eventId);
+  }
+
+  /** Leaves the live-push group for one raid event's signups — see `RaidSignupHubService.leaveEvent`. */
+  leaveRaidSignupUpdates(guildBranchId: number, eventId: number): void {
+    this.#signupHub.leaveEvent(guildBranchId, eventId);
+  }
+
+  /** Registers a callback for every live signup-change push, across every joined event — see `RaidSignupHubService.onRaidSignupChanged`. */
+  onRaidSignupChanged(callback: (eventId: number) => void): () => void {
+    return this.#signupHub.onRaidSignupChanged(callback);
   }
 
   assignSlot(

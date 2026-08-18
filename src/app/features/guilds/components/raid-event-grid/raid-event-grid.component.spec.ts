@@ -42,7 +42,10 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [{ id: 10, name: 'Serpentshrine Cavern', shortCode: 'SSC' }],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
   ...overrides,
 });
 

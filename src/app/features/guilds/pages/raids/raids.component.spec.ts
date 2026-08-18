@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
 import { TranslocoService } from '@jsverse/transloco';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { RaidsComponent } from './raids.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
@@ -19,10 +19,14 @@ import { RaidPublicationStatus } from '../../models/raid-publication-status.enum
 import { RaidSeries } from '../../models/raid-series.model';
 import { RaidSlotAssignment } from '../../models/raid-slot-assignment.model';
 import { SignupMode } from '../../models/signup-mode.enum';
+import { SignupStatus } from '../../models/signup-status.enum';
+import { GuildRosterMember } from '../../models/guild-roster-member.model';
+import { CharacterRank } from '../../models/character-rank.enum';
 import { CreateRaidSeriesDialogComponent } from '../../components/create-raid-series-dialog/create-raid-series-dialog.component';
 import { DeactivateRaidSeriesDialogComponent } from '../../components/deactivate-raid-series-dialog/deactivate-raid-series-dialog.component';
 import { CreateRaidEventDialogComponent } from '../../components/create-raid-event-dialog/create-raid-event-dialog.component';
 import { EditRaidEventDialogComponent } from '../../components/edit-raid-event-dialog/edit-raid-event-dialog.component';
+import { SignupCharacterDialogComponent } from '../../components/signup-character-dialog/signup-character-dialog.component';
 
 const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment => ({
   groupNumber: 1,
@@ -53,7 +57,34 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
+  ...overrides,
+});
+
+const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
+  characterId: 1,
+  characterName: 'Addse',
+  classId: 1,
+  className: 'Warrior',
+  classColor: '#c79c6e',
+  level: 60,
+  branchName: 'Classic Anniversary',
+  realmSlug: 'gehennas',
+  avatarUrl: null,
+  playerDiscordId: 'player-1',
+  playerName: 'Dah Boo',
+  playerAvatarHash: null,
+  playerGuildAvatarUrl: null,
+  raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }],
+  characterRank: CharacterRank.Main,
+  joinedAt: '2026-01-01T00:00:00Z',
+  canExclude: true,
   ...overrides,
 });
 
@@ -100,22 +131,32 @@ describe('RaidsComponent', () => {
     loadRange: ReturnType<typeof vi.fn>;
     reload: ReturnType<typeof vi.fn>;
     getLockoutWeek: ReturnType<typeof vi.fn>;
+    setMySignup: ReturnType<typeof vi.fn>;
   };
   let seriesStore: { series: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
   let rosterStore: { members: ReturnType<typeof signal>; loadRoster: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
   let transloco: { getActiveLang: ReturnType<typeof vi.fn>; activeLang: ReturnType<typeof signal>; translate: ReturnType<typeof vi.fn> };
 
-  const setup = (opts?: { user?: User | null; events?: RaidEvent[]; series?: RaidSeries[]; guildId?: string | null; branchId?: number; lockoutWeekStart?: string | null }) => {
+  const setup = (opts?: {
+    user?: User | null;
+    events?: RaidEvent[];
+    series?: RaidSeries[];
+    guildId?: string | null;
+    branchId?: number;
+    lockoutWeekStart?: string | null;
+    members?: GuildRosterMember[];
+  }) => {
     boardStore = {
       events: signal(opts?.events ?? []),
       isLoading: signal(false),
       loadRange: vi.fn(),
       reload: vi.fn(),
       getLockoutWeek: vi.fn().mockReturnValue(of({ weekStartLocal: opts?.lockoutWeekStart ?? null, weekEndLocal: null })),
+      setMySignup: vi.fn().mockReturnValue(of(undefined)),
     };
     seriesStore = { series: signal(opts?.series ?? []), load: vi.fn(), reload: vi.fn() };
-    rosterStore = { members: signal([]), loadRoster: vi.fn() };
+    rosterStore = { members: signal(opts?.members ?? []), loadRoster: vi.fn() };
     dialog = { open: vi.fn().mockReturnValue({ closed: of(false) }) };
     transloco = {
       getActiveLang: vi.fn(() => 'en-US'),
@@ -333,6 +374,15 @@ describe('RaidsComponent', () => {
       expect(component.rangeStart()).toEqual(expected);
     });
 
+    it('goToday adopts the branch\'s configured lockout week start when available', () => {
+      const component = setup({ lockoutWeekStart: '2026-08-10' });
+      component.rangeStart.set(new Date(2020, 0, 1));
+
+      component.goToday();
+
+      expect(component.rangeStart()).toEqual(new Date(2026, 7, 10));
+    });
+
     it('re-loads the board/series/roster for the new range', () => {
       const component = setup();
       boardStore.loadRange.mockClear();
@@ -377,6 +427,139 @@ describe('RaidsComponent', () => {
     it('tallies raid roles from the event assignments', () => {
       const event = raidEvent({ assignments: [assignment({ spec: { id: 73, name: 'Protection', iconUrl: null } })] });
       expect(setup().roleCounts(event)).toEqual({ tank: 1, heal: 0, melee: 0, ranged: 0 });
+    });
+  });
+
+  // ── mySignupCharacter ────────────────────────────────────────────────────
+
+  describe('mySignupCharacter', () => {
+    it('is null when the viewer has no response yet', () => {
+      const component = setup({ members: [member()] });
+      expect(component.mySignupCharacter(raidEvent({ mySignupCharacterId: null }))).toBeNull();
+    });
+
+    it('is null when the responded-with character is no longer on the roster', () => {
+      const component = setup({ members: [] });
+      expect(component.mySignupCharacter(raidEvent({ mySignupCharacterId: 1 }))).toBeNull();
+    });
+
+    it('resolves the character name, class color and spec icon', () => {
+      const component = setup({
+        members: [member({ characterId: 1, characterName: 'Addse', classColor: '#c79c6e', raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: 'arms.png', isMain: true }] })],
+      });
+
+      const result = component.mySignupCharacter(raidEvent({ mySignupCharacterId: 1, mySignupSpecId: 71 }));
+
+      expect(result).toEqual({ name: 'Addse', classColor: '#c79c6e', specIconUrl: 'arms.png' });
+    });
+
+    it('falls back to a null spec icon when the spec is not found on the character', () => {
+      const component = setup({ members: [member({ characterId: 1, raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: 'arms.png', isMain: true }] })] });
+
+      const result = component.mySignupCharacter(raidEvent({ mySignupCharacterId: 1, mySignupSpecId: 999 }));
+
+      expect(result?.specIconUrl).toBeNull();
+    });
+  });
+
+  // ── setSignup ────────────────────────────────────────────────────────────
+
+  describe('setSignup', () => {
+    it('submits a Declined response directly, with no character/spec', () => {
+      const component = setup({ members: [member()] });
+
+      component.setSignup(raidEvent(), SignupStatus.Declined);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 1, SignupStatus.Declined, null, null);
+      expect(dialog.open).not.toHaveBeenCalled();
+    });
+
+    it('auto-submits Accepted when the viewer has exactly one character with at most one spec', () => {
+      const component = setup({ members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }] })] });
+
+      component.setSignup(raidEvent(), SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 1, SignupStatus.Accepted, 1, 71);
+      expect(dialog.open).not.toHaveBeenCalled();
+    });
+
+    it('auto-submits with a null spec when the single character has no raid specs at all', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+
+      component.setSignup(raidEvent(), SignupStatus.Tentative);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 1, SignupStatus.Tentative, 1, null);
+    });
+
+    it('opens the character picker when the viewer has more than one character', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(raidEvent(), SignupStatus.Accepted);
+
+      expect(dialog.open).toHaveBeenCalledWith(
+        SignupCharacterDialogComponent,
+        expect.objectContaining({ data: expect.objectContaining({ currentCharacterId: null, currentSpecId: null }) }),
+      );
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+
+    it('opens the character picker when the single character has more than one raid spec', () => {
+      const component = setup({
+        members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }, { specId: 72, name: 'Fury', iconUrl: null, isMain: false }] })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(raidEvent(), SignupStatus.Accepted);
+
+      expect(dialog.open).toHaveBeenCalled();
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+
+    it('submits the picker result on close', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of({ characterId: 5, specId: 99 }) });
+
+      component.setSignup(raidEvent(), SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 1, SignupStatus.Accepted, 5, 99);
+    });
+
+    it('does nothing when the picker is dismissed (null result)', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(raidEvent(), SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── #submitSignup (via setSignup) ────────────────────────────────────────
+
+  describe('#submitSignup', () => {
+    it('reloads the board after a successful submission', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+
+      component.setSignup(raidEvent(), SignupStatus.Declined);
+
+      expect(boardStore.reload).toHaveBeenCalledOnce();
+    });
+
+    it('does not throw and leaves the board as-is when the submission fails', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+      boardStore.setMySignup.mockReturnValue(throwError(() => new Error('boom')));
+
+      const act = () => component.setSignup(raidEvent(), SignupStatus.Declined);
+
+      expect(act).not.toThrow();
+      expect(boardStore.reload).not.toHaveBeenCalled();
     });
   });
 

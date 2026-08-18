@@ -15,5 +15,72 @@
     </div>
   }
 
+  @if (signupMode() === SignupMode.Signup) {
+    <div class="detail-signup">
+      <h2 class="detail-signup-title">{{ 'raidBuilder.signup.myResponse' | transloco }}</h2>
+      <div class="detail-signup-buttons" role="group" [attr.aria-label]="'raidBuilder.signup.myResponse' | transloco">
+        <app-button
+          variant="stroked"
+          icon="check_circle"
+          [extraClass]="mySignupStatus() === SignupStatus.Accepted ? 'signup-btn--active signup-btn--accept' : ''"
+          [disabled]="savingSignup()"
+          (click)="setSignup(SignupStatus.Accepted)"
+        >
+          {{ 'raidBuilder.signup.accept' | transloco }}
+        </app-button>
+        <app-button
+          variant="stroked"
+          icon="help"
+          [extraClass]="mySignupStatus() === SignupStatus.Tentative ? 'signup-btn--active signup-btn--tentative' : ''"
+          [disabled]="savingSignup()"
+          (click)="setSignup(SignupStatus.Tentative)"
+        >
+          {{ 'raidBuilder.signup.tentative' | transloco }}
+        </app-button>
+        <app-button
+          variant="stroked"
+          icon="cancel"
+          [extraClass]="mySignupStatus() === SignupStatus.Declined ? 'signup-btn--active signup-btn--decline' : ''"
+          [disabled]="savingSignup()"
+          (click)="setSignup(SignupStatus.Declined)"
+        >
+          {{ 'raidBuilder.signup.decline' | transloco }}
+        </app-button>
+      </div>
+
+      @if (isOfficer()) {
+        <div class="detail-signup-roster">
+          <h3 class="detail-signup-roster-title">{{ 'raidBuilder.signup.roster' | transloco }}</h3>
+          <div class="detail-signup-roster-columns">
+            <div class="detail-signup-roster-column">
+              <h4>{{ 'raidBuilder.signup.accept' | transloco }} ({{ acceptedSignups().length }})</h4>
+              @for (s of acceptedSignups(); track s.userDiscordId) {
+                <p>{{ s.playerName ?? s.userDiscordId }}@if (s.characterName) { <span class="signup-character">({{ s.characterName }}@if (s.specName) { &ndash; {{ s.specName }} }) </span> }</p>
+              }
+            </div>
+            <div class="detail-signup-roster-column">
+              <h4>{{ 'raidBuilder.signup.tentative' | transloco }} ({{ tentativeSignups().length }})</h4>
+              @for (s of tentativeSignups(); track s.userDiscordId) {
+                <p>{{ s.playerName ?? s.userDiscordId }}@if (s.characterName) { <span class="signup-character">({{ s.characterName }}@if (s.specName) { &ndash; {{ s.specName }} }) </span> }</p>
+              }
+            </div>
+            <div class="detail-signup-roster-column">
+              <h4>{{ 'raidBuilder.signup.decline' | transloco }} ({{ declinedSignups().length }})</h4>
+              @for (s of declinedSignups(); track s.userDiscordId) {
+                <p>{{ s.playerName ?? s.userDiscordId }}</p>
+              }
+            </div>
+            <div class="detail-signup-roster-column">
+              <h4>{{ 'raidBuilder.signup.noResponse' | transloco }} ({{ noResponseSignups().length }})</h4>
+              @for (s of noResponseSignups(); track s.userDiscordId) {
+                <p>{{ s.playerName ?? s.userDiscordId }}</p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
   <app-empty-hint>{{ 'raidBuilder.detail.comingSoon' | transloco }}</app-empty-hint>
 </div>

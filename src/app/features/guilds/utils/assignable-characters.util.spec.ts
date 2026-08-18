@@ -42,7 +42,9 @@ const event = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [{ id: 10, name: 'Serpentshrine Cavern', shortCode: 'SSC' }],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
   ...overrides,
 });
 
@@ -147,7 +149,7 @@ describe('assignable-characters.util', () => {
     });
 
     it('excludes a member declared absent for the event', () => {
-      const e = event({ absentPlayerDiscordIds: ['player-1'] });
+      const e = event({ ineligiblePlayerDiscordIds: ['player-1'] });
 
       expect(assignableCharactersFor(e, [rosterMember()], [])).toEqual([]);
     });
@@ -168,6 +170,24 @@ describe('assignable-characters.util', () => {
       const other = event({ id: 2, raidZones: [{ id: 99, name: 'Karazhan', shortCode: 'Kara' }], assignments: [assignment({ characterId: 1 })] });
 
       expect(assignableCharactersFor(event(), [rosterMember()], [other])).toHaveLength(1);
+    });
+
+    it('offers a member with no entry in acceptedCharacterIdsByPlayerDiscordId (DefaultPresent event)', () => {
+      const e = event({ acceptedCharacterIdsByPlayerDiscordId: {} });
+
+      expect(assignableCharactersFor(e, [rosterMember()], [])).toHaveLength(1);
+    });
+
+    it('offers a member whose roster character matches the one they signed up with', () => {
+      const e = event({ acceptedCharacterIdsByPlayerDiscordId: { 'player-1': 1 } });
+
+      expect(assignableCharactersFor(e, [rosterMember()], [])).toHaveLength(1);
+    });
+
+    it('excludes a member whose roster character is an alt they did not sign up with', () => {
+      const e = event({ acceptedCharacterIdsByPlayerDiscordId: { 'player-1': 2 } });
+
+      expect(assignableCharactersFor(e, [rosterMember()], [])).toEqual([]);
     });
   });
 });

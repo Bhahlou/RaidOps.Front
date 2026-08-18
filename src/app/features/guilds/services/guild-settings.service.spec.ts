@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { GuildSettings } from '../models/guild-settings.model';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
 import { DiscordChannel } from '../../../shared/models/discord-channel.model';
+import { GuildCategories } from '../../../shared/models/discord-category.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildSettingsService } from './guild-settings.service';
 
@@ -81,6 +82,25 @@ describe('GuildSettingsService', () => {
       service.getNotificationChannels('guild-1').subscribe(r => (result = r));
 
       const req = controller.expectOne(r => r.url.endsWith('/guilds/guild-1/notification-channels'));
+      expect(req.request.method).toBe('GET');
+      req.flush(expected);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  // ── getCategories ─────────────────────────────────────────────────────────
+
+  describe('getCategories', () => {
+    it('sends GET to /guilds/:id/categories and returns the guild categories payload', () => {
+      const expected: GuildCategories = {
+        canCreateRootChannel: true,
+        categories: [{ id: 'cat-1', name: 'Raids', canCreateChannel: true }],
+      };
+      let result: GuildCategories | undefined;
+
+      service.getCategories('guild-1').subscribe((r) => (result = r));
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/guild-1/categories'));
       expect(req.request.method).toBe('GET');
       req.flush(expected);
       expect(result).toEqual(expected);

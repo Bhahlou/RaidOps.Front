@@ -31,8 +31,8 @@ export class RaidSlotComponent {
   readonly slotNumber = input.required<number>();
   readonly assignment = input<RaidSlotAssignment | null>(null);
   readonly dropListId = input.required<string>();
-  /** Discord IDs of roster players declared absent for this slot's event — see `RaidEvent.absentPlayerDiscordIds`. */
-  readonly absentPlayerDiscordIds = input<string[]>([]);
+  /** Discord IDs of roster players currently ineligible for this slot's event — see `RaidEvent.ineligiblePlayerDiscordIds`. */
+  readonly ineligiblePlayerDiscordIds = input<string[]>([]);
   /** Character ID → locking event IDs for this slot's event, via a shared raid zone with another loaded event. */
   readonly lockedCharacterEventIds = input<LockedCharacterEventIds>(new Map());
   /** Player → already-seated character in this slot's event — see `isBlockedForDrag`. */
@@ -68,7 +68,7 @@ export class RaidSlotComponent {
    */
   readonly isBlockedForDrag = computed(() => {
     const draggingPlayerId = this.#boardStore.draggingPlayerDiscordId();
-    if (draggingPlayerId != null && this.absentPlayerDiscordIds().includes(draggingPlayerId)) return true;
+    if (draggingPlayerId != null && this.ineligiblePlayerDiscordIds().includes(draggingPlayerId)) return true;
 
     const draggingCharacterId = this.#boardStore.draggingCharacterId();
     if (draggingCharacterId != null) {

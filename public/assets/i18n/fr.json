@@ -533,6 +533,10 @@
         "raidCompositionAnnouncement": {
           "label": "Annonce de composition",
           "hint": "Poste un embed permanent avec la composition actuelle complète d'un raid publié (édité en place à chaque changement), et/ou envoie un DM aux joueurs ajoutés ou retirés."
+        },
+        "raidSignupCall": {
+          "label": "Appel aux inscriptions",
+          "hint": "Poste un embed permanent avec des boutons Présent/Peut-être/Absent pour un raid publié en mode inscription, édité en place au fur et à mesure des réponses."
         }
       },
       "events": {
@@ -546,7 +550,8 @@
         "RaidSlotsSwapped": "Deux personnages sont échangés",
         "RaidSlotSpecChanged": "La spécialisation d'un emplacement change",
         "RaidCompositionAnnouncementPosted": "Poster la composition en embed",
-        "RaidCompositionAnnouncementDm": "DM aux joueurs ajoutés ou retirés du raid"
+        "RaidCompositionAnnouncementDm": "DM aux joueurs ajoutés ou retirés du raid",
+        "RaidSignupCallPosted": "Poster l'appel aux inscriptions en embed"
       },
       "scope": {
         "label": "Portée",
@@ -638,6 +643,7 @@
       "BranchActivated": "Branche activée",
       "BranchDeactivated": "Branche désactivée",
       "BranchRosterSettingsUpdated": "Réglages de roster de branche modifiés",
+      "BranchSignupModeUpdated": "Mode d'inscription de branche modifié",
       "NotificationSettingsReset": "Surcharge de notification réinitialisée",
       "RaidSeriesCreated": "Série de raid créée",
       "RaidSeriesUpdated": "Série de raid modifiée",
@@ -858,6 +864,23 @@
     "board": {
       "empty": "Aucun raid prévu sur cette période — créez une série ou un raid ponctuel pour commencer."
     },
+    "signup": {
+      "accept": "Présent",
+      "tentative": "Peut-être",
+      "decline": "Absent",
+      "myResponse": "Ta réponse",
+      "listTitle": "Inscriptions",
+      "noOneYet": "Personne pour l'instant",
+      "alreadyAssigned": "Déjà dans le raid",
+      "roster": "Réponses du roster",
+      "noResponse": "Aucune réponse",
+      "respondedAt": "Répondu {{when}}",
+      "saveFailed": "Impossible d'enregistrer ta réponse.",
+      "characterDialogTitle": "Quel personnage amènes-tu ?",
+      "characterDialogLabel": "Personnage",
+      "characterDialogSpecLabel": "Spécialisation",
+      "characterDialogSubmit": "Confirmer"
+    },
     "detail": {
       "breadcrumb": "Raid",
       "comingSoon": "Les détails du raid arrivent bientôt — présence, loot et analyse de logs vivront ici.",
@@ -934,7 +957,8 @@
       "slotsPerGroup": "Slots par groupe",
       "zones": "Zones de raid",
       "noZones": "Aucune zone de raid configurée pour cette branche.",
-      "saveSuccess": "Série de raid enregistrée."
+      "saveSuccess": "Série de raid enregistrée.",
+      "newChannelPerOccurrenceHint": "Un nouveau salon sera créé ici pour chaque raid produit par cette série, nommé d'après le raid et sa date."
     },
     "eventDialog": {
       "createTitle": "Nouveau raid",
@@ -950,7 +974,18 @@
       "deleteConfirmMessageWithAssignments": "« {{name}} » et tous les persos affectés seront définitivement supprimés. Cette action est irréversible.",
       "deleteSuccess": "Raid supprimé.",
       "publishConfirmTitle": "Publier ce raid ?",
-      "publishSuccess": "Raid publié."
+      "publishSuccess": "Raid publié.",
+      "signupOverride": "Utiliser le mode inscription pour ce raid (raid exceptionnel, remplace le réglage par défaut de la branche)",
+      "dedicatedChannel": "Salon Discord dédié",
+      "channelModeExisting": "Salon existant",
+      "channelModeNew": "Nouveau salon",
+      "dedicatedChannelPlaceholder": "Choisir un salon",
+      "newChannelCategory": "Catégorie",
+      "newChannelCategoryPlaceholder": "Aucune catégorie",
+      "newChannelNamePlaceholder": "Nom du nouveau salon",
+      "createChannel": "Créer",
+      "createChannelFailed": "Impossible de créer le salon.",
+      "createChannelMissingPermission": "Le bot n'a pas la permission Gérer les salons ici — choisis une autre catégorie ou accorde-lui la permission sur Discord."
     },
     "weekday": {
       "Monday": "Lundi",

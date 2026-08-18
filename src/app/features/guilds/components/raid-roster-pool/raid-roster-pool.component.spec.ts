@@ -47,7 +47,11 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [{ id: 10, name: 'Serpentshrine Cavern', shortCode: 'SSC' }],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
   ...overrides,
 });
 
@@ -160,12 +164,12 @@ describe('RaidRosterPoolComponent', () => {
     });
 
     it('excludes a member declared absent for every visible event', () => {
-      setup([member()], [raidEvent({ absentPlayerDiscordIds: ['player-1'] })]);
+      setup([member()], [raidEvent({ ineligiblePlayerDiscordIds: ['player-1'] })]);
       expect(component.poolMembers()).toEqual([]);
     });
 
     it('narrows to a specific event via targetEventFilter', () => {
-      const e1 = raidEvent({ id: 1, absentPlayerDiscordIds: ['player-1'] });
+      const e1 = raidEvent({ id: 1, ineligiblePlayerDiscordIds: ['player-1'] });
       const e2 = raidEvent({ id: 2 });
       setup([member()], [e1, e2]);
 

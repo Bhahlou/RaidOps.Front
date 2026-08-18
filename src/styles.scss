@@ -260,6 +260,39 @@ body::after {
   }
 }
 
+// ── Raid signup RSVP colors ──────────────────────────────────────────────────
+// Global (not component-scoped): these classes decorate the inner <button>/<span> rendered by
+// app-icon-button's/app-button's own template, which sits outside the caller component's view
+// -encapsulation boundary — a selector scoped to the caller's stylesheet can never match it.
+.signup-btn {
+  border-radius: 6px;
+  color: var(--color-text-muted);
+}
+
+.signup-btn--accept.signup-btn--active {
+  color: #57f287;
+  border-color: #57f287;
+  background: rgb(87 242 135 / 15%);
+}
+
+.signup-btn--tentative.signup-btn--active {
+  color: #fee75c;
+  border-color: #fee75c;
+  background: rgb(254 231 92 / 15%);
+}
+
+.signup-btn--decline.signup-btn--active {
+  color: #ed4245;
+  border-color: #ed4245;
+  background: rgb(237 66 69 / 15%);
+}
+
+.channel-mode-btn--active {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
 // ── Spinner ───────────────────────────────────────────────────────────────────
 // Global CSS-only spinner replacing mat-progress-spinner/mat-spinner.
 .spinner {

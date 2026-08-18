@@ -31,4 +31,10 @@ export interface RaidSeriesPayload {
   slotsPerGroup: number;
   signupMode: SignupMode;
   raidZoneIds: number[];
+  /** Overrides the branch's default signup mode for this series — creation only, `undefined` means "use the branch default." */
+  signupModeOverride?: SignupMode | null;
+  /** Discord snowflake ID of a dedicated channel every occurrence's notifications should all post to instead of the guild-wide configured one — creation only, mutually exclusive with `dedicatedAnnouncementChannelCategoryId`. */
+  dedicatedAnnouncementChannelId?: string | null;
+  /** Discord snowflake ID of a category — when set, each materialized occurrence gets its own fresh channel created here instead of sharing one — creation only, mutually exclusive with `dedicatedAnnouncementChannelId`. */
+  dedicatedAnnouncementChannelCategoryId?: string | null;
 }

@@ -1,0 +1,34 @@
+<h2 class="dialog-title">{{ 'raidBuilder.signup.characterDialogTitle' | transloco }}</h2>
+
+<div class="dialog-content">
+  <div class="field-group">
+    <label class="field-label" for="signup-character-select">{{ 'raidBuilder.signup.characterDialogLabel' | transloco }}</label>
+    <app-select
+      [inputId]="'signup-character-select'"
+      [options]="characterOptions()"
+      [value]="selectedCharacterId()"
+      (valueChange)="onCharacterChange($any($event))"
+    />
+  </div>
+
+  @if (specOptions().length > 1) {
+    <div class="field-group">
+      <label class="field-label" for="signup-spec-select">{{ 'raidBuilder.signup.characterDialogSpecLabel' | transloco }}</label>
+      <app-select
+        [inputId]="'signup-spec-select'"
+        [options]="specOptions()"
+        [value]="selectedSpecId()"
+        (valueChange)="selectedSpecId.set($any($event))"
+      />
+    </div>
+  }
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">
+    {{ 'raidBuilder.actions.cancel' | transloco }}
+  </app-button>
+  <app-button variant="primary" [disabled]="selectedCharacterId() === null || selectedSpecId() === null" (click)="submit()">
+    {{ 'raidBuilder.signup.characterDialogSubmit' | transloco }}
+  </app-button>
+</div>

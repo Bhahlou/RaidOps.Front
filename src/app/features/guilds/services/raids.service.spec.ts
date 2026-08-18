@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { RaidEventPayload } from '../models/raid-event.model';
 import { RaidSeriesPayload } from '../models/raid-series.model';
 import { SignupMode } from '../models/signup-mode.enum';
+import { SignupStatus } from '../models/signup-status.enum';
 import { RaidsService } from './raids.service';
 
 const BASE = '/guilds/guild-1/branches/7/raids';
@@ -172,6 +173,25 @@ describe('RaidsService', () => {
     });
   });
 
+  describe('createAnnouncementChannel', () => {
+    it('sends POST to .../announcement-channel with the name and category id', () => {
+      service.createAnnouncementChannel('guild-1', 7, 'kara-tue-18-aug', 'cat-1').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/announcement-channel`));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ name: 'kara-tue-18-aug', categoryId: 'cat-1' });
+      req.flush({ body: { id: '555', name: 'kara-tue-18-aug', missingPermissions: [], categoryName: 'Raids' } });
+    });
+
+    it('defaults categoryId to null when omitted', () => {
+      service.createAnnouncementChannel('guild-1', 7, 'kara-tue-18-aug').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/announcement-channel`));
+      expect(req.request.body).toEqual({ name: 'kara-tue-18-aug', categoryId: null });
+      req.flush({ body: { id: '555', name: 'kara-tue-18-aug', missingPermissions: [], categoryName: null } });
+    });
+  });
+
   describe('publish', () => {
     it('sends POST to .../events/:id/publish with an empty body', () => {
       service.publish('guild-1', 7, 11).subscribe();
@@ -209,6 +229,35 @@ describe('RaidsService', () => {
       const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/announce-grouping`));
       expect(req.request.body).toEqual({ characterName: null });
       req.flush(null);
+    });
+  });
+
+  describe('setMySignup', () => {
+    it('sends POST to .../events/:id/signup with the status, character and spec', () => {
+      service.setMySignup('guild-1', 7, 11, SignupStatus.Accepted, 42, 71).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/signup`));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ status: SignupStatus.Accepted, characterId: 42, specId: 71 });
+      req.flush(null);
+    });
+
+    it('defaults characterId/specId to null when omitted (Declined response)', () => {
+      service.setMySignup('guild-1', 7, 11, SignupStatus.Declined).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/signup`));
+      expect(req.request.body).toEqual({ status: SignupStatus.Declined, characterId: null, specId: null });
+      req.flush(null);
+    });
+  });
+
+  describe('getSignups', () => {
+    it('sends GET to .../events/:id/signups', () => {
+      service.getSignups('guild-1', 7, 11).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/signups`));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
     });
   });
 

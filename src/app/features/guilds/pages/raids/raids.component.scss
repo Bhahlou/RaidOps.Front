@@ -210,11 +210,6 @@
   }
 }
 
-.board-spinner {
-  align-self: center;
-  margin-top: 32px;
-}
-
 .active-event-header {
   display: flex;
   align-items: center;
@@ -236,6 +231,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.active-event-signup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+
+  // DefaultPresent-mode events keep the same DOM footprint as Signup-mode ones (buttons just
+  // disabled + invisible) so stacked panels of mixed signup modes still line up their icons-group
+  // / edit button columns instead of space-between redistributing around a missing flex item.
+  &--placeholder {
+    visibility: hidden;
+  }
+}
+
+.active-event-signup-buttons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .active-event-zones {
@@ -275,6 +291,19 @@
   color: var(--color-text-secondary);
 }
 
+.active-event-my-signup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.active-event-my-signup-icon {
+  border-radius: 3px;
+}
+
 // Narrow board-main: title + date share one line (info switches to a row) instead of stacking,
 // and zones + role counters move to their own full-width line below — the wide layout's single
 // row (info | zones | counters | edit) gets too cramped to read once the panel is phone-width.
@@ -301,14 +330,23 @@
 }
 
 .raid-name-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover,
   &:focus-visible {
     color: var(--color-accent);
     text-decoration: underline;
   }
+}
+
+.raid-name-link-chevron {
+  font-size: 1.1rem;
+  opacity: 0.6;
 }
 
 .active-event-draft-badge {

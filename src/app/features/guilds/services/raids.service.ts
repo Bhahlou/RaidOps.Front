@@ -7,6 +7,9 @@ import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
 import { RaidBoard, RaidEventPayload, RaidEventSummary } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 import { RaidEventAssignedCharacter } from '../models/raid-event-assigned-character.model';
+import { RaidSignup } from '../models/raid-signup.model';
+import { SignupStatus } from '../models/signup-status.enum';
+import { DiscordChannel } from '../../../shared/models/discord-channel.model';
 
 /** Thin HTTP wrapper over every `api/v1/guilds/{guildId}/branches/{guildBranchId}/raids/...` endpoint. */
 @Service()
@@ -100,6 +103,28 @@ export class RaidsService {
    */
   announceGrouping(guildId: string, guildBranchId: number, eventId: number, characterName?: string): Observable<void> {
     return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/announce-grouping`, { characterName: characterName ?? null });
+  }
+
+  /** Sets the requesting member's own Accepted/Tentative/Declined response to a Signup-mode raid event — `characterId` is required when `status` is Accepted. */
+  setMySignup(
+    guildId: string,
+    guildBranchId: number,
+    eventId: number,
+    status: SignupStatus,
+    characterId: number | null = null,
+    specId: number | null = null,
+  ): Observable<void> {
+    return this.#http.post<void>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/signup`, { status, characterId, specId });
+  }
+
+  /** Every roster member's current response to a Signup-mode raid event. */
+  getSignups(guildId: string, guildBranchId: number, eventId: number): Observable<RaidSignup[]> {
+    return this.#http.get<RaidSignup[]>(`${this.#base(guildId, guildBranchId)}/events/${eventId}/signups`);
+  }
+
+  /** Officer-only — creates a new Discord text channel, for immediate use as a raid's dedicated announcement channel. */
+  createAnnouncementChannel(guildId: string, guildBranchId: number, name: string, categoryId: string | null = null): Observable<{ body: DiscordChannel }> {
+    return this.#http.post<{ body: DiscordChannel }>(`${this.#base(guildId, guildBranchId)}/announcement-channel`, { name, categoryId });
   }
 
   assignSlot(

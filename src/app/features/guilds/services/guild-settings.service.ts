@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { DiscordChannel } from '../../../shared/models/discord-channel.model';
+import { GuildCategories } from '../../../shared/models/discord-category.model';
 import { DiscordRole } from '../../../shared/models/discord-role.model';
 import { GuildNotificationEventType, GuildNotificationSetting } from '../models/guild-notification-setting.model';
 import { GuildSettings } from '../models/guild-settings.model';
@@ -30,6 +31,11 @@ export class GuildSettingsService {
   /** Fetches the guild's text-postable Discord channels, for the notification settings channel picker. */
   getNotificationChannels(guildId: string): Observable<DiscordChannel[]> {
     return this.#http.get<DiscordChannel[]>(`${this.#api}/guilds/${guildId}/notification-channels`);
+  }
+
+  /** Fetches the guild's Discord channel categories, for picking where a bot-created channel should be nested. */
+  getCategories(guildId: string): Observable<GuildCategories> {
+    return this.#http.get<GuildCategories>(`${this.#api}/guilds/${guildId}/categories`);
   }
 
   /** Persists the guild's Discord notification settings in bulk, scoped to a branch or guild-wide (null). */

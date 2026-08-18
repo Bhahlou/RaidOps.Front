@@ -1,23 +1,9 @@
-import { inject, InjectionToken, Service } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+import { inject, Service } from '@angular/core';
+import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
+import { HUB_CONNECTION_FACTORY } from './hub-connection-factory';
 
-/**
- * Builds the actual `/hubs/auth` connection. Extracted behind a DI token (rather than calling
- * `HubConnectionBuilder` directly in `AuthHubService`) so unit tests can substitute a fake
- * connection via a TestBed provider override, the same way every other service in this codebase
- * is tested — instead of `vi.mock`-ing the `@microsoft/signalr` package itself, which leaks
- * across spec files under this repo's non-isolated Vitest runner.
- */
-export const HUB_CONNECTION_FACTORY = new InjectionToken<(hubUrl: string) => HubConnection>(
-  'HUB_CONNECTION_FACTORY',
-  {
-    providedIn: 'root',
-    /* v8 ignore next 2 */
-    factory: () => (hubUrl: string) =>
-      new HubConnectionBuilder().withUrl(hubUrl, { withCredentials: true }).withAutomaticReconnect().build(),
-  },
-);
+export { HUB_CONNECTION_FACTORY };
 
 /**
  * Thin wrapper around the `/hubs/auth` SignalR connection. Holds no app state — pushes a

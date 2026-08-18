@@ -17,15 +17,22 @@ import { RaidSeriesStore } from '../../stores/raid-series.store';
 import { GuildRosterStore } from '../../stores/guild-roster.store';
 import { RaidEvent } from '../../models/raid-event.model';
 import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
+import { SignupMode } from '../../models/signup-mode.enum';
+import { SignupStatus } from '../../models/signup-status.enum';
 import { RaidSeries } from '../../models/raid-series.model';
 import { countRaidRoles, RAID_ROLE_ICON, RAID_ROLE_ORDER, RaidRole } from '../../utils/raid-role.util';
 import { raidZoneIconUrl } from '../../utils/raid-zone-icon.util';
 import { RaidRosterPoolComponent } from '../../components/raid-roster-pool/raid-roster-pool.component';
 import { RaidEventGridComponent } from '../../components/raid-event-grid/raid-event-grid.component';
+import { RaidSignupListComponent } from '../../components/raid-signup-list/raid-signup-list.component';
 import { CreateRaidSeriesDialogComponent } from '../../components/create-raid-series-dialog/create-raid-series-dialog.component';
 import { DeactivateRaidSeriesDialogComponent } from '../../components/deactivate-raid-series-dialog/deactivate-raid-series-dialog.component';
 import { CreateRaidEventDialogComponent } from '../../components/create-raid-event-dialog/create-raid-event-dialog.component';
 import { EditRaidEventDialogComponent } from '../../components/edit-raid-event-dialog/edit-raid-event-dialog.component';
+import {
+  SignupCharacterDialogComponent,
+  SignupCharacterDialogResult,
+} from '../../components/signup-character-dialog/signup-character-dialog.component';
 import { parseIsoDate } from '../../../calendar/utils/iso-date.util';
 
 // One page = one weekly lockout window (region reset to region reset) — see rangeStart's default below.
@@ -58,6 +65,7 @@ const MAX_VISIBLE_EVENTS = 4;
     CdkDropListGroup,
     RaidRosterPoolComponent,
     RaidEventGridComponent,
+    RaidSignupListComponent,
     BranchTabsComponent,
     TranslocoPipe,
     RouterLink,
@@ -90,7 +98,12 @@ export class RaidsComponent {
   /** Highlights the viewer's own characters (yellow outline) wherever a character chip is rendered. */
   readonly currentUserDiscordId = computed(() => this.#authStore.user()?.discordId ?? null);
 
+  /** The viewer's own characters on this branch's roster — the pool an Accept/Tentative RSVP can pick from. */
+  readonly myCharacters = computed(() => this.rosterMembers().filter((m) => m.playerDiscordId === this.currentUserDiscordId()));
+
   readonly PublicationStatus = RaidPublicationStatus;
+  readonly SignupMode = SignupMode;
+  readonly SignupStatus = SignupStatus;
   readonly roleOrder = RAID_ROLE_ORDER;
   readonly roleIcon = RAID_ROLE_ICON;
 
@@ -104,7 +117,6 @@ export class RaidsComponent {
   });
 
   readonly events = this.boardStore.events;
-  readonly isLoading = this.boardStore.isLoading;
   readonly activeSeries = computed(() => (this.seriesStore.series() ?? []).filter((s) => s.isActive));
   readonly rosterMembers = computed(() => this.#rosterStore.members() ?? []);
 
@@ -150,6 +162,13 @@ export class RaidsComponent {
     });
   }
 
+  /** Re-resolves the branch's current lockout week rather than snapping to a civil Monday-based week. */
+  #goToLockoutWeek(): void {
+    this.boardStore.getLockoutWeek(this.guildId(), this.guildBranchId()).subscribe((week) => {
+      this.rangeStart.set(week.weekStartLocal ? parseIsoDate(week.weekStartLocal) : startOfWeek(new Date()));
+    });
+  }
+
   prevRange(): void {
     this.rangeStart.update((d) => addDays(d, -RANGE_DAYS));
   }
@@ -159,7 +178,7 @@ export class RaidsComponent {
   }
 
   goToday(): void {
-    this.rangeStart.set(startOfWeek(new Date()));
+    this.#goToLockoutWeek();
   }
 
   openCreateSeriesDialog(series: RaidSeries | null): void {
@@ -236,12 +255,59 @@ export class RaidsComponent {
     return countRaidRoles(event.assignments);
   }
 
+  /** The character the viewer is signed up with on this event (Accepted or Tentative both commit one), or null. */
+  mySignupCharacter(event: RaidEvent): { name: string; classColor: string; specIconUrl: string | null } | null {
+    if (event.mySignupCharacterId == null) return null;
+    const member = this.rosterMembers().find((m) => m.characterId === event.mySignupCharacterId);
+    if (!member) return null;
+    const spec = member.raidSpecs.find((s) => s.specId === event.mySignupSpecId);
+    return { name: member.characterName, classColor: member.classColor, specIconUrl: spec?.iconUrl ?? null };
+  }
+
   selectEvent(eventId: number): void {
     this.#activeEventId.set(eventId);
   }
 
   isActiveEvent(eventId: number): boolean {
     return eventId === this.activeEventId();
+  }
+
+  setSignup(event: RaidEvent, status: SignupStatus): void {
+    // Declined carries no character; Accepted and Tentative both commit one (matches the Discord
+    // signup-call buttons and the server's own validation — see SetMyRaidSignupCommandHandler).
+    if (status === SignupStatus.Declined) {
+      this.#submitSignup(event, status, null, null);
+      return;
+    }
+
+    const characters = this.myCharacters();
+    const onlyCharacter = characters.length === 1 ? characters[0] : null;
+    if (onlyCharacter && onlyCharacter.raidSpecs.length <= 1) {
+      this.#submitSignup(event, status, onlyCharacter.characterId, onlyCharacter.raidSpecs[0]?.specId ?? null);
+      return;
+    }
+
+    this.#dialog
+      .open<SignupCharacterDialogResult | null>(SignupCharacterDialogComponent, {
+        width: '360px',
+        data: {
+          characters: characters.map((c) => ({ characterId: c.characterId, characterName: c.characterName, raidSpecs: c.raidSpecs })),
+          currentCharacterId: event.mySignupCharacterId,
+          currentSpecId: event.mySignupSpecId,
+        },
+      })
+      .closed.subscribe((result) => {
+        if (result != null) this.#submitSignup(event, status, result.characterId, result.specId);
+      });
+  }
+
+  #submitSignup(event: RaidEvent, status: SignupStatus, characterId: number | null, specId: number | null): void {
+    this.boardStore.setMySignup(this.guildId(), this.guildBranchId(), event.id, status, characterId, specId).subscribe({
+      next: () => this.#reloadBoard(),
+      error: () => {
+        // Board stays as-is on failure — the control simply won't reflect the attempted change.
+      },
+    });
   }
 }
 

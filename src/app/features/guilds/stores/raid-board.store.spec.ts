@@ -7,6 +7,8 @@ import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.mod
 import { RaidEventStatus } from '../models/raid-event-status.enum';
 import { RaidPublicationStatus } from '../models/raid-publication-status.enum';
 import { SignupMode } from '../models/signup-mode.enum';
+import { SignupStatus } from '../models/signup-status.enum';
+import { RaidSignupHubService } from '../services/raid-signup-hub.service';
 import { RaidBoardStore } from './raid-board.store';
 
 const BASE = '/guilds/g1/branches/7/raids';
@@ -25,7 +27,10 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   publicationStatus: RaidPublicationStatus.Draft,
   raidZones: [],
   assignments: [],
-  absentPlayerDiscordIds: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
   ...overrides,
 });
 
@@ -42,10 +47,18 @@ const eventPayload = (overrides?: Partial<RaidEventPayload>): RaidEventPayload =
 describe('RaidBoardStore', () => {
   let store: RaidBoardStore;
   let controller: HttpTestingController;
+  let signupHub: { joinEvent: ReturnType<typeof vi.fn>; leaveEvent: ReturnType<typeof vi.fn>; onRaidSignupChanged: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
+    signupHub = { joinEvent: vi.fn().mockResolvedValue(undefined), leaveEvent: vi.fn(), onRaidSignupChanged: vi.fn().mockReturnValue(() => {}) };
+
     TestBed.configureTestingModule({
-      providers: [RaidBoardStore, provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        RaidBoardStore,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: RaidSignupHubService, useValue: signupHub },
+      ],
     });
     store = TestBed.inject(RaidBoardStore);
     controller = TestBed.inject(HttpTestingController);
@@ -271,6 +284,47 @@ describe('RaidBoardStore', () => {
       const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/slots/swap`));
       expect(req.request.body).toEqual({ groupNumberA: 1, slotNumberA: 2, groupNumberB: 3, slotNumberB: 4 });
       req.flush(null);
+    });
+  });
+
+  describe('setMySignup', () => {
+    it('sends POST to .../events/:id/signup with the status, character and spec', () => {
+      store.setMySignup('g1', 7, 11, SignupStatus.Accepted, 42, 71).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/signup`));
+      expect(req.request.body).toEqual({ status: SignupStatus.Accepted, characterId: 42, specId: 71 });
+      req.flush(null);
+    });
+  });
+
+  describe('getSignups', () => {
+    it('sends GET to .../events/:id/signups', () => {
+      store.getSignups('g1', 7, 11).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11/signups`));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
+  describe('joinRaidSignupUpdates / leaveRaidSignupUpdates / onRaidSignupChanged', () => {
+    it('delegates joinRaidSignupUpdates to RaidSignupHubService.joinEvent', () => {
+      store.joinRaidSignupUpdates('g1', 7, 11);
+      expect(signupHub.joinEvent).toHaveBeenCalledWith('g1', 7, 11);
+    });
+
+    it('delegates leaveRaidSignupUpdates to RaidSignupHubService.leaveEvent', () => {
+      store.leaveRaidSignupUpdates(7, 11);
+      expect(signupHub.leaveEvent).toHaveBeenCalledWith(7, 11);
+    });
+
+    it('delegates onRaidSignupChanged to RaidSignupHubService.onRaidSignupChanged and returns its unsubscribe function', () => {
+      const callback = vi.fn();
+      const unsubscribe = vi.fn();
+      signupHub.onRaidSignupChanged.mockReturnValue(unsubscribe);
+
+      const result = store.onRaidSignupChanged(callback);
+
+      expect(signupHub.onRaidSignupChanged).toHaveBeenCalledWith(callback);
+      expect(result).toBe(unsubscribe);
     });
   });
 

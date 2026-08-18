@@ -10,6 +10,7 @@ export enum GuildNotificationEventType {
   RaidSlotSpecChanged = 'RaidSlotSpecChanged',
   RaidCompositionAnnouncementPosted = 'RaidCompositionAnnouncementPosted',
   RaidCompositionAnnouncementDm = 'RaidCompositionAnnouncementDm',
+  RaidSignupCallPosted = 'RaidSignupCallPosted',
 }
 
 export interface GuildNotificationSetting {

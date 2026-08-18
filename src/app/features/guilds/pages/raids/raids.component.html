@@ -72,9 +72,7 @@
 
     <div class="board-body" cdkDropListGroup>
       <section class="board-main">
-        @if (isLoading() && visibleEvents().length === 0) {
-          <span class="spinner board-spinner"></span>
-        } @else if (visibleEvents().length === 0) {
+        @if (visibleEvents().length === 0) {
           <app-empty-hint>{{ 'raidBuilder.board.empty' | transloco }}</app-empty-hint>
         } @else {
           @if (visibleEvents().length > 1) {
@@ -104,14 +102,12 @@
                 <div class="active-event-header">
                   <div class="active-event-info">
                     <h2>
-                      @if (event.publicationStatus === PublicationStatus.Published) {
-                        <a
-                          class="raid-name-link"
-                          [routerLink]="['/guilds', guildId(), guildBranchId(), 'raids', event.id]"
-                          >{{ event.name }}</a
-                        >
-                      } @else {
-                        {{ event.name }}
+                      <a
+                        class="raid-name-link"
+                        [routerLink]="['/guilds', guildId(), guildBranchId(), 'raids', event.id]"
+                        >{{ event.name }}<span class="material-icons raid-name-link-chevron">chevron_right</span></a
+                      >
+                      @if (event.publicationStatus !== PublicationStatus.Published) {
                         <span class="active-event-draft-badge">{{
                           'raidBuilder.draft' | transloco
                         }}</span>
@@ -153,6 +149,46 @@
                       }
                     </div>
                   </div>
+                  <div class="active-event-signup" [class.active-event-signup--placeholder]="event.signupMode !== SignupMode.Signup">
+                    <div class="active-event-signup-buttons" role="group" [attr.aria-label]="'raidBuilder.signup.myResponse' | transloco">
+                      <app-icon-button
+                        icon="check_circle"
+                        [extraClass]="'signup-btn signup-btn--accept' + (event.mySignupStatus === SignupStatus.Accepted ? ' signup-btn--active' : '')"
+                        [ariaLabel]="'raidBuilder.signup.accept' | transloco"
+                        [title]="'raidBuilder.signup.accept' | transloco"
+                        [disabled]="event.signupMode !== SignupMode.Signup"
+                        (click)="setSignup(event, SignupStatus.Accepted)"
+                      />
+                      <app-icon-button
+                        icon="help"
+                        [extraClass]="'signup-btn signup-btn--tentative' + (event.mySignupStatus === SignupStatus.Tentative ? ' signup-btn--active' : '')"
+                        [ariaLabel]="'raidBuilder.signup.tentative' | transloco"
+                        [title]="'raidBuilder.signup.tentative' | transloco"
+                        [disabled]="event.signupMode !== SignupMode.Signup"
+                        (click)="setSignup(event, SignupStatus.Tentative)"
+                      />
+                      <app-icon-button
+                        icon="cancel"
+                        [extraClass]="'signup-btn signup-btn--decline' + (event.mySignupStatus === SignupStatus.Declined ? ' signup-btn--active' : '')"
+                        [ariaLabel]="'raidBuilder.signup.decline' | transloco"
+                        [title]="'raidBuilder.signup.decline' | transloco"
+                        [disabled]="event.signupMode !== SignupMode.Signup"
+                        (click)="setSignup(event, SignupStatus.Declined)"
+                      />
+                    </div>
+                    @if (
+                      (event.mySignupStatus === SignupStatus.Accepted || event.mySignupStatus === SignupStatus.Tentative) &&
+                      mySignupCharacter(event);
+                      as character
+                    ) {
+                      <span class="active-event-my-signup">
+                        @if (character.specIconUrl) {
+                          <img class="active-event-my-signup-icon" [src]="character.specIconUrl" alt="" width="14" height="14" />
+                        }
+                        <span [style.color]="character.classColor">{{ character.name }}</span>
+                      </span>
+                    }
+                  </div>
                   @if (isOfficer()) {
                     <app-icon-button
                       icon="edit"
@@ -171,6 +207,16 @@
                   [rosterMembers]="rosterMembers()"
                   [allEvents]="events()"
                 />
+
+                @if (event.signupMode === SignupMode.Signup) {
+                  <app-raid-signup-list
+                    [event]="event"
+                    [guildId]="guildId()"
+                    [guildBranchId]="guildBranchId()"
+                    [disabled]="!isOfficer()"
+                    [currentUserDiscordId]="currentUserDiscordId()"
+                  />
+                }
               </div>
             }
           </div>

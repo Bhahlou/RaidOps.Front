@@ -68,6 +68,22 @@
   </div>
 
   <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
+
+  @if (showChannelField) {
+    <app-raid-channel-field
+      [channels]="channels()"
+      [categories]="categories()"
+      [canCreateRootChannel]="canCreateRootChannel()"
+      [raidName]="name()"
+      [startsAtLocal]="startsAtLocal()"
+      [guildLanguage]="guildLanguage()"
+      [(channelMode)]="channelMode"
+      [(selectedChannelId)]="selectedChannelId"
+      [(selectedCategoryId)]="selectedCategoryId"
+      [(newChannelName)]="newChannelName"
+      (canCreateAtSelectionChange)="canCreateChannelAtSelection.set($event)"
+    />
+  }
 </div>
 
 <div class="dialog-actions">
