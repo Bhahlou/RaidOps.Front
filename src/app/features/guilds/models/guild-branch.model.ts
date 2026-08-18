@@ -1,5 +1,5 @@
 import { RosterMode } from './roster-mode.enum';
-import { SignupMode } from './signup-mode.enum';
+import { SignupMode } from '../raids/models/signup-mode.enum';
 
 /** One WoW game-version branch activated on a guild, with its roster/officer role-set configuration. */
 export interface GuildBranch {

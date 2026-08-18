@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuildBranch, GuildBranchRosterSettings } from '../models/guild-branch.model';
 import { RosterMode } from '../models/roster-mode.enum';
-import { SignupMode } from '../models/signup-mode.enum';
+import { SignupMode } from '../raids/models/signup-mode.enum';
 import { GuildBranchesService } from './guild-branches.service';
 
 describe('GuildBranchesService', () => {

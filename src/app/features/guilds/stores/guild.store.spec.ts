@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { GuildSettings } from '../models/guild-settings.model';
+import { GuildSettings } from '../settings/models/guild-settings.model';
 import { GuildStore } from './guild.store';
 
 const settings = (overrides?: Partial<GuildSettings>): GuildSettings => ({
