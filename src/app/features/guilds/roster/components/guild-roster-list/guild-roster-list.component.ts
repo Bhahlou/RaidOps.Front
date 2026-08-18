@@ -22,9 +22,9 @@ import { GuildRosterMember } from '../../../models/guild-roster-member.model';
 import { CharacterRank } from '../../../models/character-rank.enum';
 import { ConfirmKickDialogComponent } from '../confirm-kick-dialog/confirm-kick-dialog.component';
 import { characterLink } from '../../../../../shared/utils/character-link.util';
+import { createSortableColumn } from '../../../../../shared/utils/sortable-column.util';
 
 type SortColumn = 'player' | 'character' | 'class' | 'level' | 'rank' | 'joinedAt';
-type SortDirection = 'asc' | 'desc';
 
 interface ClassOption {
   classId: number;
@@ -191,17 +191,16 @@ export class GuildRosterListComponent {
 
   // ── Sorting ───────────────────────────────────────────────────────────────
 
-  readonly #sortColumn = signal<SortColumn | null>(null);
-  readonly #sortDirection = signal<SortDirection>('asc');
+  readonly #sort = createSortableColumn<SortColumn>();
 
   readonly sortedMembers = computed(() => {
     const members = this.filteredMembers();
     if (!members) return null;
 
-    const column = this.#sortColumn();
+    const column = this.#sort.column();
     if (!column) return members;
 
-    const dir = this.#sortDirection() === 'asc' ? 1 : -1;
+    const dir = this.#sort.direction() === 'asc' ? 1 : -1;
     return [...members].sort((a, b) => dir * this.#compare(a, b, column));
   });
 
@@ -219,17 +218,11 @@ export class GuildRosterListComponent {
   }
 
   toggleSort(column: SortColumn): void {
-    if (this.#sortColumn() === column) {
-      this.#sortDirection.update((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.#sortColumn.set(column);
-      this.#sortDirection.set('asc');
-    }
+    this.#sort.toggle(column);
   }
 
   sortIcon(column: SortColumn): string | null {
-    if (this.#sortColumn() !== column) return null;
-    return this.#sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward';
+    return this.#sort.icon(column);
   }
 
   toggleClass(classId: number): void {

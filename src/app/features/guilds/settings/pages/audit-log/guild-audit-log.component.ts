@@ -16,6 +16,7 @@ import {
 } from '../../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
 import { DiscordIconType } from '../../../../../shared/models/discord-icon-type.enum';
 import { formatDiscordColor } from '../../../../../shared/utils/discord-color.util';
+import { createSortableColumn } from '../../../../../shared/utils/sortable-column.util';
 import { injectGuildContext } from '../../../inject-guild-context';
 import { AuditLogStore } from '../../stores/audit-log.store';
 import { AuditLogEntry } from '../../models/audit-log-entry.model';
@@ -27,7 +28,6 @@ import { DayAvailabilityStatus } from '../../../../calendar/models/day-availabil
 import { describePartialTime, formatPartialTimeLabel } from '../../../../calendar/models/availability.model';
 
 type SortColumn = 'actor' | 'category' | 'action' | 'change' | 'time';
-type SortDirection = 'asc' | 'desc';
 
 interface ActorOption {
   id: string;
@@ -115,8 +115,7 @@ export class GuildAuditLogComponent {
   readonly dateRangeStart = signal<Date | null>(null);
   readonly dateRangeEnd = signal<Date | null>(null);
 
-  readonly #sortColumn = signal<SortColumn | null>(null);
-  readonly #sortDirection = signal<SortDirection>('asc');
+  readonly #sort = createSortableColumn<SortColumn>();
 
   readonly categories = Object.values(GuildAuditCategory);
 
@@ -196,10 +195,10 @@ export class GuildAuditLogComponent {
       list = list.filter((e) => new Date(e.occurredAt) <= to);
     }
 
-    const column = this.#sortColumn();
+    const column = this.#sort.column();
     if (!column) return list;
 
-    const dir = this.#sortDirection() === 'asc' ? 1 : -1;
+    const dir = this.#sort.direction() === 'asc' ? 1 : -1;
     return [...list].sort(
       (a, b) => dir * this.#sortValue(a, column).localeCompare(this.#sortValue(b, column)),
     );
@@ -259,17 +258,11 @@ export class GuildAuditLogComponent {
   }
 
   toggleSort(column: SortColumn): void {
-    if (this.#sortColumn() === column) {
-      this.#sortDirection.update((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.#sortColumn.set(column);
-      this.#sortDirection.set('asc');
-    }
+    this.#sort.toggle(column);
   }
 
   sortIcon(column: SortColumn): string | null {
-    if (this.#sortColumn() !== column) return null;
-    return this.#sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward';
+    return this.#sort.icon(column);
   }
 
   /** Formats a timestamp using the app's current language, not a hardcoded locale. */
