@@ -30,7 +30,7 @@ export class RaidSignupHubService {
       .start()
       .then(() => connection)
       .catch((err: unknown) => {
-        if (this.#connection === connection) this.#connection = null;
+        this.#connection = null;
         this.#ready = null;
         throw err;
       });

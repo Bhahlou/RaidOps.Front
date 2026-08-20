@@ -148,11 +148,12 @@ describe('RaidsComponent', () => {
     branchId?: number;
     lockoutWeekStart?: string | null;
     members?: GuildRosterMember[];
+    lastViewedRangeStart?: Date | null;
   }) => {
     boardStore = {
       events: signal(opts?.events ?? []),
       isLoading: signal(false),
-      lastViewedRangeStart: signal(null),
+      lastViewedRangeStart: signal(opts?.lastViewedRangeStart ?? null),
       rememberRangeStart: vi.fn(),
       loadRange: vi.fn(),
       reload: vi.fn(),
@@ -416,6 +417,20 @@ describe('RaidsComponent', () => {
       expected.setHours(0, 0, 0, 0);
 
       expect(component.rangeStart()).toEqual(expected);
+    });
+
+    it('adopts the remembered range start instead of the lockout week when one is already stored', () => {
+      const remembered = new Date(2026, 7, 12);
+      const component = setup({ lastViewedRangeStart: remembered });
+
+      expect(component.rangeStart()).toEqual(remembered);
+    });
+
+    it('does not re-fetch the lockout week when a range start is already remembered', () => {
+      const component = setup({ lastViewedRangeStart: new Date(2026, 7, 12) });
+
+      expect(boardStore.getLockoutWeek).not.toHaveBeenCalled();
+      expect(component.rangeStart()).toEqual(new Date(2026, 7, 12));
     });
   });
 
