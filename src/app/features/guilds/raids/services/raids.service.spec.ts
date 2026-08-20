@@ -127,9 +127,9 @@ describe('RaidsService', () => {
     });
   });
 
-  describe('getEventSummary', () => {
+  describe('getEvent', () => {
     it('sends GET to .../events/:id', () => {
-      service.getEventSummary('guild-1', 7, 11).subscribe();
+      service.getEvent('guild-1', 7, 11).subscribe();
 
       const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`));
       expect(req.request.method).toBe('GET');

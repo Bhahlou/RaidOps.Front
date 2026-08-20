@@ -881,9 +881,21 @@
       "characterDialogSpecLabel": "Skillung",
       "characterDialogSubmit": "Bestätigen"
     },
+    "availability": {
+      "listTitle": "Wer ist verfügbar",
+      "unavailableSection": "Nicht verfügbar"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Raid-Details kommen bald — Anwesenheit, Loot und Log-Analyse werden hier zu finden sein.",
+      "notFound": "Dieses Raid-Event wurde nicht gefunden oder ist für dich noch nicht sichtbar.",
+      "hub": {
+        "title": "Demnächst verfügbar",
+        "comingSoon": "Demnächst verfügbar",
+        "loot": "Loot",
+        "assignments": "Zuweisungen",
+        "logs": "Logs",
+        "analysis": "Analyse"
+      },
       "triggerGrouping": "Gruppierung anpingen",
       "groupingSent": "Gruppierungs-Ping gesendet.",
       "groupingFailed": "Der Gruppierungs-Ping konnte nicht gesendet werden — prüfe, ob der Raid veröffentlicht ist und ein Ankündigungskanal konfiguriert ist.",

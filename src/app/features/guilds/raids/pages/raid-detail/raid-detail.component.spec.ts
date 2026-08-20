@@ -3,41 +3,50 @@ import { signal } from '@angular/core';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog } from '@angular/cdk/dialog';
+import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
 import { RaidDetailComponent } from './raid-detail.component';
 import { AuthStore } from '../../../../../core/stores/auth.store';
 import { RaidsService } from '../../services/raids.service';
+import { RaidBoardStore } from '../../stores/raid-board.store';
 import { GuildRosterStore } from '../../../roster/stores/guild-roster.store';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { GuildAccessLevel } from '../../../../../core/models/guild-access-level.enum';
 import { User } from '../../../../../core/models/user.model';
-import { RaidEventSummary } from '../../models/raid-event.model';
+import { RaidEvent } from '../../models/raid-event.model';
+import { RaidEventStatus } from '../../models/raid-event-status.enum';
+import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { SignupStatus } from '../../models/signup-status.enum';
-import { RaidSignup } from '../../models/raid-signup.model';
 import { GuildRosterMember } from '../../../models/guild-roster-member.model';
 import { CharacterRank } from '../../../models/character-rank.enum';
 import { SignupCharacterDialogComponent } from '../../components/signup-character-dialog/signup-character-dialog.component';
+import { EditRaidEventDialogComponent } from '../../components/edit-raid-event-dialog/edit-raid-event-dialog.component';
+import { RaidGroupingCharacterDialogComponent } from '../../components/raid-grouping-character-dialog/raid-grouping-character-dialog.component';
 
-const userGuild = (accessLevel: GuildAccessLevel) => ({
-  id: 'g1',
-  name: 'Dah Boo',
-  iconHash: null,
-  isRegistered: true,
-  isConfigured: true,
-  isAdmin: false,
-  accessLevel,
-  branches: [{ id: 7, branchId: 3, branchName: 'Classic Anniversary', accessLevel, hasActiveCharacter: true }],
-});
-
-const fakeUser = (accessLevel: GuildAccessLevel = GuildAccessLevel.Officer): User => ({
-  discordId: 'player-1',
-  name: 'Dah Boo',
-  avatarHash: null,
-  guilds: [userGuild(accessLevel)],
-  notifications: [],
-  seenChangelogEntryIds: [],
+const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
+  id: 11,
+  raidSeriesId: null,
+  name: 'Split 1',
+  branchId: 3,
+  branchName: 'Classic Anniversary',
+  startsAtUtc: '2026-08-05T19:00:00Z',
+  groupCount: 5,
+  slotsPerGroup: 5,
+  signupMode: SignupMode.DefaultPresent,
+  status: RaidEventStatus.Scheduled,
+  publicationStatus: RaidPublicationStatus.Draft,
+  raidZones: [],
+  assignments: [],
+  ineligiblePlayerDiscordIds: [],
+  mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
+  ...overrides,
 });
 
 const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
@@ -61,56 +70,67 @@ const member = (overrides?: Partial<GuildRosterMember>): GuildRosterMember => ({
   ...overrides,
 });
 
-const signup = (overrides?: Partial<RaidSignup>): RaidSignup => ({
-  userDiscordId: 'player-1',
-  playerName: 'Dah Boo',
-  status: SignupStatus.Accepted,
-  respondedAtUtc: '2026-08-01T00:00:00Z',
-  characterId: 1,
-  characterName: 'Addse',
-  classId: 1,
-  className: 'Warrior',
-  specId: 71,
-  specName: 'Arms',
-  specIconUrl: null,
-  ...overrides,
+const userGuild = (accessLevel: GuildAccessLevel) => ({
+  id: 'g1',
+  name: 'Dah Boo',
+  iconHash: null,
+  isRegistered: true,
+  isConfigured: true,
+  isAdmin: false,
+  accessLevel,
+  branches: [{ id: 7, branchId: 3, branchName: 'Classic Anniversary', accessLevel, hasActiveCharacter: true }],
 });
 
-const signupModeSummary = (overrides?: Partial<RaidEventSummary>): RaidEventSummary => ({
-  id: 11,
-  name: 'Split 1',
-  signupMode: SignupMode.Signup,
-  mySignupStatus: null,
-  mySignupCharacterId: null,
-  mySignupSpecId: null,
-  ...overrides,
+const fakeUser = (accessLevel: GuildAccessLevel = GuildAccessLevel.Officer): User => ({
+  discordId: 'player-1',
+  name: 'Dah Boo',
+  avatarHash: null,
+  guilds: [userGuild(accessLevel)],
+  notifications: [],
+  seenChangelogEntryIds: [],
 });
 
 describe('RaidDetailComponent', () => {
-  let raidsService: { getEventSummary: ReturnType<typeof vi.fn>; announceGrouping: ReturnType<typeof vi.fn>; getSignups: ReturnType<typeof vi.fn>; setMySignup: ReturnType<typeof vi.fn> };
+  let boardStore: {
+    events: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    loadEvent: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
+    setMySignup: ReturnType<typeof vi.fn>;
+    publishEvent: ReturnType<typeof vi.fn>;
+  };
+  let raidsService: { announceGrouping: ReturnType<typeof vi.fn> };
   let rosterStore: { members: ReturnType<typeof signal>; loadRoster: ReturnType<typeof vi.fn> };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
+  let transloco: { getActiveLang: ReturnType<typeof vi.fn>; activeLang: ReturnType<typeof signal>; translate: ReturnType<typeof vi.fn> };
 
   const setup = (opts?: {
     user?: User | null;
-    summary?: RaidEventSummary | null;
+    events?: RaidEvent[];
+    isLoading?: boolean;
     guildId?: string | null;
     branchId?: number;
     eventId?: number;
     members?: GuildRosterMember[];
-    signups?: RaidSignup[];
   }) => {
-    const summary: RaidEventSummary | null = opts?.summary === undefined ? { id: 11, name: 'Split 1' } as RaidEventSummary : opts.summary;
-    raidsService = {
-      getEventSummary: vi.fn().mockReturnValue(summary ? of(summary) : throwError(() => new Error('not found'))),
-      announceGrouping: vi.fn().mockReturnValue(of(undefined)),
-      getSignups: vi.fn().mockReturnValue(of(opts?.signups ?? [])),
+    boardStore = {
+      events: signal(opts?.events ?? [raidEvent()]),
+      isLoading: signal(opts?.isLoading ?? false),
+      loadEvent: vi.fn(),
+      reload: vi.fn(),
       setMySignup: vi.fn().mockReturnValue(of(undefined)),
+      publishEvent: vi.fn().mockReturnValue(of(undefined)),
     };
+    raidsService = { announceGrouping: vi.fn().mockReturnValue(of(undefined)) };
     rosterStore = { members: signal(opts?.members ?? []), loadRoster: vi.fn() };
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialog = { open: vi.fn().mockReturnValue({ closed: of(false) }) };
+    transloco = {
+      getActiveLang: vi.fn(() => 'en-US'),
+      activeLang: signal('en-US'),
+      translate: vi.fn((key: string) => key),
+    };
 
     const guildId = opts?.guildId === undefined ? 'g1' : opts.guildId;
     const branchId = opts?.branchId ?? 7;
@@ -135,10 +155,12 @@ describe('RaidDetailComponent', () => {
           },
         },
         { provide: AuthStore, useValue: { user: signal(opts?.user === undefined ? fakeUser() : opts.user) } },
+        { provide: RaidBoardStore, useValue: boardStore },
         { provide: RaidsService, useValue: raidsService },
         { provide: GuildRosterStore, useValue: rosterStore },
         { provide: SnackbarService, useValue: snackbar },
         { provide: Dialog, useValue: dialog },
+        { provide: TranslocoService, useValue: transloco },
       ],
     }).overrideComponent(RaidDetailComponent, { set: { template: '', imports: [] } });
 
@@ -153,274 +175,59 @@ describe('RaidDetailComponent', () => {
     expect(setup({ eventId: 42 }).eventId).toBe(42);
   });
 
-  // ── constructor / raidName ────────────────────────────────────────────────
+  // ── constructor ──────────────────────────────────────────────────────────
 
-  describe('raidName', () => {
-    it('fetches the event summary and sets raidName', () => {
-      const component = setup({ summary: { id: 11, name: 'Split 1' } });
+  describe('constructor', () => {
+    it('loads the event and the roster', () => {
+      setup({ guildId: 'g1', branchId: 7, eventId: 11 });
 
-      expect(raidsService.getEventSummary).toHaveBeenCalledWith('g1', 7, 11);
-      expect(component.raidName()).toBe('Split 1');
-    });
-
-    it('leaves raidName null when the fetch fails', () => {
-      const component = setup({ summary: null });
-
-      expect(component.raidName()).toBeNull();
-    });
-
-    it('sets signupMode and the viewer\'s own response from the summary', () => {
-      const component = setup({ summary: signupModeSummary({ mySignupStatus: SignupStatus.Accepted, mySignupCharacterId: 1, mySignupSpecId: 71 }) });
-
-      expect(component.signupMode()).toBe(SignupMode.Signup);
-      expect(component.mySignupStatus()).toBe(SignupStatus.Accepted);
-      expect(component.mySignupCharacterId()).toBe(1);
-      expect(component.mySignupSpecId()).toBe(71);
-    });
-
-    it('does not load the roster or signups for a DefaultPresent event', () => {
-      setup({ summary: { id: 11, name: 'Split 1' } as RaidEventSummary });
-
-      expect(rosterStore.loadRoster).not.toHaveBeenCalled();
-      expect(raidsService.getSignups).not.toHaveBeenCalled();
-    });
-
-    it('loads the roster for a Signup-mode event', () => {
-      setup({ summary: signupModeSummary() });
-
+      expect(boardStore.loadEvent).toHaveBeenCalledWith('g1', 7, 11);
       expect(rosterStore.loadRoster).toHaveBeenCalledWith('g1', 7);
     });
+  });
 
-    it('loads signups for a Signup-mode event when the viewer is an officer', () => {
-      setup({ summary: signupModeSummary(), user: fakeUser(GuildAccessLevel.Officer), signups: [signup()] });
+  // ── event / isLoading ────────────────────────────────────────────────────
 
-      expect(raidsService.getSignups).toHaveBeenCalledWith('g1', 7, 11);
+  describe('event', () => {
+    it('finds the event matching eventId among the board store events', () => {
+      const event = raidEvent({ id: 11, name: 'Split 1' });
+      const component = setup({ events: [raidEvent({ id: 1 }), event], eventId: 11 });
+
+      expect(component.event()).toBe(event);
     });
 
-    it('does not load signups for a Signup-mode event when the viewer is not an officer', () => {
-      setup({ summary: signupModeSummary(), user: fakeUser(GuildAccessLevel.Roster) });
-
-      expect(raidsService.getSignups).not.toHaveBeenCalled();
+    it('is undefined when no event matches', () => {
+      const component = setup({ events: [], eventId: 11 });
+      expect(component.event()).toBeUndefined();
     });
   });
 
-  // ── status buckets ────────────────────────────────────────────────────────
-
-  describe('status buckets', () => {
-    it('splits loaded signups into accepted/tentative/declined/no-response', () => {
-      const component = setup({
-        summary: signupModeSummary(),
-        signups: [
-          signup({ userDiscordId: 'p1', status: SignupStatus.Accepted }),
-          signup({ userDiscordId: 'p2', status: SignupStatus.Tentative }),
-          signup({ userDiscordId: 'p3', status: SignupStatus.Declined }),
-          signup({ userDiscordId: 'p4', status: null }),
-        ],
-      });
-
-      expect(component.acceptedSignups().map((s) => s.userDiscordId)).toEqual(['p1']);
-      expect(component.tentativeSignups().map((s) => s.userDiscordId)).toEqual(['p2']);
-      expect(component.declinedSignups().map((s) => s.userDiscordId)).toEqual(['p3']);
-      expect(component.noResponseSignups().map((s) => s.userDiscordId)).toEqual(['p4']);
-    });
-
-    it('falls back to an empty signups list when the load fails', () => {
-      raidsService = {
-        getEventSummary: vi.fn().mockReturnValue(of(signupModeSummary())),
-        announceGrouping: vi.fn().mockReturnValue(of(undefined)),
-        getSignups: vi.fn().mockReturnValue(throwError(() => new Error('boom'))),
-        setMySignup: vi.fn().mockReturnValue(of(undefined)),
-      };
-      rosterStore = { members: signal([]), loadRoster: vi.fn() };
-      TestBed.configureTestingModule({
-        imports: [RaidDetailComponent],
-        providers: [
-          {
-            provide: ActivatedRoute,
-            useValue: {
-              snapshot: { paramMap: { get: (key: string) => (key === 'branchId' ? '7' : key === 'eventId' ? '11' : 'g1') } },
-              paramMap: of(convertToParamMap({ id: 'g1', branchId: '7', eventId: '11' })),
-              parent: { snapshot: { paramMap: { get: () => 'g1' } }, paramMap: of(convertToParamMap({ id: 'g1' })) },
-            },
-          },
-          { provide: AuthStore, useValue: { user: signal(fakeUser(GuildAccessLevel.Officer)) } },
-          { provide: RaidsService, useValue: raidsService },
-          { provide: GuildRosterStore, useValue: rosterStore },
-          { provide: SnackbarService, useValue: { success: vi.fn(), error: vi.fn() } },
-          { provide: Dialog, useValue: { open: vi.fn() } },
-        ],
-      }).overrideComponent(RaidDetailComponent, { set: { template: '', imports: [] } });
-      const component = TestBed.createComponent(RaidDetailComponent).componentInstance;
-
-      expect(component.signups()).toEqual([]);
+  describe('isLoading', () => {
+    it('delegates to the board store', () => {
+      expect(setup({ isLoading: true }).isLoading()).toBe(true);
     });
   });
 
-  // ── myCharacters ──────────────────────────────────────────────────────────
-
-  describe('myCharacters', () => {
-    it('filters the roster down to the current user\'s own characters', () => {
-      const component = setup({ members: [member({ playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-2' })] });
-
-      expect(component.myCharacters().map((c) => c.characterId)).toEqual([1]);
-    });
-
-    it('is empty with no authenticated user', () => {
-      const component = setup({ user: null, members: [member()] });
-      expect(component.myCharacters()).toEqual([]);
-    });
-
-    it('falls back to an empty roster while the store has not loaded any members yet', () => {
-      const component = setup();
-      rosterStore.members.set(null);
-      expect(component.myCharacters()).toEqual([]);
-    });
-  });
-
-  // ── setSignup ─────────────────────────────────────────────────────────────
-
-  describe('setSignup', () => {
-    it('submits a Declined response directly, with no character/spec', () => {
-      const component = setup({ members: [member()] });
-
-      component.setSignup(SignupStatus.Declined);
-
-      expect(raidsService.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Declined, null, null);
-      expect(dialog.open).not.toHaveBeenCalled();
-    });
-
-    it('auto-submits Accepted when the viewer has exactly one character with at most one spec', () => {
-      const component = setup({ members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }] })] });
-
-      component.setSignup(SignupStatus.Accepted);
-
-      expect(raidsService.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Accepted, 1, 71);
-    });
-
-    it('auto-submits with a null spec when the single character has no raid specs at all', () => {
-      const component = setup({ members: [member({ raidSpecs: [] })] });
-
-      component.setSignup(SignupStatus.Tentative);
-
-      expect(raidsService.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Tentative, 1, null);
-    });
-
-    it('opens the character picker when the viewer has more than one character', () => {
-      const component = setup({
-        summary: signupModeSummary(),
-        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
-      });
-      dialog.open.mockReturnValue({ closed: of(null) });
-
-      component.setSignup(SignupStatus.Accepted);
-
-      expect(dialog.open).toHaveBeenCalledWith(
-        SignupCharacterDialogComponent,
-        expect.objectContaining({ data: expect.objectContaining({ currentCharacterId: null, currentSpecId: null }) }),
-      );
-      expect(raidsService.setMySignup).not.toHaveBeenCalled();
-    });
-
-    it('opens the character picker when the single character has more than one raid spec', () => {
-      const component = setup({
-        members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }, { specId: 72, name: 'Fury', iconUrl: null, isMain: false }] })],
-      });
-      dialog.open.mockReturnValue({ closed: of(null) });
-
-      component.setSignup(SignupStatus.Accepted);
-
-      expect(dialog.open).toHaveBeenCalled();
-      expect(raidsService.setMySignup).not.toHaveBeenCalled();
-    });
-
-    it('submits the picker result on close', () => {
-      const component = setup({
-        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
-      });
-      dialog.open.mockReturnValue({ closed: of({ characterId: 5, specId: 99 }) });
-
-      component.setSignup(SignupStatus.Accepted);
-
-      expect(raidsService.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Accepted, 5, 99);
-    });
-
-    it('does nothing when the picker is dismissed (null result)', () => {
-      const component = setup({
-        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
-      });
-      dialog.open.mockReturnValue({ closed: of(null) });
-
-      component.setSignup(SignupStatus.Accepted);
-
-      expect(raidsService.setMySignup).not.toHaveBeenCalled();
-    });
-  });
-
-  // ── #submitSignup (via setSignup) ────────────────────────────────────────
-
-  describe('#submitSignup', () => {
-    it('updates mySignupStatus/Character/Spec and clears savingSignup on success', () => {
-      const component = setup({ members: [member({ raidSpecs: [] })] });
-
-      component.setSignup(SignupStatus.Declined);
-
-      expect(component.mySignupStatus()).toBe(SignupStatus.Declined);
-      expect(component.mySignupCharacterId()).toBeNull();
-      expect(component.mySignupSpecId()).toBeNull();
-      expect(component.savingSignup()).toBe(false);
-    });
-
-    it('reloads signups after a successful submission when the viewer is an officer', () => {
-      const component = setup({ members: [member({ raidSpecs: [] })], user: fakeUser(GuildAccessLevel.Officer) });
-      raidsService.getSignups.mockClear();
-
-      component.setSignup(SignupStatus.Declined);
-
-      expect(raidsService.getSignups).toHaveBeenCalledWith('g1', 7, 11);
-    });
-
-    it('does not reload signups when the viewer is not an officer', () => {
-      const component = setup({ members: [member({ raidSpecs: [] })], user: fakeUser(GuildAccessLevel.Roster) });
-
-      component.setSignup(SignupStatus.Declined);
-
-      expect(raidsService.getSignups).not.toHaveBeenCalled();
-    });
-
-    it('shows an error snackbar and clears savingSignup on failure', () => {
-      const component = setup({ members: [member({ raidSpecs: [] })] });
-      raidsService.setMySignup.mockReturnValue(throwError(() => new Error('boom')));
-
-      component.setSignup(SignupStatus.Declined);
-
-      expect(snackbar.error).toHaveBeenCalledWith('raidBuilder.signup.saveFailed');
-      expect(component.savingSignup()).toBe(false);
-    });
-  });
-
-  // ── breadcrumbs ───────────────────────────────────────────────────────────
+  // ── breadcrumbs ──────────────────────────────────────────────────────────
 
   describe('breadcrumbs', () => {
     it('uses the raid name as the leaf label once loaded', () => {
-      const component = setup({ summary: { id: 11, name: 'Split 1' } });
-
+      const component = setup({ events: [raidEvent({ id: 11, name: 'Split 1' })] });
       expect(component.breadcrumbs().at(-1)).toEqual({ label: 'Split 1' });
     });
 
-    it('falls back to the generic breadcrumb key while the name is not yet loaded', () => {
-      const component = setup({ summary: null });
-
+    it('falls back to the generic breadcrumb key while the event is not yet loaded', () => {
+      const component = setup({ events: [] });
       expect(component.breadcrumbs().at(-1)).toEqual({ i18nKey: 'raidBuilder.detail.breadcrumb' });
     });
 
     it('links the raid-builder crumb to the branch\'s raids page', () => {
       const component = setup({ guildId: 'g1', branchId: 7 });
-
       expect(component.breadcrumbs()[1]).toEqual({ i18nKey: 'sidenav.guild.raidBuilder', link: ['/guilds', 'g1', '7', 'raids'] });
     });
   });
 
-  // ── isOfficer ─────────────────────────────────────────────────────────────
+  // ── isOfficer ────────────────────────────────────────────────────────────
 
   describe('isOfficer', () => {
     it('is false with no authenticated user', () => {
@@ -433,6 +240,236 @@ describe('RaidDetailComponent', () => {
 
     it('is true for an Officer-level member', () => {
       expect(setup({ user: fakeUser(GuildAccessLevel.Officer) }).isOfficer()).toBe(true);
+    });
+  });
+
+  // ── currentUserDiscordId / rosterMembers / myCharacters ─────────────────
+
+  describe('currentUserDiscordId', () => {
+    it('reads the discordId from the authenticated user', () => {
+      expect(setup({ user: fakeUser() }).currentUserDiscordId()).toBe('player-1');
+    });
+
+    it('is null with no authenticated user', () => {
+      expect(setup({ user: null }).currentUserDiscordId()).toBeNull();
+    });
+  });
+
+  describe('rosterMembers', () => {
+    it('falls back to an empty array when the store has no members loaded yet', () => {
+      const component = setup();
+      rosterStore.members.set(null);
+      expect(component.rosterMembers()).toEqual([]);
+    });
+  });
+
+  describe('myCharacters', () => {
+    it('filters the roster down to the current user\'s own characters', () => {
+      const component = setup({ members: [member({ playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-2' })] });
+      expect(component.myCharacters().map((c) => c.characterId)).toEqual([1]);
+    });
+
+    it('is empty with no authenticated user', () => {
+      const component = setup({ user: null, members: [member()] });
+      expect(component.myCharacters()).toEqual([]);
+    });
+  });
+
+  // ── roleCounts / zoneIcon / fullDateTime ─────────────────────────────────
+
+  describe('roleCounts', () => {
+    it('delegates to countRaidRoles for the event assignments', () => {
+      const component = setup();
+      expect(component.roleCounts(raidEvent())).toEqual({ tank: 0, heal: 0, melee: 0, ranged: 0 });
+    });
+  });
+
+  describe('zoneIcon', () => {
+    it('resolves a known short code', () => {
+      expect(setup().zoneIcon('SSC')).toBe('/assets/images/raid-icons/ssc.jpg');
+    });
+
+    it('is null for an unknown short code', () => {
+      expect(setup().zoneIcon('NOPE')).toBeNull();
+    });
+  });
+
+  describe('fullDateTime', () => {
+    it('formats a non-empty label using the active language', () => {
+      const component = setup();
+      const label = component.fullDateTime(raidEvent());
+
+      expect(transloco.getActiveLang).toHaveBeenCalled();
+      expect(label.length).toBeGreaterThan(0);
+    });
+  });
+
+  // ── setSignup ─────────────────────────────────────────────────────────────
+
+  describe('setSignup', () => {
+    it('does nothing when the event has not loaded yet', () => {
+      const component = setup({ events: [] });
+      component.setSignup(SignupStatus.Declined);
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+
+    it('submits a Declined response directly, with no character/spec', () => {
+      const component = setup({ members: [member()] });
+
+      component.setSignup(SignupStatus.Declined);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Declined, null, null);
+      expect(dialog.open).not.toHaveBeenCalled();
+    });
+
+    it('auto-submits Accepted when the viewer has exactly one character with at most one spec', () => {
+      const component = setup({ members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }] })] });
+
+      component.setSignup(SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Accepted, 1, 71);
+    });
+
+    it('auto-submits with a null spec when the single character has no raid specs at all', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+
+      component.setSignup(SignupStatus.Tentative);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Tentative, 1, null);
+    });
+
+    it('opens the character picker when the viewer has more than one character', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(SignupStatus.Accepted);
+
+      expect(dialog.open).toHaveBeenCalledWith(
+        SignupCharacterDialogComponent,
+        expect.objectContaining({ data: expect.objectContaining({ currentCharacterId: null, currentSpecId: null }) }),
+      );
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+
+    it('opens the character picker when the single character has more than one raid spec', () => {
+      const component = setup({
+        members: [member({ raidSpecs: [{ specId: 71, name: 'Arms', iconUrl: null, isMain: true }, { specId: 72, name: 'Fury', iconUrl: null, isMain: false }] })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(SignupStatus.Accepted);
+
+      expect(dialog.open).toHaveBeenCalled();
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+
+    it('submits the picker result on close', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of({ characterId: 5, specId: 99 }) });
+
+      component.setSignup(SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).toHaveBeenCalledWith('g1', 7, 11, SignupStatus.Accepted, 5, 99);
+    });
+
+    it('does nothing when the picker is dismissed (null result)', () => {
+      const component = setup({
+        members: [member({ characterId: 1, playerDiscordId: 'player-1' }), member({ characterId: 2, playerDiscordId: 'player-1' })],
+      });
+      dialog.open.mockReturnValue({ closed: of(null) });
+
+      component.setSignup(SignupStatus.Accepted);
+
+      expect(boardStore.setMySignup).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── #submitSignup (via setSignup) ────────────────────────────────────────
+
+  describe('#submitSignup', () => {
+    it('reloads the board on success', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+
+      component.setSignup(SignupStatus.Declined);
+
+      expect(boardStore.reload).toHaveBeenCalledOnce();
+    });
+
+    it('shows an error snackbar on failure', () => {
+      const component = setup({ members: [member({ raidSpecs: [] })] });
+      boardStore.setMySignup.mockReturnValue(throwError(() => new Error('boom')));
+
+      component.setSignup(SignupStatus.Declined);
+
+      expect(snackbar.error).toHaveBeenCalledWith('raidBuilder.signup.saveFailed');
+      expect(boardStore.reload).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── openEditEventDialog ──────────────────────────────────────────────────
+
+  describe('openEditEventDialog', () => {
+    it('opens the dialog with the guild/branch and given event', () => {
+      const component = setup();
+      const event = raidEvent();
+
+      component.openEditEventDialog(event);
+
+      expect(dialog.open).toHaveBeenCalledWith(EditRaidEventDialogComponent, expect.objectContaining({ data: { guildId: 'g1', guildBranchId: 7, event } }));
+    });
+
+    it('reloads the board when saved', () => {
+      const component = setup();
+      dialog.open.mockReturnValue({ closed: of(true) });
+
+      component.openEditEventDialog(raidEvent());
+
+      expect(boardStore.reload).toHaveBeenCalled();
+    });
+
+    it('does nothing when dismissed', () => {
+      const component = setup();
+      component.openEditEventDialog(raidEvent());
+      expect(boardStore.reload).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── publishEvent ─────────────────────────────────────────────────────────
+
+  describe('publishEvent', () => {
+    it('does nothing when the confirm dialog is dismissed', () => {
+      const component = setup();
+
+      component.publishEvent(raidEvent());
+
+      expect(boardStore.publishEvent).not.toHaveBeenCalled();
+    });
+
+    it('publishes and reloads on confirm', () => {
+      const component = setup();
+      dialog.open.mockReturnValue({ closed: of(true) });
+
+      component.publishEvent(raidEvent());
+
+      expect(boardStore.publishEvent).toHaveBeenCalledWith('g1', 7, 11);
+      expect(snackbar.success).toHaveBeenCalledWith('raidBuilder.eventDialog.publishSuccess');
+      expect(boardStore.reload).toHaveBeenCalled();
+      expect(component.publishing()).toBe(false);
+    });
+
+    it('shows a translated error snackbar and resets publishing on failure', () => {
+      const component = setup();
+      dialog.open.mockReturnValue({ closed: of(true) });
+      boardStore.publishEvent.mockReturnValue(throwError(() => new HttpErrorResponse({ error: { error: 'RaidEventAlreadyPublished' } })));
+
+      component.publishEvent(raidEvent());
+
+      expect(snackbar.error).toHaveBeenCalledWith('raidBuilder.errors.raidEventAlreadyPublished');
+      expect(component.publishing()).toBe(false);
     });
   });
 
@@ -457,7 +494,7 @@ describe('RaidDetailComponent', () => {
 
       await component.triggerGrouping();
 
-      expect(dialog.open).toHaveBeenCalledWith(expect.anything(), {
+      expect(dialog.open).toHaveBeenCalledWith(RaidGroupingCharacterDialogComponent, {
         width: '420px',
         data: { guildId: 'g1', guildBranchId: 7, eventId: 11 },
       });

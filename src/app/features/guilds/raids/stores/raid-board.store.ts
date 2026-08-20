@@ -16,12 +16,24 @@ interface RangeKey {
   rangeEnd: string;
 }
 
+interface EventKey {
+  guildId: string;
+  guildBranchId: number;
+  eventId: number;
+}
+
 /**
  * The raid board (materialized events + assignments + resolved member availability) for a guild
  * branch over a date range. Materialization has no scheduled job (no Hangfire/Quartz in this
  * codebase), so `loadRange` always fires the idempotent materialize command first, then
  * loads/reloads the board — same "reload if same key, else set new key" branching as
  * `AvailabilityStore.loadRange`.
+ *
+ * Also supports a second, mutually-exclusive loading mode — a single event, for the raid detail
+ * page — via `loadEvent`. Only one of the two is ever active: setting one clears the other. This
+ * lets `events()` stay the one reactive source both `RaidEventGridComponent` and
+ * `RaidSignupListComponent` read from and mutate through (`assignSlot`, `setMySignup`, ..., then
+ * `reload()`) regardless of which page is driving the store.
  */
 @Service()
 export class RaidBoardStore {
@@ -37,8 +49,23 @@ export class RaidBoardStore {
     return `${environment.apiUrl}/guilds/${key.guildId}/branches/${key.guildBranchId}/raids/board?rangeStart=${key.rangeStart}&rangeEnd=${key.rangeEnd}`;
   });
 
-  readonly events = computed<RaidEvent[]>(() => this.#boardResource.value()?.events ?? []);
-  readonly isLoading = computed(() => this.#materializing() || this.#boardResource.isLoading());
+  readonly #eventKey = signal<EventKey | null>(null);
+
+  readonly #eventResource = httpResource<RaidEvent>(() => {
+    const key = this.#eventKey();
+    if (!key) return undefined;
+    return `${environment.apiUrl}/guilds/${key.guildId}/branches/${key.guildBranchId}/raids/events/${key.eventId}`;
+  });
+
+  readonly events = computed<RaidEvent[]>(() => {
+    if (this.#eventKey()) {
+      const event = this.#eventResource.value();
+      return event ? [event] : [];
+    }
+    return this.#boardResource.value()?.events ?? [];
+  });
+
+  readonly isLoading = computed(() => this.#materializing() || this.#boardResource.isLoading() || this.#eventResource.isLoading());
 
   /**
    * Discord ID / character ID of whoever's currently being dragged (from the roster pool or an
@@ -54,6 +81,20 @@ export class RaidBoardStore {
   readonly draggingCharacterId = signal<number | null>(null);
   readonly draggingFromSlot = signal<{ eventId: number; groupNumber: number; slotNumber: number } | null>(null);
 
+  /**
+   * Last week the raids list page was scrolled to, remembered across navigation (this store is a
+   * root singleton, so it outlives the page's own component when the user drills into a raid's
+   * detail page and comes back) — without it, coming back always snapped to the current week,
+   * which is a real annoyance while prepping a future week's raids. `null` means "never set this
+   * session," the signal for "fall back to the current lockout week" instead of a remembered one.
+   */
+  readonly #lastViewedRangeStart = signal<Date | null>(null);
+  readonly lastViewedRangeStart = this.#lastViewedRangeStart.asReadonly();
+
+  rememberRangeStart(date: Date): void {
+    this.#lastViewedRangeStart.set(date);
+  }
+
   startDrag(playerDiscordId: string, characterId: number, fromSlot: { eventId: number; groupNumber: number; slotNumber: number } | null = null): void {
     this.draggingPlayerDiscordId.set(playerDiscordId);
     this.draggingCharacterId.set(characterId);
@@ -68,6 +109,7 @@ export class RaidBoardStore {
 
   /** Materializes any due series occurrence in the range, then points the board at it (forcing a fresh fetch). */
   loadRange(guildId: string, guildBranchId: number, rangeStart: string, rangeEnd: string): void {
+    this.#eventKey.set(null);
     const next: RangeKey = { guildId, guildBranchId, rangeStart, rangeEnd };
     this.#materializing.set(true);
     this.#service.materializeOccurrences(guildId, guildBranchId, rangeStart, rangeEnd).subscribe({
@@ -78,9 +120,25 @@ export class RaidBoardStore {
     });
   }
 
-  /** Re-fetches the current range without changing which guild branch/range is tracked, and without re-materializing. */
+  /** Points the board at a single event instead of a date range — the raid detail page's only consumer. Already-materialized, so no materialize call first. */
+  loadEvent(guildId: string, guildBranchId: number, eventId: number): void {
+    this.#key.set(null);
+    const next: EventKey = { guildId, guildBranchId, eventId };
+    const current = this.#eventKey();
+    if (current && current.guildId === next.guildId && current.guildBranchId === next.guildBranchId && current.eventId === next.eventId) {
+      this.#eventResource.reload();
+    } else {
+      this.#eventKey.set(next);
+    }
+  }
+
+  /** Re-fetches whichever of range/single-event is currently tracked, without changing it and without re-materializing. */
   reload(): void {
-    this.#boardResource.reload();
+    if (this.#eventKey()) {
+      this.#eventResource.reload();
+    } else {
+      this.#boardResource.reload();
+    }
   }
 
   /** One-off fetch of the branch's current weekly lockout window — used to default the board's date range. */

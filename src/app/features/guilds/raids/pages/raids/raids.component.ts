@@ -107,7 +107,7 @@ export class RaidsComponent {
   readonly roleOrder = RAID_ROLE_ORDER;
   readonly roleIcon = RAID_ROLE_ICON;
 
-  readonly rangeStart = signal(startOfWeek(new Date()));
+  readonly rangeStart = signal(this.boardStore.lastViewedRangeStart() ?? startOfWeek(new Date()));
   readonly rangeEnd = computed(() => addDays(this.rangeStart(), RANGE_DAYS - 1));
 
   readonly rangeLabel = computed(() => {
@@ -143,23 +143,30 @@ export class RaidsComponent {
     effect(() => {
       const guildId = this.guildId();
       const guildBranchId = this.guildBranchId();
-      const rangeStart = toIsoDate(this.rangeStart());
+      const rangeStartDate = this.rangeStart();
+      const rangeStart = toIsoDate(rangeStartDate);
       const rangeEnd = toIsoDate(this.rangeEnd());
       this.boardStore.loadRange(guildId, guildBranchId, rangeStart, rangeEnd);
+      this.boardStore.rememberRangeStart(rangeStartDate);
       this.seriesStore.load(guildId, guildBranchId);
       this.#rosterStore.loadRoster(guildId, guildBranchId);
     });
 
     // Defaults the view to the branch's current weekly lockout window (region reset to region
-    // reset) instead of an arbitrary Monday-based week. Falls back to the initial Monday default
-    // when the branch has no region configured yet (weekStartLocal comes back null).
-    effect(() => {
-      const guildId = this.guildId();
-      const guildBranchId = this.guildBranchId();
-      this.boardStore.getLockoutWeek(guildId, guildBranchId).subscribe((week) => {
-        if (week.weekStartLocal) this.rangeStart.set(parseIsoDate(week.weekStartLocal));
+    // reset) instead of an arbitrary Monday-based week — but only when there's no remembered week
+    // to come back to yet (a fresh session), so navigating away to a raid's detail page and back
+    // doesn't snap the view back to "now" and lose whatever future week was being prepped. Falls
+    // back to the initial Monday default when the branch has no region configured yet
+    // (weekStartLocal comes back null).
+    if (this.boardStore.lastViewedRangeStart() === null) {
+      effect(() => {
+        const guildId = this.guildId();
+        const guildBranchId = this.guildBranchId();
+        this.boardStore.getLockoutWeek(guildId, guildBranchId).subscribe((week) => {
+          if (week.weekStartLocal) this.rangeStart.set(parseIsoDate(week.weekStartLocal));
+        });
       });
-    });
+    }
   }
 
   /** Re-resolves the branch's current lockout week rather than snapping to a civil Monday-based week. */

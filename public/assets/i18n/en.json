@@ -881,9 +881,21 @@
       "characterDialogSpecLabel": "Spec",
       "characterDialogSubmit": "Confirm"
     },
+    "availability": {
+      "listTitle": "Who's available",
+      "unavailableSection": "Not available"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Raid details are coming soon — attendance, loot, and log analysis will live here.",
+      "notFound": "This raid couldn't be found, or isn't visible to you yet.",
+      "hub": {
+        "title": "Coming soon",
+        "comingSoon": "Coming soon",
+        "loot": "Loot",
+        "assignments": "Assignments",
+        "logs": "Logs",
+        "analysis": "Analysis"
+      },
       "triggerGrouping": "Ping to group up",
       "groupingSent": "Grouping ping sent.",
       "groupingFailed": "Couldn't send the grouping ping — check that the raid is published and an announcement channel is configured.",

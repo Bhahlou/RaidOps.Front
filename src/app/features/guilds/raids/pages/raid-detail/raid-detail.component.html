@@ -2,86 +2,146 @@
   <app-page-header [items]="breadcrumbs()" />
   <app-branch-tabs [guildId]="guildId()" leaf="raids" />
 
-  @if (isOfficer()) {
-    <div class="detail-actions">
-      <app-button
-        variant="stroked"
-        icon="campaign"
-        [disabled]="triggeringGrouping()"
-        (click)="triggerGrouping()"
-      >
-        {{ 'raidBuilder.detail.triggerGrouping' | transloco }}
-      </app-button>
-    </div>
-  }
-
-  @if (signupMode() === SignupMode.Signup) {
-    <div class="detail-signup">
-      <h2 class="detail-signup-title">{{ 'raidBuilder.signup.myResponse' | transloco }}</h2>
-      <fieldset class="detail-signup-buttons">
-        <legend class="visually-hidden">{{ 'raidBuilder.signup.myResponse' | transloco }}</legend>
-        <app-button
-          variant="stroked"
-          icon="check_circle"
-          [extraClass]="mySignupStatus() === SignupStatus.Accepted ? 'signup-btn--active signup-btn--accept' : ''"
-          [disabled]="savingSignup()"
-          (click)="setSignup(SignupStatus.Accepted)"
-        >
-          {{ 'raidBuilder.signup.accept' | transloco }}
-        </app-button>
-        <app-button
-          variant="stroked"
-          icon="help"
-          [extraClass]="mySignupStatus() === SignupStatus.Tentative ? 'signup-btn--active signup-btn--tentative' : ''"
-          [disabled]="savingSignup()"
-          (click)="setSignup(SignupStatus.Tentative)"
-        >
-          {{ 'raidBuilder.signup.tentative' | transloco }}
-        </app-button>
-        <app-button
-          variant="stroked"
-          icon="cancel"
-          [extraClass]="mySignupStatus() === SignupStatus.Declined ? 'signup-btn--active signup-btn--decline' : ''"
-          [disabled]="savingSignup()"
-          (click)="setSignup(SignupStatus.Declined)"
-        >
-          {{ 'raidBuilder.signup.decline' | transloco }}
-        </app-button>
-      </fieldset>
-
-      @if (isOfficer()) {
-        <div class="detail-signup-roster">
-          <h3 class="detail-signup-roster-title">{{ 'raidBuilder.signup.roster' | transloco }}</h3>
-          <div class="detail-signup-roster-columns">
-            <div class="detail-signup-roster-column">
-              <h4>{{ 'raidBuilder.signup.accept' | transloco }} ({{ acceptedSignups().length }})</h4>
-              @for (s of acceptedSignups(); track s.userDiscordId) {
-                <p>{{ s.playerName ?? s.userDiscordId }}@if (s.characterName) { <span class="signup-character">({{ s.characterName }}@if (s.specName) { &ndash; {{ s.specName }} }) </span> }</p>
-              }
-            </div>
-            <div class="detail-signup-roster-column">
-              <h4>{{ 'raidBuilder.signup.tentative' | transloco }} ({{ tentativeSignups().length }})</h4>
-              @for (s of tentativeSignups(); track s.userDiscordId) {
-                <p>{{ s.playerName ?? s.userDiscordId }}@if (s.characterName) { <span class="signup-character">({{ s.characterName }}@if (s.specName) { &ndash; {{ s.specName }} }) </span> }</p>
-              }
-            </div>
-            <div class="detail-signup-roster-column">
-              <h4>{{ 'raidBuilder.signup.decline' | transloco }} ({{ declinedSignups().length }})</h4>
-              @for (s of declinedSignups(); track s.userDiscordId) {
-                <p>{{ s.playerName ?? s.userDiscordId }}</p>
-              }
-            </div>
-            <div class="detail-signup-roster-column">
-              <h4>{{ 'raidBuilder.signup.noResponse' | transloco }} ({{ noResponseSignups().length }})</h4>
-              @for (s of noResponseSignups(); track s.userDiscordId) {
-                <p>{{ s.playerName ?? s.userDiscordId }}</p>
-              }
-            </div>
-          </div>
+  @if (event(); as event) {
+    <section class="detail-header">
+      <div class="detail-header-top">
+        <div class="detail-header-title">
+          <h1>{{ event.name }}</h1>
+          @if (event.publicationStatus !== PublicationStatus.Published) {
+            <span class="detail-header-draft-badge">{{ 'raidBuilder.draft' | transloco }}</span>
+          }
         </div>
-      }
-    </div>
-  }
+        @if (isOfficer()) {
+          <div class="detail-header-actions">
+            @if (event.publicationStatus !== PublicationStatus.Published) {
+              <app-button
+                variant="stroked"
+                icon="publish"
+                [disabled]="publishing()"
+                (click)="publishEvent(event)"
+              >
+                {{ 'raidBuilder.publish' | transloco }}
+              </app-button>
+            } @else {
+              <app-button
+                variant="stroked"
+                icon="campaign"
+                [disabled]="triggeringGrouping()"
+                (click)="triggerGrouping()"
+              >
+                {{ 'raidBuilder.detail.triggerGrouping' | transloco }}
+              </app-button>
+            }
+            <app-icon-button
+              icon="edit"
+              [ariaLabel]="'raidBuilder.actions.edit' | transloco"
+              (click)="openEditEventDialog(event)"
+            />
+          </div>
+        }
+      </div>
 
-  <app-empty-hint>{{ 'raidBuilder.detail.comingSoon' | transloco }}</app-empty-hint>
+      <span class="detail-header-datetime">{{ fullDateTime(event) }}</span>
+
+      <div class="detail-header-row">
+        <div class="detail-header-zones">
+          @for (zone of event.raidZones; track zone.id) {
+            <div class="zone-chip" [title]="zone.name">
+              @if (zoneIcon(zone.shortCode); as icon) {
+                <img class="zone-chip-icon" [src]="icon" alt="" width="32" height="32" />
+              } @else {
+                <span class="zone-chip-icon zone-chip-icon--fallback">{{ zone.shortCode }}</span>
+              }
+              <span class="zone-chip-label">{{ zone.shortCode }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-header-roles">
+          @for (role of roleOrder; track role) {
+            <span class="role-counter" [title]="'raidBuilder.roles.' + role | transloco">
+              <img class="role-counter-icon" [src]="roleIcon[role]" alt="" width="18" height="18" />
+              {{ roleCounts(event)[role] }}
+            </span>
+          }
+        </div>
+      </div>
+
+      @if (event.signupMode === SignupMode.Signup) {
+        <fieldset class="detail-header-signup">
+          <legend class="visually-hidden">{{ 'raidBuilder.signup.myResponse' | transloco }}</legend>
+          <app-button
+            variant="stroked"
+            icon="check_circle"
+            [extraClass]="'signup-btn signup-btn--accept' + (event.mySignupStatus === SignupStatus.Accepted ? ' signup-btn--active' : '')"
+            (click)="setSignup(SignupStatus.Accepted)"
+          >
+            {{ 'raidBuilder.signup.accept' | transloco }}
+          </app-button>
+          <app-button
+            variant="stroked"
+            icon="help"
+            [extraClass]="'signup-btn signup-btn--tentative' + (event.mySignupStatus === SignupStatus.Tentative ? ' signup-btn--active' : '')"
+            (click)="setSignup(SignupStatus.Tentative)"
+          >
+            {{ 'raidBuilder.signup.tentative' | transloco }}
+          </app-button>
+          <app-button
+            variant="stroked"
+            icon="cancel"
+            [extraClass]="'signup-btn signup-btn--decline' + (event.mySignupStatus === SignupStatus.Declined ? ' signup-btn--active' : '')"
+            (click)="setSignup(SignupStatus.Declined)"
+          >
+            {{ 'raidBuilder.signup.decline' | transloco }}
+          </app-button>
+        </fieldset>
+      }
+    </section>
+
+    <div class="detail-body" cdkDropListGroup>
+      <div class="detail-main">
+        <app-raid-event-grid
+          [guildId]="guildId()"
+          [guildBranchId]="guildBranchId()"
+          [event]="event"
+          [disabled]="!isOfficer()"
+          [currentUserDiscordId]="currentUserDiscordId()"
+          [rosterMembers]="rosterMembers()"
+          [allEvents]="[event]"
+        />
+
+        @if (event.signupMode === SignupMode.Signup) {
+          <app-raid-signup-list
+            [event]="event"
+            [guildId]="guildId()"
+            [guildBranchId]="guildBranchId()"
+            [disabled]="!isOfficer()"
+            [currentUserDiscordId]="currentUserDiscordId()"
+            [initiallyExpanded]="true"
+          />
+        } @else {
+          <app-raid-available-roster
+            [event]="event"
+            [rosterMembers]="rosterMembers()"
+            [disabled]="!isOfficer()"
+            [currentUserDiscordId]="currentUserDiscordId()"
+            [initiallyExpanded]="true"
+          />
+        }
+      </div>
+
+      <aside class="detail-aside">
+        <nav class="detail-hub" [attr.aria-label]="'raidBuilder.detail.hub.title' | transloco">
+          @for (link of hubLinks; track link.labelKey) {
+            <span class="detail-hub-chip" [title]="'raidBuilder.detail.hub.comingSoon' | transloco">
+              <span class="material-icons">{{ link.icon }}</span>
+              {{ link.labelKey | transloco }}
+            </span>
+          }
+        </nav>
+      </aside>
+    </div>
+  } @else if (!isLoading()) {
+    <app-empty-hint>{{ 'raidBuilder.detail.notFound' | transloco }}</app-empty-hint>
+  }
 </div>

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, OnDestroy, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CLASS_COLORS, wowClassIconUrl } from '../../../../../shared/components/icons/wow-class-icon/wow-class-icon.component';
@@ -46,12 +46,19 @@ export class RaidSignupListComponent implements OnDestroy {
   readonly disabled = input(false);
   /** Highlights the viewer's own response (yellow outline) in the Accepted list. */
   readonly currentUserDiscordId = input<string | null>(null);
+  /** Starts expanded instead of the default collapsed state — the raid detail page only ever shows one event, so there's no reason to hide its signups behind a click. */
+  readonly initiallyExpanded = input(false);
 
   readonly #boardStore = inject(RaidBoardStore);
 
   readonly SignupStatus = SignupStatus;
 
-  readonly expanded = signal(false);
+  // `signal(this.initiallyExpanded())` would freeze on the input's default (`false`): field
+  // initializers run before Angular applies the bound input value to a signal input, so a plain
+  // one-time read here never sees the real `true` passed by the raid detail page. `linkedSignal`
+  // reads lazily (on first access, by which point the binding is live) and still stays a normal
+  // writable signal afterward, so `toggleExpanded` keeps working exactly like a plain `signal`.
+  readonly expanded = linkedSignal(() => this.initiallyExpanded());
   readonly signups = signal<RaidSignup[]>([]);
 
   readonly acceptedSignups = computed(() => this.signups().filter((s) => s.status === SignupStatus.Accepted));

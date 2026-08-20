@@ -1,12 +1,12 @@
 <div class="signup-list">
   <button type="button" class="signup-list-toggle" (click)="toggleExpanded()">
     <span class="material-icons">{{ expanded() ? 'expand_less' : 'expand_more' }}</span>
-    <span class="signup-list-toggle-label">{{ 'raidBuilder.signup.listTitle' | transloco }}</span>
     <span class="signup-list-counts">
       <span class="signup-list-count signup-list-count--accept">✅ {{ acceptedSignups().length }}</span>
       <span class="signup-list-count signup-list-count--tentative">❓ {{ tentativeSignups().length }}</span>
       <span class="signup-list-count signup-list-count--decline">❌ {{ declinedSignups().length }}</span>
     </span>
+    <span class="signup-list-toggle-label">{{ 'raidBuilder.signup.listTitle' | transloco }}</span>
   </button>
 
   @if (expanded()) {
@@ -39,7 +39,10 @@
               @if (s.specIconUrl) {
                 <img class="signup-row-spec-icon" [src]="s.specIconUrl" [alt]="s.specName ?? ''" [title]="s.specName ?? ''" width="16" height="16" />
               }
-              <span class="signup-row-name" [style.color]="classColor(s)">{{ s.characterName }}</span>
+              <span class="signup-row-name" [style.color]="isAlreadyAssigned(s) ? null : classColor(s)">{{ s.characterName }}</span>
+              @if (isAlreadyAssigned(s)) {
+                <span class="material-icons signup-row-assigned-icon">check_circle</span>
+              }
             </div>
           }
         </div>

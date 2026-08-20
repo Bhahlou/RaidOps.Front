@@ -54,16 +54,6 @@ export interface RaidBoard {
   events: RaidEvent[];
 }
 
-/** Minimal identity of a raid event — backs the raid detail page's breadcrumb and its self-serve RSVP control. */
-export interface RaidEventSummary {
-  id: number;
-  name: string;
-  signupMode: SignupMode;
-  mySignupStatus: SignupStatus | null;
-  mySignupCharacterId: number | null;
-  mySignupSpecId: number | null;
-}
-
 /** Payload shared by ad-hoc raid event creation and full replacement (PATCH) — the guild branch (and its WoW game version) is the route's `guildBranchId`, never a client-supplied field. */
 export interface RaidEventPayload {
   name: string;

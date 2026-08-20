@@ -6,64 +6,216 @@
   overflow: auto;
 }
 
-.detail-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.detail-signup {
+// The detail page only ever shows one raid, so its header can afford real breathing room — a
+// bigger card than the list page's compact per-panel header, not a shrink-wrapped reuse of it.
+.detail-header {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  padding: 20px 24px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--color-bg-secondary);
 }
 
-.detail-signup-title {
-  margin: 0;
-  font-size: 1rem;
+.detail-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.detail-signup-buttons {
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--color-text-primary);
+  }
+}
+
+.detail-header-draft-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-bg-primary);
+  background: var(--color-accent);
+}
+
+.detail-header-datetime {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
+.detail-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.detail-header-zones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.zone-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 56px;
+}
+
+.zone-chip-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+
+  &--fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-muted);
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+}
+
+.zone-chip-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.detail-header-roles {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.role-counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.role-counter-icon {
+  flex-shrink: 0;
+}
+
+.detail-header-signup {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin: 0;
   padding: 0;
   border: 0;
-}
-
-.detail-signup-roster {
   border-top: 1px solid var(--color-border-subtle);
   padding-top: 12px;
 }
 
-.detail-signup-roster-title {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
+// Main column (grid + signups) beside a fixed-width right sidebar (hub links + roster pool) —
+// stacks below a certain width since there's no room to keep the grid readable otherwise.
+.detail-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  // align-items: flex-start sizes each column to its own content width, which is exactly what's
+  // wanted side by side (the aside shouldn't stretch to match the grid's height) — but the same
+  // rule also applies once flex-direction flips to column below, where "cross axis" becomes
+  // width: without overriding back to stretch, .detail-main shrank to its narrowest content
+  // (~230px, the grid's own minimum) instead of using the full stacked-column width.
+  @media (max-width: 900px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
-.detail-signup-roster-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+.detail-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.detail-signup-roster-column h4 {
-  margin: 0 0 4px;
+.detail-aside {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    width: 100%;
+  }
+}
+
+.detail-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-hub-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
   font-size: 0.8rem;
+  font-weight: 600;
   color: var(--color-text-muted);
+  cursor: default;
+
+  .material-icons {
+    font-size: 1.1rem;
+  }
 }
 
-.detail-signup-roster-column p {
-  margin: 0;
-  font-size: 0.85rem;
+// Phone-width tightening — .detail-header-top's own flex-wrap already lets the actions drop below
+// the title rather than squeezing them, this just reclaims some of the header's generous padding
+// and lets the wrapped actions row span full width so the buttons stay right-aligned under it.
+@media (max-width: 480px) {
+  .detail-header {
+    padding: 14px 16px;
+  }
+
+  .detail-header-title h1 {
+    font-size: 1.15rem;
+  }
+
+  .detail-header-actions {
+    width: 100%;
+  }
 }
 
-.signup-character {
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-}

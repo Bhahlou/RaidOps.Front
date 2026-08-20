@@ -881,9 +881,21 @@
       "characterDialogSpecLabel": "Spécialisation",
       "characterDialogSubmit": "Confirmer"
     },
+    "availability": {
+      "listTitle": "Qui est disponible",
+      "unavailableSection": "Indisponibles"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Les détails du raid arrivent bientôt — présence, loot et analyse de logs vivront ici.",
+      "notFound": "Ce raid est introuvable, ou n'est pas encore visible pour vous.",
+      "hub": {
+        "title": "Bientôt disponible",
+        "comingSoon": "Bientôt disponible",
+        "loot": "Loot",
+        "assignments": "Attributions",
+        "logs": "Logs",
+        "analysis": "Analyse"
+      },
       "triggerGrouping": "Annoncer le groupage",
       "groupingSent": "Message de groupage envoyé.",
       "groupingFailed": "Impossible d'envoyer le message de groupage — vérifiez que le raid est publié et qu'un salon d'annonce est configuré.",

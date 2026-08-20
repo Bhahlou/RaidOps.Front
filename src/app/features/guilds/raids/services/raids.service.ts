@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { RaidZone } from '../models/raid-zone.model';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
-import { RaidBoard, RaidEventPayload, RaidEventSummary } from '../models/raid-event.model';
+import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 import { RaidEventAssignedCharacter } from '../models/raid-event-assigned-character.model';
 import { RaidSignup } from '../models/raid-signup.model';
@@ -67,9 +67,9 @@ export class RaidsService {
     });
   }
 
-  /** Minimal identity (id + name) of a single raid event — backs the raid detail page's breadcrumb. */
-  getEventSummary(guildId: string, guildBranchId: number, eventId: number): Observable<RaidEventSummary> {
-    return this.#http.get<RaidEventSummary>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`);
+  /** Fetches a single raid event (with assignments and resolved member availability) — backs the raid detail page. */
+  getEvent(guildId: string, guildBranchId: number, eventId: number): Observable<RaidEvent> {
+    return this.#http.get<RaidEvent>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`);
   }
 
   createEvent(guildId: string, guildBranchId: number, payload: RaidEventPayload): Observable<void> {
