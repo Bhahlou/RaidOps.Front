@@ -1,0 +1,230 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'audit-log' }" />
+
+  <div class="audit-log-content">
+    <h1>{{ 'auditLog.pageTitle' | transloco }}</h1>
+    <p class="subtitle">{{ 'auditLog.pageSubtitle' | transloco }}</p>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <span class="spinner audit-log-spinner"></span>
+      </div>
+    } @else if (!hasEntries()) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">history</span>
+        <p class="empty-desc">{{ 'auditLog.empty' | transloco }}</p>
+      </div>
+    } @else {
+      <ul class="audit-log-table">
+        <li class="audit-log-row audit-log-row--header">
+          <span class="col-header col-actor">
+            <button class="col-header-label" (click)="toggleSort('actor')">
+              {{ 'auditLog.columns.actor' | transloco }}
+              <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('actor')">
+                {{ sortIcon('actor') ?? 'unfold_more' }}
+              </span>
+            </button>
+            <app-filter-menu
+              [options]="actorFilterOptions()"
+              [selected]="selectedActorId()"
+              [allLabel]="'auditLog.filterAll' | transloco"
+              [searchAriaLabel]="'auditLog.columns.actor' | transloco"
+              [searchPlaceholder]="'auditLog.filterSearchPlaceholder' | transloco"
+              [triggerTitle]="'auditLog.filter' | transloco"
+              (selectedChange)="selectActorFilter($event)"
+            />
+          </span>
+
+          <span class="col-header col-category">
+            <button class="col-header-label" (click)="toggleSort('category')">
+              {{ 'auditLog.columns.category' | transloco }}
+              <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('category')">
+                {{ sortIcon('category') ?? 'unfold_more' }}
+              </span>
+            </button>
+            <app-filter-menu
+              [options]="categoryFilterOptions()"
+              [selected]="selectedCategory()"
+              [allLabel]="'auditLog.filterAll' | transloco"
+              [searchAriaLabel]="'auditLog.columns.category' | transloco"
+              [searchPlaceholder]="'auditLog.filterSearchPlaceholder' | transloco"
+              [triggerTitle]="'auditLog.filter' | transloco"
+              (selectedChange)="selectCategoryFilter($event)"
+            />
+          </span>
+
+          <span class="col-header col-action">
+            <button class="col-header-label" (click)="toggleSort('action')">
+              {{ 'auditLog.columns.action' | transloco }}
+              <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('action')">
+                {{ sortIcon('action') ?? 'unfold_more' }}
+              </span>
+            </button>
+            <app-filter-menu
+              [options]="actionFilterOptions()"
+              [selected]="selectedFilter()"
+              [allLabel]="'auditLog.filterAll' | transloco"
+              [searchAriaLabel]="'auditLog.columns.action' | transloco"
+              [searchPlaceholder]="'auditLog.filterSearchPlaceholder' | transloco"
+              [triggerTitle]="'auditLog.filter' | transloco"
+              (selectedChange)="onFilterChange($event)"
+            />
+          </span>
+
+          <span class="col-header col-change">
+            <button class="col-header-label" (click)="toggleSort('change')">
+              {{ 'auditLog.columns.change' | transloco }}
+              <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('change')">
+                {{ sortIcon('change') ?? 'unfold_more' }}
+              </span>
+            </button>
+            <app-filter-menu
+              [options]="changeFilterOptions()"
+              [selected]="selectedChange()"
+              [allLabel]="'auditLog.filterAll' | transloco"
+              [searchAriaLabel]="'auditLog.columns.change' | transloco"
+              [searchPlaceholder]="'auditLog.filterSearchPlaceholder' | transloco"
+              [triggerTitle]="'auditLog.filter' | transloco"
+              (selectedChange)="selectChangeFilter($event)"
+            />
+          </span>
+
+          <span class="col-header col-time">
+            <button class="col-header-label sort-icon-only" [title]="'auditLog.columns.time' | transloco" (click)="toggleSort('time')">
+              <span class="material-icons sort-icon" [class.sort-icon--active]="sortIcon('time')">
+                {{ sortIcon('time') ?? 'unfold_more' }}
+              </span>
+            </button>
+            <div class="date-range-filter">
+              <app-date-range-input
+                [start]="dateRangeStart()"
+                [end]="dateRangeEnd()"
+                [startAriaLabel]="'auditLog.dateRangeStart' | transloco"
+                [endAriaLabel]="'auditLog.dateRangeEnd' | transloco"
+                (startChange)="setDateRangeStart($event)"
+                (endChange)="setDateRangeEnd($event)"
+              />
+              @if (dateRangeStart() !== null || dateRangeEnd() !== null) {
+                <app-icon-button
+                  icon="close"
+                  [extraClass]="'filter-active'"
+                  [ariaLabel]="'auditLog.clearFilter' | transloco"
+                  (click)="clearDateRange()"
+                />
+              }
+            </div>
+          </span>
+        </li>
+        @if (sortedEntries().length === 0) {
+          <li class="audit-log-row">
+            <span class="no-match-message">{{ 'auditLog.noMatch' | transloco }}</span>
+          </li>
+        } @else {
+          @for (entry of sortedEntries(); track entry.id) {
+            <li class="audit-log-row">
+              <span class="col-actor">
+                <app-discord-icon
+                  [id]="entry.actorDiscordId"
+                  [hash]="entry.actorAvatarHash"
+                  [overrideUrl]="entry.actorGuildAvatarUrl"
+                  [type]="DiscordIconType.User"
+                  [size]="28"
+                />
+                <span class="actor-name">{{ entry.actorUsername ?? entry.actorDiscordId }}</span>
+              </span>
+              <span class="col-category">{{ categoryLabel(entry.category) }}</span>
+              <span class="col-action">{{ tableActionLabel(entry) }}</span>
+              <span class="col-change" [title]="changeSummary(entry)">
+                @if (settingsFieldChanges(entry); as changes) {
+                  @if (changes.length > 0) {
+                    <span class="settings-changes">
+                      @for (change of changes; track change.labelKey) {
+                        <span class="settings-change-line">
+                          @if (changes.length > 1) {
+                            {{ change.labelKey | transloco }}:
+                          }
+                          @if (change.roleChange; as rc) {
+                            <span class="role-change">
+                              <ng-container *ngTemplateOutlet="roleChip; context: { role: rc.old }" />
+                              <span class="role-arrow">→</span>
+                              <ng-container *ngTemplateOutlet="roleChip; context: { role: rc.new }" />
+                            </span>
+                          } @else {
+                            {{ change.summary }}
+                          }
+                        </span>
+                      }
+                    </span>
+                  } @else if (guildRegisteredDisplay(entry); as display) {
+                    <span class="change-with-icon">
+                      <app-discord-icon
+                        [id]="guildId()"
+                        [hash]="display.iconHash"
+                        [type]="DiscordIconType.Guild"
+                        [size]="20"
+                      />
+                      <span>{{ display.name }}</span>
+                    </span>
+                  } @else if (characterChangeDisplay(entry); as change) {
+                    <span class="change-with-icon">
+                      @if (change.classId !== null) {
+                        <app-wow-class-icon [classId]="change.classId" [size]="18" />
+                      }
+                      <span [style.color]="change.color">{{ change.name }}</span>
+                      @if (changeSuffix(entry); as suffix) {
+                        <span>{{ suffix }}</span>
+                      }
+                    </span>
+                  } @else if (slotsSwappedDisplay(entry); as swap) {
+                    <span class="change-with-icon">
+                      @if (swap.a.classId !== null) {
+                        <app-wow-class-icon [classId]="swap.a.classId" [size]="18" />
+                      }
+                      <span [style.color]="swap.a.color">{{ swap.a.name }}</span>
+                      <span>↔</span>
+                      @if (swap.b.classId !== null) {
+                        <app-wow-class-icon [classId]="swap.b.classId" [size]="18" />
+                      }
+                      <span [style.color]="swap.b.color">{{ swap.b.name }}</span>
+                      @if (swap.suffix) {
+                        <span>{{ swap.suffix }}</span>
+                      }
+                    </span>
+                  } @else {
+                    {{ changeSummary(entry) }}
+                  }
+                }
+              </span>
+              <span class="col-time">{{ formatDate(entry.occurredAt) }}</span>
+            </li>
+          }
+        }
+      </ul>
+
+      @if (hasMore()) {
+        <app-button variant="stroked" [extraClass]="'load-more-btn'" [disabled]="loadingMore()" (click)="loadMore()">
+          @if (loadingMore()) {
+            <span class="spinner load-more-spinner"></span>
+          } @else {
+            {{ 'auditLog.loadMore' | transloco }}
+          }
+        </app-button>
+      }
+    }
+  </div>
+
+  <ng-template #roleChip let-role="role">
+    @if (role) {
+      <span class="role-chip" [style.--role-color]="role.color">
+        @if (role.iconUrl) {
+          <img class="role-icon" [ngSrc]="role.iconUrl" alt="" width="18" height="18" />
+        } @else {
+          <span class="role-dot"></span>
+        }
+        {{ role.name }}
+      </span>
+    } @else {
+      <span>—</span>
+    }
+  </ng-template>
+</div>

@@ -26,6 +26,7 @@ const makeUser = (guilds: UserGuild[]): User => ({
   avatarHash: null,
   guilds,
   notifications: [],
+  seenChangelogEntryIds: [],
 });
 
 describe('guildAccessGuard', () => {

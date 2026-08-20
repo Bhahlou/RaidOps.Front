@@ -18,7 +18,7 @@ const makeGuild = (overrides: Partial<UserGuild> = {}): UserGuild => ({
 });
 
 const makeUser = (guilds: UserGuild[]): User => ({
-  discordId: '123', name: 'TestUser', avatarHash: null, guilds, notifications: [],
+  discordId: '123', name: 'TestUser', avatarHash: null, guilds, notifications: [], seenChangelogEntryIds: [],
 });
 
 const setup = (

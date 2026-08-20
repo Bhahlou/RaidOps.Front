@@ -1,4 +1,5 @@
 import { RosterMode } from './roster-mode.enum';
+import { SignupMode } from '../raids/models/signup-mode.enum';
 
 /** One WoW game-version branch activated on a guild, with its roster/officer role-set configuration. */
 export interface GuildBranch {
@@ -14,6 +15,8 @@ export interface GuildBranch {
   officerRoleIds: string[];
   /** Blizzard API region this branch's realm sits in ("eu"/"us"/"kr"/"tw"), or null until an officer configures it. */
   region: GuildBranchRegion | null;
+  /** Default signup mode for new raid events on this branch, or null until an officer configures it. */
+  signupMode: SignupMode | null;
 }
 
 /** Body of the roster-settings PATCH — guildId/guildBranchId are set by the route, not this payload. */

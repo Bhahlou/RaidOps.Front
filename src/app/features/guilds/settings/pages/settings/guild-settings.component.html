@@ -1,0 +1,28 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" [manualLink]="{ category: 'guild', article: 'settings' }" />
+  <div class="settings-content">
+    <app-tabs [tabs]="tabs" [activeTabId]="activeTab()" (tabChange)="onTabChange($event)" />
+
+    <div id="panel-general" role="tabpanel" aria-labelledby="tab-general" [hidden]="activeTab() !== 'general'">
+      <app-guild-settings-form [guildId]="guildId" [autoSave]="true" />
+      <app-guild-branches [guildId]="guildId" />
+    </div>
+
+    <div id="panel-roster" role="tabpanel" aria-labelledby="tab-roster" [hidden]="activeTab() !== 'roster'">
+      <app-guild-roster-branches [guildId]="guildId" />
+    </div>
+
+    <div id="panel-raids" role="tabpanel" aria-labelledby="tab-raids" [hidden]="activeTab() !== 'raids'">
+      <app-guild-raid-branches [guildId]="guildId" />
+    </div>
+
+    <div
+      id="panel-notifications"
+      role="tabpanel"
+      aria-labelledby="tab-notifications"
+      [hidden]="activeTab() !== 'notifications'"
+    >
+      <app-guild-notification-settings [guildId]="guildId" />
+    </div>
+  </div>
+</div>

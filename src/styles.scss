@@ -58,6 +58,21 @@ app-root {
   z-index: 1;
 }
 
+// Keeps content in the accessibility tree (screen readers, e.g. a <fieldset>'s required
+// <legend>) without rendering it visually — for groups whose label is already shown elsewhere
+// on the page.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 :root {
   // ── Layout ──────────────────────────────────────────────────────────────────
   --navbar-height: 46px;
@@ -258,6 +273,43 @@ body::after {
   &.filter-active {
     color: var(--color-accent);
   }
+}
+
+// ── Raid signup RSVP colors ──────────────────────────────────────────────────
+// Global (not component-scoped): these classes decorate the inner <button>/<span> rendered by
+// app-icon-button's/app-button's own template, which sits outside the caller component's view
+// -encapsulation boundary — a selector scoped to the caller's stylesheet can never match it.
+.signup-btn {
+  border-radius: 6px;
+  color: var(--color-text-muted);
+}
+
+// The 15%-alpha backgrounds below read as low-contrast to a checker computing against an
+// assumed white/unknown backdrop, but this app is dark-theme-only (--color-bg-primary is
+// near-black) — composited over the real background these bright accent colors sit at well
+// above AA contrast, same recipe as GitHub's own colored labels.
+.signup-btn--accept.signup-btn--active {
+  color: #57f287;
+  border-color: #57f287;
+  background: rgb(87 242 135 / 15%); // NOSONAR - translucent over dark theme bg, see comment above
+}
+
+.signup-btn--tentative.signup-btn--active {
+  color: #fee75c;
+  border-color: #fee75c;
+  background: rgb(254 231 92 / 15%); // NOSONAR - translucent over dark theme bg, see comment above
+}
+
+.signup-btn--decline.signup-btn--active {
+  color: #ed4245;
+  border-color: #ed4245;
+  background: rgb(237 66 69 / 15%); // NOSONAR - translucent over dark theme bg, see comment above
+}
+
+.channel-mode-btn--active {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 
 // ── Spinner ───────────────────────────────────────────────────────────────────

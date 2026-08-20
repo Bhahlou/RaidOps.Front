@@ -44,13 +44,13 @@ export const guildRoutes: Routes = [
             path: 'settings/:tab',
             data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
-              import('./pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),
+              import('./settings/pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),
           },
           {
             path: 'audit-log',
             data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>
-              import('./pages/audit-log/guild-audit-log.component').then(m => m.GuildAuditLogComponent),
+              import('./settings/pages/audit-log/guild-audit-log.component').then(m => m.GuildAuditLogComponent),
           },
           {
             // Branch-scoped leaves. No component here on purpose — this route only groups
@@ -72,7 +72,7 @@ export const guildRoutes: Routes = [
                 data: { minAccessLevel: GuildAccessLevel.Roster },
                 resolve: { characters: charactersResolver },
                 loadComponent: () =>
-                  import('./pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
+                  import('./roster/pages/roster/guild-roster.component').then(m => m.GuildRosterComponent),
               },
               {
                 path: 'loot',
@@ -84,7 +84,13 @@ export const guildRoutes: Routes = [
                 path: 'raids',
                 data: { minAccessLevel: GuildAccessLevel.Roster },
                 loadComponent: () =>
-                  import('./pages/raids/raids.component').then(m => m.RaidsComponent),
+                  import('./raids/pages/raids/raids.component').then(m => m.RaidsComponent),
+              },
+              {
+                path: 'raids/:eventId',
+                data: { minAccessLevel: GuildAccessLevel.Roster },
+                loadComponent: () =>
+                  import('./raids/pages/raid-detail/raid-detail.component').then(m => m.RaidDetailComponent),
               },
             ],
           },

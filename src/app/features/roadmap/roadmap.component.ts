@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { CdkAccordion, CdkAccordionItem } from '@angular/cdk/accordion';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TooltipDirective } from '../../shared/directives/tooltip.directive';
 import { ROADMAP_SECTIONS } from './data/roadmap-sections.data';
@@ -7,7 +8,7 @@ import { RoadmapItemStatus, RoadmapSection } from './models/roadmap-section.mode
 
 @Component({
   selector: 'app-roadmap',
-  imports: [TooltipDirective, TranslocoPipe],
+  imports: [CdkAccordion, CdkAccordionItem, TooltipDirective, TranslocoPipe],
   templateUrl: './roadmap.component.html',
   styleUrl: './roadmap.component.scss',
 })
@@ -17,8 +18,22 @@ export class RoadmapComponent {
   readonly sections = ROADMAP_SECTIONS;
   readonly ItemStatus = RoadmapItemStatus;
 
+  // CDK's `[expanded]` fires `(opened)`/`(closed)` even on first render whenever the bound value
+  // differs from the item's internal default of `false` — since sections start expanded here, that
+  // would fire one spurious `opened` per section. Recording the *actual current* state explicitly
+  // (set from that same event) avoids treating that initial emission as a real user toggle.
+  readonly #expanded = signal<ReadonlyMap<string, boolean>>(new Map());
+
   goBack(): void {
     this.#location.back();
+  }
+
+  isExpanded(sectionId: string): boolean {
+    return this.#expanded().get(sectionId) ?? true;
+  }
+
+  setExpanded(sectionId: string, expanded: boolean): void {
+    this.#expanded.set(new Map(this.#expanded()).set(sectionId, expanded));
   }
 
   doneCount(section: RoadmapSection): number {

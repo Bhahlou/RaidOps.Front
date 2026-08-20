@@ -51,6 +51,40 @@ describe('RoadmapComponent', () => {
     });
   });
 
+  // ── isExpanded / setExpanded ─────────────────────────────────────────────
+
+  describe('isExpanded', () => {
+    it('defaults to true before any explicit toggle', () => {
+      expect(setup().isExpanded('s1')).toBe(true);
+    });
+
+    it('reflects an explicit setExpanded(false)', () => {
+      const component = setup();
+
+      component.setExpanded('s1', false);
+
+      expect(component.isExpanded('s1')).toBe(false);
+    });
+
+    it('reflects an explicit setExpanded(true) after a prior collapse', () => {
+      const component = setup();
+
+      component.setExpanded('s1', false);
+      component.setExpanded('s1', true);
+
+      expect(component.isExpanded('s1')).toBe(true);
+    });
+
+    it('tracks each section independently', () => {
+      const component = setup();
+
+      component.setExpanded('s1', false);
+
+      expect(component.isExpanded('s1')).toBe(false);
+      expect(component.isExpanded('s2')).toBe(true);
+    });
+  });
+
   // ── doneCount ─────────────────────────────────────────────────────────────
 
   describe('doneCount', () => {

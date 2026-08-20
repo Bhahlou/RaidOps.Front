@@ -27,7 +27,7 @@ export const guildDefaultBranchGuard: CanActivateFn = (route) => {
     // Freshly-registered guild, or every branch deactivated. Admins go activate one; everyone
     // else has nothing to see here yet.
     return guild.isAdmin
-      ? router.createUrlTree(['/guilds', guildId, 'settings', 'branches'])
+      ? router.createUrlTree(['/guilds', guildId, 'settings', 'general'])
       : router.createUrlTree(['/guilds']);
   }
 

@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.field-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

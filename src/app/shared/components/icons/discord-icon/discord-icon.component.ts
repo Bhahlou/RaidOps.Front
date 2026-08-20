@@ -13,8 +13,12 @@ export class DiscordIconComponent {
   hash = input<string | null>();
   type = input.required<DiscordIconType>();
   size = input<number>(36);
+  /** Pre-resolved URL (e.g. a per-guild avatar override) that takes priority over id/hash. */
+  overrideUrl = input<string | null>(null);
 
   get url() {
+    if (this.overrideUrl()) return this.overrideUrl();
+
     const baseUrl = 'https://cdn.discordapp.com';
     if (this.hash()) {
       if (this.type() === DiscordIconType.User) {

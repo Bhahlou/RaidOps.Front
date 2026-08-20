@@ -1,0 +1,194 @@
+:host {
+  display: block;
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 8px;
+}
+
+.signup-list-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 2px;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  .material-icons {
+    font-size: 20px;
+  }
+}
+
+.signup-list-toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.signup-list-counts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.signup-list-count--accept {
+  color: #57f287;
+}
+
+.signup-list-count--tentative {
+  color: #fee75c;
+}
+
+.signup-list-count--decline {
+  color: #ed4245;
+}
+
+.signup-class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px 12px;
+  padding: 8px 2px 2px;
+}
+
+.signup-class-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.signup-class-column-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.signup-class-icon {
+  border-radius: 3px;
+}
+
+.signup-status-section {
+  padding: 8px 2px 0;
+
+  h4 {
+    margin: 0 0 4px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.signup-status-names {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.signup-status-name {
+  &:not(:last-child)::after {
+    content: ', ';
+  }
+}
+
+.signup-tentative-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.signup-tentative-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.signup-list-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.signup-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 5px;
+  background: var(--color-bg-tertiary);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  // The viewer's own response — a quick visual anchor when scanning the list.
+  &--own {
+    border-color: #f5c518;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background: var(--color-bg-elevated);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+
+  &.cdk-drag-disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  // Already holding a slot in this event. Opacity alone barely registered against a grid full of
+  // similarly-dim colored rows — the name now drops its class color entirely (flat muted grey),
+  // gets struck through, and a checkmark badge spells out *why* it's inert, instead of relying on
+  // the viewer to notice a faded chip among many.
+  &--assigned {
+    opacity: 0.6;
+    background: none;
+    border-style: dashed;
+    border-color: var(--color-border-subtle);
+
+    .signup-row-name {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+  }
+}
+
+.signup-row-assigned-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: #57f287;
+}
+
+.signup-row-name {
+  min-width: 0;
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.signup-row-spec-icon {
+  flex-shrink: 0;
+  border-radius: 3px;
+}

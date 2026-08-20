@@ -6,10 +6,14 @@ Un évènement « absence » couvre aussi bien une déclaration ponctuelle qu'un
 
 ![Vue d'ensemble de l'onglet Notifications](/assets/manual/fr/guild/notifications-settings-overview.png)
 
-Les évènements de raid ont deux familles distinctes, activables indépendamment l'une de l'autre :
+Les évènements de raid ont quatre familles distinctes, activables indépendamment les unes des autres :
 
 - **Changements de raid** poste quand un raid est publié, quand un raid déjà publié est annulé (supprimé), ou quand son horaire est reprogrammé.
 - **Changements de composition** poste quand un personnage est assigné, désassigné, échangé, ou change de spé sur un raid **déjà publié** — les modifications faites pendant qu'un raid est encore en brouillon ne postent jamais, puisque personne en dehors des officiers ne peut encore le voir.
+- **Annonce de composition** poste un embed unique qui affiche l'état complet de la composition d'un raid publié, groupe par groupe — contrairement à *Changements de composition* (un message par changement), ce même message est réédité en place à chaque modification, jamais republié. Le réglage **DM aux joueurs ajoutés ou retirés du raid** envoie en plus un message privé à chaque joueur concerné ; comme un DM n'a pas de salon, aucun sélecteur de salon n'apparaît pour cette ligne.
+- **Appel aux inscriptions** poste un embed permanent avec des boutons Présent/Peut-être/Absent pour un raid publié en mode Planificateur (voir [Raids](/manual/guild/raid-builder)) — réédité en place au fur et à mesure des réponses, pour répondre directement depuis Discord sans passer par le site.
+
+> Le salon choisi pour **Annonce de composition** est aussi celui utilisé pour le message de groupage (bouton **Annoncer le groupage** sur la page d'un raid, ou commande Discord `/raid invite`) — voir le guide **Page Raids**. Sans salon configuré ici, le groupage échoue.
 
 ### Choisir une portée
 
@@ -23,6 +27,6 @@ Chaque évènement a son propre interrupteur. L'activer fait apparaître un sél
 
 Si un salon affiche un avertissement ⚠️, il manque au bot une ou plusieurs permissions nécessaires pour y poster (par exemple *voir le salon*, *envoyer des messages*, *intégrer des liens* — listées nommément pour que tu saches exactement quoi corriger). Tu peux quand même le sélectionner avant de corriger ses permissions, mais aucun message ne sera posté tant que l'accès du bot n'est pas corrigé.
 
-### Enregistrer
+### Enregistrement
 
-**Enregistrer les notifications** sauvegarde l'interrupteur et le salon de chaque évènement en une seule action, indépendamment de l'onglet Général.
+Cocher un évènement ou choisir un salon enregistre automatiquement — pas de bouton Enregistrer. Une ligne reste non enregistrée si elle est activée mais sans salon choisi.
