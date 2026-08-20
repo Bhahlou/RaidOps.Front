@@ -125,7 +125,7 @@ export class RaidBoardStore {
     this.#key.set(null);
     const next: EventKey = { guildId, guildBranchId, eventId };
     const current = this.#eventKey();
-    if (current && current.guildId === next.guildId && current.guildBranchId === next.guildBranchId && current.eventId === next.eventId) {
+    if (current?.guildId === next.guildId && current?.guildBranchId === next.guildBranchId && current?.eventId === next.eventId) {
       this.#eventResource.reload();
     } else {
       this.#eventKey.set(next);

@@ -179,6 +179,95 @@ describe('RaidBoardStore', () => {
 
       expect(store.events()[0].name).toBe('Kara');
     });
+
+    it('re-fetches the currently tracked single event when in event mode', async () => {
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`)).flush(raidEvent({ id: 11 }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.reload();
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`));
+      req.flush(raidEvent({ id: 11, name: 'Kara' }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.events()[0].name).toBe('Kara');
+    });
+  });
+
+  // ── loadEvent ────────────────────────────────────────────────────────────
+
+  describe('loadEvent', () => {
+    it('points events() at the single fetched event and clears the range key', async () => {
+      store.loadRange('g1', 7, '2026-08-05', '2026-08-11');
+      controller.expectOne((r) => r.url.endsWith(`${BASE}/materialize`)).flush(null);
+      await Promise.resolve();
+      TestBed.tick();
+      controller.expectOne((r) => r.url.includes(`${BASE}/board?`)).flush({ events: [raidEvent()] });
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      controller.expectNone((r) => r.url.endsWith(`${BASE}/materialize`));
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`));
+      expect(req.request.method).toBe('GET');
+      req.flush(raidEvent({ id: 11, name: 'Split 1' }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.events()).toEqual([raidEvent({ id: 11, name: 'Split 1' })]);
+    });
+
+    it('is empty before the event has loaded', () => {
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      expect(store.events()).toEqual([]);
+      controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`)).flush(raidEvent({ id: 11 }));
+    });
+
+    it('re-fetches instead of setting a new key when called again for the same event', async () => {
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`)).flush(raidEvent({ id: 11 }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`));
+      req.flush(raidEvent({ id: 11, name: 'Kara' }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.events()[0].name).toBe('Kara');
+    });
+
+    it('sets a new key and re-fetches when the event changes', async () => {
+      store.loadEvent('g1', 7, 11);
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith(`${BASE}/events/11`)).flush(raidEvent({ id: 11 }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.loadEvent('g1', 7, 12);
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/12`));
+      req.flush(raidEvent({ id: 12, name: 'Kara' }));
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.events()[0].name).toBe('Kara');
+    });
+  });
+
+  // ── lastViewedRangeStart / rememberRangeStart ───────────────────────────
+
+  describe('lastViewedRangeStart / rememberRangeStart', () => {
+    it('is null until a range start is remembered', () => {
+      expect(store.lastViewedRangeStart()).toBeNull();
+    });
+
+    it('remembers the given date', () => {
+      const date = new Date(2026, 7, 5);
+      store.rememberRangeStart(date);
+      expect(store.lastViewedRangeStart()).toBe(date);
+    });
   });
 
   // ── dragging state ───────────────────────────────────────────────────────
