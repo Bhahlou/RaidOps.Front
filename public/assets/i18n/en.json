@@ -100,6 +100,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Signup mode: raiders RSVP themselves, on the web or in Discord",
+        "description": "A branch (or a single exceptional raid) can now switch its \"Raid mode\" setting to \"Planner\": roster members respond Accept, Tentative, or Decline themselves — from the raid's detail page, or a standing Discord embed with buttons — kept in sync live either way. That detail page also got a full rework: a proper header with role counts and the raid's zones, your own response front and center, and the roster/signups breakdown sitting next to the composition grid. Any raid can also post to its own dedicated Discord channel instead of the guild-wide one."
+      },
       "raidGrouping": {
         "title": "Grouping ping, from the site or Discord",
         "description": "On a published raid's page, the \"Ping to group up\" button (Officer only) posts a one-off message in the announcement channel, mentioning every assigned player and stating which character to whisper for an invite, with a snapshot of the composition attached as an embed. The same action is available from Discord via the /raid invite command, with autocomplete raid selection and an optional character."
@@ -504,7 +508,7 @@
         "defaultPresent": "Auto",
         "defaultPresentDescription": "Players are assumed present by default, unless they've declared an absence. No sign-up is required for raids.",
         "signup": "Planner",
-        "signupDescription": "Players must sign up on a raid planner (not implemented yet)."
+        "signupDescription": "Players sign up per raid — Accept, Tentative, or Decline — instead of being assumed present."
       },
       "rosterSettings": {
         "saveSuccess": "Branch settings saved."

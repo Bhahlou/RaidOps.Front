@@ -6,11 +6,12 @@ Ein „Abwesenheit"-Ereignis umfasst sowohl eine einmalige Eintragung als auch e
 
 ![Übersicht des Tabs Benachrichtigungen](/assets/manual/de/guild/notifications-settings-overview.png)
 
-Raid-Ereignisse haben drei getrennte Gruppen, die du unabhängig voneinander aktivieren kannst:
+Raid-Ereignisse haben vier getrennte Gruppen, die du unabhängig voneinander aktivieren kannst:
 
 - **Raid-Änderungen** postet, wenn ein Raid veröffentlicht wird, wenn ein bereits veröffentlichter Raid abgesagt (gelöscht) wird, oder wenn seine Startzeit verschoben wird.
 - **Zusammensetzungsänderungen** postet, wenn ein Charakter auf einem **bereits veröffentlichten** Raid zugewiesen, entfernt, getauscht wird oder seine Skillung geändert wird — Änderungen, die noch im Entwurfsstadium vorgenommen werden, werden nie gepostet, da außer den Officern noch niemand den Raid sehen kann.
 - **Zusammensetzungsankündigung** postet ein einziges Embed mit der vollständigen Zusammensetzung eines veröffentlichten Raids, Gruppe für Gruppe — anders als bei *Zusammensetzungsänderungen* (eine Nachricht pro Änderung) wird dieselbe Nachricht bei jeder Änderung bearbeitet, nie neu gepostet. Die Einstellung **DM an hinzugefügte oder entfernte Spieler** sendet zusätzlich eine private Nachricht an jeden betroffenen Spieler; da eine DM keinen Kanal hat, erscheint für diese Zeile keine Kanalauswahl.
+- **Raid-Anmeldeaufruf** postet ein dauerhaftes Embed mit Zusagen/Vielleicht/Absagen-Buttons für einen veröffentlichten Raid im Planer-Modus (siehe [Raids](/manual/guild/raid-builder)) — wird bei jeder Antwort bearbeitet, sodass direkt aus Discord geantwortet werden kann, ohne das Web zu öffnen.
 
 > Der für **Zusammensetzungsankündigung** gewählte Kanal wird auch für den Gruppierungs-Ping verwendet (der Button **Gruppierung anpingen** auf der Seite eines Raids, oder der Discord-Befehl `/raid invite`) — siehe die Anleitung **Raids**. Ohne hier konfigurierten Kanal schlägt die Gruppierung fehl.
 

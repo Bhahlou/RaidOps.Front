@@ -100,6 +100,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Mode inscription : les raiders répondent eux-mêmes, sur le site ou dans Discord",
+        "description": "Une branche (ou un raid ponctuel) peut désormais passer son réglage « Mode de raid » sur « Planificateur » : les membres du roster répondent eux-mêmes Présent, Peut-être ou Absent — depuis la page de détail du raid, ou un embed Discord permanent à boutons — synchronisés en direct dans les deux sens. Cette page de détail a aussi été entièrement refondue : un en-tête complet avec comptage des rôles et zones du raid, leur propre réponse mise en avant, et le récapitulatif roster/inscriptions juste à côté de la grille de composition. Chaque raid peut en plus poster dans son propre salon Discord dédié plutôt que dans celui de la guilde."
+      },
       "raidGrouping": {
         "title": "Annonce de groupage, depuis le site ou Discord",
         "description": "Sur la page d'un raid publié, le bouton « Annoncer le groupage » (réservé aux Officiers) poste un message ponctuel dans le salon d'annonce, mentionnant tous les joueurs assignés et indiquant sur quel personnage les whisper pour une invitation, avec un instantané de la composition en embed. La même action est disponible depuis Discord via la commande /raid invite, avec un choix de raid par autocomplétion et un personnage optionnel."
@@ -504,7 +508,7 @@
         "defaultPresent": "Auto",
         "defaultPresentDescription": "Les joueurs sont considérés présents par défaut, à moins d'avoir déclaré une absence. Aucune inscription n'est requise pour les raids.",
         "signup": "Planificateur",
-        "signupDescription": "Les joueurs doivent s'inscrire sur un planificateur de raid (pas encore implémenté)."
+        "signupDescription": "Les joueurs s'inscrivent par raid — Présent, Peut-être ou Absent — plutôt que d'être considérés présents par défaut."
       },
       "rosterSettings": {
         "saveSuccess": "Réglages de la branche enregistrés."

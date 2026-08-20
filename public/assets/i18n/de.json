@@ -100,6 +100,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Anmeldemodus: Raider melden sich selbst an, im Web oder in Discord",
+        "description": "Ein Spielzweig (oder ein einzelner Ausnahme-Raid) kann seine Einstellung „Raid-Modus“ jetzt auf „Planer“ umstellen: Roster-Mitglieder antworten selbst mit Zusagen, Vielleicht oder Absagen — über die Detailseite des Raids oder ein dauerhaftes Discord-Embed mit Buttons —, live in beide Richtungen synchronisiert. Auch die Detailseite wurde komplett überarbeitet: ein vollständiger Header mit Rollenzählung und den Zonen des Raids, die eigene Antwort direkt im Blick, und die Roster-/Anmeldungsübersicht neben dem Kompositionsraster. Jeder Raid kann außerdem in seinen eigenen dedizierten Discord-Kanal posten statt in den gildeweiten."
+      },
       "raidGrouping": {
         "title": "Gruppierungs-Ping, von der Website oder aus Discord",
         "description": "Auf der Seite eines veröffentlichten Raids postet der Button „Gruppierung anpingen“ (nur für Officer) eine einmalige Nachricht im Ankündigungskanal, die alle zugewiesenen Spieler erwähnt und angibt, welchen Charakter sie für eine Einladung anflüstern sollen, mit einem Schnappschuss der Zusammensetzung als Embed. Dieselbe Aktion ist auch aus Discord über den Befehl /raid invite verfügbar, mit Raid-Auswahl per Autovervollständigung und optionalem Charakter."
@@ -504,7 +508,7 @@
         "defaultPresent": "Automatisch",
         "defaultPresentDescription": "Spieler gelten standardmäßig als anwesend, sofern sie keine Abwesenheit eingetragen haben. Für Raids ist keine Anmeldung erforderlich.",
         "signup": "Planer",
-        "signupDescription": "Spieler müssen sich über einen Raid-Planer anmelden (noch nicht implementiert)."
+        "signupDescription": "Spieler melden sich pro Raid an — Zusagen, Vielleicht oder Absagen — statt automatisch als anwesend zu gelten."
       },
       "rosterSettings": {
         "saveSuccess": "Spielzweig-Einstellungen gespeichert."

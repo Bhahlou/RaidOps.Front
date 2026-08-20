@@ -20,9 +20,23 @@ Die standardmäßig angezeigte Woche entspricht dem tatsächlichen wöchentliche
 
 ![Dialog „Raid-Event bearbeiten": Name, Zeitplan, Rastergröße und Raidzonen](/assets/manual/de/guild/raid-builder-edit-dialog.png)
 
+### Anmeldemodus
+
+Standardmäßig läuft ein Raid im Modus **Automatisch**: Jedes Roster-Mitglied gilt als anwesend, sofern es keine Abwesenheit eingetragen hat, keine Anmeldung nötig (der Standard pro Spielzweig wird in den [Raid-Einstellungen](/manual/guild/raid-settings) festgelegt). Ein Raid kann stattdessen im Modus **Planer** laufen — entweder weil sein Spielzweig das als Standard hat, oder weil ein Officer beim Erstellen eines einmaligen Ausnahme-Raids „Anmeldemodus für diesen Raid verwenden" ankreuzt — dann melden sich Roster-Mitglieder selbst an (siehe die Detailseite des Raids weiter unten), statt sich auf ihre eingetragenen Abwesenheiten zu verlassen.
+
+Mit **Zusagen** oder **Vielleicht** zu antworten fragt, welcher Charakter mitkommt und welche Raid-Spezialisierung, falls mehr als eine deklariert ist; **Absagen** braucht keins von beidem. Officer sehen jede Antwort nach Status aufgeschlüsselt auf der Detailseite des Raids — Zusagen nach Klasse gruppiert, Vielleicht und Absagen als einfache Listen — live, egal ob die Antwort vom Web oder aus Discord kam, und können einen zugesagten Charakter von dort direkt in einen Slot ziehen, genau wie aus dem Roster-Pool.
+
+### Dedizierter Discord-Kanal
+
+Ein Raid — einmalig oder aus einer Serie erzeugt — kann in seinen eigenen Discord-Kanal posten statt in den unter Benachrichtigungen konfigurierten: Aktiviere **Dedizierter Discord-Kanal** im Erstellungs- oder Bearbeitungsdialog, wähle dann entweder einen **Bestehenden Kanal** oder lass RaidOps einen **Neuen Kanal** anlegen (in einer Kategorie deiner Wahl, mit einem aus Raidname und Datum vorgeschlagenen, änderbaren Namen). Eine Serie kann dasselbe für jedes von ihr erzeugte Vorkommen tun und dabei jedes Mal einen frischen Kanal anlegen, statt einen wiederzuverwenden.
+
+![Erstellungsdialog: Umschalter für Anmeldemodus und Auswahl des dedizierten Kanals](/assets/manual/de/guild/raid-builder-channel-picker.png)
+
 ### Detailseite eines Raids
 
-Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und öffnet seine eigene Detailseite (Breadcrumb: Gilde > Raids > Raid-Name) — hier werden später Anwesenheit, Loot und Log-Analyse zu finden sein. Ein noch im Entwurf befindlicher Raid behält einen einfachen, nicht verlinkten Namen.
+Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und öffnet seine eigene Detailseite (Breadcrumb: Gilde > Raids > Raid-Name) — ein noch im Entwurf befindlicher Raid behält einen einfachen, nicht verlinkten Namen. Der Header zeigt Datum und Uhrzeit vollständig, die Zonen des Raids und eine live aus den aktuellen Einteilungen berechnete Rollenzählung (Tank/Heal/Nahkampf/Fernkampf); ein Raid im Planer-Modus fügt dort deine eigene Antwort (Zusagen/Vielleicht/Absagen) hinzu. Darunter steht dasselbe Kompositionsraster wie auf der Raids-Seite neben entweder der Verfügbarkeitsübersicht des Rosters (Modus Automatisch) oder der Anmeldungsübersicht (Modus Planer) — beide dienen Officern zugleich als Ziehquelle ins Raster, genau wie der Roster-Pool. Officer bekommen zusätzlich **Veröffentlichen** (solange es ein Entwurf ist), **Gruppierung anpingen** (sobald veröffentlicht, siehe unten) und einen **Bearbeiten**-Shortcut, alles vom selben Header aus.
+
+![Detailseite eines Raids: Header mit Antwort-Buttons, Kompositionsraster und Anmeldungsübersicht](/assets/manual/de/guild/raid-detail-overview.png)
 
 ### Discord-Kompositions-Ankündigung
 
