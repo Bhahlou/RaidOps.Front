@@ -100,6 +100,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Signup mode: raiders RSVP themselves, on the web or in Discord",
+        "description": "A branch (or a single exceptional raid) can now switch its \"Raid mode\" setting to \"Planner\": roster members respond Accept, Tentative, or Decline themselves — from the raid's detail page, or a standing Discord embed with buttons — kept in sync live either way. That detail page also got a full rework: a proper header with role counts and the raid's zones, your own response front and center, and the roster/signups breakdown sitting next to the composition grid. Any raid can also post to its own dedicated Discord channel instead of the guild-wide one."
+      },
       "raidGrouping": {
         "title": "Grouping ping, from the site or Discord",
         "description": "On a published raid's page, the \"Ping to group up\" button (Officer only) posts a one-off message in the announcement channel, mentioning every assigned player and stating which character to whisper for an invite, with a snapshot of the composition attached as an embed. The same action is available from Discord via the /raid invite command, with autocomplete raid selection and an optional character."
@@ -504,7 +508,7 @@
         "defaultPresent": "Auto",
         "defaultPresentDescription": "Players are assumed present by default, unless they've declared an absence. No sign-up is required for raids.",
         "signup": "Planner",
-        "signupDescription": "Players must sign up on a raid planner (not implemented yet)."
+        "signupDescription": "Players sign up per raid — Accept, Tentative, or Decline — instead of being assumed present."
       },
       "rosterSettings": {
         "saveSuccess": "Branch settings saved."
@@ -533,6 +537,10 @@
         "raidCompositionAnnouncement": {
           "label": "Raid composition announcement",
           "hint": "Post a standing embed with the full current composition of a published raid (edited in place as it changes), and/or DM players when they're added to or removed from it."
+        },
+        "raidSignupCall": {
+          "label": "Raid signup call",
+          "hint": "Post a standing embed with Accept/Tentative/Decline buttons for a published Signup-mode raid, edited in place as responses come in."
         }
       },
       "events": {
@@ -546,7 +554,8 @@
         "RaidSlotsSwapped": "Two characters' slots are swapped",
         "RaidSlotSpecChanged": "A slot's spec is changed",
         "RaidCompositionAnnouncementPosted": "Post the composition as an embed",
-        "RaidCompositionAnnouncementDm": "DM players added to or removed from the raid"
+        "RaidCompositionAnnouncementDm": "DM players added to or removed from the raid",
+        "RaidSignupCallPosted": "Post the signup call as an embed"
       },
       "scope": {
         "label": "Scope",
@@ -638,6 +647,7 @@
       "BranchActivated": "Branch activated",
       "BranchDeactivated": "Branch deactivated",
       "BranchRosterSettingsUpdated": "Branch roster settings updated",
+      "BranchSignupModeUpdated": "Branch signup mode updated",
       "NotificationSettingsReset": "Notification override reset",
       "RaidSeriesCreated": "Raid series created",
       "RaidSeriesUpdated": "Raid series updated",
@@ -858,9 +868,38 @@
     "board": {
       "empty": "No raid event in this range yet — create a series or an ad-hoc event to get started."
     },
+    "signup": {
+      "accept": "Accept",
+      "tentative": "Tentative",
+      "decline": "Decline",
+      "myResponse": "Your response",
+      "listTitle": "Signups",
+      "noOneYet": "No one yet",
+      "alreadyAssigned": "Already in the raid",
+      "roster": "Roster responses",
+      "noResponse": "No response",
+      "respondedAt": "Responded {{when}}",
+      "saveFailed": "Couldn't save your response.",
+      "characterDialogTitle": "Which character are you bringing?",
+      "characterDialogLabel": "Character",
+      "characterDialogSpecLabel": "Spec",
+      "characterDialogSubmit": "Confirm"
+    },
+    "availability": {
+      "listTitle": "Who's available",
+      "unavailableSection": "Not available"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Raid details are coming soon — attendance, loot, and log analysis will live here.",
+      "notFound": "This raid couldn't be found, or isn't visible to you yet.",
+      "hub": {
+        "title": "Coming soon",
+        "comingSoon": "Coming soon",
+        "loot": "Loot",
+        "assignments": "Assignments",
+        "logs": "Logs",
+        "analysis": "Analysis"
+      },
       "triggerGrouping": "Ping to group up",
       "groupingSent": "Grouping ping sent.",
       "groupingFailed": "Couldn't send the grouping ping — check that the raid is published and an announcement channel is configured.",
@@ -934,7 +973,8 @@
       "slotsPerGroup": "Slots per group",
       "zones": "Raid zones",
       "noZones": "No raid zone configured for this branch.",
-      "saveSuccess": "Raid series saved."
+      "saveSuccess": "Raid series saved.",
+      "newChannelPerOccurrenceHint": "A fresh channel will be created here for each raid this series produces, named after the raid and its date."
     },
     "eventDialog": {
       "createTitle": "New raid event",
@@ -950,7 +990,18 @@
       "deleteConfirmMessageWithAssignments": "\"{{name}}\" and everyone assigned to it will be permanently deleted. This cannot be undone.",
       "deleteSuccess": "Raid event deleted.",
       "publishConfirmTitle": "Publish this raid event?",
-      "publishSuccess": "Raid event published."
+      "publishSuccess": "Raid event published.",
+      "signupOverride": "Use Signup mode for this raid (exceptional raid, overrides the branch default)",
+      "dedicatedChannel": "Dedicated Discord channel",
+      "channelModeExisting": "Existing channel",
+      "channelModeNew": "New channel",
+      "dedicatedChannelPlaceholder": "Select a channel",
+      "newChannelCategory": "Category",
+      "newChannelCategoryPlaceholder": "No category",
+      "newChannelNamePlaceholder": "New channel name",
+      "createChannel": "Create",
+      "createChannelFailed": "Couldn't create the channel.",
+      "createChannelMissingPermission": "The bot doesn't have Manage Channels here — pick a different category or grant it the permission in Discord."
     },
     "weekday": {
       "Monday": "Monday",

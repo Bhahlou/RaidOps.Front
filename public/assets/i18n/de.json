@@ -100,6 +100,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Anmeldemodus: Raider melden sich selbst an, im Web oder in Discord",
+        "description": "Ein Spielzweig (oder ein einzelner Ausnahme-Raid) kann seine Einstellung „Raid-Modus“ jetzt auf „Planer“ umstellen: Roster-Mitglieder antworten selbst mit Zusagen, Vielleicht oder Absagen — über die Detailseite des Raids oder ein dauerhaftes Discord-Embed mit Buttons —, live in beide Richtungen synchronisiert. Auch die Detailseite wurde komplett überarbeitet: ein vollständiger Header mit Rollenzählung und den Zonen des Raids, die eigene Antwort direkt im Blick, und die Roster-/Anmeldungsübersicht neben dem Kompositionsraster. Jeder Raid kann außerdem in seinen eigenen dedizierten Discord-Kanal posten statt in den gildeweiten."
+      },
       "raidGrouping": {
         "title": "Gruppierungs-Ping, von der Website oder aus Discord",
         "description": "Auf der Seite eines veröffentlichten Raids postet der Button „Gruppierung anpingen“ (nur für Officer) eine einmalige Nachricht im Ankündigungskanal, die alle zugewiesenen Spieler erwähnt und angibt, welchen Charakter sie für eine Einladung anflüstern sollen, mit einem Schnappschuss der Zusammensetzung als Embed. Dieselbe Aktion ist auch aus Discord über den Befehl /raid invite verfügbar, mit Raid-Auswahl per Autovervollständigung und optionalem Charakter."
@@ -504,7 +508,7 @@
         "defaultPresent": "Automatisch",
         "defaultPresentDescription": "Spieler gelten standardmäßig als anwesend, sofern sie keine Abwesenheit eingetragen haben. Für Raids ist keine Anmeldung erforderlich.",
         "signup": "Planer",
-        "signupDescription": "Spieler müssen sich über einen Raid-Planer anmelden (noch nicht implementiert)."
+        "signupDescription": "Spieler melden sich pro Raid an — Zusagen, Vielleicht oder Absagen — statt automatisch als anwesend zu gelten."
       },
       "rosterSettings": {
         "saveSuccess": "Spielzweig-Einstellungen gespeichert."
@@ -533,6 +537,10 @@
         "raidCompositionAnnouncement": {
           "label": "Zusammensetzungsankündigung",
           "hint": "Postet ein dauerhaftes Embed mit der aktuellen vollständigen Zusammensetzung eines veröffentlichten Raids (wird bei jeder Änderung bearbeitet), und/oder sendet eine DM an hinzugefügte oder entfernte Spieler."
+        },
+        "raidSignupCall": {
+          "label": "Raid-Anmeldeaufruf",
+          "hint": "Postet ein dauerhaftes Embed mit Zusagen/Vielleicht/Absagen-Buttons für einen veröffentlichten Raid im Anmeldemodus, wird bei jeder Antwort bearbeitet."
         }
       },
       "events": {
@@ -546,7 +554,8 @@
         "RaidSlotsSwapped": "Zwei Charaktere werden getauscht",
         "RaidSlotSpecChanged": "Die Skillung eines Slots wird geändert",
         "RaidCompositionAnnouncementPosted": "Zusammensetzung als Embed posten",
-        "RaidCompositionAnnouncementDm": "DM an hinzugefügte oder entfernte Spieler"
+        "RaidCompositionAnnouncementDm": "DM an hinzugefügte oder entfernte Spieler",
+        "RaidSignupCallPosted": "Anmeldeaufruf als Embed posten"
       },
       "scope": {
         "label": "Geltungsbereich",
@@ -638,6 +647,7 @@
       "BranchActivated": "Spielzweig aktiviert",
       "BranchDeactivated": "Spielzweig deaktiviert",
       "BranchRosterSettingsUpdated": "Roster-Einstellungen des Spielzweigs geändert",
+      "BranchSignupModeUpdated": "Anmeldemodus des Spielzweigs geändert",
       "NotificationSettingsReset": "Benachrichtigungs-Override zurückgesetzt",
       "RaidSeriesCreated": "Raid-Serie erstellt",
       "RaidSeriesUpdated": "Raid-Serie geändert",
@@ -858,9 +868,38 @@
     "board": {
       "empty": "Noch kein Raid in diesem Zeitraum — erstelle eine Serie oder einen Ad-hoc-Raid, um zu starten."
     },
+    "signup": {
+      "accept": "Zusagen",
+      "tentative": "Vielleicht",
+      "decline": "Absagen",
+      "myResponse": "Deine Antwort",
+      "listTitle": "Anmeldungen",
+      "noOneYet": "Noch niemand",
+      "alreadyAssigned": "Bereits im Raid",
+      "roster": "Antworten des Rosters",
+      "noResponse": "Keine Antwort",
+      "respondedAt": "Geantwortet {{when}}",
+      "saveFailed": "Deine Antwort konnte nicht gespeichert werden.",
+      "characterDialogTitle": "Welchen Charakter bringst du mit?",
+      "characterDialogLabel": "Charakter",
+      "characterDialogSpecLabel": "Skillung",
+      "characterDialogSubmit": "Bestätigen"
+    },
+    "availability": {
+      "listTitle": "Wer ist verfügbar",
+      "unavailableSection": "Nicht verfügbar"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Raid-Details kommen bald — Anwesenheit, Loot und Log-Analyse werden hier zu finden sein.",
+      "notFound": "Dieses Raid-Event wurde nicht gefunden oder ist für dich noch nicht sichtbar.",
+      "hub": {
+        "title": "Demnächst verfügbar",
+        "comingSoon": "Demnächst verfügbar",
+        "loot": "Loot",
+        "assignments": "Zuweisungen",
+        "logs": "Logs",
+        "analysis": "Analyse"
+      },
       "triggerGrouping": "Gruppierung anpingen",
       "groupingSent": "Gruppierungs-Ping gesendet.",
       "groupingFailed": "Der Gruppierungs-Ping konnte nicht gesendet werden — prüfe, ob der Raid veröffentlicht ist und ein Ankündigungskanal konfiguriert ist.",
@@ -934,7 +973,8 @@
       "slotsPerGroup": "Slots pro Gruppe",
       "zones": "Raid-Zonen",
       "noZones": "Keine Raid-Zone für diesen Branch konfiguriert.",
-      "saveSuccess": "Raid-Serie gespeichert."
+      "saveSuccess": "Raid-Serie gespeichert.",
+      "newChannelPerOccurrenceHint": "Für jeden von dieser Serie erzeugten Raid wird hier ein neuer Kanal erstellt, benannt nach dem Raid und seinem Datum."
     },
     "eventDialog": {
       "createTitle": "Neuer Raid",
@@ -950,7 +990,18 @@
       "deleteConfirmMessageWithAssignments": "„{{name}}“ und alle zugeteilten Charaktere werden endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
       "deleteSuccess": "Raid gelöscht.",
       "publishConfirmTitle": "Diesen Raid veröffentlichen?",
-      "publishSuccess": "Raid veröffentlicht."
+      "publishSuccess": "Raid veröffentlicht.",
+      "signupOverride": "Anmeldemodus für diesen Raid verwenden (Ausnahme-Raid, überschreibt die Branch-Vorgabe)",
+      "dedicatedChannel": "Dedizierter Discord-Kanal",
+      "channelModeExisting": "Vorhandener Kanal",
+      "channelModeNew": "Neuer Kanal",
+      "dedicatedChannelPlaceholder": "Kanal auswählen",
+      "newChannelCategory": "Kategorie",
+      "newChannelCategoryPlaceholder": "Keine Kategorie",
+      "newChannelNamePlaceholder": "Name des neuen Kanals",
+      "createChannel": "Erstellen",
+      "createChannelFailed": "Der Kanal konnte nicht erstellt werden.",
+      "createChannelMissingPermission": "Der Bot hat hier keine Berechtigung „Kanäle verwalten“ — wähle eine andere Kategorie oder erteile ihm die Berechtigung in Discord."
     },
     "weekday": {
       "Monday": "Montag",

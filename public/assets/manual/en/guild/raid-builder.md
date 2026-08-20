@@ -20,9 +20,23 @@ The week shown defaults to the guild branch's actual weekly raid-lockout reset w
 
 ![Edit raid event dialog: name, schedule, grid size, and raid zones](/assets/manual/en/guild/raid-builder-edit-dialog.png)
 
+### Signup mode
+
+By default a raid runs in **Auto** mode: every roster member is assumed present unless they've declared an absence, no sign-up needed (the branch-wide default is set in [Raids settings](/manual/guild/raid-settings)). A raid can instead run in **Planner** mode — either because its branch defaults to it, or because an officer ticks "Use Signup mode for this raid" when creating a one-off exceptional raid — in which case roster members self-serve their own response (see the raid detail page below) instead of relying on their declared absences.
+
+Responding **Accept** or **Tentative** asks which character to bring, and which raid spec if more than one is declared; **Decline** needs neither. Officers see every response broken down by status on the raid's detail page — Accepted grouped by class, Tentative and Declined as flat lists — live, whether the response came from the web or Discord, and can drag an Accepted character straight into a slot from there, exactly like the roster pool.
+
+### Dedicated Discord channel
+
+A raid — one-off or generated from a series — can post to its own Discord channel instead of the guild-wide one configured in Notifications: tick **Dedicated Discord channel** in the creation or edit dialog, then either pick an **Existing channel** or have RaidOps create a **New channel** (in a category of your choice, with a name it suggests from the raid's name and date, editable). A series can do the same for every occurrence it generates, creating a fresh channel each time instead of reusing one.
+
+![Create raid dialog: Signup mode override and dedicated channel picker](/assets/manual/en/guild/raid-builder-channel-picker.png)
+
 ### Raid detail page
 
-Once a raid is **published**, its name becomes clickable in the grid and opens its dedicated detail page (breadcrumb: Guild > Raids > raid name) — for now, this is where attendance, loot, and log analysis will live later. A raid still in draft keeps a plain, unlinked name.
+Once a raid is **published**, its name becomes clickable in the grid and opens its dedicated detail page (breadcrumb: Guild > Raids > raid name) — a raid still in draft keeps a plain, unlinked name. The header shows the full date and time, the raid's zones, and a live role count (tank/heal/melee/ranged) tallied from the current assignments; a Planner-mode raid adds your own response (Accept/Tentative/Decline) right there. Below, the same composition grid as the Raids page sits next to either the roster's availability breakdown (Auto mode) or the signups breakdown (Planner mode) — both double as a drag source into the grid for officers, exactly like the roster pool. Officers additionally get **Publish** (while still a draft), **Ping to group up** (once published, see below), and an **Edit** shortcut, all from the same header.
+
+![Raid detail page: header with RSVP buttons, composition grid, and the signups breakdown](/assets/manual/en/guild/raid-detail-overview.png)
 
 ### Discord composition announcement
 

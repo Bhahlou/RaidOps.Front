@@ -100,6 +100,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidSignupMode": {
+        "title": "Mode inscription : les raiders répondent eux-mêmes, sur le site ou dans Discord",
+        "description": "Une branche (ou un raid ponctuel) peut désormais passer son réglage « Mode de raid » sur « Planificateur » : les membres du roster répondent eux-mêmes Présent, Peut-être ou Absent — depuis la page de détail du raid, ou un embed Discord permanent à boutons — synchronisés en direct dans les deux sens. Cette page de détail a aussi été entièrement refondue : un en-tête complet avec comptage des rôles et zones du raid, leur propre réponse mise en avant, et le récapitulatif roster/inscriptions juste à côté de la grille de composition. Chaque raid peut en plus poster dans son propre salon Discord dédié plutôt que dans celui de la guilde."
+      },
       "raidGrouping": {
         "title": "Annonce de groupage, depuis le site ou Discord",
         "description": "Sur la page d'un raid publié, le bouton « Annoncer le groupage » (réservé aux Officiers) poste un message ponctuel dans le salon d'annonce, mentionnant tous les joueurs assignés et indiquant sur quel personnage les whisper pour une invitation, avec un instantané de la composition en embed. La même action est disponible depuis Discord via la commande /raid invite, avec un choix de raid par autocomplétion et un personnage optionnel."
@@ -504,7 +508,7 @@
         "defaultPresent": "Auto",
         "defaultPresentDescription": "Les joueurs sont considérés présents par défaut, à moins d'avoir déclaré une absence. Aucune inscription n'est requise pour les raids.",
         "signup": "Planificateur",
-        "signupDescription": "Les joueurs doivent s'inscrire sur un planificateur de raid (pas encore implémenté)."
+        "signupDescription": "Les joueurs s'inscrivent par raid — Présent, Peut-être ou Absent — plutôt que d'être considérés présents par défaut."
       },
       "rosterSettings": {
         "saveSuccess": "Réglages de la branche enregistrés."
@@ -533,6 +537,10 @@
         "raidCompositionAnnouncement": {
           "label": "Annonce de composition",
           "hint": "Poste un embed permanent avec la composition actuelle complète d'un raid publié (édité en place à chaque changement), et/ou envoie un DM aux joueurs ajoutés ou retirés."
+        },
+        "raidSignupCall": {
+          "label": "Appel aux inscriptions",
+          "hint": "Poste un embed permanent avec des boutons Présent/Peut-être/Absent pour un raid publié en mode inscription, édité en place au fur et à mesure des réponses."
         }
       },
       "events": {
@@ -546,7 +554,8 @@
         "RaidSlotsSwapped": "Deux personnages sont échangés",
         "RaidSlotSpecChanged": "La spécialisation d'un emplacement change",
         "RaidCompositionAnnouncementPosted": "Poster la composition en embed",
-        "RaidCompositionAnnouncementDm": "DM aux joueurs ajoutés ou retirés du raid"
+        "RaidCompositionAnnouncementDm": "DM aux joueurs ajoutés ou retirés du raid",
+        "RaidSignupCallPosted": "Poster l'appel aux inscriptions en embed"
       },
       "scope": {
         "label": "Portée",
@@ -638,6 +647,7 @@
       "BranchActivated": "Branche activée",
       "BranchDeactivated": "Branche désactivée",
       "BranchRosterSettingsUpdated": "Réglages de roster de branche modifiés",
+      "BranchSignupModeUpdated": "Mode d'inscription de branche modifié",
       "NotificationSettingsReset": "Surcharge de notification réinitialisée",
       "RaidSeriesCreated": "Série de raid créée",
       "RaidSeriesUpdated": "Série de raid modifiée",
@@ -858,9 +868,38 @@
     "board": {
       "empty": "Aucun raid prévu sur cette période — créez une série ou un raid ponctuel pour commencer."
     },
+    "signup": {
+      "accept": "Présent",
+      "tentative": "Peut-être",
+      "decline": "Absent",
+      "myResponse": "Ta réponse",
+      "listTitle": "Inscriptions",
+      "noOneYet": "Personne pour l'instant",
+      "alreadyAssigned": "Déjà dans le raid",
+      "roster": "Réponses du roster",
+      "noResponse": "Aucune réponse",
+      "respondedAt": "Répondu {{when}}",
+      "saveFailed": "Impossible d'enregistrer ta réponse.",
+      "characterDialogTitle": "Quel personnage amènes-tu ?",
+      "characterDialogLabel": "Personnage",
+      "characterDialogSpecLabel": "Spécialisation",
+      "characterDialogSubmit": "Confirmer"
+    },
+    "availability": {
+      "listTitle": "Qui est disponible",
+      "unavailableSection": "Indisponibles"
+    },
     "detail": {
       "breadcrumb": "Raid",
-      "comingSoon": "Les détails du raid arrivent bientôt — présence, loot et analyse de logs vivront ici.",
+      "notFound": "Ce raid est introuvable, ou n'est pas encore visible pour vous.",
+      "hub": {
+        "title": "Bientôt disponible",
+        "comingSoon": "Bientôt disponible",
+        "loot": "Loot",
+        "assignments": "Attributions",
+        "logs": "Logs",
+        "analysis": "Analyse"
+      },
       "triggerGrouping": "Annoncer le groupage",
       "groupingSent": "Message de groupage envoyé.",
       "groupingFailed": "Impossible d'envoyer le message de groupage — vérifiez que le raid est publié et qu'un salon d'annonce est configuré.",
@@ -934,7 +973,8 @@
       "slotsPerGroup": "Slots par groupe",
       "zones": "Zones de raid",
       "noZones": "Aucune zone de raid configurée pour cette branche.",
-      "saveSuccess": "Série de raid enregistrée."
+      "saveSuccess": "Série de raid enregistrée.",
+      "newChannelPerOccurrenceHint": "Un nouveau salon sera créé ici pour chaque raid produit par cette série, nommé d'après le raid et sa date."
     },
     "eventDialog": {
       "createTitle": "Nouveau raid",
@@ -950,7 +990,18 @@
       "deleteConfirmMessageWithAssignments": "« {{name}} » et tous les persos affectés seront définitivement supprimés. Cette action est irréversible.",
       "deleteSuccess": "Raid supprimé.",
       "publishConfirmTitle": "Publier ce raid ?",
-      "publishSuccess": "Raid publié."
+      "publishSuccess": "Raid publié.",
+      "signupOverride": "Utiliser le mode inscription pour ce raid (raid exceptionnel, remplace le réglage par défaut de la branche)",
+      "dedicatedChannel": "Salon Discord dédié",
+      "channelModeExisting": "Salon existant",
+      "channelModeNew": "Nouveau salon",
+      "dedicatedChannelPlaceholder": "Choisir un salon",
+      "newChannelCategory": "Catégorie",
+      "newChannelCategoryPlaceholder": "Aucune catégorie",
+      "newChannelNamePlaceholder": "Nom du nouveau salon",
+      "createChannel": "Créer",
+      "createChannelFailed": "Impossible de créer le salon.",
+      "createChannelMissingPermission": "Le bot n'a pas la permission Gérer les salons ici — choisis une autre catégorie ou accorde-lui la permission sur Discord."
     },
     "weekday": {
       "Monday": "Lundi",

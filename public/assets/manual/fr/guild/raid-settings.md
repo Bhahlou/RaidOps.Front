@@ -7,7 +7,9 @@ L'onglet **Raids** (dans les paramètres de la guilde) configure, par branche Wo
 ### Mode de raid
 
 Deux options :
-- **Auto** (par défaut, et la seule à avoir un effet aujourd'hui) — tout membre du roster est considéré présent sauf s'il a déclaré une absence. C'est comme ça que fonctionne la présence aux raids aujourd'hui.
-- **Planificateur** — réservé à une future fonctionnalité où les membres s'inscrivent explicitement par raid plutôt que de se baser sur les absences déclarées. Le sélectionner ne change rien pour l'instant.
+- **Auto** (par défaut) — tout membre du roster est considéré présent sauf s'il a déclaré une absence. Aucune inscription n'est requise.
+- **Planificateur** — les membres s'inscrivent par raid : Présent, Peut-être ou Absent, depuis la page du raid ou un embed Discord permanent à boutons (voir [Raids](/manual/guild/raid-builder)).
+
+Chaque raid peut aussi surcharger le mode depuis sa propre boîte de dialogue de création — un raid Planificateur ponctuel sur une branche en Auto, ou l'inverse, sans changer le réglage par défaut de la branche.
 
 > Active d'abord une branche dans l'onglet **Général** si tu ne la vois pas encore ici.

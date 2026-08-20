@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.text-input {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.channel-mode-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.channel-permission-warning {
+  margin: -4px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-error);
+}
+
+.mode-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}

@@ -6,11 +6,12 @@ An "absence" event covers both a one-off declaration and a recurring pattern (we
 
 ![Notifications tab overview](/assets/manual/en/guild/notifications-settings-overview.png)
 
-Raid events have three separate families, so you can enable any of them without the others:
+Raid events have four separate families, so you can enable any of them without the others:
 
 - **Raid changes** posts when a raid is published, when an already-published raid is cancelled (deleted), or when its start time is rescheduled.
 - **Raid composition changes** posts when a character is assigned, unassigned, swapped, or has its spec changed on an **already-published** raid — edits made while a raid is still a draft never post, since nobody outside officers can see it yet.
 - **Raid composition announcement** posts a single embed showing a published raid's full composition, group by group — unlike *Raid composition changes* (one message per change), this same message is edited in place on every change, never reposted. The **DM players added to or removed from the raid** setting also sends a private message to each affected player; since a DM has no channel, no channel picker appears for that row.
+- **Raid signup call** posts a standing embed with Accept/Tentative/Decline buttons for a published Signup-mode raid (see [Raids](/manual/guild/raid-builder)) — edited in place as responses come in, so members can respond straight from Discord instead of the web.
 
 > The channel chosen for **Raid composition announcement** is also the one used for the grouping ping (the **Ping to group up** button on a raid's page, or the `/raid invite` Discord command) — see the **Raids** guide. Grouping fails without a channel configured here.
 

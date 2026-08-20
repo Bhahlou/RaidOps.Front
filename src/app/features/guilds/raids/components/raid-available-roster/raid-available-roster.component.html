@@ -1,0 +1,81 @@
+<div class="avail-list">
+  <button type="button" class="avail-list-toggle" (click)="toggleExpanded()">
+    <span class="material-icons">{{ expanded() ? 'expand_less' : 'expand_more' }}</span>
+    <span class="avail-list-counts">
+      <span class="avail-list-count avail-list-count--available">✅ {{ availableMembers().length }}</span>
+      <span class="avail-list-count avail-list-count--unavailable">❌ {{ unavailablePlayers().length }}</span>
+    </span>
+    <span class="avail-list-toggle-label">{{ 'raidBuilder.availability.listTitle' | transloco }}</span>
+  </button>
+
+  @if (expanded()) {
+    <fieldset class="avail-list-filters">
+      <legend class="visually-hidden">{{ 'raidBuilder.pool.rankLabel' | transloco }}</legend>
+      @for (rank of ranks; track rank) {
+        <button
+          type="button"
+          class="avail-rank-chip"
+          [class.avail-rank-chip--active]="isRankSelected(rank)"
+          [attr.aria-pressed]="isRankSelected(rank)"
+          (click)="toggleRank(rank)"
+        >
+          {{ 'roster.list.rank.' + rank | transloco }}
+        </button>
+      }
+    </fieldset>
+
+    <div
+      class="avail-class-grid"
+      cdkDropList
+      [id]="'raid-available-roster-' + event().id"
+      [cdkDropListEnterPredicate]="rejectEnter"
+    >
+      @for (group of availableByClass(); track group.classId) {
+        <div class="avail-class-column">
+          <h4 class="avail-class-column-title">
+            @if (group.iconUrl) {
+              <img class="avail-class-icon" [src]="group.iconUrl" alt="" width="16" height="16" />
+            }
+            {{ 'classes.' + group.classId | transloco }} ({{ group.members.length }})
+          </h4>
+          @for (m of group.members; track m.characterId) {
+            <div
+              class="avail-row"
+              [class.avail-row--own]="isOwnCharacter(m)"
+              [class.avail-row--assigned]="isAlreadyAssigned(m)"
+              [title]="isAlreadyAssigned(m) ? ('raidBuilder.signup.alreadyAssigned' | transloco) : ''"
+              cdkDrag
+              [cdkDragData]="dragItem(m)"
+              [cdkDragDisabled]="disabled() || isAlreadyAssigned(m)"
+              (cdkDragStarted)="onDragStarted(m)"
+              (cdkDragEnded)="onDragEnded()"
+            >
+              @if (mainSpecIconUrl(m); as icon) {
+                <img class="avail-row-spec-icon" [src]="icon" alt="" width="16" height="16" />
+              }
+              <span class="avail-row-name" [style.color]="isAlreadyAssigned(m) ? null : m.classColor">{{ m.characterName }}</span>
+              @if (isAlreadyAssigned(m)) {
+                <span class="material-icons avail-row-assigned-icon">check_circle</span>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="avail-list-empty">{{ 'raidBuilder.signup.noOneYet' | transloco }}</p>
+      }
+    </div>
+
+    <div class="avail-status-section">
+      <h4>{{ 'raidBuilder.availability.unavailableSection' | transloco }} ({{ unavailablePlayers().length }})</h4>
+      @if (unavailablePlayers().length === 0) {
+        <p class="avail-list-empty">{{ 'raidBuilder.signup.noOneYet' | transloco }}</p>
+      } @else {
+        <p class="avail-status-names">
+          @for (p of unavailablePlayers(); track p.playerDiscordId) {
+            <span class="avail-status-name">{{ p.playerName }}</span>
+          }
+        </p>
+      }
+    </div>
+  }
+</div>
