@@ -128,6 +128,8 @@ describe('RaidsComponent', () => {
   let boardStore: {
     events: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
+    lastViewedRangeStart: ReturnType<typeof signal>;
+    rememberRangeStart: ReturnType<typeof vi.fn>;
     loadRange: ReturnType<typeof vi.fn>;
     reload: ReturnType<typeof vi.fn>;
     getLockoutWeek: ReturnType<typeof vi.fn>;
@@ -150,6 +152,8 @@ describe('RaidsComponent', () => {
     boardStore = {
       events: signal(opts?.events ?? []),
       isLoading: signal(false),
+      lastViewedRangeStart: signal(null),
+      rememberRangeStart: vi.fn(),
       loadRange: vi.fn(),
       reload: vi.fn(),
       getLockoutWeek: vi.fn().mockReturnValue(of({ weekStartLocal: opts?.lockoutWeekStart ?? null, weekEndLocal: null })),
