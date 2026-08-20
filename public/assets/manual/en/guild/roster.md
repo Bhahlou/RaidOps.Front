@@ -4,7 +4,7 @@ The **Roster** page lists every member of the guild and lets you manage your own
 
 ### Switching between branches
 
-If your guild has more than one active WoW branch (see the **Settings - Branches** guide), tabs appear at the top of the page to pick which branch's roster to display. A guild with a single active branch doesn't see these tabs.
+If your guild has more than one active WoW branch (see the **General** tab of guild settings), tabs appear at the top of the page to pick which branch's roster to display. A guild with a single active branch doesn't see these tabs.
 
 ![The branch tabs](/assets/manual/en/guild/branch-switcher-tabs.png)
 

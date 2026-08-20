@@ -7,47 +7,59 @@
   <h1>{{ 'roadmap.pageTitle' | transloco }}</h1>
   <p class="intro">{{ 'roadmap.intro' | transloco }}</p>
 
-  @for (section of sections; track section.id) {
-    <section
-      class="roadmap-section"
-      [class.roadmap-section--active]="section.inProgress"
-      [class.roadmap-section--complete]="isComplete(section)"
-    >
-      <div class="section-header">
-        <h2 class="section-title">{{ section.titleKey | transloco }}</h2>
-        @if (section.inProgress) {
-          <span class="section-badge">{{ 'roadmap.inProgress' | transloco }}</span>
-        } @else if (isComplete(section)) {
-          <span class="section-badge section-badge--complete">{{ 'roadmap.completed' | transloco }}</span>
-        }
-        <span class="section-progress">{{ doneCount(section) }}/{{ section.items.length }}</span>
-      </div>
+  <div cdkAccordion [multi]="true">
+    @for (section of sections; track section.id) {
+      <section
+        cdkAccordionItem
+        #sectionItem="cdkAccordionItem"
+        class="roadmap-section"
+        [class.roadmap-section--active]="section.inProgress"
+        [class.roadmap-section--complete]="isComplete(section)"
+        [expanded]="isExpanded(section.id)"
+        (opened)="setExpanded(section.id, true)"
+        (closed)="setExpanded(section.id, false)"
+      >
+        <h2 class="section-heading">
+          <button type="button" class="section-header" (click)="sectionItem.toggle()">
+            <span class="material-icons section-chevron" [class.section-chevron--expanded]="sectionItem.expanded">expand_more</span>
+            <span class="section-title">{{ section.titleKey | transloco }}</span>
+            @if (section.inProgress) {
+              <span class="section-badge">{{ 'roadmap.inProgress' | transloco }}</span>
+            } @else if (isComplete(section)) {
+              <span class="section-badge section-badge--complete">{{ 'roadmap.completed' | transloco }}</span>
+            }
+            <span class="section-progress">{{ doneCount(section) }}/{{ section.items.length }}</span>
+          </button>
+        </h2>
 
-      <div class="item-grid">
-        @for (item of section.items; track item.id) {
-          <div class="item-box" [class.item-box--done]="item.status === ItemStatus.Done">
-            <div class="item-header">
-              @if (item.status === ItemStatus.Done) {
-                <span
-                  class="material-icons item-status item-status--done"
-                  [appTooltip]="'roadmap.status.done' | transloco"
-                >
-                  check_circle
-                </span>
-              } @else {
-                <span
-                  class="material-icons item-status item-status--planned"
-                  [appTooltip]="'roadmap.status.planned' | transloco"
-                >
-                  radio_button_unchecked
-                </span>
-              }
-              <span class="item-title">{{ item.titleKey | transloco }}</span>
-            </div>
-            <span class="item-description">{{ item.descriptionKey | transloco }}</span>
+        @if (sectionItem.expanded) {
+          <div class="item-grid">
+            @for (item of section.items; track item.id) {
+              <div class="item-box" [class.item-box--done]="item.status === ItemStatus.Done">
+                <div class="item-header">
+                  @if (item.status === ItemStatus.Done) {
+                    <span
+                      class="material-icons item-status item-status--done"
+                      [appTooltip]="'roadmap.status.done' | transloco"
+                    >
+                      check_circle
+                    </span>
+                  } @else {
+                    <span
+                      class="material-icons item-status item-status--planned"
+                      [appTooltip]="'roadmap.status.planned' | transloco"
+                    >
+                      radio_button_unchecked
+                    </span>
+                  }
+                  <span class="item-title">{{ item.titleKey | transloco }}</span>
+                </div>
+                <span class="item-description">{{ item.descriptionKey | transloco }}</span>
+              </div>
+            }
           </div>
         }
-      </div>
-    </section>
-  }
+      </section>
+    }
+  </div>
 </div>

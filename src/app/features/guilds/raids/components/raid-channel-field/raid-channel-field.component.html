@@ -1,0 +1,65 @@
+<div class="field-group">
+  <span class="field-label">{{ 'raidBuilder.eventDialog.dedicatedChannel' | transloco }}</span>
+
+  <div class="channel-mode-toggle" role="radiogroup" [attr.aria-label]="'raidBuilder.eventDialog.dedicatedChannel' | transloco">
+    <app-button
+      variant="stroked"
+      [extraClass]="channelMode() === 'existing' ? 'channel-mode-btn--active' : ''"
+      (click)="channelMode.set('existing')"
+    >
+      {{ 'raidBuilder.eventDialog.channelModeExisting' | transloco }}
+    </app-button>
+    <app-button
+      variant="stroked"
+      [extraClass]="channelMode() === 'new' ? 'channel-mode-btn--active' : ''"
+      (click)="channelMode.set('new')"
+    >
+      {{ 'raidBuilder.eventDialog.channelModeNew' | transloco }}
+    </app-button>
+  </div>
+
+  @if (channelMode() === 'existing') {
+    <app-select
+      inputId="event-channel"
+      [options]="channelOptions()"
+      [filterable]="true"
+      [placeholder]="'raidBuilder.eventDialog.dedicatedChannelPlaceholder' | transloco"
+      [(value)]="selectedChannelId"
+    />
+  } @else {
+    @if (newChannelHint(); as hint) {
+      <p class="mode-hint">{{ hint }}</p>
+    }
+
+    <div class="field-group">
+      <label class="field-label" for="event-new-channel-category">{{ 'raidBuilder.eventDialog.newChannelCategory' | transloco }}</label>
+      <app-select
+        inputId="event-new-channel-category"
+        [options]="categoryOptions()"
+        [filterable]="true"
+        [placeholder]="'raidBuilder.eventDialog.newChannelCategoryPlaceholder' | transloco"
+        [(value)]="selectedCategoryId"
+      />
+    </div>
+
+    @if (showNewChannelName()) {
+      <div class="field-group">
+        <label class="field-label" for="event-new-channel-name">{{ 'raidBuilder.eventDialog.newChannelNamePlaceholder' | transloco }}</label>
+        <input
+          id="event-new-channel-name"
+          type="text"
+          class="text-input"
+          autocomplete="off"
+          [placeholder]="'raidBuilder.eventDialog.newChannelNamePlaceholder' | transloco"
+          [value]="newChannelName()"
+          (input)="onNewChannelNameInput($any($event.target).value)"
+          maxlength="100"
+        />
+      </div>
+    }
+
+    @if (!canCreateAtSelection()) {
+      <p class="channel-permission-warning">{{ 'raidBuilder.eventDialog.createChannelMissingPermission' | transloco }}</p>
+    }
+  }
+</div>

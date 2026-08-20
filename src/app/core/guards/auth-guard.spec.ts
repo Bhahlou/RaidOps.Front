@@ -8,7 +8,7 @@ import { authGuard } from './auth-guard';
 import { AuthStore } from '../stores/auth.store';
 import { User } from '../models/user.model';
 
-const mockUser: User = { discordId: '123', name: 'Test', avatarHash: null, guilds: [], notifications: [] };
+const mockUser: User = { discordId: '123', name: 'Test', avatarHash: null, guilds: [], notifications: [], seenChangelogEntryIds: [] };
 
 describe('authGuard', () => {
   const executeGuard: CanActivateFn = (...args) =>

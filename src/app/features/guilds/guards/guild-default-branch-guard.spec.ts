@@ -37,6 +37,7 @@ const makeUser = (guilds: UserGuild[]): User => ({
   avatarHash: null,
   guilds,
   notifications: [],
+  seenChangelogEntryIds: [],
 });
 
 describe('guildDefaultBranchGuard', () => {
@@ -103,7 +104,7 @@ describe('guildDefaultBranchGuard', () => {
 
     const result = execute('g1');
 
-    expect(router.serializeUrl(result as UrlTree)).toBe('/guilds/g1/settings/branches');
+    expect(router.serializeUrl(result as UrlTree)).toBe('/guilds/g1/settings/general');
   });
 
   it('redirects a non-admin to /guilds when the guild has no active branch', () => {

@@ -1,0 +1,205 @@
+:host {
+  display: block;
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 8px;
+}
+
+.avail-list-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 2px;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  .material-icons {
+    font-size: 20px;
+  }
+}
+
+.avail-list-toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.avail-list-counts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.avail-list-count--available {
+  color: #57f287;
+}
+
+.avail-list-count--unavailable {
+  color: #ed4245;
+}
+
+.avail-list-filters {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 2px 0;
+  border: 0;
+}
+
+.avail-rank-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  &--active {
+    border-color: var(--color-accent);
+    color: var(--color-text-primary);
+    background: color-mix(in srgb, var(--color-accent) 20%, var(--color-bg-tertiary));
+  }
+}
+
+.avail-class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px 12px;
+  padding: 8px 2px 2px;
+}
+
+.avail-class-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.avail-class-column-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.avail-class-icon {
+  border-radius: 3px;
+}
+
+.avail-status-section {
+  padding: 8px 2px 0;
+
+  h4 {
+    margin: 0 0 4px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.avail-status-names {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.avail-status-name {
+  &:not(:last-child)::after {
+    content: ', ';
+  }
+}
+
+.avail-list-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.avail-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 5px;
+  background: var(--color-bg-tertiary);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  // The viewer's own character — a quick visual anchor when scanning the list.
+  &--own {
+    border-color: #f5c518;
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background: var(--color-bg-elevated);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+
+  &.cdk-drag-disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  // Already holding a slot in this event. Opacity alone barely registered against a grid full of
+  // similarly-dim colored rows — the name now drops its class color entirely (flat muted grey),
+  // gets struck through, and a checkmark badge spells out *why* it's inert, instead of relying on
+  // the viewer to notice a faded chip among many.
+  &--assigned {
+    opacity: 0.6;
+    background: none;
+    border-style: dashed;
+    border-color: var(--color-border-subtle);
+
+    .avail-row-name {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+  }
+}
+
+.avail-row-assigned-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: #57f287;
+}
+
+.avail-row-name {
+  min-width: 0;
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avail-row-spec-icon {
+  flex-shrink: 0;
+  border-radius: 3px;
+}

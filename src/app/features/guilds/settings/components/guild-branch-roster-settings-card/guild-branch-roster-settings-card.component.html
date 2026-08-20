@@ -1,0 +1,55 @@
+<app-form-field-card [label]="branch().branchName">
+  <p class="field-label">{{ 'guildSettings.branches.rosterMode.label' | transloco }}</p>
+  <p class="field-hint">{{ 'guildSettings.branches.rosterMode.hint' | transloco }}</p>
+  <div class="roster-toggle">
+    <button
+      type="button"
+      class="toggle-btn"
+      [class.active]="rosterMode() === RosterMode.Open"
+      [disabled]="submitting()"
+      (click)="onRosterModeChange(RosterMode.Open)"
+    >
+      <span class="material-icons toggle-icon">public</span>
+      {{ 'guildSettings.branches.rosterMode.open' | transloco }}
+    </button>
+    <button
+      type="button"
+      class="toggle-btn"
+      [class.active]="rosterMode() === RosterMode.DiscordRoleOnly"
+      [disabled]="submitting()"
+      (click)="onRosterModeChange(RosterMode.DiscordRoleOnly)"
+    >
+      <span class="material-icons toggle-icon">shield</span>
+      {{ 'guildSettings.branches.rosterMode.discordRoleOnly' | transloco }}
+    </button>
+  </div>
+
+  @if (isDiscordRoleMode()) {
+    <p class="field-label">{{ 'guildSettings.branches.rosterRoles.label' | transloco }}</p>
+    <p class="field-hint">{{ 'guildSettings.branches.rosterRoles.hint' | transloco }}</p>
+    <app-multi-select
+      [inputId]="'branch-' + branch().id + '-roster-roles-input'"
+      [options]="roleOptions()"
+      [placeholder]="rolesPlaceholder()"
+      [disabled]="rolesLoading() || submitting()"
+      [filterable]="true"
+      [value]="rosterRoleIds()"
+      (valueChange)="onRosterRoleIdsChange($event)"
+    />
+    @if (!canSave()) {
+      <small class="field-error">{{ 'guildSettings.branches.rosterRoles.required' | transloco }}</small>
+    }
+  }
+
+  <p class="field-label officer-roles-label">{{ 'guildSettings.branches.officerRoles.label' | transloco }}</p>
+  <p class="field-hint">{{ 'guildSettings.branches.officerRoles.hint' | transloco }}</p>
+  <app-multi-select
+    [inputId]="'branch-' + branch().id + '-officer-roles-input'"
+    [options]="roleOptions()"
+    [placeholder]="rolesPlaceholder()"
+    [disabled]="rolesLoading()"
+    [filterable]="true"
+    [value]="officerRoleIds()"
+    (valueChange)="onOfficerRoleIdsChange($event)"
+  />
+</app-form-field-card>

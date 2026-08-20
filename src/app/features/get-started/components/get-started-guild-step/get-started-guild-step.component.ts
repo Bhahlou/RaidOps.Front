@@ -7,7 +7,7 @@ import { DiscordIconComponent } from '../../../../shared/components/icons/discor
 import { ButtonComponent } from '../../../../shared/components/buttons/button/button.component';
 import { DiscordIconType } from '../../../../shared/models/discord-icon-type.enum';
 import { IconCardComponent } from '../../../../shared/components/layout/icon-card/icon-card.component';
-import { GuildSettingsFormComponent } from '../../../guilds/components/guild-settings-form/guild-settings-form.component';
+import { GuildSettingsFormComponent } from '../../../guilds/settings/components/guild-settings-form/guild-settings-form.component';
 import { LOCATION } from '../../../../core/tokens/location.token';
 import { environment } from '../../../../../environments/environment';
 

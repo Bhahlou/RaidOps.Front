@@ -1,0 +1,12 @@
+<app-form-field-card [label]="branch().branchName">
+  <p class="field-label">{{ 'guildSettings.branches.region.label' | transloco }}</p>
+  <p class="field-hint">{{ 'guildSettings.branches.region.hint' | transloco }}</p>
+  <app-select
+    [inputId]="'branch-' + branch().id + '-region'"
+    [options]="regionOptions()"
+    [value]="region()"
+    [disabled]="submitting()"
+    (valueChange)="onRegionChange($any($event))"
+    [placeholder]="'guildSettings.branches.region.placeholder' | transloco"
+  />
+</app-form-field-card>

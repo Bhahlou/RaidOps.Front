@@ -1,0 +1,32 @@
+<app-form-field-card [label]="branch().branchName">
+  <p class="field-label">{{ 'guildSettings.branches.signupMode.label' | transloco }}</p>
+  <div class="signup-mode-toggle">
+    <button
+      type="button"
+      class="toggle-btn"
+      [class.active]="signupMode() === SignupMode.DefaultPresent"
+      [disabled]="submitting()"
+      (click)="onSignupModeChange(SignupMode.DefaultPresent)"
+    >
+      <span class="material-icons toggle-icon">event_available</span>
+      {{ 'guildSettings.branches.signupMode.defaultPresent' | transloco }}
+    </button>
+    <button
+      type="button"
+      class="toggle-btn"
+      [class.active]="signupMode() === SignupMode.Signup"
+      [disabled]="submitting()"
+      (click)="onSignupModeChange(SignupMode.Signup)"
+    >
+      <span class="material-icons toggle-icon">how_to_reg</span>
+      {{ 'guildSettings.branches.signupMode.signup' | transloco }}
+    </button>
+  </div>
+
+  <dl class="signup-mode-legend">
+    <dt>{{ 'guildSettings.branches.signupMode.defaultPresent' | transloco }}</dt>
+    <dd>{{ 'guildSettings.branches.signupMode.defaultPresentDescription' | transloco }}</dd>
+    <dt>{{ 'guildSettings.branches.signupMode.signup' | transloco }}</dt>
+    <dd>{{ 'guildSettings.branches.signupMode.signupDescription' | transloco }}</dd>
+  </dl>
+</app-form-field-card>

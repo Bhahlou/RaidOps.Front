@@ -15,6 +15,8 @@ export interface GuildRosterMember {
   playerDiscordId: string;
   playerName: string | null;
   playerAvatarHash: string | null;
+  /** Server-specific avatar override, or null if the player has none set for this guild. */
+  playerGuildAvatarUrl: string | null;
   /** User-curated raid-viable specs, main spec first. Empty if none have been curated yet. */
   raidSpecs: CharacterSpec[];
   characterRank: CharacterRank;

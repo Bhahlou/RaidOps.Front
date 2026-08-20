@@ -4,7 +4,7 @@ La page **Roster** liste tous les membres de la guilde et te permet de gérer te
 
 ### Basculer entre les branches
 
-Si ta guilde a plus d'une branche WoW active (voir le guide **Paramètres - Branches**), des onglets apparaissent en haut de la page pour choisir de quelle branche afficher le roster. Une guilde avec une seule branche active ne voit pas ces onglets.
+Si ta guilde a plus d'une branche WoW active (voir l'onglet **Général** des paramètres de la guilde), des onglets apparaissent en haut de la page pour choisir de quelle branche afficher le roster. Une guilde avec une seule branche active ne voit pas ces onglets.
 
 ![Les onglets de branche](/assets/manual/fr/guild/branch-switcher-tabs.png)
 

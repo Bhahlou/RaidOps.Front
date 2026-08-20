@@ -7,4 +7,5 @@ export interface User {
   avatarHash: string | null;
   guilds: UserGuild[];
   notifications: Notification[];
+  seenChangelogEntryIds: string[];
 }

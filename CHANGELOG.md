@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.7.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.6.0...raidops-front-v1.7.0) (2026-08-20)
+
+
+### 🚀 Features
+
+* Add raid composition announcements, grouping ping, and split guild settings into Roster/Raids tabs ([#83](https://github.com/Bhahlou/RaidOps.Front/issues/83)) ([a5a9ae6](https://github.com/Bhahlou/RaidOps.Front/commit/a5a9ae64a265138e9d82df5cf0953c5bc88e40a3))
+* Add the raid signup mode UI, live board sync, and dedicated Discord channel picker ([#84](https://github.com/Bhahlou/RaidOps.Front/issues/84)) ([8feff17](https://github.com/Bhahlou/RaidOps.Front/commit/8feff17133a3078815d8702d5fea092773977e07))
+* Display per-guild Discord nickname/avatar in guild context ([#79](https://github.com/Bhahlou/RaidOps.Front/issues/79)) ([38717f4](https://github.com/Bhahlou/RaidOps.Front/commit/38717f4692eadcec355f6ff599aaabfc1db9a751))
+* Make RaidOps installable as a PWA and auto-detect new versions ([#81](https://github.com/Bhahlou/RaidOps.Front/issues/81)) ([b7a9416](https://github.com/Bhahlou/RaidOps.Front/commit/b7a9416df1d079699362d2c859aba3b44cd821ea))
+* Refresh Discord roles, guild membership, and permissions live instantly to the user in RaidOps ([#78](https://github.com/Bhahlou/RaidOps.Front/issues/78)) ([53d35be](https://github.com/Bhahlou/RaidOps.Front/commit/53d35be8bc98ccf69cf3c3c6c089cb8ebc999e46))
+* Rework the changelog into a themed epoch/category hierarchy synced across devices ([#77](https://github.com/Bhahlou/RaidOps.Front/issues/77)) ([baf36de](https://github.com/Bhahlou/RaidOps.Front/commit/baf36de791cdac33e9e37a61ccd8536223315df5))
+
+
+### 🐛 Bug Fixes
+
+* Fix acceptance deploy from silently duplicating/resurrecting content ([#75](https://github.com/Bhahlou/RaidOps.Front/issues/75)) ([29c5e48](https://github.com/Bhahlou/RaidOps.Front/commit/29c5e489ad88a70b87aad50f249eafb35cd579b9))
+* Render the real before/after detail for notification-settings audit-log entries ([#80](https://github.com/Bhahlou/RaidOps.Front/issues/80)) ([5bb411d](https://github.com/Bhahlou/RaidOps.Front/commit/5bb411d95a2abd4ef582825a4b31967c664ae0b3))
+
 ## [1.6.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.5.0...raidops-front-v1.6.0) (2026-08-03)
 
 

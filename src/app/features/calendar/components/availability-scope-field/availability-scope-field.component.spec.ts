@@ -24,6 +24,7 @@ const fakeUser: User = {
     },
   ],
   notifications: [],
+  seenChangelogEntryIds: [],
 };
 
 describe('AvailabilityScopeFieldComponent', () => {

@@ -1,0 +1,9 @@
+@if (activeBranches().length > 0) {
+  <div class="branch-settings-list">
+    @for (branch of activeBranches(); track branch.id) {
+      <app-guild-branch-raid-settings-card [guildId]="guildId()" [branch]="branch" />
+    }
+  </div>
+} @else {
+  <p class="empty-hint">{{ 'guildSettings.branches.noActiveBranches' | transloco }}</p>
+}

@@ -8,7 +8,17 @@ Discord est la colonne vertébrale de RaidOps : c'est ton identité, la liste de
 - **Les guildes RaidOps sont adossées à un serveur Discord.** Si tu es membre du serveur, RaidOps le sait automatiquement.
 - **Tes permissions découlent de tes rôles Discord** sur le serveur de la guilde. Personne n'a besoin de te les attribuer manuellement dans RaidOps — tout suit ce qui est déjà configuré côté Discord.
 
-> Tes rôles Discord sont revérifiés à chaque connexion, jamais mis en cache longtemps. Si ton rôle change sur Discord, ça se répercute automatiquement dans RaidOps dès ta prochaine connexion.
+> Tes rôles et ton appartenance aux guildes sont revérifiés en direct pendant que tu es connecté à RaidOps — voir plus bas.
+
+### Rôles et guildes à jour en direct
+
+Pas besoin de te déconnecter/reconnecter pour que Discord et RaidOps restent synchronisés : tant que tu as un onglet RaidOps ouvert, les changements suivants se répercutent automatiquement, en quelques secondes :
+
+- Un officier te donne ou te retire un rôle → tes permissions dans la guilde changent immédiatement.
+- Tu rejoins le serveur Discord d'une guilde → elle apparaît dans ton sélecteur de guilde.
+- Tu quittes ou es exclu d'un serveur → la guilde disparaît de RaidOps tout aussi vite.
+
+> Seuls les rôles et l'appartenance aux guildes sont mis à jour en direct. Ton pseudo et ton avatar Discord globaux, eux, peuvent mettre jusqu'à 15 minutes à se rafraîchir (ou instantanément si tu te reconnectes).
 
 ### Se connecter
 

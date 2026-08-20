@@ -1,7 +1,7 @@
 import { httpResource } from '@angular/common/http';
 import { computed, Service, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { GuildSettings } from '../models/guild-settings.model';
+import { GuildSettings } from '../settings/models/guild-settings.model';
 
 @Service()
 export class GuildStore {
