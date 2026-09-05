@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.7.0...raidops-front-v1.8.0) (2026-09-05)
+
+
+### 🚀 Features
+
+* Let a raid extend another raid's lockout so the same roster carries across nights ([#86](https://github.com/Bhahlou/RaidOps.Front/issues/86)) ([7d79853](https://github.com/Bhahlou/RaidOps.Front/commit/7d798531abc4f63652beb696d0a99f394b1e052f))
+
 ## [1.7.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.6.0...raidops-front-v1.7.0) (2026-08-20)
 
 
