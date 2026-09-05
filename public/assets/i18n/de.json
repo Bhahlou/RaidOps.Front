@@ -100,6 +100,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidLockoutExtension": {
+        "title": "Einen Raid über mehrere Abende verlängern",
+        "description": "Ein Raid kann jetzt als Verlängerung eines anderen markiert werden — das Ingame-Äquivalent zum Verlängern der Lockout-ID statt eine neue zu verbrauchen, z. B. um dieselbe Instanz über zwei aufeinanderfolgende Abende zu clearen. Das Feld „Verlängert das Lockout von\" im Erstellungs- oder Bearbeitungsdialog schlägt die Raids des Spielzweigs innerhalb desselben wöchentlichen Reset-Fensters vor; sobald die Verknüpfung besteht, können dieselben Charaktere beiden zugewiesen werden, ohne dass die Zuweisung als Lockout-Konflikt blockiert wird."
+      },
       "raidSignupMode": {
         "title": "Anmeldemodus: Raider melden sich selbst an, im Web oder in Discord",
         "description": "Ein Spielzweig (oder ein einzelner Ausnahme-Raid) kann seine Einstellung „Raid-Modus“ jetzt auf „Planer“ umstellen: Roster-Mitglieder antworten selbst mit Zusagen, Vielleicht oder Absagen — über die Detailseite des Raids oder ein dauerhaftes Discord-Embed mit Buttons —, live in beide Richtungen synchronisiert. Auch die Detailseite wurde komplett überarbeitet: ein vollständiger Header mit Rollenzählung und den Zonen des Raids, die eigene Antwort direkt im Blick, und die Roster-/Anmeldungsübersicht neben dem Kompositionsraster. Jeder Raid kann außerdem in seinen eigenen dedizierten Discord-Kanal posten statt in den gildeweiten."

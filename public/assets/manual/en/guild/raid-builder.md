@@ -20,6 +20,10 @@ The week shown defaults to the guild branch's actual weekly raid-lockout reset w
 
 ![Edit raid event dialog: name, schedule, grid size, and raid zones](/assets/manual/en/guild/raid-builder-edit-dialog.png)
 
+### Extending a raid across multiple nights
+
+A raid can be marked as extending another one — the in-game equivalent of extending a raid's lockout ID instead of consuming a fresh one, e.g. clearing Black Temple across two consecutive nights on the same lock. The **Extends the lockout of** field, in the create or edit dialog, offers the branch's raids within the same weekly reset window. Once linked, the same characters can be assigned to both raids without the site blocking the assignment as a lockout conflict; an **Extension of "name"** badge then shows up on the raid's detail page.
+
 ### Signup mode
 
 By default a raid runs in **Auto** mode: every roster member is assumed present unless they've declared an absence, no sign-up needed (the branch-wide default is set in [Raids settings](/manual/guild/raid-settings)). A raid can instead run in **Planner** mode — either because its branch defaults to it, or because an officer ticks "Use Signup mode for this raid" when creating a one-off exceptional raid — in which case roster members self-serve their own response (see the raid detail page below) instead of relying on their declared absences.
