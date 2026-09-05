@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -12,7 +12,8 @@ import { GuildBranchesStore } from '../../../stores/guild-branches.store';
 import { GuildStore } from '../../../stores/guild.store';
 import { RaidsService } from '../../services/raids.service';
 import { GuildSettingsService } from '../../../settings/services/guild-settings.service';
-import { RaidEventChoice, RaidEventPayload } from '../../models/raid-event.model';
+import { RaidEventPayload } from '../../models/raid-event.model';
+import { resetStaleExtendsRaidEventId, watchRaidEventChoices } from '../../utils/raid-event-choices.util';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { DiscordChannel } from '../../../../../shared/models/discord-channel.model';
 import { DiscordCategory } from '../../../../../shared/models/discord-category.model';
@@ -59,12 +60,8 @@ export class CreateRaidEventDialogComponent {
    * lock carried across 2 raid nights), or `null` for a standalone event, the common case.
    */
   readonly extendsRaidEventId = signal<number | null>(null);
-  /**
-   * Scoped to the lockout window around `startsAtLocal` (re-fetched whenever it changes) and
-   * independent of the board's currently loaded range — see `RaidsService.getEventChoices`. Empty
-   * until a start date is set, since there's no window to scope the pick-list to yet.
-   */
-  readonly #raidEventChoices = signal<RaidEventChoice[]>([]);
+  /** See `watchRaidEventChoices` — independent of the board's currently loaded range. */
+  readonly #raidEventChoices = watchRaidEventChoices(this.#raidsService, this.data.guildId, this.data.guildBranchId, this.startsAtLocal);
   readonly extendCandidates = computed<SelectOption<number>[]>(() => {
     this.#transloco.activeLang(); // depend on language changes so labels stay in sync
     const lang = this.#transloco.getActiveLang();
@@ -120,26 +117,7 @@ export class CreateRaidEventDialogComponent {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
     this.#branchesStore.load(this.data.guildId);
     this.#guildStore.loadSettings(this.data.guildId);
-    effect(() => {
-      const startsAtLocal = this.startsAtLocal();
-      if (!startsAtLocal) {
-        this.#raidEventChoices.set([]);
-        return;
-      }
-      const aroundStartsAtUtc = new Date(startsAtLocal).toISOString();
-      this.#raidsService
-        .getEventChoices(this.data.guildId, this.data.guildBranchId, aroundStartsAtUtc)
-        .subscribe((choices) => this.#raidEventChoices.set(choices));
-    });
-    // A previously-picked target can fall out of the window after a later date change — CdkListbox
-    // throws (breaking the overlay's own positioning) if `value` ever points at a missing option.
-    effect(() => {
-      const candidates = this.extendCandidates();
-      const current = this.extendsRaidEventId();
-      if (current !== null && !candidates.some((o) => o.value === current)) {
-        this.extendsRaidEventId.set(null);
-      }
-    });
+    resetStaleExtendsRaidEventId(this.extendCandidates, this.extendsRaidEventId);
     this.#guildSettingsService.getNotificationChannels(this.data.guildId).subscribe((channels) => this.channels.set(channels));
     this.#guildSettingsService.getCategories(this.data.guildId).subscribe((result) => {
       this.canCreateRootChannel.set(result.canCreateRootChannel);

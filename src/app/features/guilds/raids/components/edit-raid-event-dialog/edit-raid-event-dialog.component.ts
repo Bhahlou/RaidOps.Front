@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { firstValueFrom } from 'rxjs';
@@ -12,7 +12,7 @@ import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { GuildStore } from '../../../stores/guild.store';
 import { RaidsService } from '../../services/raids.service';
 import { GuildSettingsService } from '../../../settings/services/guild-settings.service';
-import { RaidEvent, RaidEventChoice, RaidEventPayload } from '../../models/raid-event.model';
+import { RaidEvent, RaidEventPayload } from '../../models/raid-event.model';
 import { RaidEventStatus } from '../../models/raid-event-status.enum';
 import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { SignupMode } from '../../models/signup-mode.enum';
@@ -20,6 +20,7 @@ import { DiscordChannel } from '../../../../../shared/models/discord-channel.mod
 import { DiscordCategory } from '../../../../../shared/models/discord-category.model';
 import { raidErrorKey } from '../../utils/raid-error-key.util';
 import { submitRaidDialogRequest } from '../../utils/dialog-submit.util';
+import { resetStaleExtendsRaidEventId, watchRaidEventChoices } from '../../utils/raid-event-choices.util';
 import { RaidZoneFieldComponent } from '../raid-zone-field/raid-zone-field.component';
 import { RaidChannelFieldComponent, RaidChannelMode } from '../raid-channel-field/raid-channel-field.component';
 
@@ -73,11 +74,8 @@ export class EditRaidEventDialogComponent {
 
   /** See `CreateRaidEventDialogComponent.extendsRaidEventId` — same field, editable after creation too. */
   readonly extendsRaidEventId = signal<number | null>(this.data.event.extendsRaidEventId);
-  /**
-   * Scoped to the lockout window around `startsAtLocal` (re-fetched whenever it changes) and
-   * independent of the board's currently loaded range/single-event mode — see `RaidsService.getEventChoices`.
-   */
-  readonly #raidEventChoices = signal<RaidEventChoice[]>([]);
+  /** See `watchRaidEventChoices` — independent of the board's currently loaded range/single-event mode. */
+  readonly #raidEventChoices = watchRaidEventChoices(this.#raidsService, this.data.guildId, this.data.guildBranchId, this.startsAtLocal);
   /**
    * Candidates exclude this event itself and any of its own descendants (an event that already
    * extends this one, directly or via the flattened chain) — picking either would hit the back
@@ -145,27 +143,7 @@ export class EditRaidEventDialogComponent {
 
   constructor() {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
-    effect(() => {
-      const startsAtLocal = this.startsAtLocal();
-      if (!startsAtLocal) {
-        this.#raidEventChoices.set([]);
-        return;
-      }
-      const aroundStartsAtUtc = new Date(startsAtLocal).toISOString();
-      this.#raidsService
-        .getEventChoices(this.data.guildId, this.data.guildBranchId, aroundStartsAtUtc)
-        .subscribe((choices) => this.#raidEventChoices.set(choices));
-    });
-    // A freshly-picked target (not the original one `extendCandidates` always guarantees a slot
-    // for) can fall out of the window after a later date change — CdkListbox throws (breaking the
-    // overlay's own positioning) if `value` ever points at a missing option.
-    effect(() => {
-      const candidates = this.extendCandidates();
-      const current = this.extendsRaidEventId();
-      if (current !== null && !candidates.some((o) => o.value === current)) {
-        this.extendsRaidEventId.set(null);
-      }
-    });
+    resetStaleExtendsRaidEventId(this.extendCandidates, this.extendsRaidEventId);
     if (this.showChannelField) {
       this.#guildStore.loadSettings(this.data.guildId);
       this.#guildSettingsService.getNotificationChannels(this.data.guildId).subscribe((channels) => this.channels.set(channels));
