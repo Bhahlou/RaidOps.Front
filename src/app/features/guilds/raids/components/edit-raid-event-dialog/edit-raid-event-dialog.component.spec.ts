@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
 import { EditRaidEventDialogComponent, EditRaidEventDialogData } from './edit-raid-event-dialog.component';
@@ -42,6 +43,7 @@ const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment
   availabilityStatus: DayAvailabilityStatus.Available,
   spec: { id: 1, name: 'Fury', iconUrl: null },
   availableSpecs: [],
+  signupStatus: null,
   ...overrides,
 });
 
@@ -61,8 +63,13 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   assignments: [],
   ineligiblePlayerDiscordIds: [],
   mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
   dedicatedAnnouncementChannelId: null,
   dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 
@@ -70,11 +77,12 @@ describe('EditRaidEventDialogComponent', () => {
   let boardStore: { updateEvent: ReturnType<typeof vi.fn>; publishEvent: ReturnType<typeof vi.fn>; deleteEvent: ReturnType<typeof vi.fn> };
   let zoneStore: { zones: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn> };
   let guildStore: { settings: ReturnType<typeof signal>; loadSettings: ReturnType<typeof vi.fn> };
-  let raidsService: { createAnnouncementChannel: ReturnType<typeof vi.fn> };
+  let raidsService: { createAnnouncementChannel: ReturnType<typeof vi.fn>; getEventChoices: ReturnType<typeof vi.fn> };
   let guildSettingsService: { getNotificationChannels: ReturnType<typeof vi.fn>; getCategories: ReturnType<typeof vi.fn> };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialogRef: { close: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
+  let transloco: { getActiveLang: ReturnType<typeof vi.fn>; activeLang: ReturnType<typeof signal>; translate: ReturnType<typeof vi.fn> };
 
   const setup = (event: RaidEvent, confirmed = true) => {
     boardStore = {
@@ -84,7 +92,10 @@ describe('EditRaidEventDialogComponent', () => {
     };
     zoneStore = { zones: signal([zone()]), load: vi.fn() };
     guildStore = { settings: signal({ language: 'en' }), loadSettings: vi.fn() };
-    raidsService = { createAnnouncementChannel: vi.fn().mockReturnValue(of({ body: { id: 'c-new', name: 'raid-name', missingPermissions: [], categoryName: null } })) };
+    raidsService = {
+      createAnnouncementChannel: vi.fn().mockReturnValue(of({ body: { id: 'c-new', name: 'raid-name', missingPermissions: [], categoryName: null } })),
+      getEventChoices: vi.fn().mockReturnValue(of([])),
+    };
     guildSettingsService = {
       getNotificationChannels: vi.fn().mockReturnValue(of([])),
       getCategories: vi.fn().mockReturnValue(of({ canCreateRootChannel: true, categories: [] })),
@@ -92,6 +103,11 @@ describe('EditRaidEventDialogComponent', () => {
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialogRef = { close: vi.fn() };
     dialog = { open: vi.fn().mockReturnValue({ closed: of(confirmed) }) };
+    transloco = {
+      getActiveLang: vi.fn(() => 'en-US'),
+      activeLang: signal('en-US'),
+      translate: vi.fn((key: string) => key),
+    };
 
     const data: EditRaidEventDialogData = { guildId: 'g1', guildBranchId: 7, event };
 
@@ -107,6 +123,7 @@ describe('EditRaidEventDialogComponent', () => {
         { provide: DIALOG_DATA, useValue: data },
         { provide: DialogRef, useValue: dialogRef },
         { provide: Dialog, useValue: dialog },
+        { provide: TranslocoService, useValue: transloco },
       ],
     }).overrideComponent(EditRaidEventDialogComponent, { set: { template: '', imports: [] } });
 
@@ -152,6 +169,97 @@ describe('EditRaidEventDialogComponent', () => {
 
     it('flags isDraft false for a Published event', () => {
       expect(setup(raidEvent({ publicationStatus: RaidPublicationStatus.Published })).isDraft).toBe(false);
+    });
+  });
+
+  // ── extendCandidates ─────────────────────────────────────────────────────
+
+  describe('extendCandidates', () => {
+    it("fetches choices scoped to the event's own start date on construction", () => {
+      setup(raidEvent({ startsAtUtc: '2026-08-05T21:00:00Z' }));
+      TestBed.tick();
+
+      expect(raidsService.getEventChoices).toHaveBeenCalledWith('g1', 7, new Date('2026-08-05T21:00:00Z').toISOString());
+    });
+
+    it('excludes itself and its own descendants from the candidates', () => {
+      const component = setup(raidEvent({ id: 1 }));
+      raidsService.getEventChoices.mockReturnValue(
+        of([
+          { id: 1, name: 'Self', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null },
+          { id: 2, name: 'Descendant', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: 1 },
+          { id: 3, name: 'Unrelated', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null },
+        ]),
+      );
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      expect(component.extendCandidates().map((o) => o.value)).toEqual([3]);
+    });
+
+    it("keeps the current target selectable even when it's missing from the fresh fetch", () => {
+      const component = setup(raidEvent({ id: 1, extendsRaidEventId: 99, extendsRaidEventName: 'Old Raid' }));
+      raidsService.getEventChoices.mockReturnValue(of([{ id: 3, name: 'Unrelated', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      expect(component.extendCandidates()).toContainEqual({ value: 99, label: 'Old Raid' });
+    });
+
+    it('falls back to a bare id label for the current target when it has no name', () => {
+      const component = setup(raidEvent({ id: 1, extendsRaidEventId: 99, extendsRaidEventName: null }));
+      raidsService.getEventChoices.mockReturnValue(of([]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      expect(component.extendCandidates()).toContainEqual({ value: 99, label: '#99' });
+    });
+
+    it('clears the candidates if the start date is cleared', () => {
+      const component = setup(raidEvent({ id: 1 }));
+      raidsService.getEventChoices.mockReturnValue(of([{ id: 3, name: 'Unrelated', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+      expect(component.extendCandidates().length).toBe(1);
+
+      component.startsAtLocal.set('');
+      TestBed.tick();
+
+      expect(component.extendCandidates()).toEqual([]);
+    });
+
+    it('does not duplicate the current target when the fresh fetch already includes it', () => {
+      const component = setup(raidEvent({ id: 1, extendsRaidEventId: 99, extendsRaidEventName: 'Old Raid' }));
+      raidsService.getEventChoices.mockReturnValue(of([{ id: 99, name: 'Old Raid', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      expect(component.extendCandidates().filter((o) => o.value === 99)).toHaveLength(1);
+    });
+  });
+
+  // ── stale extendsRaidEventId reset ───────────────────────────────────────
+
+  describe('extendsRaidEventId reset', () => {
+    it('leaves the selection untouched while it still matches a candidate', () => {
+      const component = setup(raidEvent({ id: 1 }));
+      raidsService.getEventChoices.mockReturnValue(of([{ id: 5, name: 'Split 1', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      component.extendsRaidEventId.set(5);
+      TestBed.tick();
+
+      expect(component.extendsRaidEventId()).toBe(5);
+    });
+
+    it('resets the selection to null once it no longer matches any candidate', () => {
+      const component = setup(raidEvent({ id: 1 }));
+      component.extendsRaidEventId.set(999);
+
+      TestBed.tick();
+
+      expect(component.extendsRaidEventId()).toBeNull();
     });
   });
 

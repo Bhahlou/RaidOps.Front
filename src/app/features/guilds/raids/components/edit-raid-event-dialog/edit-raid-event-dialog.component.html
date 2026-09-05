@@ -69,6 +69,17 @@
 
   <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" [disabled]="isReadOnly" />
 
+  <div class="field-group">
+    <label class="field-label" for="edit-event-extends">{{ 'raidBuilder.eventDialog.extendsRaidEvent' | transloco }}</label>
+    <app-select
+      inputId="edit-event-extends"
+      [options]="extendCandidates()"
+      [placeholder]="'raidBuilder.eventDialog.extendsRaidEventPlaceholder' | transloco"
+      [disabled]="isReadOnly"
+      [(value)]="extendsRaidEventId"
+    />
+  </div>
+
   @if (showChannelField) {
     <app-raid-channel-field
       [channels]="channels()"

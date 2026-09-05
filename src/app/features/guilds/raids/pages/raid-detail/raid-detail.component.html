@@ -10,6 +10,9 @@
           @if (event.publicationStatus !== PublicationStatus.Published) {
             <span class="detail-header-draft-badge">{{ 'raidBuilder.draft' | transloco }}</span>
           }
+          @if (event.extendsRaidEventName; as extendsName) {
+            <span class="detail-header-extension-badge">{{ 'raidBuilder.extensionBadge' | transloco: { name: extendsName } }}</span>
+          }
         </div>
         @if (isOfficer()) {
           <div class="detail-header-actions">

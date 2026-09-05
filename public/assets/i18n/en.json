@@ -100,6 +100,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidLockoutExtension": {
+        "title": "Extend a raid across multiple nights",
+        "description": "A raid can now be marked as extending another one — the in-game equivalent of extending a raid's lockout ID instead of consuming a fresh one, e.g. clearing the same instance across two consecutive nights. The \"Extends the lockout of\" field, in the create or edit dialog, offers the branch's raids within the same weekly reset window; once linked, the same characters can be assigned to both without the site blocking it as a lockout conflict."
+      },
       "raidSignupMode": {
         "title": "Signup mode: raiders RSVP themselves, on the web or in Discord",
         "description": "A branch (or a single exceptional raid) can now switch its \"Raid mode\" setting to \"Planner\": roster members respond Accept, Tentative, or Decline themselves — from the raid's detail page, or a standing Discord embed with buttons — kept in sync live either way. That detail page also got a full rework: a proper header with role counts and the raid's zones, your own response front and center, and the roster/signups breakdown sitting next to the composition grid. Any raid can also post to its own dedicated Discord channel instead of the guild-wide one."
@@ -863,6 +867,7 @@
     "previousRange": "Previous range",
     "nextRange": "Next range",
     "draft": "Draft",
+    "extensionBadge": "Extension of \"{{name}}\"",
     "publish": "Publish",
     "publishConfirm": "\"{{name}}\" will become visible to every roster member. This can't be undone.",
     "board": {
@@ -981,6 +986,8 @@
       "editTitle": "Edit raid event",
       "name": "Name",
       "startsAt": "Starts at",
+      "extendsRaidEvent": "Extends the lockout of",
+      "extendsRaidEventPlaceholder": "None — standalone raid",
       "createSuccess": "Raid event created.",
       "saveSuccess": "Raid event saved.",
       "readOnlyCompleted": "This event is completed and can no longer be edited.",

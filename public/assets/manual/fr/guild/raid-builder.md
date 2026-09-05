@@ -20,6 +20,10 @@ La semaine affichée par défaut correspond à la fenêtre de reset hebdomadaire
 
 ![Boîte de dialogue d'édition d'un raid : nom, horaire, taille de grille et zones](/assets/manual/fr/guild/raid-builder-edit-dialog.png)
 
+### Suite d'un raid sur plusieurs soirs
+
+Un raid peut être marqué comme la suite d'un autre — l'équivalent en jeu d'étendre l'ID d'un raid plutôt que d'en consommer un nouveau, par exemple pour cleaner Black Temple sur deux soirées consécutives avec le même lock. Le champ **Suite de**, dans la boîte de dialogue de création ou d'édition, propose les raids de la branche dans la même fenêtre de reset hebdomadaire. Une fois le lien posé, les mêmes personnages peuvent être assignés aux deux raids sans que le site ne bloque l'assignation pour conflit de verrouillage ; un badge **Suite de « nom »** apparaît alors sur la page de détail du raid concerné.
+
 ### Mode d'inscription
 
 Par défaut, un raid tourne en mode **Auto** : tout membre du roster est considéré présent sauf s'il a déclaré une absence, aucune inscription n'est nécessaire (le réglage par défaut de la branche se configure dans les [paramètres Raids](/manual/guild/raid-settings)). Un raid peut à la place tourner en mode **Planificateur** — soit parce que sa branche l'a comme défaut, soit parce qu'un officier coche « Utiliser le mode inscription pour ce raid » en créant un raid exceptionnel ponctuel — auquel cas les membres du roster s'inscrivent eux-mêmes (voir la page de détail du raid ci-dessous) plutôt que de se baser sur leurs absences déclarées.

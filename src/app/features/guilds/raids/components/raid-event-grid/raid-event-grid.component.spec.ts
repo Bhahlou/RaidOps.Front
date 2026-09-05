@@ -25,6 +25,7 @@ const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment
   availabilityStatus: DayAvailabilityStatus.Available,
   spec: { id: 1, name: 'Fury', iconUrl: null },
   availableSpecs: [],
+  signupStatus: null,
   ...overrides,
 });
 
@@ -44,8 +45,13 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   assignments: [],
   ineligiblePlayerDiscordIds: [],
   mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
+  acceptedCharacterIdsByPlayerDiscordId: {},
   dedicatedAnnouncementChannelId: null,
   dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 
