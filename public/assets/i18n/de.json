@@ -863,6 +863,7 @@
     "previousRange": "Vorheriger Zeitraum",
     "nextRange": "Nächster Zeitraum",
     "draft": "Entwurf",
+    "extensionBadge": "Verlängerung von „{{name}}“",
     "publish": "Veröffentlichen",
     "publishConfirm": "„{{name}}“ wird für alle Rostermitglieder sichtbar. Dies kann nicht rückgängig gemacht werden.",
     "board": {
@@ -981,6 +982,8 @@
       "editTitle": "Raid bearbeiten",
       "name": "Name",
       "startsAt": "Beginnt am",
+      "extendsRaidEvent": "Verlängert das Lockout von",
+      "extendsRaidEventPlaceholder": "Keine — eigenständiger Raid",
       "createSuccess": "Raid erstellt.",
       "saveSuccess": "Raid gespeichert.",
       "readOnlyCompleted": "Dieser Raid ist abgeschlossen und kann nicht mehr bearbeitet werden.",

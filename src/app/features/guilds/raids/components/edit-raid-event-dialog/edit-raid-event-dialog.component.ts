@@ -1,17 +1,18 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { firstValueFrom } from 'rxjs';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../../shared/components/buttons/button/button.component';
 import { ConfirmDialogComponent } from '../../../../../shared/components/dialogs/confirm-dialog/confirm-dialog.component';
+import { SelectComponent, SelectOption } from '../../../../../shared/components/form/select/select.component';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
 import { GuildStore } from '../../../stores/guild.store';
 import { RaidsService } from '../../services/raids.service';
 import { GuildSettingsService } from '../../../settings/services/guild-settings.service';
-import { RaidEvent, RaidEventPayload } from '../../models/raid-event.model';
+import { RaidEvent, RaidEventChoice, RaidEventPayload } from '../../models/raid-event.model';
 import { RaidEventStatus } from '../../models/raid-event-status.enum';
 import { RaidPublicationStatus } from '../../models/raid-publication-status.enum';
 import { SignupMode } from '../../models/signup-mode.enum';
@@ -40,7 +41,7 @@ export interface EditRaidEventDialogData {
 @Component({
   selector: 'app-edit-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, RaidZoneFieldComponent, RaidChannelFieldComponent],
+  imports: [TranslocoPipe, ButtonComponent, SelectComponent, RaidZoneFieldComponent, RaidChannelFieldComponent],
   templateUrl: './edit-raid-event-dialog.component.html',
   styleUrl: './edit-raid-event-dialog.component.scss',
 })
@@ -53,6 +54,7 @@ export class EditRaidEventDialogComponent {
   readonly #guildSettingsService = inject(GuildSettingsService);
   readonly #snackbar = inject(SnackbarService);
   readonly #dialog = inject(Dialog);
+  readonly #transloco = inject(TranslocoService);
   readonly data = inject<EditRaidEventDialogData>(DIALOG_DATA);
 
   readonly Publication = RaidPublicationStatus;
@@ -68,6 +70,46 @@ export class EditRaidEventDialogComponent {
   readonly groupCount = signal(this.data.event.groupCount);
   readonly slotsPerGroup = signal(this.data.event.slotsPerGroup);
   readonly selectedZoneIds = signal<Set<number>>(new Set(this.data.event.raidZones.map((z) => z.id)));
+
+  /** See `CreateRaidEventDialogComponent.extendsRaidEventId` — same field, editable after creation too. */
+  readonly extendsRaidEventId = signal<number | null>(this.data.event.extendsRaidEventId);
+  /**
+   * Scoped to the lockout window around `startsAtLocal` (re-fetched whenever it changes) and
+   * independent of the board's currently loaded range/single-event mode — see `RaidsService.getEventChoices`.
+   */
+  readonly #raidEventChoices = signal<RaidEventChoice[]>([]);
+  /**
+   * Candidates exclude this event itself and any of its own descendants (an event that already
+   * extends this one, directly or via the flattened chain) — picking either would hit the back
+   * end's cycle guard. Deliberately does NOT exclude this event's current target: comparing against
+   * `this.data.event.id` (not that target's own group key) keeps it selectable, so re-saving the
+   * same link — or seeing it in the list at all — doesn't leave `extendsRaidEventId` pointing at a
+   * value absent from `options`, which throws inside CdkListbox and breaks the overlay entirely.
+   */
+  readonly extendCandidates = computed<SelectOption<number>[]>(() => {
+    this.#transloco.activeLang(); // depend on language changes so labels stay in sync
+    const lang = this.#transloco.getActiveLang();
+    const dayFormatter = new Intl.DateTimeFormat(lang, { weekday: 'short', day: '2-digit', month: '2-digit' });
+    const timeFormatter = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
+    const myId = this.data.event.id;
+    const options = this.#raidEventChoices()
+      .filter((e) => e.id !== myId && (e.extendsRaidEventId ?? e.id) !== myId)
+      .map((e) => {
+        const date = new Date(e.startsAtLocal);
+        return { value: e.id, label: `${e.name} — ${dayFormatter.format(date)} ${timeFormatter.format(date)}` };
+      });
+
+    // Guarantees the currently-linked target is always a selectable option, even if a later date
+    // edit moves it outside the freshly re-fetched lockout window — CdkListbox throws (and takes
+    // the whole overlay's positioning down with it) if `value` ever points at something missing
+    // from `options`.
+    const { extendsRaidEventId: currentTargetId, extendsRaidEventName: currentTargetName } = this.data.event;
+    if (currentTargetId != null && !options.some((o) => o.value === currentTargetId)) {
+      options.unshift({ value: currentTargetId, label: currentTargetName ?? `#${currentTargetId}` });
+    }
+
+    return options;
+  });
 
   readonly guildLanguage = computed(() => this.#guildStore.settings()?.language ?? 'en');
   readonly channels = signal<DiscordChannel[]>([]);
@@ -103,6 +145,27 @@ export class EditRaidEventDialogComponent {
 
   constructor() {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
+    effect(() => {
+      const startsAtLocal = this.startsAtLocal();
+      if (!startsAtLocal) {
+        this.#raidEventChoices.set([]);
+        return;
+      }
+      const aroundStartsAtUtc = new Date(startsAtLocal).toISOString();
+      this.#raidsService
+        .getEventChoices(this.data.guildId, this.data.guildBranchId, aroundStartsAtUtc)
+        .subscribe((choices) => this.#raidEventChoices.set(choices));
+    });
+    // A freshly-picked target (not the original one `extendCandidates` always guarantees a slot
+    // for) can fall out of the window after a later date change — CdkListbox throws (breaking the
+    // overlay's own positioning) if `value` ever points at a missing option.
+    effect(() => {
+      const candidates = this.extendCandidates();
+      const current = this.extendsRaidEventId();
+      if (current !== null && !candidates.some((o) => o.value === current)) {
+        this.extendsRaidEventId.set(null);
+      }
+    });
     if (this.showChannelField) {
       this.#guildStore.loadSettings(this.data.guildId);
       this.#guildSettingsService.getNotificationChannels(this.data.guildId).subscribe((channels) => this.channels.set(channels));
@@ -151,6 +214,7 @@ export class EditRaidEventDialogComponent {
       slotsPerGroup: this.slotsPerGroup(),
       signupMode: this.data.event.signupMode,
       raidZoneIds: [...this.selectedZoneIds()],
+      extendsRaidEventId: this.extendsRaidEventId(),
       dedicatedAnnouncementChannelId: this.showChannelField ? this.selectedChannelId() : null,
       dedicatedAnnouncementChannelIsBotOwned,
     };

@@ -21,6 +21,7 @@ const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment
   availabilityStatus: DayAvailabilityStatus.Available,
   spec: { id: 1, name: 'Fury', iconUrl: null },
   availableSpecs: [{ id: 1, name: 'Fury', iconUrl: null }],
+  signupStatus: null,
   ...overrides,
 });
 

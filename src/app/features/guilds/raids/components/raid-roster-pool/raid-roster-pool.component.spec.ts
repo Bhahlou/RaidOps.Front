@@ -49,9 +49,13 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   assignments: [],
   ineligiblePlayerDiscordIds: [],
   mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
   acceptedCharacterIdsByPlayerDiscordId: {},
   dedicatedAnnouncementChannelId: null,
   dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 

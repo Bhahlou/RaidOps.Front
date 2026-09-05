@@ -46,6 +46,8 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   acceptedCharacterIdsByPlayerDiscordId: {},
   dedicatedAnnouncementChannelId: null,
   dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 

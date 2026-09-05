@@ -57,6 +57,16 @@
   background: var(--color-accent);
 }
 
+// Informational, not a call to action like the draft badge — an outlined chip instead of a filled one.
+.detail-header-extension-badge {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
 .detail-header-datetime {
   font-size: 0.95rem;
   font-weight: 600;

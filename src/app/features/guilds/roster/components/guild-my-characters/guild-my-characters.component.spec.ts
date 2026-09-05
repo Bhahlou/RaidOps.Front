@@ -29,7 +29,7 @@ const makeChar = (id: number, overrides: Partial<Character> = {}): Character => 
 
 const makeBranch = (overrides: Partial<GuildBranch> = {}): GuildBranch => ({
   id: 1, branchId: 1, branchName: 'Classic Anniversary', isActive: true,
-  rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [], region: null,
+  rosterMode: RosterMode.Open, rosterRoleIds: [], officerRoleIds: [], region: null, signupMode: null,
   ...overrides,
 });
 

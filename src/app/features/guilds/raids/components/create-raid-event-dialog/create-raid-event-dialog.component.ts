@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { firstValueFrom } from 'rxjs';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../../shared/components/buttons/button/button.component';
 import { CheckboxComponent } from '../../../../../shared/components/form/checkbox/checkbox.component';
+import { SelectComponent, SelectOption } from '../../../../../shared/components/form/select/select.component';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidZoneStore } from '../../stores/raid-zone.store';
@@ -11,7 +12,7 @@ import { GuildBranchesStore } from '../../../stores/guild-branches.store';
 import { GuildStore } from '../../../stores/guild.store';
 import { RaidsService } from '../../services/raids.service';
 import { GuildSettingsService } from '../../../settings/services/guild-settings.service';
-import { RaidEventPayload } from '../../models/raid-event.model';
+import { RaidEventChoice, RaidEventPayload } from '../../models/raid-event.model';
 import { SignupMode } from '../../models/signup-mode.enum';
 import { DiscordChannel } from '../../../../../shared/models/discord-channel.model';
 import { DiscordCategory } from '../../../../../shared/models/discord-category.model';
@@ -28,7 +29,7 @@ export interface CreateRaidEventDialogData {
 @Component({
   selector: 'app-create-raid-event-dialog',
   standalone: true,
-  imports: [TranslocoPipe, ButtonComponent, CheckboxComponent, RaidZoneFieldComponent, RaidChannelFieldComponent],
+  imports: [TranslocoPipe, ButtonComponent, CheckboxComponent, SelectComponent, RaidZoneFieldComponent, RaidChannelFieldComponent],
   templateUrl: './create-raid-event-dialog.component.html',
   styleUrl: './create-raid-event-dialog.component.scss',
 })
@@ -41,6 +42,7 @@ export class CreateRaidEventDialogComponent {
   readonly #raidsService = inject(RaidsService);
   readonly #guildSettingsService = inject(GuildSettingsService);
   readonly #snackbar = inject(SnackbarService);
+  readonly #transloco = inject(TranslocoService);
   readonly data = inject<CreateRaidEventDialogData>(DIALOG_DATA);
 
   readonly zones = this.#zoneStore.zones;
@@ -51,6 +53,28 @@ export class CreateRaidEventDialogComponent {
   readonly groupCount = signal(5);
   readonly slotsPerGroup = signal(5);
   readonly selectedZoneIds = signal<Set<number>>(new Set());
+
+  /**
+   * Raid event this one extends the lockout of (a WoW "ID extension" — e.g. the same Black Temple
+   * lock carried across 2 raid nights), or `null` for a standalone event, the common case.
+   */
+  readonly extendsRaidEventId = signal<number | null>(null);
+  /**
+   * Scoped to the lockout window around `startsAtLocal` (re-fetched whenever it changes) and
+   * independent of the board's currently loaded range — see `RaidsService.getEventChoices`. Empty
+   * until a start date is set, since there's no window to scope the pick-list to yet.
+   */
+  readonly #raidEventChoices = signal<RaidEventChoice[]>([]);
+  readonly extendCandidates = computed<SelectOption<number>[]>(() => {
+    this.#transloco.activeLang(); // depend on language changes so labels stay in sync
+    const lang = this.#transloco.getActiveLang();
+    const dayFormatter = new Intl.DateTimeFormat(lang, { weekday: 'short', day: '2-digit', month: '2-digit' });
+    const timeFormatter = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
+    return this.#raidEventChoices().map((e) => {
+      const date = new Date(e.startsAtLocal);
+      return { value: e.id, label: `${e.name} — ${dayFormatter.format(date)} ${timeFormatter.format(date)}` };
+    });
+  });
 
   /** The branch's configured default — the Signup-mode checkbox only makes sense to offer when this is DefaultPresent. */
   readonly branchDefaultSignupMode = computed<SignupMode>(() => {
@@ -96,6 +120,26 @@ export class CreateRaidEventDialogComponent {
     this.#zoneStore.load(this.data.guildId, this.data.guildBranchId);
     this.#branchesStore.load(this.data.guildId);
     this.#guildStore.loadSettings(this.data.guildId);
+    effect(() => {
+      const startsAtLocal = this.startsAtLocal();
+      if (!startsAtLocal) {
+        this.#raidEventChoices.set([]);
+        return;
+      }
+      const aroundStartsAtUtc = new Date(startsAtLocal).toISOString();
+      this.#raidsService
+        .getEventChoices(this.data.guildId, this.data.guildBranchId, aroundStartsAtUtc)
+        .subscribe((choices) => this.#raidEventChoices.set(choices));
+    });
+    // A previously-picked target can fall out of the window after a later date change — CdkListbox
+    // throws (breaking the overlay's own positioning) if `value` ever points at a missing option.
+    effect(() => {
+      const candidates = this.extendCandidates();
+      const current = this.extendsRaidEventId();
+      if (current !== null && !candidates.some((o) => o.value === current)) {
+        this.extendsRaidEventId.set(null);
+      }
+    });
     this.#guildSettingsService.getNotificationChannels(this.data.guildId).subscribe((channels) => this.channels.set(channels));
     this.#guildSettingsService.getCategories(this.data.guildId).subscribe((result) => {
       this.canCreateRootChannel.set(result.canCreateRootChannel);
@@ -134,6 +178,7 @@ export class CreateRaidEventDialogComponent {
       slotsPerGroup: this.slotsPerGroup(),
       signupMode: SignupMode.DefaultPresent,
       raidZoneIds: [...this.selectedZoneIds()],
+      extendsRaidEventId: this.extendsRaidEventId(),
       signupModeOverride: this.showSignupOverride() && this.signupOverride() ? SignupMode.Signup : null,
       dedicatedAnnouncementChannelId: this.isSignupMode() ? this.selectedChannelId() : null,
       dedicatedAnnouncementChannelIsBotOwned: this.isSignupMode() && this.channelMode() === 'new',

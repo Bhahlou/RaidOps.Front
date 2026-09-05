@@ -863,6 +863,7 @@
     "previousRange": "Période précédente",
     "nextRange": "Période suivante",
     "draft": "Brouillon",
+    "extensionBadge": "Suite de « {{name}} »",
     "publish": "Publier",
     "publishConfirm": "« {{name}} » deviendra visible pour tous les membres du roster. Cette action est irréversible.",
     "board": {
@@ -981,6 +982,8 @@
       "editTitle": "Modifier le raid",
       "name": "Nom",
       "startsAt": "Débute à",
+      "extendsRaidEvent": "Suite de",
+      "extendsRaidEventPlaceholder": "Aucun — raid indépendant",
       "createSuccess": "Raid créé.",
       "saveSuccess": "Raid enregistré.",
       "readOnlyCompleted": "Ce raid est terminé et ne peut plus être modifié.",

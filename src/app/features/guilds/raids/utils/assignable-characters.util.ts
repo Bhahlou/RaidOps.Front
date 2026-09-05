@@ -14,18 +14,26 @@ export interface AssignableCharacter {
  * Character ID → set of other event IDs it's already locked to via a shared target zone with
  * `event` (the board only ever loads one lockout week at a time, so any other loaded event is, in
  * practice, within the same lockout window — an accurate stand-in for the back end's full per-zone
- * cadence/anchor comparison without duplicating that math here). Keyed per-event (not just a flat
- * ID set) so the grid's drag-blocking highlight can tell a genuine second-lockout conflict apart
- * from a same-zone *move*: dragging a character straight out of the one event that's locking it
- * clears the lock, so that specific drag should read as relocating them, not duplicating them.
+ * cadence/anchor comparison without duplicating that math here), except events in the same
+ * extension chain (`extendsRaidEventId`) — sharing the window across those is intentional, mirrors
+ * the back end's own exemption. Keyed per-event (not just a flat ID set) so the grid's
+ * drag-blocking highlight can tell a genuine second-lockout conflict apart from a same-zone *move*:
+ * dragging a character straight out of the one event that's locking it clears the lock, so that
+ * specific drag should read as relocating them, not duplicating them.
  */
 export type LockedCharacterEventIds = ReadonlyMap<number, ReadonlySet<number>>;
 
+/** The event's own extension-chain identity — two events share a chain when this value matches. */
+function extensionGroupKey(event: RaidEvent): number {
+  return event.extendsRaidEventId ?? event.id;
+}
+
 export function lockedCharacterEventIdsFor(event: RaidEvent, otherEvents: RaidEvent[]): LockedCharacterEventIds {
   const eventZoneIds = new Set(event.raidZones.map((z) => z.id));
+  const eventGroupKey = extensionGroupKey(event);
   const result = new Map<number, Set<number>>();
   for (const other of otherEvents) {
-    if (other.id === event.id || !other.raidZones.some((z) => eventZoneIds.has(z.id))) continue;
+    if (other.id === event.id || extensionGroupKey(other) === eventGroupKey || !other.raidZones.some((z) => eventZoneIds.has(z.id))) continue;
     for (const assignment of other.assignments) {
       const lockingEventIds = result.get(assignment.characterId) ?? new Set<number>();
       lockingEventIds.add(other.id);

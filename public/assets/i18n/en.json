@@ -863,6 +863,7 @@
     "previousRange": "Previous range",
     "nextRange": "Next range",
     "draft": "Draft",
+    "extensionBadge": "Extension of \"{{name}}\"",
     "publish": "Publish",
     "publishConfirm": "\"{{name}}\" will become visible to every roster member. This can't be undone.",
     "board": {
@@ -981,6 +982,8 @@
       "editTitle": "Edit raid event",
       "name": "Name",
       "startsAt": "Starts at",
+      "extendsRaidEvent": "Extends the lockout of",
+      "extendsRaidEventPlaceholder": "None — standalone raid",
       "createSuccess": "Raid event created.",
       "saveSuccess": "Raid event saved.",
       "readOnlyCompleted": "This event is completed and can no longer be edited.",

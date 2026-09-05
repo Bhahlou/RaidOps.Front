@@ -54,6 +54,16 @@
 
   <app-raid-zone-field [zones]="zones()" [(selectedZoneIds)]="selectedZoneIds" />
 
+  <div class="field-group">
+    <label class="field-label" for="event-extends">{{ 'raidBuilder.eventDialog.extendsRaidEvent' | transloco }}</label>
+    <app-select
+      inputId="event-extends"
+      [options]="extendCandidates()"
+      [placeholder]="'raidBuilder.eventDialog.extendsRaidEventPlaceholder' | transloco"
+      [(value)]="extendsRaidEventId"
+    />
+  </div>
+
   @if (showSignupOverride()) {
     <div class="field-group">
       <app-checkbox [checked]="signupOverride()" (checkedChange)="signupOverride.set($event)">
