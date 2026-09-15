@@ -169,6 +169,12 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       expect(component.classes().map((c) => c.name)).toEqual(['guildSettings.attributions.classes.paladin', 'guildSettings.attributions.classes.warlock']);
     });
+
+    it('falls back to the raw class id for a class id with no known icon/translation slug', () => {
+      const component = setup({}, [], [wowClass({ id: 999, name: 'Unknown Future Class' })]);
+
+      expect(component.classes()).toEqual([{ id: 999, name: '999' }]);
+    });
   });
 
   describe('classOptions', () => {
@@ -410,6 +416,17 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       expect(component.cells()[0]).toMatchObject({ iconSource: AttributionIconSource.RaidMarker, raidMarker: RaidMarkerIcon.Star, spellId: null, spellIconUrl: null, staticRole: null });
     });
+
+    it('leaves every other cell untouched', () => {
+      const component = setup();
+      component.addIconCell();
+      component.addIconCell();
+      const [firstKey, secondKey] = component.cells().map((c) => c.key);
+
+      component.onMarkerSelected(secondKey, RaidMarkerIcon.Star);
+
+      expect(component.cells().find((c) => c.key === firstKey)).toMatchObject({ iconSource: AttributionIconSource.None, raidMarker: null });
+    });
   });
 
   describe('onStaticRoleSelected', () => {
@@ -541,6 +558,15 @@ describe('AttributionDefinitionDialogComponent', () => {
     it('falls back to a generic error snackbar when the server error carries no code', () => {
       const component = setup({ definition: definition({ cells: [nameSlotCell()] }) });
       definitionsService.updateDefinition.mockReturnValue(throwError(() => new HttpErrorResponse({ error: {} })));
+
+      component.submit();
+
+      expect(snackbar.error).toHaveBeenCalledWith('errors.server');
+    });
+
+    it('falls back to a generic error snackbar when the response carries no error body at all', () => {
+      const component = setup({ definition: definition({ cells: [nameSlotCell()] }) });
+      definitionsService.updateDefinition.mockReturnValue(throwError(() => new HttpErrorResponse({})));
 
       component.submit();
 

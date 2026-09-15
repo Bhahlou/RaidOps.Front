@@ -223,6 +223,10 @@ describe('RaidAttributionsComponent', () => {
   // ── sections ─────────────────────────────────────────────────────────────
 
   describe('sections', () => {
+    it('is empty before the store has any data yet', () => {
+      expect(setup().sections()).toEqual([]);
+    });
+
     it('is empty with no definitions', () => {
       expect(setup({ data: { definitions: [], fills: [], seatedCharacters: [] } }).sections()).toEqual([]);
     });
@@ -278,6 +282,12 @@ describe('RaidAttributionsComponent', () => {
   // ── instanceCount / instanceIndexes ──────────────────────────────────────
 
   describe('instanceCount', () => {
+    it('treats an unrestricted fixed row as usable (1) before the store has any data yet', () => {
+      const component = setup();
+
+      expect(component.instanceCount(definition())).toBe(1);
+    });
+
     it('is the eligible count for a repeatable row with a restricted counting cell', () => {
       const def = definition({ id: 1, isRepeatable: true, cells: [nameSlotCell({ id: 2, requiredClassIds: [9] })] });
       const seatedChars = [seated({ characterId: 100, classId: 9 }), seated({ characterId: 101, classId: 9 })];
@@ -358,6 +368,12 @@ describe('RaidAttributionsComponent', () => {
   // ── characterOptions ─────────────────────────────────────────────────────
 
   describe('characterOptions', () => {
+    it('is just the unassign sentinel before the store has any data yet', () => {
+      const component = setup();
+
+      expect(component.characterOptions(nameSlotCell())).toEqual([{ value: UNASSIGNED, label: '' }]);
+    });
+
     it('starts with an empty-label unassign sentinel', () => {
       const component = setup({ data: { definitions: [], fills: [], seatedCharacters: [] } });
 
@@ -442,11 +458,35 @@ describe('RaidAttributionsComponent', () => {
       expect(component.pickerWidth()).toBe(`${5 * 8 + 46}px`);
     });
 
+    it('is the 0-length floor while unassigned with no slotLabel either', () => {
+      const def = definition({ id: 1, cells: [nameSlotCell({ id: 2, slotLabel: null })] });
+      const component = setup({ data: { definitions: [def], fills: [], seatedCharacters: [seated()] } });
+
+      expect(component.pickerWidth()).toBe('46px');
+    });
+
+    it('is the 0-length floor for a fill whose character is no longer among the eligible options', () => {
+      const def = definition({ id: 1, cells: [nameSlotCell({ id: 2, slotLabel: null })] });
+      const fills = [fill({ definitionId: 1, cellId: 2, instanceIndex: 0, characterId: 999 })];
+      const component = setup({ data: { definitions: [def], fills, seatedCharacters: [seated({ characterId: 1 })] } });
+
+      expect(component.pickerWidth()).toBe('46px');
+    });
+
     it('is 46px (0-length floor) with no name-slot cells anywhere', () => {
       const def = definition({ id: 1, cells: [iconCell()] });
       const component = setup({ data: { definitions: [def], fills: [], seatedCharacters: [] } });
 
       expect(component.pickerWidth()).toBe('46px');
+    });
+
+    it('skips an icon cell interleaved between two name-slot cells', () => {
+      const def = definition({ id: 1, cells: [nameSlotCell({ id: 2, slotLabel: 'De' }), iconCell({ id: 3 }), nameSlotCell({ id: 4, slotLabel: 'Cible' })] });
+      const component = setup({ data: { definitions: [def], fills: [], seatedCharacters: [seated()] } });
+
+      // Only the two slotLabel placeholders ("De" 2 chars, "Cible" 5 chars) factor in — the
+      // interleaved icon cell has no text of its own to measure.
+      expect(component.pickerWidth()).toBe(`${5 * 8 + 46}px`);
     });
 
     // Kept last in this describe block: it permanently swaps the module-level cached canvas

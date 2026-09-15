@@ -132,6 +132,14 @@ describe('GuildAttributionSettingsComponent', () => {
       );
     });
 
+    it('excludes a definition with no section (null) from existingSections', () => {
+      const component = setup([definition({ id: 1, section: 'Curses' }), definition({ id: 2, section: null })]);
+
+      component.openCreateDialog();
+
+      expect(dialog.open).toHaveBeenCalledWith(AttributionDefinitionDialogComponent, expect.objectContaining({ data: expect.objectContaining({ existingSections: ['Curses'] }) }));
+    });
+
     it('reloads the store when the dialog reports a save', () => {
       const component = setup();
       dialog.open.mockReturnValue({ closed: of(true) });
