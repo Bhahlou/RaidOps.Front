@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 
-/** Blizzard CDN icon slug keyed by class ID. */
-const CLASS_ICON_NAMES: Record<number, string> = {
+/** Blizzard CDN icon slug keyed by class ID — also used as the i18n key suffix for translated class names. */
+export const CLASS_ICON_NAMES: Record<number, string> = {
   1: 'warrior',
   2: 'paladin',
   3: 'hunter',

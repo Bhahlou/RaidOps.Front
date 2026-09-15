@@ -1,0 +1,160 @@
+<h2 class="dialog-title">
+  {{ (isEditMode ? 'guildSettings.attributions.dialog.editTitle' : 'guildSettings.attributions.dialog.createTitle') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <div class="field-row">
+    <app-form-field-card [label]="'guildSettings.attributions.dialog.label' | transloco" class="field-row-item">
+      <input
+        id="attribution-label"
+        type="text"
+        class="text-input"
+        autocomplete="off"
+        [value]="label()"
+        (input)="label.set($any($event.target).value)"
+        maxlength="64"
+        [placeholder]="'guildSettings.attributions.dialog.labelPlaceholder' | transloco"
+      />
+    </app-form-field-card>
+
+    <app-form-field-card [label]="'guildSettings.attributions.dialog.section' | transloco" class="field-row-item">
+      <input
+        id="attribution-section"
+        type="text"
+        class="text-input"
+        autocomplete="off"
+        list="attribution-section-suggestions"
+        [value]="section()"
+        (input)="section.set($any($event.target).value)"
+        maxlength="64"
+        [placeholder]="'guildSettings.attributions.dialog.sectionPlaceholder' | transloco"
+      />
+      <span class="material-icons section-hint-chevron">expand_more</span>
+      <datalist id="attribution-section-suggestions">
+        @for (s of data.existingSections; track s) {
+          <option [value]="s"></option>
+        }
+      </datalist>
+    </app-form-field-card>
+  </div>
+
+  <label class="checkbox-field">
+    <app-checkbox [checked]="isRepeatable()" (checkedChange)="isRepeatable.set($event)" />
+    {{ 'guildSettings.attributions.dialog.isRepeatable' | transloco }}
+  </label>
+  <span class="field-hint">{{ 'guildSettings.attributions.dialog.isRepeatableHint' | transloco }}</span>
+
+  <div class="field-group">
+    <label class="field-label">{{ 'guildSettings.attributions.dialog.cells' | transloco }}</label>
+
+    <div class="cell-list">
+      @for (cell of cells(); track cell.key; let i = $index; let count = $count) {
+        <div class="cell-card">
+          <div class="cell-card-header">
+            <span class="cell-card-header-left">
+              <span class="cell-kind-label">
+                {{ (cell.kind === CellKind.Icon ? 'guildSettings.attributions.dialog.iconCell' : 'guildSettings.attributions.dialog.nameSlotCell') | transloco }}
+              </span>
+              @if (cell.kind === CellKind.Icon && cell.iconSource !== IconSource.None) {
+                <span class="icon-preview">
+                  @if (cell.iconSource === IconSource.Spell && cell.spellIconUrl) {
+                    <app-spell-icon [iconUrl]="cell.spellIconUrl" [spellId]="cell.spellId" [size]="24" />
+                  } @else if (cell.iconSource === IconSource.RaidMarker && cell.raidMarker !== null) {
+                    <app-raid-marker-icon [marker]="cell.raidMarker" [size]="24" />
+                  } @else if (cell.iconSource === IconSource.StaticRole && cell.staticRole !== null) {
+                    <app-attribution-role-icon [role]="cell.staticRole" [size]="24" />
+                  }
+                </span>
+              }
+            </span>
+            <span class="cell-card-actions">
+              <app-icon-button icon="arrow_upward" [disabled]="i === 0" (click)="moveCell(cell.key, -1)" [title]="'guildSettings.attributions.dialog.moveUp' | transloco" />
+              <app-icon-button icon="arrow_downward" [disabled]="i === count - 1" (click)="moveCell(cell.key, 1)" [title]="'guildSettings.attributions.dialog.moveDown' | transloco" />
+              <app-icon-button icon="delete" (click)="removeCell(cell.key)" [title]="'guildSettings.attributions.dialog.removeCell' | transloco" />
+            </span>
+          </div>
+
+          @if (cell.kind === CellKind.Icon) {
+            <div class="icon-picker">
+              <div class="icon-picker-row">
+                <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.markers' | transloco }}</span>
+                <app-raid-marker-picker
+                  [activeMarker]="cell.iconSource === IconSource.RaidMarker ? cell.raidMarker : null"
+                  (selected)="onMarkerSelected(cell.key, $event)"
+                />
+              </div>
+
+              <div class="icon-picker-row">
+                <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.roles' | transloco }}</span>
+                <span class="static-role-buttons">
+                  @for (role of staticRoleOrder; track role) {
+                    <button type="button" class="static-role-button" [class.active]="cell.staticRole === role" (click)="onStaticRoleSelected(cell.key, role)">
+                      <app-attribution-role-icon [role]="role" [size]="28" />
+                    </button>
+                  }
+                </span>
+              </div>
+
+              <div class="icon-picker-row">
+                <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.spell' | transloco }}</span>
+                <app-spell-picker [guildId]="data.guildId" [expansionId]="data.expansionId" (selected)="onSpellSelected(cell.key, $event)" />
+              </div>
+            </div>
+          } @else {
+            <div class="name-slot-row">
+              <app-form-field-card [label]="'guildSettings.attributions.dialog.nameSlot' | transloco" class="name-slot-label-card">
+                <input
+                  type="text"
+                  class="text-input"
+                  autocomplete="off"
+                  maxlength="32"
+                  [value]="cell.slotLabel"
+                  (input)="setSlotLabel(cell.key, $any($event.target).value)"
+                  [placeholder]="'guildSettings.attributions.dialog.slotLabelPlaceholder' | transloco"
+                />
+              </app-form-field-card>
+
+              <app-multi-select
+                class="restriction-select"
+                [label]="'guildSettings.attributions.dialog.requiredClasses' | transloco"
+                [options]="classOptions()"
+                [value]="cell.requiredClassIds"
+                (valueChange)="setRequiredClasses(cell, $any($event))"
+                [iconOnlySelected]="true"
+              />
+              <app-multi-select
+                class="restriction-select"
+                [label]="'guildSettings.attributions.dialog.requiredRoles' | transloco"
+                [options]="roleOptions()"
+                [value]="cell.requiredRoles"
+                (valueChange)="setRequiredRoles(cell, $any($event))"
+                [iconOnlySelected]="true"
+              />
+              <app-multi-select
+                class="restriction-select"
+                [label]="'guildSettings.attributions.dialog.requiredSpecs' | transloco"
+                [options]="specOptionsFor(cell)"
+                [value]="cell.requiredSpecIds"
+                (valueChange)="setRequiredSpecs(cell, $any($event))"
+                [iconOnlySelected]="true"
+                [filterable]="true"
+              />
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="add-cell-buttons">
+      <app-button variant="text" (click)="addIconCell()">{{ 'guildSettings.attributions.dialog.addIconCell' | transloco }}</app-button>
+      <app-button variant="text" (click)="addNameSlotCell()">{{ 'guildSettings.attributions.dialog.addNameSlotCell' | transloco }}</app-button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'raidBuilder.actions.save' | transloco }}
+  </app-button>
+</div>

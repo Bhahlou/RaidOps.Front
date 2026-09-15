@@ -42,6 +42,14 @@ Once a raid is **published**, its name becomes clickable in the grid and opens i
 
 ![Raid detail page: header with RSVP buttons, composition grid, and the signups breakdown](/assets/manual/en/guild/raid-detail-overview.png)
 
+### Assignments
+
+The **Assignments** hub link, on a raid's detail page, opens who's filling each row of the guild's [raid attribution template](/manual/guild/raid-settings) for that specific raid — buffs, curses, tank/heal swaps, interrupts, whatever officers have set up. Rows are grouped by section and only show up if at least one currently seated character could fill them; a **Repeatable** row's instance count adjusts itself automatically (e.g. as many Innervate slots as there are druids currently seated).
+
+![Assignments page: rows filled in with seated characters](/assets/manual/en/guild/raid-attributions-overview.png)
+
+Only officers can fill a slot — pick a character from the dropdown, restricted to whoever's seated in the raid and meets that slot's class/role/spec requirement, if any. Everyone else sees the same page read-only.
+
 ### Discord composition announcement
 
 Once the **Raid composition announcement** channel is configured in the Notifications tab (see the dedicated guide), publishing a raid posts an embed listing every slot group by group. That same message is then edited in place on every assignment, unassignment, swap, or spec change — never reposted, so it stays current without spamming the channel. Each player added or removed can also get a DM detailing which character, if that separate setting is enabled.

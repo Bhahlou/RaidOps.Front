@@ -1,0 +1,7 @@
+<div class="raid-marker-row">
+  @for (marker of markers; track marker) {
+    <button type="button" class="raid-marker-option" [class.active]="activeMarker() === marker" (click)="selected.emit(marker)">
+      <app-raid-marker-icon [marker]="marker" [size]="28" />
+    </button>
+  }
+</div>

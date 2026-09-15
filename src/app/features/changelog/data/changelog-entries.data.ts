@@ -73,6 +73,10 @@ export const CHANGELOG_GROUPS: ChangelogGroup[] = [
 
 /** Newest first. */
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  feature('2026-09-09-raid-attributions', '1.6', '2026-09-09', 'raidAttributions', {
+    category: 'guild',
+    article: 'raid-builder',
+  }),
   feature('2026-09-06-raid-lockout-extension', '1.6', '2026-09-06', 'raidLockoutExtension', {
     category: 'guild',
     article: 'raid-builder',

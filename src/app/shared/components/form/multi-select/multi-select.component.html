@@ -14,7 +14,19 @@
     [attr.aria-expanded]="isOpen()"
   >
     <span class="select-value" [class.select-value--placeholder]="!selectedLabel()">
-      {{ selectedLabel() || placeholder() }}
+      @if (iconOnlySelected() && selectedOptions().length > 0) {
+        <span class="selected-chips">
+          @for (opt of selectedOptions(); track opt.value) {
+            @if (opt.iconUrl) {
+              <img class="selected-chip-icon" [ngSrc]="opt.iconUrl" [alt]="opt.label" [title]="opt.label" width="18" height="18" />
+            } @else {
+              <span class="selected-chip-text" [title]="opt.label">{{ opt.label }}</span>
+            }
+          }
+        </span>
+      } @else {
+        {{ selectedLabel() || placeholder() }}
+      }
     </span>
     <span class="material-icons select-chevron">expand_more</span>
   </button>
@@ -25,13 +37,12 @@
   [cdkConnectedOverlayOrigin]="origin"
   [cdkConnectedOverlayOpen]="isOpen()"
   [cdkConnectedOverlayPositions]="dropdownPositions"
-  [cdkConnectedOverlayWidth]="triggerWidth()"
   [cdkConnectedOverlayHasBackdrop]="true"
   cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
   (backdropClick)="close()"
   (detach)="close()"
 >
-  <div class="select-panel" (keydown)="onPanelKeydown($event)">
+  <div class="select-panel" [style.min-width.px]="triggerWidth()" (keydown)="onPanelKeydown($event)">
     @if (filterable()) {
       <div class="select-filter">
         <span class="material-icons select-filter-icon">search</span>

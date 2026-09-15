@@ -42,6 +42,14 @@ Une fois un raid **publié**, son nom devient cliquable dans la grille et ouvre 
 
 ![Page de détail d'un raid : en-tête avec boutons de réponse, grille de composition, et répartition des inscriptions](/assets/manual/fr/guild/raid-detail-overview.png)
 
+### Attributions
+
+Le lien **Attributions** de la page de détail d'un raid ouvre qui remplit chaque ligne du [modèle d'attributions](/manual/guild/raid-settings) de la guilde pour ce raid précis — buffs, malédictions, échanges tank/heal, interrupts, tout ce que les officiers ont configuré. Les lignes sont groupées par section et n'apparaissent que si au moins un personnage actuellement présent peut les remplir ; le nombre d'instances d'une ligne **Répétable** s'ajuste automatiquement (ex. autant d'emplacements Innervation que de druides présents).
+
+![Page Attributions : lignes remplies avec les personnages présents](/assets/manual/fr/guild/raid-attributions-overview.png)
+
+Seuls les officiers peuvent remplir un emplacement — en choisissant un personnage dans la liste déroulante, restreinte à ceux présents dans le raid et remplissant la restriction de classe/rôle/spécialisation de l'emplacement, s'il y en a une. Les autres voient la même page en lecture seule.
+
 ### Annonce de composition Discord
 
 Quand le salon **Annonce de composition** est configuré dans l'onglet Notifications (voir le guide dédié), publier un raid poste un embed listant tous les slots groupe par groupe. Ce même message est ensuite édité en place à chaque assignation, désassignation, échange ou changement de spécialisation — jamais republié, donc toujours à jour sans spammer le salon. Chaque joueur ajouté ou retiré peut en plus recevoir un DM détaillant sur quel personnage, si ce réglage est activé séparément.

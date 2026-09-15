@@ -1,0 +1,56 @@
+<app-form-field-card>
+  <div class="attribution-card-header">
+    <div>
+      <p class="field-label">{{ 'guildSettings.attributions.title' | transloco }}</p>
+      <p class="card-hint">{{ 'guildSettings.attributions.hint' | transloco }}</p>
+    </div>
+    <app-button variant="primary" (click)="openCreateDialog()">{{ 'guildSettings.attributions.add' | transloco }}</app-button>
+  </div>
+
+  @if (isLoading()) {
+    <p class="card-hint">{{ 'guildSettings.attributions.loading' | transloco }}</p>
+  } @else if (definitions().length === 0) {
+    <p class="card-hint">{{ 'guildSettings.attributions.empty' | transloco }}</p>
+  } @else {
+    <div class="attribution-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+      @for (section of groupedSections(); track section.label + '-' + $index) {
+        <div class="attribution-section" [class.attribution-section--unlabeled]="!section.label">
+          @if (section.label) {
+            <div class="attribution-section-header">{{ section.label }}</div>
+          }
+          @for (definition of section.definitions; track definition.id) {
+            <div class="attribution-row" cdkDrag>
+              <span class="material-icons drag-handle" cdkDragHandle>drag_indicator</span>
+
+              @if (definition.label) {
+                <span class="attribution-label">{{ definition.label }}</span>
+              }
+
+              <span class="attribution-cells">
+                @for (cell of definition.cells; track cell.id) {
+                  @if (cell.kind === CellKind.Icon) {
+                    @if (cell.iconSource === IconSource.Spell && cell.spellIconUrl) {
+                      <app-spell-icon [iconUrl]="cell.spellIconUrl" [label]="definition.label" [spellId]="cell.spellId" [size]="28" />
+                    } @else if (cell.iconSource === IconSource.RaidMarker && cell.raidMarker !== null) {
+                      <app-raid-marker-icon [marker]="cell.raidMarker" [size]="28" />
+                    } @else if (cell.iconSource === IconSource.StaticRole && cell.staticRole !== null) {
+                      <app-attribution-role-icon [role]="cell.staticRole" [size]="28" />
+                    }
+                  } @else {
+                    <span class="attribution-slot-chip">{{ cell.slotLabel || ('guildSettings.attributions.dialog.nameSlot' | transloco) }}</span>
+                  }
+                }
+              </span>
+
+              <span class="attribution-row-actions">
+                <app-icon-button icon="edit" (click)="openEditDialog(definition)" [title]="'guildSettings.attributions.edit' | transloco" />
+                <app-icon-button icon="content_copy" (click)="duplicateDefinition(definition)" [title]="'guildSettings.attributions.duplicate' | transloco" />
+                <app-icon-button icon="delete" (click)="deleteDefinition(definition)" [title]="'guildSettings.attributions.delete' | transloco" />
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</app-form-field-card>

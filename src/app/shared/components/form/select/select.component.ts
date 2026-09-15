@@ -17,6 +17,8 @@ export interface SelectOption<T> {
   group?: string;
   /** Optional icon rendered before the label, both in the option row and the collapsed trigger. */
   iconUrl?: string | null;
+  /** Optional text color (e.g. a WoW class color) applied to the label, both in the option row and the collapsed trigger. */
+  color?: string | null;
 }
 
 /**
@@ -65,6 +67,11 @@ export class SelectComponent<T> implements FormValueControl<T | null> {
   readonly selectedIconUrl = computed(() => {
     const current = this.value();
     return this.options().find((o) => o.value === current)?.iconUrl ?? null;
+  });
+
+  readonly selectedColor = computed(() => {
+    const current = this.value();
+    return this.options().find((o) => o.value === current)?.color ?? null;
   });
 
   readonly listboxValue = computed(() => {

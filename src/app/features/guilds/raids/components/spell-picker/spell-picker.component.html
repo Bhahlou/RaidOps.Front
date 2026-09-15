@@ -1,0 +1,32 @@
+<button type="button" class="spell-picker-trigger" [cdkMenuTriggerFor]="panel" (cdkMenuOpened)="onOpened()">
+  <span class="material-icons">search</span>
+  {{ 'guildSettings.attributions.spellPicker.trigger' | transloco }}
+</button>
+
+<ng-template #panel>
+  <div class="spell-picker-panel" cdkMenu>
+    <div class="spell-picker-search" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <span class="material-icons spell-picker-search-icon">search</span>
+      <input
+        #searchInput
+        type="text"
+        [placeholder]="'guildSettings.attributions.spellPicker.placeholder' | transloco"
+        [value]="query()"
+        (input)="onQueryInput(searchInput.value)"
+      />
+    </div>
+    <ul class="spell-picker-results">
+      @if (searching()) {
+        <li class="spell-picker-hint">{{ 'guildSettings.attributions.spellPicker.searching' | transloco }}</li>
+      } @else if (query().trim().length >= 2 && results().length === 0) {
+        <li class="spell-picker-hint">{{ 'guildSettings.attributions.spellPicker.noResults' | transloco }}</li>
+      }
+      @for (spell of results(); track spell.id) {
+        <li class="spell-picker-row">
+          <app-spell-icon [iconUrl]="spell.iconUrl" [label]="spell.name" [spellId]="spell.id" [size]="20" />
+          <button type="button" class="spell-picker-option" (click)="select(spell)">{{ spell.name }}</button>
+        </li>
+      }
+    </ul>
+  </div>
+</ng-template>

@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
@@ -35,17 +35,18 @@ import {
   SignupCharacterDialogResult,
 } from '../../components/signup-character-dialog/signup-character-dialog.component';
 
-/** Placeholder hub-strip link — no route yet, just establishes the page's eventual scope. */
+/** Hub-strip link — `id: 'assignments'` is wired to a real route, the rest are still "coming soon" placeholders. */
 interface DetailHubLink {
+  id: 'loot' | 'assignments' | 'logs' | 'analysis';
   icon: string;
   labelKey: string;
 }
 
 const HUB_LINKS: DetailHubLink[] = [
-  { icon: 'inventory_2', labelKey: 'raidBuilder.detail.hub.loot' },
-  { icon: 'assignment_ind', labelKey: 'raidBuilder.detail.hub.assignments' },
-  { icon: 'description', labelKey: 'raidBuilder.detail.hub.logs' },
-  { icon: 'insights', labelKey: 'raidBuilder.detail.hub.analysis' },
+  { id: 'loot', icon: 'inventory_2', labelKey: 'raidBuilder.detail.hub.loot' },
+  { id: 'assignments', icon: 'assignment_ind', labelKey: 'raidBuilder.detail.hub.assignments' },
+  { id: 'logs', icon: 'description', labelKey: 'raidBuilder.detail.hub.logs' },
+  { id: 'analysis', icon: 'insights', labelKey: 'raidBuilder.detail.hub.analysis' },
 ];
 
 /**
@@ -63,6 +64,7 @@ const HUB_LINKS: DetailHubLink[] = [
 @Component({
   selector: 'app-raid-detail',
   imports: [
+    RouterLink,
     PageHeaderComponent,
     EmptyHintComponent,
     ButtonComponent,

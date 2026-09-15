@@ -100,6 +100,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidAttributions": {
+        "title": "Raid-Zuweisungsvorlagen, pro Raid ausgefüllt",
+        "description": "Officer können jetzt eine wiederverwendbare Vorlage aus Zeilen anlegen, die jeder Raid ausgefüllt braucht — Buffs, Flüche, Tank-/Heal-Wechsel, Interrupts — mit Icons, Namensplätzen und optionalen Klassen-/Rollen-/Spezialisierungseinschränkungen (Gildeneinstellungen → Raids). Jeder Raid bekommt einen eigenen \"Zuweisungen\"-Tab, auf dem Officer jede Zeile mit echten im Raid sitzenden Charakteren ausfüllen; die Zeilen einer \"wiederholbaren\" Zuweisung (z. B. Anregen) passen sich automatisch an die Anzahl geeigneter, im Raid sitzender Charaktere an."
+      },
       "raidLockoutExtension": {
         "title": "Einen Raid über mehrere Abende verlängern",
         "description": "Ein Raid kann jetzt als Verlängerung eines anderen markiert werden — das Ingame-Äquivalent zum Verlängern der Lockout-ID statt eine neue zu verbrauchen, z. B. um dieselbe Instanz über zwei aufeinanderfolgende Abende zu clearen. Das Feld „Verlängert das Lockout von\" im Erstellungs- oder Bearbeitungsdialog schlägt die Raids des Spielzweigs innerhalb desselben wöchentlichen Reset-Fensters vor; sobald die Verknüpfung besteht, können dieselben Charaktere beiden zugewiesen werden, ohne dass die Zuweisung als Lockout-Konflikt blockiert wird."
@@ -524,6 +528,114 @@
         "saveSuccess": "Raid-Modus des Spielzweigs gespeichert."
       }
     },
+    "attributions": {
+      "title": "Raid-Zuweisungsvorlage",
+      "hint": "Zeilen, die deine Gilde bei einem Raid immer zuweisen muss (Buffs, Flüche, Tank-/Heiler-Wechsel, Unterbrechungen…). Offiziere füllen jede Zeile pro Raid-Event mit echten Charakteren, auf dessen Zuweisungen-Tab.",
+      "add": "Zeile hinzufügen",
+      "edit": "Bearbeiten",
+      "duplicate": "Duplizieren",
+      "delete": "Löschen",
+      "loading": "Vorlage wird geladen…",
+      "empty": "Noch keine Zuweisungszeilen — füge die erste hinzu.",
+      "saveSuccess": "Zuweisungszeile gespeichert.",
+      "deleteSuccess": "Zuweisungszeile gelöscht.",
+      "deleteConfirmTitle": "Zuweisungszeile löschen?",
+      "deleteConfirmMessage": "„{{label}}“ wird aus der Vorlage entfernt, zusammen mit allen Einträgen in jedem Raid-Event.",
+      "dialog": {
+        "createTitle": "Zuweisungszeile hinzufügen",
+        "editTitle": "Zuweisungszeile bearbeiten",
+        "duplicateLabel": "{{label}} (Kopie)",
+        "label": "Bezeichnung",
+        "labelPlaceholder": "Optional — das Icon reicht oft",
+        "section": "Abschnitt",
+        "sectionPlaceholder": "z. B. Buffs, Flüche, Tanks & Heiler…",
+        "isRepeatable": "Wiederholbar",
+        "isRepeatableHint": "Offiziere können pro Raid-Event eine variable Anzahl Instanzen dieser Zeile hinzufügen (z. B. so viele Innervates wie an dem Abend Druiden da sind), statt immer genau einer.",
+        "cells": "Zellen",
+        "iconCell": "Symbol",
+        "nameSlotCell": "Namensplatz",
+        "nameSlot": "Name",
+        "markers": "Markierungen",
+        "roles": "Rollen",
+        "spell": "Zauber",
+        "moveUp": "Nach oben",
+        "moveDown": "Nach unten",
+        "removeCell": "Zelle entfernen",
+        "addIconCell": "Symbol hinzufügen",
+        "addNameSlotCell": "Namensplatz hinzufügen",
+        "slotLabelPlaceholder": "z. B. Quelle, Ziel…",
+        "requiredClasses": "Erlaubte Klassen",
+        "requiredRoles": "Erlaubte Rollen",
+        "requiredSpecs": "Erlaubte Spezialisierungen",
+        "roleTank": "Tank",
+        "roleHealer": "Heiler",
+        "roleRanged": "Fernkampf",
+        "roleMelee": "Nahkampf"
+      },
+      "classes": {
+        "warrior": "Krieger",
+        "paladin": "Paladin",
+        "hunter": "Jäger",
+        "rogue": "Schurke",
+        "priest": "Priester",
+        "deathknight": "Todesritter",
+        "shaman": "Schamane",
+        "mage": "Magier",
+        "warlock": "Hexenmeister",
+        "monk": "Mönch",
+        "druid": "Druide",
+        "demonhunter": "Dämonenjäger",
+        "evoker": "Zeitwirker"
+      },
+      "specs": {
+        "arms": "Waffen",
+        "fury": "Furor",
+        "protection": "Schutz",
+        "holy": "Heilig",
+        "retribution": "Vergeltung",
+        "beastmastery": "Tierherrschaft",
+        "marksmanship": "Treffsicherheit",
+        "survival": "Überleben",
+        "assassination": "Meucheln",
+        "outlaw": "Gesetzlosigkeit",
+        "subtlety": "Täuschung",
+        "discipline": "Disziplin",
+        "shadow": "Schatten",
+        "blood": "Blut",
+        "frost": "Frost",
+        "unholy": "Unheilig",
+        "elemental": "Elementar",
+        "enhancement": "Verstärkung",
+        "restoration": "Wiederherstellung",
+        "arcane": "Arkan",
+        "fire": "Feuer",
+        "affliction": "Affliction",
+        "demonology": "Dämonologie",
+        "destruction": "Zerstörung",
+        "brewmaster": "Braumeister",
+        "windwalker": "Windläufer",
+        "mistweaver": "Nebelwirker",
+        "balance": "Gleichgewicht",
+        "feral": "Wildheit",
+        "guardian": "Wächter",
+        "havoc": "Verwüstung",
+        "vengeance": "Rache",
+        "devastation": "Verwüstung",
+        "preservation": "Bewahrung",
+        "augmentation": "Bereicherung"
+      },
+      "spellPicker": {
+        "trigger": "Zauber auswählen",
+        "placeholder": "Zauber suchen…",
+        "searching": "Suche…",
+        "noResults": "Kein passender Zauber."
+      },
+      "errors": {
+        "SpellNotFound": "Dieser Zauber wurde nicht gefunden.",
+        "InvalidRequest": "Einige Felder sind ungültig.",
+        "NoCellsInDefinition": "Diese Zeile benötigt mindestens eine Zelle."
+      }
+    },
     "notificationSettings": {
       "families": {
         "absences": {
@@ -913,6 +1025,18 @@
       "groupingCharacterDialogHint": "Du hast keinen Charakter, der diesem Raid zugewiesen ist — wähle, welchen zugewiesenen Charakter der Ping referenzieren soll.",
       "groupingCharacterDialogLabel": "Charakter",
       "groupingCharacterDialogSubmit": "Ping senden"
+    },
+    "attributions": {
+      "loading": "Zuweisungen werden geladen…",
+      "empty": "Deine Gilde hat noch keine Zuweisungsvorlage — füge Zeilen unter Gildeneinstellungen → Raids hinzu.",
+      "noneAssignable": "Mit der aktuellen Raid-Zusammensetzung ist keine Zuweisung möglich.",
+      "errors": {
+        "CharacterNotSeatedInEvent": "Dieser Charakter sitzt nicht in diesem Raid.",
+        "AttributionCellNotFound": "Dieser Platz existiert nicht mehr in der Vorlage.",
+        "AttributionCellNotNameSlot": "Diese Zelle kann nicht befüllt werden.",
+        "CharacterDoesNotMeetSlotRequirement": "Dieser Charakter erfüllt nicht die Klassen-/Rollen-/Spezialisierungsanforderung dieses Platzes.",
+        "InvalidInstanceIndex": "Diese Instanz existiert nicht mehr in dieser Zeile."
+      }
     },
     "tabs": {
       "empty": "Kein Raid in diesem Zeitraum.",

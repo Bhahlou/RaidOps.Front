@@ -1,0 +1,19 @@
+@if (iconUrl()) {
+  @if (wowheadUrl(); as href) {
+    <a
+      [href]="href"
+      [attr.data-wowhead]="'domain=' + wowheadDomain()"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="spell-icon-link">
+      <img [src]="iconUrl()" [alt]="label()" [style.width.px]="size()" [style.height.px]="size()" />
+    </a>
+  } @else {
+    <img
+      [src]="iconUrl()"
+      [alt]="label()"
+      [title]="label()"
+      [style.width.px]="size()"
+      [style.height.px]="size()" />
+  }
+}

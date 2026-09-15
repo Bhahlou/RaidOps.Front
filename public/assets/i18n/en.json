@@ -100,6 +100,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidAttributions": {
+        "title": "Raid attribution templates, filled in per raid",
+        "description": "Officers can now define a reusable template of rows every raid needs assigned — buffs, curses, tank/heal swaps, interrupts — with icons, name slots, and optional class/role/spec restrictions (Guild Settings → Raids). Each raid gets its own \"Assignments\" tab where officers fill every row in with real seated characters; rows for a \"Repeatable\" attribution (e.g. Innervate) automatically match however many eligible characters are seated."
+      },
       "raidLockoutExtension": {
         "title": "Extend a raid across multiple nights",
         "description": "A raid can now be marked as extending another one — the in-game equivalent of extending a raid's lockout ID instead of consuming a fresh one, e.g. clearing the same instance across two consecutive nights. The \"Extends the lockout of\" field, in the create or edit dialog, offers the branch's raids within the same weekly reset window; once linked, the same characters can be assigned to both without the site blocking it as a lockout conflict."
@@ -524,6 +528,114 @@
         "saveSuccess": "Branch raid mode saved."
       }
     },
+    "attributions": {
+      "title": "Raid attribution template",
+      "hint": "Rows your guild always needs assigned during a raid (buffs, curses, tank/heal swaps, interrupts…). Officers fill each row in with real characters per raid event, on its Assignments tab.",
+      "add": "Add row",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "loading": "Loading template…",
+      "empty": "No attribution rows yet — add your first one.",
+      "saveSuccess": "Attribution row saved.",
+      "deleteSuccess": "Attribution row deleted.",
+      "deleteConfirmTitle": "Delete attribution row?",
+      "deleteConfirmMessage": "\"{{label}}\" will be removed from the template, along with every fill it has across every raid event.",
+      "dialog": {
+        "createTitle": "Add attribution row",
+        "editTitle": "Edit attribution row",
+        "duplicateLabel": "{{label}} (copy)",
+        "label": "Label",
+        "labelPlaceholder": "Optional — the icon is often enough",
+        "section": "Section",
+        "sectionPlaceholder": "e.g. Buffs, Curses, Tanks & Heals…",
+        "isRepeatable": "Repeatable",
+        "isRepeatableHint": "Officers can add a variable number of instances of this row per raid event (e.g. as many Innervates as there are druids that night), instead of always exactly one.",
+        "cells": "Cells",
+        "iconCell": "Icon",
+        "nameSlotCell": "Name slot",
+        "nameSlot": "Name",
+        "markers": "Markers",
+        "roles": "Roles",
+        "spell": "Spell",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "removeCell": "Remove cell",
+        "addIconCell": "Add icon",
+        "addNameSlotCell": "Add name slot",
+        "slotLabelPlaceholder": "e.g. Source, Target…",
+        "requiredClasses": "Allowed classes",
+        "requiredRoles": "Allowed roles",
+        "requiredSpecs": "Allowed specs",
+        "roleTank": "Tank",
+        "roleHealer": "Healer",
+        "roleRanged": "Ranged",
+        "roleMelee": "Melee"
+      },
+      "classes": {
+        "warrior": "Warrior",
+        "paladin": "Paladin",
+        "hunter": "Hunter",
+        "rogue": "Rogue",
+        "priest": "Priest",
+        "deathknight": "Death Knight",
+        "shaman": "Shaman",
+        "mage": "Mage",
+        "warlock": "Warlock",
+        "monk": "Monk",
+        "druid": "Druid",
+        "demonhunter": "Demon Hunter",
+        "evoker": "Evoker"
+      },
+      "specs": {
+        "arms": "Arms",
+        "fury": "Fury",
+        "protection": "Protection",
+        "holy": "Holy",
+        "retribution": "Retribution",
+        "beastmastery": "Beast Mastery",
+        "marksmanship": "Marksmanship",
+        "survival": "Survival",
+        "assassination": "Assassination",
+        "outlaw": "Outlaw",
+        "subtlety": "Subtlety",
+        "discipline": "Discipline",
+        "shadow": "Shadow",
+        "blood": "Blood",
+        "frost": "Frost",
+        "unholy": "Unholy",
+        "elemental": "Elemental",
+        "enhancement": "Enhancement",
+        "restoration": "Restoration",
+        "arcane": "Arcane",
+        "fire": "Fire",
+        "affliction": "Affliction",
+        "demonology": "Demonology",
+        "destruction": "Destruction",
+        "brewmaster": "Brewmaster",
+        "windwalker": "Windwalker",
+        "mistweaver": "Mistweaver",
+        "balance": "Balance",
+        "feral": "Feral",
+        "guardian": "Guardian",
+        "havoc": "Havoc",
+        "vengeance": "Vengeance",
+        "devastation": "Devastation",
+        "preservation": "Preservation",
+        "augmentation": "Augmentation"
+      },
+      "spellPicker": {
+        "trigger": "Pick a spell",
+        "placeholder": "Search a spell…",
+        "searching": "Searching…",
+        "noResults": "No matching spell."
+      },
+      "errors": {
+        "SpellNotFound": "That spell couldn't be found.",
+        "InvalidRequest": "Some fields are invalid.",
+        "NoCellsInDefinition": "This row needs at least one cell."
+      }
+    },
     "notificationSettings": {
       "families": {
         "absences": {
@@ -913,6 +1025,18 @@
       "groupingCharacterDialogHint": "You don't have a character assigned to this raid — pick which assigned character the ping should reference.",
       "groupingCharacterDialogLabel": "Character",
       "groupingCharacterDialogSubmit": "Send ping"
+    },
+    "attributions": {
+      "loading": "Loading assignments…",
+      "empty": "Your guild hasn't set up any raid-attribution template yet — add rows in Guild Settings → Raids.",
+      "noneAssignable": "No attribution is assignable with the raid's current composition.",
+      "errors": {
+        "CharacterNotSeatedInEvent": "That character isn't seated in this raid.",
+        "AttributionCellNotFound": "This slot no longer exists on the template.",
+        "AttributionCellNotNameSlot": "This cell isn't fillable.",
+        "CharacterDoesNotMeetSlotRequirement": "That character doesn't meet this slot's class/role/spec requirement.",
+        "InvalidInstanceIndex": "That instance no longer exists on this row."
+      }
     },
     "tabs": {
       "empty": "No raid event in this range.",

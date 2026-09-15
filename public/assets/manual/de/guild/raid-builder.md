@@ -42,6 +42,14 @@ Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und
 
 ![Detailseite eines Raids: Header mit Antwort-Buttons, Kompositionsraster und Anmeldungsübersicht](/assets/manual/de/guild/raid-detail-overview.png)
 
+### Zuweisungen
+
+Der Link **Zuweisungen** auf der Detailseite eines Raids öffnet, wer welche Zeile der [Raid-Zuweisungsvorlage](/manual/guild/raid-settings) der Gilde für genau diesen Raid ausfüllt — Buffs, Flüche, Tank-/Heal-Wechsel, Interrupts, was auch immer Officer eingerichtet haben. Zeilen sind nach Abschnitt gruppiert und erscheinen nur, wenn sie mindestens ein aktuell im Raid sitzender Charakter ausfüllen könnte; die Instanzenzahl einer **wiederholbaren** Zeile passt sich automatisch an (z. B. so viele Anregen-Plätze wie Druiden im Raid sitzen).
+
+![Zuweisungen-Seite: Zeilen mit anwesenden Charakteren ausgefüllt](/assets/manual/de/guild/raid-attributions-overview.png)
+
+Nur Officer können einen Platz ausfüllen — durch Auswahl eines Charakters aus dem Dropdown, beschränkt auf im Raid sitzende Charaktere, die die Klassen-/Rollen-/Spezialisierungsanforderung des Platzes erfüllen, sofern vorhanden. Alle anderen sehen dieselbe Seite nur lesend.
+
 ### Discord-Kompositions-Ankündigung
 
 Sobald der Kanal **Zusammensetzungsankündigung** im Tab Benachrichtigungen konfiguriert ist (siehe die eigene Anleitung), postet das Veröffentlichen eines Raids ein Embed mit allen Slots, Gruppe für Gruppe. Dieselbe Nachricht wird danach bei jeder Zuweisung, Entfernung, jedem Tausch oder Skillungswechsel bearbeitet — nie neu gepostet, sodass sie stets aktuell bleibt, ohne den Kanal zuzuspammen. Jeder hinzugefügte oder entfernte Spieler kann zusätzlich eine DM erhalten, die angibt, mit welchem Charakter — sofern diese separate Einstellung aktiviert ist.
