@@ -1,0 +1,129 @@
+.spell-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-primary);
+  }
+
+  .material-icons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Mirrors .filter-panel/.filter-search/.filter-options/.filter-option in filter-menu.component.scss
+// so every searchable dropdown in the app reads as the same control — duplicated rather than
+// shared because Angular's view encapsulation scopes those classes to their own component.
+.spell-picker-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.spell-picker-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+
+  .spell-picker-search-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+.spell-picker-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.spell-picker-hint {
+  padding: 8px 10px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+// The icon (app-spell-icon, a real <a href> for its Wowhead tooltip/link — can't nest inside the
+// <button> below) and the button are siblings here, sharing one hover/focus background so the row
+// still reads as a single option regardless of which of the two the pointer/focus is actually on.
+.spell-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  &:hover,
+  &:focus-within {
+    background: var(--color-bg-tertiary);
+  }
+}
+
+.spell-picker-option {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-text-primary);
+    outline: none;
+  }
+}

@@ -92,6 +92,12 @@ export const guildRoutes: Routes = [
                 loadComponent: () =>
                   import('./raids/pages/raid-detail/raid-detail.component').then(m => m.RaidDetailComponent),
               },
+              {
+                path: 'raids/:eventId/attributions',
+                data: { minAccessLevel: GuildAccessLevel.Roster },
+                loadComponent: () =>
+                  import('./raids/pages/raid-attributions/raid-attributions.component').then(m => m.RaidAttributionsComponent),
+              },
             ],
           },
         ],

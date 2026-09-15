@@ -41,6 +41,8 @@ export class MultiSelectComponent<T> implements FormValueControl<T[]> {
   readonly filterAriaLabel = input('Filter');
   readonly label = input<string | undefined>(undefined);
   readonly disabled = input(false);
+  /** When true, the trigger shows the selected options' icons instead of their joined labels (falls back to label text for any option with no `iconUrl`). Opt-in — other call sites keep the joined-text display. */
+  readonly iconOnlySelected = input(false);
 
   readonly value = model<T[]>([]);
 
@@ -66,6 +68,12 @@ export class MultiSelectComponent<T> implements FormValueControl<T[]> {
       .filter((o) => selected.has(o.value))
       .map((o) => o.label)
       .join(', ');
+  });
+
+  /** The full option objects currently selected, in `options` order — used by `iconOnlySelected`'s chip display. */
+  readonly selectedOptions = computed(() => {
+    const selected = new Set(this.value());
+    return this.options().filter((o) => selected.has(o.value));
   });
 
   toggle(): void {

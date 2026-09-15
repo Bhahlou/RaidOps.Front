@@ -1,0 +1,100 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+
+import { GuildAttributionDefinition } from '../../raids/models/guild-attribution-definition.model';
+import { AttributionDefinitionsStore } from './attribution-definitions.store';
+
+const definition = (overrides?: Partial<GuildAttributionDefinition>): GuildAttributionDefinition => ({
+  id: 1,
+  label: 'Innervate',
+  section: 'Personals',
+  isRepeatable: true,
+  cells: [],
+  sortOrder: 0,
+  ...overrides,
+});
+
+describe('AttributionDefinitionsStore', () => {
+  let store: AttributionDefinitionsStore;
+  let controller: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [AttributionDefinitionsStore, provideHttpClient(), provideHttpClientTesting()],
+    });
+    store = TestBed.inject(AttributionDefinitionsStore);
+    controller = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => controller.verify());
+
+  describe('definitions', () => {
+    it('is empty before any guild is set', () => {
+      TestBed.tick();
+      expect(store.definitions()).toEqual([]);
+      expect(store.isLoading()).toBe(false);
+    });
+  });
+
+  describe('load', () => {
+    it('fetches the attribution definitions for the given guild', async () => {
+      const definitions = [definition()];
+
+      store.load('g1');
+      TestBed.tick();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/attribution-definitions'));
+      expect(req.request.method).toBe('GET');
+      req.flush(definitions);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.definitions()).toEqual(definitions);
+    });
+
+    it('does not re-fetch when called again for the same guild', async () => {
+      store.load('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/attribution-definitions')).flush([definition()]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.load('g1');
+      TestBed.tick();
+
+      controller.expectNone((r) => r.url.endsWith('/guilds/g1/attribution-definitions'));
+    });
+
+    it('re-fetches when the guild changes', async () => {
+      store.load('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/attribution-definitions')).flush([definition()]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.load('g2');
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g2/attribution-definitions'));
+      req.flush([definition({ label: 'PI' })]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.definitions()[0].label).toBe('PI');
+    });
+  });
+
+  describe('reload', () => {
+    it('re-fetches the same guild', async () => {
+      store.load('g1');
+      TestBed.tick();
+      controller.expectOne((r) => r.url.endsWith('/guilds/g1/attribution-definitions')).flush([definition()]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      store.reload();
+      TestBed.tick();
+      const req = controller.expectOne((r) => r.url.endsWith('/guilds/g1/attribution-definitions'));
+      req.flush([definition({ label: 'Updated' })]);
+      await TestBed.inject(ApplicationRef).whenStable();
+
+      expect(store.definitions()[0].label).toBe('Updated');
+    });
+  });
+});

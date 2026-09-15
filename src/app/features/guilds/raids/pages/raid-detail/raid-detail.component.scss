@@ -212,6 +212,21 @@
   }
 }
 
+// Wired-up hub link (currently just "Assignments") — solid border instead of the placeholder
+// dashed one, and an accent hover state, so it reads as clickable next to the still-disabled chips.
+.detail-hub-chip--link {
+  border-style: solid;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+}
+
 // Phone-width tightening — .detail-header-top's own flex-wrap already lets the actions drop below
 // the title rather than squeezing them, this just reclaims some of the header's generous padding
 // and lets the wrapped actions row span full width so the buttons stay right-aligned under it.

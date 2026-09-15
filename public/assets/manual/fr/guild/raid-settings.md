@@ -13,3 +13,11 @@ Deux options :
 Chaque raid peut aussi surcharger le mode depuis sa propre boîte de dialogue de création — un raid Planificateur ponctuel sur une branche en Auto, ou l'inverse, sans changer le réglage par défaut de la branche.
 
 > Active d'abord une branche dans l'onglet **Général** si tu ne la vois pas encore ici.
+
+### Modèle d'attributions de raid
+
+Sous le réglage du mode de raid, les officiers peuvent définir un modèle réutilisable de lignes que chaque raid doit avoir remplies — buffs, malédictions, échanges tank/heal, interrupts, etc. Les officiers remplissent chaque ligne avec de vrais personnages présents, raid par raid, depuis l'onglet **Attributions** propre à ce raid (voir [Raids](/manual/guild/raid-builder)).
+
+![Modèle d'attributions de raid : lignes groupées par section](/assets/manual/fr/guild/raid-attribution-settings-overview.png)
+
+Chaque ligne appartient à une **section** (texte libre, ex. « Buffs », « Malédictions », « Tanks & Heals ») et contient une liste ordonnée de cellules — une icône (marqueur de raid, rôle ou sort) ou un **emplacement nominatif**, avec un libellé optionnel affiché en placeholder tant qu'il n'est pas rempli, et une restriction d'éligibilité optionnelle (classes, rôles et/ou spécialisations autorisées). Une ligne peut être marquée **Répétable** : son nombre d'instances sur un raid donné est alors calculé automatiquement selon les personnages présents (ex. un emplacement Innervation par druide présent), au lieu d'être toujours exactement un.

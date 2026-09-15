@@ -5,6 +5,10 @@ import { of } from 'rxjs';
 
 import { GuildSettingsComponent } from './guild-settings.component';
 import { AuthStore } from '../../../../../core/stores/auth.store';
+import { GuildBranchesStore } from '../../../stores/guild-branches.store';
+import { WowBrancheService } from '../../../../../shared/services/wow-branche.service';
+import { GuildBranch } from '../../../models/guild-branch.model';
+import { Branch } from '../../../../../shared/models/branch.model';
 
 const setup = (guildId: string | null, tab: string | null = null, router: { navigate: ReturnType<typeof vi.fn> } = { navigate: vi.fn() }) => {
   const route = {
@@ -21,6 +25,45 @@ const setup = (guildId: string | null, tab: string | null = null, router: { navi
       { provide: ActivatedRoute, useValue: route },
       { provide: Router, useValue: router },
       { provide: AuthStore, useValue: { user: signal(null) } },
+    ],
+  }).overrideComponent(GuildSettingsComponent, { set: { template: '', imports: [] } });
+
+  return TestBed.createComponent(GuildSettingsComponent).componentInstance;
+};
+
+const guildBranch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
+  id: 1,
+  branchId: 4,
+  branchName: 'Classic Anniversary',
+  isActive: true,
+  rosterMode: null,
+  rosterRoleIds: [],
+  officerRoleIds: [],
+  region: null,
+  signupMode: null,
+  ...overrides,
+});
+
+const wowBranch = (overrides?: Partial<Branch>): Branch => ({
+  id: 4,
+  name: 'Classic Anniversary',
+  bnetNamespacePrefix: 'dynamic-classicann',
+  currentExpansionShortCode: 'TBC',
+  ...overrides,
+});
+
+// Real GuildBranchesStore/WowBrancheService go through HttpClient — mocked here (rather than
+// relying on the bare `setup()` helper's trick of never reading the resource-backed signals) so
+// `attributionExpansionId` can be exercised deterministically without a real HTTP round trip.
+const setupWithReferenceData = (branches: GuildBranch[], wowBranches: Branch[]) => {
+  TestBed.configureTestingModule({
+    imports: [GuildSettingsComponent],
+    providers: [
+      { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})), parent: { snapshot: { paramMap: { get: () => 'g1' } }, paramMap: of(convertToParamMap({ id: 'g1' })) } } },
+      { provide: Router, useValue: { navigate: vi.fn() } },
+      { provide: AuthStore, useValue: { user: signal(null) } },
+      { provide: GuildBranchesStore, useValue: { branches: signal(branches), load: vi.fn() } },
+      { provide: WowBrancheService, useValue: { getAll: () => of(wowBranches) } },
     ],
   }).overrideComponent(GuildSettingsComponent, { set: { template: '', imports: [] } });
 
@@ -74,6 +117,34 @@ describe('GuildSettingsComponent', () => {
       component.onTabChange('notifications');
 
       expect(router.navigate).toHaveBeenCalledWith(['..', 'notifications'], { relativeTo: expect.anything() });
+    });
+  });
+
+  // ── attributionExpansionId ──────────────────────────────────────────────
+
+  describe('attributionExpansionId', () => {
+    it('resolves the active branch expansion id via its WoW branch short code', () => {
+      const component = setupWithReferenceData([guildBranch({ isActive: true, branchId: 4 })], [wowBranch({ id: 4, currentExpansionShortCode: 'TBC' })]);
+
+      expect(component.attributionExpansionId()).toBe(2);
+    });
+
+    it('is null when no guild branch is active', () => {
+      const component = setupWithReferenceData([guildBranch({ isActive: false })], [wowBranch()]);
+
+      expect(component.attributionExpansionId()).toBeNull();
+    });
+
+    it('is null when the active branch has no matching WoW branch', () => {
+      const component = setupWithReferenceData([guildBranch({ isActive: true, branchId: 999 })], [wowBranch({ id: 4 })]);
+
+      expect(component.attributionExpansionId()).toBeNull();
+    });
+
+    it('is null when there are no guild branches at all', () => {
+      const component = setupWithReferenceData([], []);
+
+      expect(component.attributionExpansionId()).toBeNull();
     });
   });
 });

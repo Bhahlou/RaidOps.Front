@@ -1,3 +1,10 @@
+// Custom elements default to display:inline, which stops the host from actually filling
+// whatever width its layout context allocates (e.g. a flex item's flex-basis) — block matches
+// what every call site expects from a form control.
+:host {
+  display: block;
+}
+
 // A real <fieldset>/<legend> pair — the browser renders a genuine gap in the border sized to
 // the legend's own content, so unlike the previous absolute-position + background-mask
 // approach, there's no label width to measure and no background color to match against
@@ -99,7 +106,10 @@ legend.select-field-label {
 .select-panel {
   display: flex;
   flex-direction: column;
-  min-width: 100%;
+  // `min-width` (not a forced overlay width) so a long option label can still widen the panel
+  // past the trigger's own width instead of wrapping or overflowing inside a fixed box.
+  width: max-content;
+  max-width: min(90vw, 360px);
   margin-top: 4px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
@@ -161,6 +171,13 @@ legend.select-field-label {
   color: var(--color-text-secondary);
   cursor: pointer;
   list-style: none;
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   &:hover,
   &.cdk-option-active {

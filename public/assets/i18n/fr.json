@@ -100,6 +100,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidAttributions": {
+        "title": "Modèles d'attributions de raid, remplis par raid",
+        "description": "Les officiers peuvent désormais définir un modèle réutilisable de lignes que chaque raid doit avoir remplies — buffs, malédictions, échanges tank/heal, interrupts — avec icônes, emplacements nominatifs, et restrictions de classe/rôle/spécialisation optionnelles (Paramètres de la guilde → Raids). Chaque raid a son propre onglet « Attributions » où les officiers remplissent chaque ligne avec de vrais personnages présents ; les lignes d'une attribution « Répétable » (ex. Innervation) s'ajustent automatiquement au nombre de personnages éligibles présents."
+      },
       "raidLockoutExtension": {
         "title": "Étendre un raid sur plusieurs soirs",
         "description": "Un raid peut désormais être marqué comme la suite d'un autre — l'équivalent en jeu d'étendre l'ID de lock plutôt que d'en consommer un nouveau, par exemple pour cleaner la même instance sur deux soirées consécutives. Le champ « Suite de », dans la boîte de dialogue de création ou d'édition, propose les raids de la branche dans la même fenêtre de reset hebdomadaire ; une fois le lien posé, les mêmes personnages peuvent être assignés aux deux sans que le site ne bloque l'assignation pour conflit de verrouillage."
@@ -524,6 +528,114 @@
         "saveSuccess": "Mode de raid de la branche enregistré."
       }
     },
+    "attributions": {
+      "title": "Modèle d'attributions de raid",
+      "hint": "Lignes que la guilde doit toujours assigner pendant un raid (buffs, malédictions, tank/heal swaps, interrupts…). Les officiers remplissent chaque ligne avec de vrais personnages par raid, dans son onglet Attributions.",
+      "add": "Ajouter une ligne",
+      "edit": "Modifier",
+      "duplicate": "Dupliquer",
+      "delete": "Supprimer",
+      "loading": "Chargement du modèle…",
+      "empty": "Aucune ligne d'attribution pour l'instant — ajoutez-en une.",
+      "saveSuccess": "Ligne d'attribution enregistrée.",
+      "deleteSuccess": "Ligne d'attribution supprimée.",
+      "deleteConfirmTitle": "Supprimer la ligne d'attribution ?",
+      "deleteConfirmMessage": "« {{label}} » sera retirée du modèle, ainsi que tous ses remplissages sur tous les raids.",
+      "dialog": {
+        "createTitle": "Ajouter une ligne d'attribution",
+        "editTitle": "Modifier la ligne d'attribution",
+        "duplicateLabel": "{{label}} (copie)",
+        "label": "Libellé",
+        "labelPlaceholder": "Optionnel — l'icône suffit souvent",
+        "section": "Section",
+        "sectionPlaceholder": "ex. Buffs, Malédictions, Tanks & Heals…",
+        "isRepeatable": "Répétable",
+        "isRepeatableHint": "Les officiers peuvent ajouter un nombre variable d'instances de cette ligne par raid (ex. autant d'Innervates qu'il y a de druides ce soir-là), au lieu d'une seule fixe.",
+        "cells": "Cellules",
+        "iconCell": "Icône",
+        "nameSlotCell": "Emplacement de nom",
+        "nameSlot": "Nom",
+        "markers": "Marqueurs",
+        "roles": "Rôles",
+        "spell": "Sort",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "removeCell": "Retirer la cellule",
+        "addIconCell": "Ajouter une icône",
+        "addNameSlotCell": "Ajouter un emplacement de nom",
+        "slotLabelPlaceholder": "ex. Source, Cible…",
+        "requiredClasses": "Classes autorisées",
+        "requiredRoles": "Rôles autorisés",
+        "requiredSpecs": "Spés autorisées",
+        "roleTank": "Tank",
+        "roleHealer": "Soigneur",
+        "roleRanged": "Distance",
+        "roleMelee": "Mêlée"
+      },
+      "classes": {
+        "warrior": "Guerrier",
+        "paladin": "Paladin",
+        "hunter": "Chasseur",
+        "rogue": "Voleur",
+        "priest": "Prêtre",
+        "deathknight": "Chevalier de la mort",
+        "shaman": "Chaman",
+        "mage": "Mage",
+        "warlock": "Démoniste",
+        "monk": "Moine",
+        "druid": "Druide",
+        "demonhunter": "Chasseur de démons",
+        "evoker": "Évocateur"
+      },
+      "specs": {
+        "arms": "Armes",
+        "fury": "Fureur",
+        "protection": "Protection",
+        "holy": "Sacré",
+        "retribution": "Vindicte",
+        "beastmastery": "Maîtrise des bêtes",
+        "marksmanship": "Précision",
+        "survival": "Survie",
+        "assassination": "Assassinat",
+        "outlaw": "Hors-la-loi",
+        "subtlety": "Finesse",
+        "discipline": "Discipline",
+        "shadow": "Ombre",
+        "blood": "Sang",
+        "frost": "Givre",
+        "unholy": "Impie",
+        "elemental": "Éléments",
+        "enhancement": "Amélioration",
+        "restoration": "Restauration",
+        "arcane": "Arcanes",
+        "fire": "Feu",
+        "affliction": "Affliction",
+        "demonology": "Démonologie",
+        "destruction": "Destruction",
+        "brewmaster": "Maître brasseur",
+        "windwalker": "Marcheur du vent",
+        "mistweaver": "Tisse-brume",
+        "balance": "Équilibre",
+        "feral": "Farouche",
+        "guardian": "Gardien",
+        "havoc": "Dévastation",
+        "vengeance": "Vengeance",
+        "devastation": "Dévastation",
+        "preservation": "Préservation",
+        "augmentation": "Amplification"
+      },
+      "spellPicker": {
+        "trigger": "Choisir un sort",
+        "placeholder": "Rechercher un sort…",
+        "searching": "Recherche…",
+        "noResults": "Aucun sort trouvé."
+      },
+      "errors": {
+        "SpellNotFound": "Ce sort est introuvable.",
+        "InvalidRequest": "Certains champs sont invalides.",
+        "NoCellsInDefinition": "Cette ligne doit avoir au moins une cellule."
+      }
+    },
     "notificationSettings": {
       "families": {
         "absences": {
@@ -913,6 +1025,18 @@
       "groupingCharacterDialogHint": "Tu n'as pas de personnage assigné à ce raid — choisis quel personnage assigné le message doit référencer.",
       "groupingCharacterDialogLabel": "Personnage",
       "groupingCharacterDialogSubmit": "Envoyer l'annonce"
+    },
+    "attributions": {
+      "loading": "Chargement des attributions…",
+      "empty": "Votre guilde n'a pas encore de modèle d'attributions — ajoutez des lignes dans Paramètres de la guilde → Raids.",
+      "noneAssignable": "Aucune attribution n'est assignable avec la composition actuelle du raid.",
+      "errors": {
+        "CharacterNotSeatedInEvent": "Ce personnage n'est pas présent dans ce raid.",
+        "AttributionCellNotFound": "Cet emplacement n'existe plus dans le modèle.",
+        "AttributionCellNotNameSlot": "Cette cellule n'est pas remplissable.",
+        "CharacterDoesNotMeetSlotRequirement": "Ce personnage ne correspond pas à la contrainte de classe/rôle/spé de cet emplacement.",
+        "InvalidInstanceIndex": "Cette instance n'existe plus sur cette ligne."
+      }
     },
     "tabs": {
       "empty": "Aucun raid sur cette période.",
