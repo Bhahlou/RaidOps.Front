@@ -13,6 +13,7 @@
         [value]="label()"
         (input)="label.set($any($event.target).value)"
         maxlength="64"
+        [attr.aria-label]="'guildSettings.attributions.dialog.label' | transloco"
         [placeholder]="'guildSettings.attributions.dialog.labelPlaceholder' | transloco"
       />
     </app-form-field-card>
@@ -27,6 +28,7 @@
         [value]="section()"
         (input)="section.set($any($event.target).value)"
         maxlength="64"
+        [attr.aria-label]="'guildSettings.attributions.dialog.section' | transloco"
         [placeholder]="'guildSettings.attributions.dialog.sectionPlaceholder' | transloco"
       />
       <span class="material-icons section-hint-chevron">expand_more</span>
@@ -38,14 +40,15 @@
     </app-form-field-card>
   </div>
 
-  <label class="checkbox-field">
-    <app-checkbox [checked]="isRepeatable()" (checkedChange)="isRepeatable.set($event)" />
-    {{ 'guildSettings.attributions.dialog.isRepeatable' | transloco }}
-  </label>
+  <div class="checkbox-field">
+    <app-checkbox [checked]="isRepeatable()" (checkedChange)="isRepeatable.set($event)">
+      {{ 'guildSettings.attributions.dialog.isRepeatable' | transloco }}
+    </app-checkbox>
+  </div>
   <span class="field-hint">{{ 'guildSettings.attributions.dialog.isRepeatableHint' | transloco }}</span>
 
   <div class="field-group">
-    <label class="field-label">{{ 'guildSettings.attributions.dialog.cells' | transloco }}</label>
+    <span class="field-label">{{ 'guildSettings.attributions.dialog.cells' | transloco }}</span>
 
     <div class="cell-list">
       @for (cell of cells(); track cell.key; let i = $index; let count = $count) {
@@ -110,6 +113,7 @@
                   maxlength="32"
                   [value]="cell.slotLabel"
                   (input)="setSlotLabel(cell.key, $any($event.target).value)"
+                  [attr.aria-label]="'guildSettings.attributions.dialog.nameSlot' | transloco"
                   [placeholder]="'guildSettings.attributions.dialog.slotLabelPlaceholder' | transloco"
                 />
               </app-form-field-card>

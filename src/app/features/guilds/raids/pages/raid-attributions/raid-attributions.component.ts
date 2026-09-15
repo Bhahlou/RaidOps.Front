@@ -119,7 +119,7 @@ export class RaidAttributionsComponent {
     for (const definition of definitions) {
       const label = definition.section?.trim() || '';
       const lastGroup = groups.at(-1);
-      if (lastGroup && lastGroup.label === label) {
+      if (lastGroup?.label === label) {
         lastGroup.definitions.push(definition);
       } else {
         groups.push({ label, definitions: [definition] });
@@ -155,20 +155,28 @@ export class RaidAttributionsComponent {
     let maxTextWidth = 0;
     for (const section of this.sections()) {
       for (const definition of section.definitions) {
-        for (const cell of this.repeatingCells(definition)) {
-          if (cell.kind !== AttributionCellKind.NameSlot) continue;
-          for (const instanceIndex of this.instanceIndexes(definition)) {
-            const filledId = this.filledCharacterId(cell.id, instanceIndex);
-            const text =
-              filledId === UNASSIGNED ? (cell.slotLabel ?? '') : (this.characterOptions(cell).find((o) => o.value === filledId)?.label ?? '');
-            const textWidth = measureTextWidth(text);
-            if (textWidth > maxTextWidth) maxTextWidth = textWidth;
-          }
-        }
+        maxTextWidth = Math.max(maxTextWidth, this.#maxSlotTextWidth(definition));
       }
     }
     return `${Math.ceil(maxTextWidth) + 46}px`;
   });
+
+  /** Widest rendered text (picked name, or placeholder while empty) among a definition's own name-slot cells, across every instance. */
+  #maxSlotTextWidth(definition: GuildAttributionDefinition): number {
+    let maxTextWidth = 0;
+    for (const cell of this.repeatingCells(definition)) {
+      if (cell.kind !== AttributionCellKind.NameSlot) continue;
+      for (const instanceIndex of this.instanceIndexes(definition)) {
+        maxTextWidth = Math.max(maxTextWidth, measureTextWidth(this.#slotText(cell, instanceIndex)));
+      }
+    }
+    return maxTextWidth;
+  }
+
+  #slotText(cell: AttributionCell, instanceIndex: number): string {
+    const filledId = this.filledCharacterId(cell.id, instanceIndex);
+    return filledId === UNASSIGNED ? (cell.slotLabel ?? '') : (this.characterOptions(cell).find((o) => o.value === filledId)?.label ?? '');
+  }
 
   /**
    * A fixed-width gutter for `.attribution-head`'s icons, sized for the row with the most head

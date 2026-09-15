@@ -69,7 +69,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
     for (const definition of this.definitions()) {
       const label = this.sectionLabel(definition);
       const lastGroup = groups.at(-1);
-      if (lastGroup && lastGroup.label === label) {
+      if (lastGroup?.label === label) {
         lastGroup.definitions.push(definition);
       } else {
         groups.push({ label, definitions: [definition] });
@@ -92,7 +92,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
   }
 
   #openDialog(definition: GuildAttributionDefinition | null, cloneFrom: GuildAttributionDefinition | null): void {
-    const existingSections = [...new Set(this.definitions().map((d) => d.section?.trim()).filter((s): s is string => !!s))].sort();
+    const existingSections = [...new Set(this.definitions().map((d) => d.section?.trim()).filter((s): s is string => !!s))].sort((a, b) => a.localeCompare(b));
 
     this.#dialog
       .open<boolean>(AttributionDefinitionDialogComponent, {
