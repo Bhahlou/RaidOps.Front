@@ -1,0 +1,59 @@
+.icon-source-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.icon-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.icon-preview-empty {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.icon-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-picker-row-label {
+  flex: 0 0 90px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.static-role-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.static-role-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  cursor: pointer;
+
+  &.active {
+    border-color: var(--color-accent);
+    background: var(--color-bg-elevated);
+  }
+}

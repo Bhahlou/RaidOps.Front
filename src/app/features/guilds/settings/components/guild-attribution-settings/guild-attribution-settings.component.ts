@@ -1,10 +1,11 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkDrag, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonComponent } from '../../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../../shared/components/buttons/icon-button/icon-button.component';
 import { FormFieldCardComponent } from '../../../../../shared/components/form/form-field-card/form-field-card.component';
+import { SelectComponent, SelectOption } from '../../../../../shared/components/form/select/select.component';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { ConfirmDialogComponent } from '../../../../../shared/components/dialogs/confirm-dialog/confirm-dialog.component';
 import { SpellIconComponent } from '../../../../../shared/components/icons/spell-icon/spell-icon.component';
@@ -13,12 +14,21 @@ import { AttributionRoleIconComponent } from '../../../../../shared/components/i
 import { AttributionDefinitionsStore } from '../../stores/attribution-definitions.store';
 import { AttributionDefinitionsService } from '../../../raids/services/attribution-definitions.service';
 import { GuildAttributionDefinition } from '../../../raids/models/guild-attribution-definition.model';
+import { RaidBoss } from '../../../raids/models/raid-boss.model';
+import { RaidZone } from '../../../raids/models/raid-zone.model';
+import { raidBossIconUrl, raidBossNameKey, raidZoneNameKey } from '../../../raids/utils/raid-boss-name.util';
+import { raidZoneIconUrl } from '../../../raids/utils/raid-zone-icon.util';
 import { AttributionIconSource } from '../../../raids/models/attribution-icon-source.enum';
 import { AttributionCellKind } from '../../../raids/models/attribution-cell-kind.enum';
 import {
   AttributionDefinitionDialogComponent,
   AttributionDefinitionDialogData,
 } from '../attribution-definition-dialog/attribution-definition-dialog.component';
+import { SectionIconDialogComponent, SectionIconDialogData } from '../section-icon-dialog/section-icon-dialog.component';
+import { IconSourceState } from '../../../raids/components/icon-source-picker/icon-source-picker.component';
+
+/** Sentinel `raidOptions` value for the "General" scope — every real raid zone has a positive seeded ID. */
+const GENERAL_SCOPE = -1;
 
 /** Guild-wide raid-attribution template editor — one evolving, reorderable list of rows the guild curates as its raid content changes. */
 @Component({
@@ -29,6 +39,7 @@ import {
     ButtonComponent,
     IconButtonComponent,
     FormFieldCardComponent,
+    SelectComponent,
     SpellIconComponent,
     RaidMarkerIconComponent,
     AttributionRoleIconComponent,
@@ -49,12 +60,66 @@ export class GuildAttributionSettingsComponent implements OnInit {
   readonly #definitionsService = inject(AttributionDefinitionsService);
   readonly #snackbar = inject(SnackbarService);
   readonly #dialog = inject(Dialog);
+  readonly #transloco = inject(TranslocoService);
 
   readonly definitions = this.#store.definitions;
   readonly isLoading = this.#store.isLoading;
 
+  readonly raidZones = signal<RaidZone[]>([]);
+  readonly bosses = signal<RaidBoss[]>([]);
+  readonly selectedRaidId = signal<number>(GENERAL_SCOPE);
+  readonly selectedBossId = signal<number | null>(null);
+  readonly loadingBosses = signal(false);
+
+  readonly raidOptions = computed<SelectOption<number>[]>(() => {
+    this.#transloco.activeLang(); // depend on language changes so labels stay in sync
+    return [
+      { value: GENERAL_SCOPE, label: this.#transloco.translate('guildSettings.attributions.scope.general') },
+      ...this.raidZones().map((z) => ({ value: z.id, label: this.#transloco.translate(raidZoneNameKey(z.shortCode)), iconUrl: raidZoneIconUrl(z.shortCode) })),
+    ];
+  });
+
+  readonly bossOptions = computed<SelectOption<number>[]>(() => {
+    this.#transloco.activeLang(); // depend on language changes so labels stay in sync
+    return this.bosses().map((b) => ({ value: b.id, label: this.#transloco.translate(raidBossNameKey(b.name)), iconUrl: raidBossIconUrl(b.name) }));
+  });
+
+  readonly showBossPicker = computed(() => this.selectedRaidId() !== GENERAL_SCOPE);
+
+  /** The scope currently loaded/edited — the boss's ID, or `null` for "General". */
+  readonly currentRaidBossId = computed<number | null>(() => (this.selectedRaidId() === GENERAL_SCOPE ? null : this.selectedBossId()));
+
   ngOnInit(): void {
-    this.#store.load(this.guildId());
+    this.#definitionsService.getRaidZonesForGuild(this.guildId()).subscribe((zones) => this.raidZones.set(zones));
+    this.#loadScope();
+  }
+
+  /** Switches the "Raid" picker — General or a specific zone — auto-selecting its first boss so the editor never sits on an unresolved scope. */
+  onRaidChange(raidId: number | null): void {
+    this.selectedRaidId.set(raidId ?? GENERAL_SCOPE);
+    this.selectedBossId.set(null);
+    this.bosses.set([]);
+
+    if (raidId === null || raidId === GENERAL_SCOPE) {
+      this.#loadScope();
+      return;
+    }
+
+    this.loadingBosses.set(true);
+    this.#definitionsService.getBossesForZone(this.guildId(), raidId).subscribe((bosses) => {
+      this.bosses.set(bosses);
+      this.loadingBosses.set(false);
+      this.onBossChange(bosses[0]?.id ?? null);
+    });
+  }
+
+  onBossChange(bossId: number | null): void {
+    this.selectedBossId.set(bossId);
+    if (bossId != null) this.#loadScope();
+  }
+
+  #loadScope(): void {
+    this.#store.load(this.guildId(), this.currentRaidBossId());
   }
 
   /** `null`/empty section renders under this fallback heading. */
@@ -91,6 +156,25 @@ export class GuildAttributionSettingsComponent implements OnInit {
     this.#openDialog(null, definition);
   }
 
+  /** Every currently-known section's icon, keyed by label — lets the row dialog prefill/preserve a section's icon when its rows are created/edited. */
+  #sectionIcons(): { section: string; icon: IconSourceState }[] {
+    return this.groupedSections()
+      .filter((g) => g.label)
+      .map((g) => {
+        const first = g.definitions[0];
+        return {
+          section: g.label,
+          icon: {
+            iconSource: first.sectionIconSource,
+            spellId: first.sectionSpellId,
+            spellIconUrl: first.sectionSpellIconUrl,
+            raidMarker: first.sectionRaidMarker,
+            staticRole: first.sectionStaticRole,
+          },
+        };
+      });
+  }
+
   #openDialog(definition: GuildAttributionDefinition | null, cloneFrom: GuildAttributionDefinition | null): void {
     const existingSections = [...new Set(this.definitions().map((d) => d.section?.trim()).filter((s): s is string => !!s))].sort((a, b) => a.localeCompare(b));
 
@@ -104,7 +188,30 @@ export class GuildAttributionSettingsComponent implements OnInit {
           definition,
           cloneFrom,
           existingSections,
+          existingSectionIcons: this.#sectionIcons(),
+          raidBossId: this.currentRaidBossId(),
         } satisfies AttributionDefinitionDialogData,
+      })
+      .closed.subscribe((saved) => {
+        if (saved) this.#store.reload();
+      });
+  }
+
+  openSectionIconDialog(section: string): void {
+    const found = this.#sectionIcons().find((s) => s.section === section);
+    if (!found) return;
+
+    this.#dialog
+      .open<boolean>(SectionIconDialogComponent, {
+        width: '420px',
+        maxWidth: '95vw',
+        data: {
+          guildId: this.guildId(),
+          expansionId: this.expansionId(),
+          raidBossId: this.currentRaidBossId(),
+          section,
+          icon: found.icon,
+        } satisfies SectionIconDialogData,
       })
       .closed.subscribe((saved) => {
         if (saved) this.#store.reload();

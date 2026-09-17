@@ -7,6 +7,25 @@
     <app-button variant="primary" (click)="openCreateDialog()">{{ 'guildSettings.attributions.add' | transloco }}</app-button>
   </div>
 
+  <div class="attribution-scope-picker">
+    <app-select
+      [options]="raidOptions()"
+      [value]="selectedRaidId()"
+      (valueChange)="onRaidChange($event)"
+      [label]="'guildSettings.attributions.scope.raidLabel' | transloco"
+    />
+    @if (showBossPicker()) {
+      <app-select
+        [options]="bossOptions()"
+        [value]="selectedBossId()"
+        (valueChange)="onBossChange($event)"
+        [disabled]="loadingBosses()"
+        [placeholder]="'guildSettings.attributions.scope.bossPlaceholder' | transloco"
+        [label]="'guildSettings.attributions.scope.bossLabel' | transloco"
+      />
+    }
+  </div>
+
   @if (isLoading()) {
     <p class="card-hint">{{ 'guildSettings.attributions.loading' | transloco }}</p>
   } @else if (definitions().length === 0) {
@@ -16,7 +35,22 @@
       @for (section of groupedSections(); track section.label + '-' + $index) {
         <div class="attribution-section" [class.attribution-section--unlabeled]="!section.label">
           @if (section.label) {
-            <div class="attribution-section-header">{{ section.label }}</div>
+            @let sectionIcon = section.definitions[0];
+            <div class="attribution-section-header">
+              @if (sectionIcon.sectionIconSource === IconSource.Spell && sectionIcon.sectionSpellIconUrl) {
+                <app-spell-icon [iconUrl]="sectionIcon.sectionSpellIconUrl" [label]="section.label" [spellId]="sectionIcon.sectionSpellId" [size]="18" />
+              } @else if (sectionIcon.sectionIconSource === IconSource.RaidMarker && sectionIcon.sectionRaidMarker !== null) {
+                <app-raid-marker-icon [marker]="sectionIcon.sectionRaidMarker" [size]="18" />
+              } @else if (sectionIcon.sectionIconSource === IconSource.StaticRole && sectionIcon.sectionStaticRole !== null) {
+                <app-attribution-role-icon [role]="sectionIcon.sectionStaticRole" [size]="18" />
+              }
+              <span class="attribution-section-header-label">{{ section.label }}</span>
+              <app-icon-button
+                icon="palette"
+                (click)="openSectionIconDialog(section.label)"
+                [title]="'guildSettings.attributions.sectionIcon.edit' | transloco"
+              />
+            </div>
           }
           @for (definition of section.definitions; track definition.id) {
             <div class="attribution-row" cdkDrag>
