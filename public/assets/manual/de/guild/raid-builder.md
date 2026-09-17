@@ -44,9 +44,11 @@ Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und
 
 ### Zuweisungen
 
-Der Link **Zuweisungen** auf der Detailseite eines Raids öffnet, wer welche Zeile der [Raid-Zuweisungsvorlage](/manual/guild/raid-settings) der Gilde für genau diesen Raid ausfüllt — Buffs, Flüche, Tank-/Heal-Wechsel, Interrupts, was auch immer Officer eingerichtet haben. Zeilen sind nach Abschnitt gruppiert und erscheinen nur, wenn sie mindestens ein aktuell im Raid sitzender Charakter ausfüllen könnte; die Instanzenzahl einer **wiederholbaren** Zeile passt sich automatisch an (z. B. so viele Anregen-Plätze wie Druiden im Raid sitzen).
+Der Link **Zuweisungen** auf der Detailseite eines Raids öffnet, wer welche Zeile der [Raid-Zuweisungsvorlage](/manual/guild/raid-settings) der Gilde für genau diesen Raid ausfüllt — Buffs, Flüche, Tank-/Heal-Wechsel, Interrupts, was auch immer Officer eingerichtet haben. Zeilen sind nach Abschnitt gruppiert und erscheinen nur, wenn sie mindestens ein aktuell im Raid sitzender Charakter ausfüllen könnte; die Instanzenzahl einer **wiederholbaren** Zeile passt sich automatisch an (z. B. so viele Anregen-Plätze wie Druiden im Raid sitzen). Die **Allgemein**-Zeilen (gildenweit, an keinen Boss gebunden) bleiben unabhängig vom ausgewählten Boss immer in ihrer eigenen Spalte sichtbar.
 
 ![Zuweisungen-Seite: Zeilen mit anwesenden Charakteren ausgefüllt](/assets/manual/de/guild/raid-attributions-overview.png)
+
+Zielt der Raid auf eine Zone mit konfigurierten bossgebundenen Zeilen, listet eine Navigationsleiste links jeden Boss auf, gruppiert nach Zone (normalerweise nur eine, außer bei einem Split-Raid über mehrere Zonen) — einen auswählen, um dessen eigene Zeilen (Interrupts, Positionen, was auch immer für diesen Kampf spezifisch ist) neben Allgemein auszufüllen.
 
 Nur Officer können einen Platz ausfüllen — durch Auswahl eines Charakters aus dem Dropdown, beschränkt auf im Raid sitzende Charaktere, die die Klassen-/Rollen-/Spezialisierungsanforderung des Platzes erfüllen, sofern vorhanden. Alle anderen sehen dieselbe Seite nur lesend.
 

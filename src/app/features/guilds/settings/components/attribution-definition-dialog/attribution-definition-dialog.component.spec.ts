@@ -58,6 +58,12 @@ const definition = (overrides?: Partial<GuildAttributionDefinition>): GuildAttri
   label: 'Innervate',
   section: 'Personals',
   isRepeatable: true,
+  raidBossId: null,
+  sectionIconSource: AttributionIconSource.None,
+  sectionSpellId: null,
+  sectionSpellIconUrl: null,
+  sectionRaidMarker: null,
+  sectionStaticRole: null,
   cells: [iconCell(), nameSlotCell()],
   sortOrder: 0,
   ...overrides,
@@ -67,7 +73,7 @@ const spell = (overrides?: Partial<Spell>): Spell => ({ id: 5, name: 'Innervate'
 
 describe('AttributionDefinitionDialogComponent', () => {
   let dialogRef: { close: ReturnType<typeof vi.fn> };
-  let definitionsService: { createDefinition: ReturnType<typeof vi.fn>; updateDefinition: ReturnType<typeof vi.fn> };
+  let definitionsService: { createDefinition: ReturnType<typeof vi.fn>; updateDefinition: ReturnType<typeof vi.fn>; setSectionIcon: ReturnType<typeof vi.fn> };
   let characterStore: { loadSpecs: ReturnType<typeof vi.fn> };
   let wowClassService: { getAll: ReturnType<typeof vi.fn> };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
@@ -75,7 +81,11 @@ describe('AttributionDefinitionDialogComponent', () => {
 
   const setup = (data: Partial<AttributionDefinitionDialogData> = {}, specs: Spec[] = [spec()], classes: WowClass[] = [wowClass()]) => {
     dialogRef = { close: vi.fn() };
-    definitionsService = { createDefinition: vi.fn().mockReturnValue(of(undefined)), updateDefinition: vi.fn().mockReturnValue(of(undefined)) };
+    definitionsService = {
+      createDefinition: vi.fn().mockReturnValue(of(undefined)),
+      updateDefinition: vi.fn().mockReturnValue(of(undefined)),
+      setSectionIcon: vi.fn().mockReturnValue(of(undefined)),
+    };
     characterStore = { loadSpecs: vi.fn().mockReturnValue(of(specs)) };
     wowClassService = { getAll: vi.fn().mockReturnValue(of(classes)) };
     snackbar = { success: vi.fn(), error: vi.fn() };
@@ -87,6 +97,8 @@ describe('AttributionDefinitionDialogComponent', () => {
       definition: null,
       cloneFrom: null,
       existingSections: [],
+      existingSectionIcons: [],
+      raidBossId: null,
       ...data,
     };
 
@@ -387,13 +399,13 @@ describe('AttributionDefinitionDialogComponent', () => {
       expect(component.cells()[0]).toMatchObject({ iconSource: AttributionIconSource.Spell, spellId: 42, spellIconUrl: 'https://cdn/spell.jpg', raidMarker: null, staticRole: null });
     });
 
-    it('fills in the empty label with the spell name', () => {
+    it('never touches the label — picking a spell is icon-only, the label stays whatever the officer typed (or left blank)', () => {
       const component = setup();
       component.addIconCell();
 
       component.onSpellSelected(component.cells()[0].key, spell({ name: 'Innervate' }));
 
-      expect(component.label()).toBe('Innervate');
+      expect(component.label()).toBe('');
     });
 
     it('does not overwrite an existing label', () => {
@@ -488,6 +500,41 @@ describe('AttributionDefinitionDialogComponent', () => {
     });
   });
 
+  // ── setSection / setSectionIcon ──────────────────────────────────────────
+
+  describe('setSection', () => {
+    const existingIcon = { iconSource: AttributionIconSource.RaidMarker, raidMarker: RaidMarkerIcon.Skull, spellId: null, spellIconUrl: null, staticRole: null };
+
+    it('picks up the icon already used by a matching existing section', () => {
+      const component = setup({ existingSectionIcons: [{ section: 'Interrupts', icon: existingIcon }] });
+
+      component.setSection('Interrupts');
+
+      expect(component.section()).toBe('Interrupts');
+      expect(component.sectionIcon()).toEqual(existingIcon);
+    });
+
+    it('resets to the blank icon for a section with no existing match', () => {
+      const component = setup({ existingSectionIcons: [{ section: 'Interrupts', icon: existingIcon }] });
+      component.setSectionIcon(existingIcon);
+
+      component.setSection('Cooldowns');
+
+      expect(component.sectionIcon()).toEqual({ iconSource: AttributionIconSource.None, spellId: null, spellIconUrl: null, raidMarker: null, staticRole: null });
+    });
+  });
+
+  describe('setSectionIcon', () => {
+    it('updates the sectionIcon signal', () => {
+      const component = setup();
+      const icon = { iconSource: AttributionIconSource.StaticRole, staticRole: SpecRole.Tank, spellId: null, spellIconUrl: null, raidMarker: null };
+
+      component.setSectionIcon(icon);
+
+      expect(component.sectionIcon()).toEqual(icon);
+    });
+  });
+
   // ── submit ───────────────────────────────────────────────────────────────
 
   describe('submit', () => {
@@ -571,6 +618,45 @@ describe('AttributionDefinitionDialogComponent', () => {
       component.submit();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
+    });
+
+    // ── section icon push on save ───────────────────────────────────────────
+
+    it('skips setSectionIcon entirely for a blank section', () => {
+      const component = setup({ definition: null });
+      component.label.set('Innervate');
+      component.addNameSlotCell();
+
+      component.submit();
+
+      expect(definitionsService.setSectionIcon).not.toHaveBeenCalled();
+      expect(snackbar.success).toHaveBeenCalledWith('guildSettings.attributions.saveSuccess');
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('pushes the current section icon for the row scope and section on a non-blank section', () => {
+      const icon = { iconSource: AttributionIconSource.RaidMarker, raidMarker: RaidMarkerIcon.Skull, spellId: null, spellIconUrl: null, staticRole: null };
+      const component = setup({ guildId: 'guild-1', raidBossId: 14, definition: null });
+      component.label.set('Interrupt');
+      component.section.set('Interrupts');
+      component.setSectionIcon(icon);
+      component.addNameSlotCell();
+
+      component.submit();
+
+      expect(definitionsService.setSectionIcon).toHaveBeenCalledWith('guild-1', { raidBossId: 14, section: 'Interrupts', ...icon });
+      expect(snackbar.success).toHaveBeenCalledWith('guildSettings.attributions.saveSuccess');
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('still closes the dialog but shows a dedicated failure snackbar when setSectionIcon fails', () => {
+      const component = setup({ definition: definition({ section: 'Personals', cells: [nameSlotCell()] }) });
+      definitionsService.setSectionIcon.mockReturnValue(throwError(() => new HttpErrorResponse({ error: {} })));
+
+      component.submit();
+
+      expect(snackbar.error).toHaveBeenCalledWith('guildSettings.attributions.sectionIcon.saveFailed');
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
     });
   });
 

@@ -2,9 +2,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { GuildAttributionDefinitionPayload } from '../models/guild-attribution-definition.model';
+import { CreateGuildAttributionDefinitionPayload, GuildAttributionDefinitionPayload } from '../models/guild-attribution-definition.model';
 import { AttributionCellKind } from '../models/attribution-cell-kind.enum';
 import { AttributionIconSource } from '../models/attribution-icon-source.enum';
+import { RaidMarkerIcon } from '../models/raid-marker-icon.enum';
 import { AttributionDefinitionsService } from './attribution-definitions.service';
 
 const BASE = '/guilds/guild-1';
@@ -43,20 +44,57 @@ describe('AttributionDefinitionsService', () => {
   afterEach(() => controller.verify());
 
   describe('getDefinitions', () => {
-    it('sends GET to .../attribution-definitions', () => {
-      service.getDefinitions('guild-1').subscribe();
-      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/attribution-definitions`));
+    it('sends GET to .../attribution-definitions with no raidBossId param when null', () => {
+      service.getDefinitions('guild-1', null).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/attribution-definitions`) && !r.params.has('raidBossId'));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+
+    it('sends the raidBossId as a query param when given', () => {
+      service.getDefinitions('guild-1', 14).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/attribution-definitions`) && r.params.get('raidBossId') === '14');
       expect(req.request.method).toBe('GET');
       req.flush([]);
     });
   });
 
+  describe('getRaidZonesForGuild', () => {
+    it('sends GET to .../raid-zones', () => {
+      service.getRaidZonesForGuild('guild-1').subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/raid-zones`));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
+  describe('getBossesForZone', () => {
+    it('sends GET to .../raid-zones/{id}/bosses', () => {
+      service.getBossesForZone('guild-1', 4).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/raid-zones/4/bosses`));
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
+  describe('setSectionIcon', () => {
+    it('sends POST to .../attribution-definitions/sections/icon with the payload', () => {
+      const sectionPayload = { raidBossId: 14, section: 'Interrupts', iconSource: AttributionIconSource.RaidMarker, spellId: null, raidMarker: RaidMarkerIcon.Skull, staticRole: null };
+      service.setSectionIcon('guild-1', sectionPayload).subscribe();
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/attribution-definitions/sections/icon`));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(sectionPayload);
+      req.flush(null);
+    });
+  });
+
   describe('createDefinition', () => {
     it('sends POST to .../attribution-definitions with the payload', () => {
-      service.createDefinition('guild-1', payload).subscribe();
+      const createPayload: CreateGuildAttributionDefinitionPayload = { ...payload, raidBossId: null };
+      service.createDefinition('guild-1', createPayload).subscribe();
       const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/attribution-definitions`));
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(payload);
+      expect(req.request.body).toEqual(createPayload);
       req.flush(null);
     });
   });

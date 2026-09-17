@@ -44,9 +44,11 @@ Une fois un raid **publié**, son nom devient cliquable dans la grille et ouvre 
 
 ### Attributions
 
-Le lien **Attributions** de la page de détail d'un raid ouvre qui remplit chaque ligne du [modèle d'attributions](/manual/guild/raid-settings) de la guilde pour ce raid précis — buffs, malédictions, échanges tank/heal, interrupts, tout ce que les officiers ont configuré. Les lignes sont groupées par section et n'apparaissent que si au moins un personnage actuellement présent peut les remplir ; le nombre d'instances d'une ligne **Répétable** s'ajuste automatiquement (ex. autant d'emplacements Innervation que de druides présents).
+Le lien **Attributions** de la page de détail d'un raid ouvre qui remplit chaque ligne du [modèle d'attributions](/manual/guild/raid-settings) de la guilde pour ce raid précis — buffs, malédictions, échanges tank/heal, interrupts, tout ce que les officiers ont configuré. Les lignes sont groupées par section et n'apparaissent que si au moins un personnage actuellement présent peut les remplir ; le nombre d'instances d'une ligne **Répétable** s'ajuste automatiquement (ex. autant d'emplacements Innervation que de druides présents). Les lignes **Générales** (transverses à la guilde, non liées à un boss) restent toujours visibles dans leur propre colonne, quel que soit le boss sélectionné.
 
 ![Page Attributions : lignes remplies avec les personnages présents](/assets/manual/fr/guild/raid-attributions-overview.png)
+
+Si le raid cible une zone avec des lignes propres à des boss configurées, une barre de navigation à gauche liste chaque boss, groupé par zone (généralement une seule, sauf pour un raid split qui en couvre plusieurs) — en choisir un pour remplir ses propres lignes (interrupts, placements, tout ce qui est spécifique à ce combat) à côté de la Générale.
 
 Seuls les officiers peuvent remplir un emplacement — en choisissant un personnage dans la liste déroulante, restreinte à ceux présents dans le raid et remplissant la restriction de classe/rôle/spécialisation de l'emplacement, s'il y en a une. Les autres voient la même page en lecture seule.
 

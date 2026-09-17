@@ -44,9 +44,11 @@ Once a raid is **published**, its name becomes clickable in the grid and opens i
 
 ### Assignments
 
-The **Assignments** hub link, on a raid's detail page, opens who's filling each row of the guild's [raid attribution template](/manual/guild/raid-settings) for that specific raid — buffs, curses, tank/heal swaps, interrupts, whatever officers have set up. Rows are grouped by section and only show up if at least one currently seated character could fill them; a **Repeatable** row's instance count adjusts itself automatically (e.g. as many Innervate slots as there are druids currently seated).
+The **Assignments** hub link, on a raid's detail page, opens who's filling each row of the guild's [raid attribution template](/manual/guild/raid-settings) for that specific raid — buffs, curses, tank/heal swaps, interrupts, whatever officers have set up. Rows are grouped by section and only show up if at least one currently seated character could fill them; a **Repeatable** row's instance count adjusts itself automatically (e.g. as many Innervate slots as there are druids currently seated). The **General** rows (guild-wide, not tied to any boss) always stay visible in their own column, regardless of which boss is selected.
 
 ![Assignments page: rows filled in with seated characters](/assets/manual/en/guild/raid-attributions-overview.png)
+
+If the raid targets a zone with boss-scoped rows configured, a navigation strip on the left lists every boss, grouped by zone (usually just one, unless the raid is a split covering several) — pick one to fill in its own rows (interrupts, positions, whatever's specific to that fight) alongside General.
 
 Only officers can fill a slot — pick a character from the dropdown, restricted to whoever's seated in the raid and meets that slot's class/role/spec requirement, if any. Everyone else sees the same page read-only.
 

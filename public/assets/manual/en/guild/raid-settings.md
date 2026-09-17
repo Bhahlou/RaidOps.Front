@@ -21,3 +21,9 @@ Below the raid mode setting, officers can define a reusable template of rows eve
 ![Raid attribution template: rows grouped by section](/assets/manual/en/guild/raid-attribution-settings-overview.png)
 
 Each row belongs to a **section** (free text, e.g. "Buffs", "Curses", "Tanks & Heals") and holds an ordered list of cells — an icon (raid marker, role, or spell) or a **name slot**, with an optional label shown as a placeholder until it's filled, and an optional eligibility restriction (allowed classes, roles, and/or specs). A row can be marked **Repeatable**: its instance count on a given raid is then worked out automatically from who's seated (e.g. one Innervate slot per druid present), instead of always exactly one.
+
+Each row also belongs to a **scope**: **General** (shown on every raid regardless of which boss is currently up) or one specific boss of a raid instance. Pick it from the **Raid** picker above the list, then the **Boss** picker once a specific raid is chosen. A boss-scoped row only ever shows up on raid events that actually target that boss's zone, and every boss keeps its own independent, reorderable list — editing or reordering one boss's rows never touches General or any other boss.
+
+![Raid attribution template: boss scope picker](/assets/manual/en/guild/raid-attribution-boss-scope.png)
+
+A section can also carry its own icon — shown once above every row sharing that section, independent of any icon on the rows themselves (handy for a marker heading a whole "Interrupts" section, say). Pick it right when creating a section's first row, or afterward from the palette button next to the section's name.

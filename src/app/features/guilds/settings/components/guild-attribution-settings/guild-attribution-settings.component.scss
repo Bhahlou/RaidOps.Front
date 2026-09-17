@@ -23,6 +23,17 @@
   color: var(--color-text-muted);
 }
 
+.attribution-scope-picker {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  app-select {
+    min-width: 220px;
+  }
+}
+
 .attribution-list {
   display: flex;
   flex-direction: column;
@@ -45,7 +56,10 @@
 }
 
 .attribution-section-header {
-  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -53,6 +67,17 @@
   color: var(--color-text-muted);
   background: var(--color-bg-elevated);
   border-bottom: 1px solid var(--color-border-subtle);
+
+  app-spell-icon,
+  app-raid-marker-icon {
+    display: flex;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.attribution-section-header-label {
+  flex: 1;
 }
 
 .attribution-row {

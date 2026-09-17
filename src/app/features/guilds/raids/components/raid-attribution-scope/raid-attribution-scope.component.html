@@ -1,0 +1,79 @@
+@if (isLoading()) {
+  <app-empty-hint>{{ 'raidBuilder.attributions.loading' | transloco }}</app-empty-hint>
+} @else if (!data() || data()!.definitions.length === 0) {
+  <app-empty-hint>{{ 'raidBuilder.attributions.empty' | transloco }}</app-empty-hint>
+} @else if (sections().length === 0) {
+  <app-empty-hint>{{ 'raidBuilder.attributions.noneAssignable' | transloco }}</app-empty-hint>
+} @else {
+  <div class="attributions-content" [class.attributions-content--horizontal]="horizontal()">
+    @for (section of sections(); track section.label + '-' + $index) {
+      <div class="attribution-section" [class.attribution-section--unlabeled]="!section.label">
+        @if (section.label) {
+          <div class="attribution-section-header">
+            @let sectionIcon = section.definitions[0];
+            @if (sectionIcon.sectionIconSource === IconSource.Spell && sectionIcon.sectionSpellIconUrl) {
+              <app-spell-icon [iconUrl]="sectionIcon.sectionSpellIconUrl" [label]="section.label" [spellId]="sectionIcon.sectionSpellId" [size]="18" />
+            } @else if (sectionIcon.sectionIconSource === IconSource.RaidMarker && sectionIcon.sectionRaidMarker !== null) {
+              <app-raid-marker-icon [marker]="sectionIcon.sectionRaidMarker" [size]="18" />
+            } @else if (sectionIcon.sectionIconSource === IconSource.StaticRole && sectionIcon.sectionStaticRole !== null) {
+              <app-attribution-role-icon [role]="sectionIcon.sectionStaticRole" [size]="18" />
+            }
+            <span>{{ section.label }}</span>
+          </div>
+        }
+
+        @for (definition of section.definitions; track definition.id) {
+          <div class="attribution-row">
+            <span class="attribution-head" [style.min-width]="headIconGutterWidth()">
+              @for (cell of headCells(definition); track cell.id) {
+                @if (cell.iconSource === IconSource.Spell && cell.spellIconUrl) {
+                  <app-spell-icon [iconUrl]="cell.spellIconUrl" [label]="definition.label" [spellId]="cell.spellId" [size]="22" />
+                } @else if (cell.iconSource === IconSource.RaidMarker && cell.raidMarker !== null) {
+                  <app-raid-marker-icon [marker]="cell.raidMarker" [size]="22" />
+                } @else if (cell.iconSource === IconSource.StaticRole && cell.staticRole !== null) {
+                  <app-attribution-role-icon [role]="cell.staticRole" [size]="22" />
+                }
+              }
+              @if (definition.label) {
+                <span class="attribution-label">{{ definition.label }}</span>
+              }
+            </span>
+
+            <span class="attribution-instances">
+              @for (instanceIndex of instanceIndexes(definition); track instanceIndex) {
+                <span class="attribution-instance">
+                  @for (pair of pairedCells(definition); track pair[0].id) {
+                    <span class="attribution-pair">
+                      @for (cell of pair; track cell.id) {
+                        @if (cell.kind === CellKind.Icon) {
+                          @if (cell.iconSource === IconSource.Spell && cell.spellIconUrl) {
+                            <app-spell-icon [iconUrl]="cell.spellIconUrl" [label]="definition.label" [spellId]="cell.spellId" [size]="22" />
+                          } @else if (cell.iconSource === IconSource.RaidMarker && cell.raidMarker !== null) {
+                            <app-raid-marker-icon [marker]="cell.raidMarker" [size]="22" />
+                          } @else if (cell.iconSource === IconSource.StaticRole && cell.staticRole !== null) {
+                            <app-attribution-role-icon [role]="cell.staticRole" [size]="22" />
+                          }
+                        } @else {
+                          <span class="attribution-slot">
+                            <app-select
+                              [options]="characterOptions(cell)"
+                              [value]="filledCharacterId(cell.id, instanceIndex)"
+                              [placeholder]="cell.slotLabel ?? ''"
+                              [style.width]="pickerWidth()"
+                              (valueChange)="onSlotChange(definition.id, cell.id, instanceIndex, $any($event))"
+                              [disabled]="!isOfficer()"
+                            />
+                          </span>
+                        }
+                      }
+                    </span>
+                  }
+                </span>
+              }
+            </span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

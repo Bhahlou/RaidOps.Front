@@ -26,7 +26,7 @@
         autocomplete="off"
         list="attribution-section-suggestions"
         [value]="section()"
-        (input)="section.set($any($event.target).value)"
+        (input)="setSection($any($event.target).value)"
         maxlength="64"
         [attr.aria-label]="'guildSettings.attributions.dialog.section' | transloco"
         [placeholder]="'guildSettings.attributions.dialog.sectionPlaceholder' | transloco"
@@ -39,6 +39,13 @@
       </datalist>
     </app-form-field-card>
   </div>
+
+  @if (section().trim()) {
+    <div class="field-group">
+      <span class="field-label">{{ 'guildSettings.attributions.dialog.sectionIcon' | transloco }}</span>
+      <app-icon-source-picker [guildId]="data.guildId" [expansionId]="data.expansionId" [value]="sectionIcon()" (changed)="setSectionIcon($event)" />
+    </div>
+  }
 
   <div class="checkbox-field">
     <app-checkbox [checked]="isRepeatable()" (checkedChange)="isRepeatable.set($event)">
