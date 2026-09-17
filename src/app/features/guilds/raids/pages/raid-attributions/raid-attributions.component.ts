@@ -70,7 +70,7 @@ export class RaidAttributionsComponent {
     const groups: BossGroup[] = [];
     for (const boss of this.bosses()) {
       let group = groups.at(-1);
-      if (!group || group.raidZoneId !== boss.raidZoneId) {
+      if (group?.raidZoneId !== boss.raidZoneId) {
         group = { raidZoneId: boss.raidZoneId, raidZoneShortCode: boss.raidZoneShortCode, bosses: [] };
         groups.push(group);
       }
