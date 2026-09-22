@@ -420,6 +420,58 @@ body::after {
   margin-top: 20px;
 }
 
+// Plain text/number/date/time inputs used across every dialog's own field markup — one shared
+// definition instead of re-declaring the same box in each dialog's component styles (this exact
+// block used to be copy-pasted across half a dozen dialogs).
+.text-input,
+.number-input,
+.date-input,
+.time-input,
+.datetime-input {
+  width: 100%;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  transition: border-color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Only the native date/time picker popup needs this — forcing it on plain text/number inputs has
+// no visual effect on the field itself but can make Chrome's autocomplete-suggestions dropdown
+// (browser-remembered past values for this field) render with a stray light border.
+.date-input,
+.time-input,
+.datetime-input {
+  color-scheme: dark;
+}
+
+// Nested inside app-form-field-card, whose own fieldset already frames the field with a border —
+// stays borderless/transparent there instead of doubling up.
+app-form-field-card {
+  .text-input,
+  .number-input {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+}
+
 // ── Menu ──────────────────────────────────────────────────────────────────────
 // Global primitives replacing mat-menu — cdkMenu content is portaled via CDK overlay but
 // still carries its own component's view-encapsulation attribute, so a global class (rather

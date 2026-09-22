@@ -47,18 +47,6 @@
   color: var(--color-text-secondary);
 }
 
-.text-input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: var(--color-text-primary);
-  font-size: 0.9rem;
-
-  &:focus {
-    outline: none;
-  }
-}
-
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

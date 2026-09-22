@@ -13,6 +13,7 @@ describe('expansionIdFromShortCode', () => {
     ['SL', 9],
     ['DF', 10],
     ['TWW', 11],
+    ['Forever', 12],
   ])('resolves %s to expansion id %i', (shortCode, id) => {
     expect(expansionIdFromShortCode(shortCode)).toBe(id);
   });

@@ -1,0 +1,119 @@
+:host {
+  display: block;
+}
+
+.preview-slot {
+  position: relative;
+  width: 100%;
+  min-height: 26px;
+  border: 1px dashed var(--color-border);
+  border-radius: 5px;
+  background: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  transition: border-color 0.12s ease, background 0.12s ease;
+
+  &--empty {
+    justify-content: center;
+  }
+}
+
+.preview-slot-note-input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+}
+
+.preview-slot-click-area {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .preview-slot--empty &:hover .preview-slot-label {
+    color: var(--color-accent);
+  }
+}
+
+.preview-slot-label {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.preview-slot-icon {
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.preview-slot-note {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+// Absolutely positioned overlay, revealed on hover — same reasoning as raid-slot's chip remove
+// button, keeps the row's persistent width from reserving space for a rarely-used action.
+.preview-slot-clear {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+
+  .material-icons {
+    font-size: 12px;
+  }
+
+  &:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-error);
+  }
+}
+
+.preview-slot:hover .preview-slot-clear {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+// Drop-target highlight while a compatible drag is hovering this slot.
+.preview-slot.cdk-drop-list-receiving {
+  border-color: var(--color-accent);
+  border-style: solid;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-tertiary));
+}
