@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.0...raidops-front-v2.0.1) (2026-09-22)
+
+
+### 🐛 Bug Fixes
+
+* Stop the service worker from hijacking full-page navigations to /api routes ([#92](https://github.com/Bhahlou/RaidOps.Front/issues/92)) ([aa13672](https://github.com/Bhahlou/RaidOps.Front/commit/aa1367247952a2594a6aa35e4abace1cad7fb4f3))
+
 ## [2.0.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v1.7.0...raidops-front-v2.0.0) (2026-09-22)
 
 
