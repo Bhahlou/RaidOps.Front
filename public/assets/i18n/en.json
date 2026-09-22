@@ -1344,6 +1344,7 @@
     "sync": {
       "title": "Sync characters",
       "branchDesc": "Select the game branch to sync.",
+      "comingSoon": "Coming soon",
       "authenticating": "Connecting to Battle.net…",
       "syncing": "Syncing characters…",
       "error": "An error occurred. Please try again.",

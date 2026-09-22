@@ -13,13 +13,19 @@
     @for (branch of branches(); track branch.id) {
       <button
         [class]="'branch-card branch-card--' + branch.currentExpansionShortCode.toLowerCase()"
+        [class.branch-card--disabled]="!branch.syncAvailable"
+        [disabled]="!branch.syncAvailable"
         (click)="selectBranch(branch)">
         <div class="branch-card__bg" aria-hidden="true"></div>
         <div class="branch-card__content">
           <span class="branch-name">{{ branch.name }}</span>
           <span class="branch-expansion">{{ branch.currentExpansionShortCode }}</span>
         </div>
-        <span class="material-icons branch-card__arrow">arrow_forward</span>
+        @if (!branch.syncAvailable) {
+          <span class="branch-card__coming-soon">{{ 'characters.sync.comingSoon' | transloco }}</span>
+        } @else {
+          <span class="material-icons branch-card__arrow">arrow_forward</span>
+        }
       </button>
     }
   </div>

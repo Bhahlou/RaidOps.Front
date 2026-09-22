@@ -184,10 +184,14 @@ export class AttributionDefinitionDialogComponent {
   readonly #specs = signal<Spec[]>([]);
   readonly #classes = signal<WowClass[]>([]);
 
-  /** Classes already playable in this guild's branch (expansion), ordered alphabetically by translated name. */
+  /**
+   * Classes already playable in this guild's branch (expansion), ordered alphabetically by
+   * translated name. Availability itself is resolved server-side (see `WowClassService.getAll`) —
+   * a plain `firstExpansionId <= expansionId` cutoff here would incorrectly include classes from a
+   * forked branch's "future" mainline history (e.g. Death Knight on a Forever-scoped template).
+   */
   readonly classes = computed(() =>
     this.#classes()
-      .filter((c) => c.firstExpansionId <= this.data.expansionId)
       .map((c) => ({ id: c.id, name: this.#className(c.id) }))
       .sort((a, b) => a.name.localeCompare(b.name)),
   );
@@ -215,7 +219,7 @@ export class AttributionDefinitionDialogComponent {
 
   constructor() {
     this.#characterStore.loadSpecs().subscribe((specs) => this.#specs.set(specs));
-    this.#wowClassService.getAll().subscribe((classes) => this.#classes.set(classes));
+    this.#wowClassService.getAll(this.data.expansionId).subscribe((classes) => this.#classes.set(classes));
   }
 
   /**

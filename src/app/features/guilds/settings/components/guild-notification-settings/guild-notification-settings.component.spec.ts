@@ -363,7 +363,7 @@ describe('GuildNotificationSettingsComponent', () => {
       setup(
         'g1', [], [],
         [branch({ id: 7, branchId: 1, branchName: 'Retail', isActive: true }), branch({ id: 8, branchName: 'Classic', isActive: false })],
-        [{ id: 1, name: 'Retail', bnetNamespacePrefix: 'retail', currentExpansionShortCode: 'TWW' }],
+        [{ id: 1, name: 'Retail', bnetNamespacePrefix: 'retail', currentExpansionShortCode: 'TWW', isActive: true, syncAvailable: true }],
       );
       fixture.detectChanges();
 

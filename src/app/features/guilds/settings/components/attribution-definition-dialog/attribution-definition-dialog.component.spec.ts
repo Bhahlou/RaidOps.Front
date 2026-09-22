@@ -170,10 +170,13 @@ describe('AttributionDefinitionDialogComponent', () => {
   // ── classes / classOptions ───────────────────────────────────────────────
 
   describe('classes', () => {
-    it('excludes classes not yet playable on this branch expansion', () => {
+    it('requests classes pre-filtered by the branch expansion from the server, and shows whatever comes back as-is', () => {
       const component = setup({ expansionId: 1 }, [], [wowClass({ id: 1, name: 'Warrior', firstExpansionId: 1 }), wowClass({ id: 10, name: 'Monk', firstExpansionId: 5 })]);
 
-      expect(component.classes().map((c) => c.id)).toEqual([1]);
+      // Availability (e.g. excluding Monk from a Forever-scoped template) is resolved server-side —
+      // see GetWowClassesQueryHandler — this component must not re-filter by firstExpansionId itself.
+      expect(wowClassService.getAll).toHaveBeenCalledWith(1);
+      expect(component.classes().map((c) => c.id).sort()).toEqual([1, 10]);
     });
 
     it('translates and alphabetically sorts class names', () => {

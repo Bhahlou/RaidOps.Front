@@ -4,4 +4,6 @@ export interface Branch {
   name: string;
   bnetNamespacePrefix: string;
   currentExpansionShortCode: string;
+  isActive: boolean;
+  syncAvailable: boolean;
 }
