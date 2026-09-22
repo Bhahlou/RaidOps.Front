@@ -15,6 +15,7 @@ const guildBranch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
   rosterRoleIds: [],
   officerRoleIds: [],
   region: null,
+  signupMode: null,
   ...overrides,
 });
 

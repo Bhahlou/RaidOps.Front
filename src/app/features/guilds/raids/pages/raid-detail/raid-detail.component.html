@@ -10,6 +10,9 @@
           @if (event.publicationStatus !== PublicationStatus.Published) {
             <span class="detail-header-draft-badge">{{ 'raidBuilder.draft' | transloco }}</span>
           }
+          @if (event.extendsRaidEventName; as extendsName) {
+            <span class="detail-header-extension-badge">{{ 'raidBuilder.extensionBadge' | transloco: { name: extendsName } }}</span>
+          }
         </div>
         @if (isOfficer()) {
           <div class="detail-header-actions">
@@ -132,11 +135,18 @@
 
       <aside class="detail-aside">
         <nav class="detail-hub" [attr.aria-label]="'raidBuilder.detail.hub.title' | transloco">
-          @for (link of hubLinks; track link.labelKey) {
-            <span class="detail-hub-chip" [title]="'raidBuilder.detail.hub.comingSoon' | transloco">
-              <span class="material-icons">{{ link.icon }}</span>
-              {{ link.labelKey | transloco }}
-            </span>
+          @for (link of hubLinks; track link.id) {
+            @if (link.id === 'assignments') {
+              <a class="detail-hub-chip detail-hub-chip--link" [routerLink]="['attributions']">
+                <span class="material-icons">{{ link.icon }}</span>
+                {{ link.labelKey | transloco }}
+              </a>
+            } @else {
+              <span class="detail-hub-chip" [title]="'raidBuilder.detail.hub.comingSoon' | transloco">
+                <span class="material-icons">{{ link.icon }}</span>
+                {{ link.labelKey | transloco }}
+              </span>
+            }
           }
         </nav>
       </aside>

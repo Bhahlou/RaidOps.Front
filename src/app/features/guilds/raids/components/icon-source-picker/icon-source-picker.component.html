@@ -1,0 +1,37 @@
+<div class="icon-source-picker">
+  <div class="icon-preview-row">
+    <span class="icon-preview">
+      @if (value().iconSource === IconSource.Spell && value().spellIconUrl; as iconUrl) {
+        <app-spell-icon [iconUrl]="iconUrl" [spellId]="value().spellId" [size]="32" />
+      } @else if (value().iconSource === IconSource.RaidMarker && value().raidMarker !== null) {
+        <app-raid-marker-icon [marker]="value().raidMarker!" [size]="32" />
+      } @else if (value().iconSource === IconSource.StaticRole && value().staticRole !== null) {
+        <app-attribution-role-icon [role]="value().staticRole!" [size]="32" />
+      } @else {
+        <span class="icon-preview-empty">{{ 'guildSettings.attributions.sectionIcon.none' | transloco }}</span>
+      }
+    </span>
+    <app-button variant="text" (click)="clear()">{{ 'guildSettings.attributions.sectionIcon.clear' | transloco }}</app-button>
+  </div>
+
+  <div class="icon-picker-row">
+    <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.markers' | transloco }}</span>
+    <app-raid-marker-picker [activeMarker]="value().iconSource === IconSource.RaidMarker ? value().raidMarker : null" (selected)="onMarkerSelected($event)" />
+  </div>
+
+  <div class="icon-picker-row">
+    <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.roles' | transloco }}</span>
+    <span class="static-role-buttons">
+      @for (role of staticRoleOrder; track role) {
+        <button type="button" class="static-role-button" [class.active]="value().staticRole === role" (click)="onStaticRoleSelected(role)">
+          <app-attribution-role-icon [role]="role" [size]="28" />
+        </button>
+      }
+    </span>
+  </div>
+
+  <div class="icon-picker-row">
+    <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.spell' | transloco }}</span>
+    <app-spell-picker [guildId]="guildId()" [expansionId]="expansionId()" (selected)="onSpellSelected($event)" />
+  </div>
+</div>

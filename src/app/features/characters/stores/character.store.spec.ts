@@ -285,8 +285,8 @@ describe('CharacterStore', () => {
 
   describe('loadSpecs', () => {
     const specs: Spec[] = [
-      { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
-      { id: 72, name: 'Fury', role: 'Dps', classId: 1, iconUrl: null },
+      { id: 71, name: 'Arms', role: 'MeleeDps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
+      { id: 72, name: 'Fury', role: 'MeleeDps', classId: 1, iconUrl: null },
     ];
 
     it('fetches and caches the spec list', () => {
@@ -317,8 +317,8 @@ describe('CharacterStore', () => {
 
   describe('setRaidSpecs', () => {
     const specs: Spec[] = [
-      { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
-      { id: 72, name: 'Fury', role: 'Dps', classId: 1, iconUrl: null },
+      { id: 71, name: 'Arms', role: 'MeleeDps', classId: 1, iconUrl: 'https://cdn/arms.jpg' },
+      { id: 72, name: 'Fury', role: 'MeleeDps', classId: 1, iconUrl: null },
     ];
 
     it('patches the character with enriched raid specs using cached spec data', () => {

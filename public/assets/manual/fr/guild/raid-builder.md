@@ -20,6 +20,10 @@ La semaine affichée par défaut correspond à la fenêtre de reset hebdomadaire
 
 ![Boîte de dialogue d'édition d'un raid : nom, horaire, taille de grille et zones](/assets/manual/fr/guild/raid-builder-edit-dialog.png)
 
+### Suite d'un raid sur plusieurs soirs
+
+Un raid peut être marqué comme la suite d'un autre — l'équivalent en jeu d'étendre l'ID d'un raid plutôt que d'en consommer un nouveau, par exemple pour cleaner Black Temple sur deux soirées consécutives avec le même lock. Le champ **Suite de**, dans la boîte de dialogue de création ou d'édition, propose les raids de la branche dans la même fenêtre de reset hebdomadaire. Une fois le lien posé, les mêmes personnages peuvent être assignés aux deux raids sans que le site ne bloque l'assignation pour conflit de verrouillage ; un badge **Suite de « nom »** apparaît alors sur la page de détail du raid concerné.
+
 ### Mode d'inscription
 
 Par défaut, un raid tourne en mode **Auto** : tout membre du roster est considéré présent sauf s'il a déclaré une absence, aucune inscription n'est nécessaire (le réglage par défaut de la branche se configure dans les [paramètres Raids](/manual/guild/raid-settings)). Un raid peut à la place tourner en mode **Planificateur** — soit parce que sa branche l'a comme défaut, soit parce qu'un officier coche « Utiliser le mode inscription pour ce raid » en créant un raid exceptionnel ponctuel — auquel cas les membres du roster s'inscrivent eux-mêmes (voir la page de détail du raid ci-dessous) plutôt que de se baser sur leurs absences déclarées.
@@ -37,6 +41,16 @@ Un raid — ponctuel ou généré depuis une série — peut poster dans son pro
 Une fois un raid **publié**, son nom devient cliquable dans la grille et ouvre sa page de détail dédiée (fil d'Ariane : Guilde > Raids > nom du raid) — un raid encore en brouillon garde un nom en texte simple, sans lien. L'en-tête affiche la date et l'heure complètes, les zones du raid, et un comptage des rôles en direct (tank/soin/mêlée/distance) calculé depuis les assignations actuelles ; un raid en mode Planificateur y ajoute ta réponse (Présent/Peut-être/Absent). En dessous, la même grille de composition que la page Raids se trouve à côté soit de la répartition de disponibilité du roster (mode Auto), soit de la répartition des inscriptions (mode Planificateur) — les deux servent aussi de source de glisser-déposer vers la grille pour les officiers, exactement comme les personnages disponibles. Les officiers ont en plus **Publier** (tant que c'est un brouillon), **Annoncer le groupage** (une fois publié, voir plus bas), et un raccourci **Modifier**, le tout depuis le même en-tête.
 
 ![Page de détail d'un raid : en-tête avec boutons de réponse, grille de composition, et répartition des inscriptions](/assets/manual/fr/guild/raid-detail-overview.png)
+
+### Attributions
+
+Le lien **Attributions** de la page de détail d'un raid ouvre qui remplit chaque ligne du [modèle d'attributions](/manual/guild/raid-settings) de la guilde pour ce raid précis — buffs, malédictions, échanges tank/heal, interrupts, tout ce que les officiers ont configuré. Les lignes sont groupées par section et n'apparaissent que si au moins un personnage actuellement présent peut les remplir ; le nombre d'instances d'une ligne **Répétable** s'ajuste automatiquement (ex. autant d'emplacements Innervation que de druides présents). Les lignes **Générales** (transverses à la guilde, non liées à un boss) restent toujours visibles dans leur propre colonne, quel que soit le boss sélectionné.
+
+![Page Attributions : lignes remplies avec les personnages présents](/assets/manual/fr/guild/raid-attributions-overview.png)
+
+Si le raid cible une zone avec des lignes propres à des boss configurées, une barre de navigation à gauche liste chaque boss, groupé par zone (généralement une seule, sauf pour un raid split qui en couvre plusieurs) — en choisir un pour remplir ses propres lignes (interrupts, placements, tout ce qui est spécifique à ce combat) à côté de la Générale.
+
+Seuls les officiers peuvent remplir un emplacement — en choisissant un personnage dans la liste déroulante, restreinte à ceux présents dans le raid et remplissant la restriction de classe/rôle/spécialisation de l'emplacement, s'il y en a une. Les autres voient la même page en lecture seule.
 
 ### Annonce de composition Discord
 

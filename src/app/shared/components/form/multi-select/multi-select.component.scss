@@ -1,3 +1,10 @@
+// Custom elements default to display:inline, which stops the host from actually filling
+// whatever width its layout context allocates (e.g. a flex item's flex-basis) — block matches
+// what every call site expects from a form control.
+:host {
+  display: block;
+}
+
 // Same fieldset/legend/trigger/panel scaffolding as SelectComponent — kept as a literal copy
 // rather than a shared partial, since the two components' markup only diverges in the option
 // row (checkbox-style indicator + optional color dot/icon here) and duplicating ~60 lines of
@@ -84,7 +91,10 @@ legend.select-field-label {
 .select-panel {
   display: flex;
   flex-direction: column;
-  min-width: 100%;
+  // `min-width` (not a forced overlay width) so a long option label can still widen the panel
+  // past the trigger's own width instead of wrapping or overflowing inside a fixed box.
+  width: max-content;
+  max-width: min(90vw, 360px);
   margin-top: 4px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
@@ -225,4 +235,27 @@ legend.select-field-label {
   height: 18px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+// ── Icon-only selected display (opt-in via `iconOnlySelected`) ─────────────────
+
+.selected-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.selected-chip-icon {
+  flex-shrink: 0;
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.selected-chip-text {
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: var(--color-bg-elevated);
 }

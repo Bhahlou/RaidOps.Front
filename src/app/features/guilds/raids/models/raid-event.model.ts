@@ -10,6 +10,10 @@ export interface RaidEvent {
   id: number;
   /** `null` for an ad-hoc event not backed by any recurring series. */
   raidSeriesId: number | null;
+  /** `null` for a standalone event. Otherwise the raid event whose lockout this one extends (a WoW "ID extension" — the same lock carried across several nights). */
+  extendsRaidEventId: number | null;
+  /** Display name of `extendsRaidEventId`'s event, or `null` alongside it. */
+  extendsRaidEventName: string | null;
   name: string;
   branchId: number;
   branchName: string;
@@ -54,6 +58,21 @@ export interface RaidBoard {
   events: RaidEvent[];
 }
 
+/**
+ * Lightweight pick-list entry for the create/edit raid dialogs' "extends the lockout of" selector —
+ * the branch's raid events around now, draft and published alike, independent of whatever date
+ * range or single event the board happens to have loaded (the edit dialog opens from the raid
+ * detail page too, where the board only ever holds the one event being edited).
+ */
+export interface RaidEventChoice {
+  id: number;
+  name: string;
+  /** Local wall-clock start time in the guild's configured timezone. ISO datetime string. */
+  startsAtLocal: string;
+  /** `null` for a standalone event — lets the edit dialog filter out a candidate already in the event-being-edited's own extension chain. */
+  extendsRaidEventId: number | null;
+}
+
 /** Payload shared by ad-hoc raid event creation and full replacement (PATCH) — the guild branch (and its WoW game version) is the route's `guildBranchId`, never a client-supplied field. */
 export interface RaidEventPayload {
   name: string;
@@ -62,6 +81,8 @@ export interface RaidEventPayload {
   slotsPerGroup: number;
   signupMode: SignupMode;
   raidZoneIds: number[];
+  /** Surrogate ID of another raid event whose lockout this one extends, or `null`/`undefined` for a standalone event. Editable after creation too. */
+  extendsRaidEventId?: number | null;
   /** Overrides the branch's default signup mode for this one event — creation only, `undefined` means "use the branch default." */
   signupModeOverride?: SignupMode | null;
   /** Discord snowflake ID of a dedicated channel this event's notifications should all post to instead of the guild-wide configured one — creation only. */

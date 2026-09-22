@@ -6,8 +6,8 @@ import { WowBrancheService } from './wow-branche.service';
 import { Branch } from '../models/branch.model';
 
 const branches: Branch[] = [
-  { id: 1, name: 'Retail', bnetNamespacePrefix: 'profile-eu', currentExpansionShortCode: 'TWW' },
-  { id: 2, name: 'Classic Anniversary', bnetNamespacePrefix: 'profile-classic1x-eu', currentExpansionShortCode: 'ANNIVERSARY' },
+  { id: 1, name: 'Retail', bnetNamespacePrefix: 'profile-eu', currentExpansionShortCode: 'TWW', isActive: true, syncAvailable: true },
+  { id: 2, name: 'Classic Anniversary', bnetNamespacePrefix: 'profile-classic1x-eu', currentExpansionShortCode: 'ANNIVERSARY', isActive: true, syncAvailable: true },
 ];
 
 describe('WowBrancheService', () => {

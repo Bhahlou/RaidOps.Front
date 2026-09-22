@@ -20,6 +20,10 @@ The week shown defaults to the guild branch's actual weekly raid-lockout reset w
 
 ![Edit raid event dialog: name, schedule, grid size, and raid zones](/assets/manual/en/guild/raid-builder-edit-dialog.png)
 
+### Extending a raid across multiple nights
+
+A raid can be marked as extending another one — the in-game equivalent of extending a raid's lockout ID instead of consuming a fresh one, e.g. clearing Black Temple across two consecutive nights on the same lock. The **Extends the lockout of** field, in the create or edit dialog, offers the branch's raids within the same weekly reset window. Once linked, the same characters can be assigned to both raids without the site blocking the assignment as a lockout conflict; an **Extension of "name"** badge then shows up on the raid's detail page.
+
 ### Signup mode
 
 By default a raid runs in **Auto** mode: every roster member is assumed present unless they've declared an absence, no sign-up needed (the branch-wide default is set in [Raids settings](/manual/guild/raid-settings)). A raid can instead run in **Planner** mode — either because its branch defaults to it, or because an officer ticks "Use Signup mode for this raid" when creating a one-off exceptional raid — in which case roster members self-serve their own response (see the raid detail page below) instead of relying on their declared absences.
@@ -37,6 +41,16 @@ A raid — one-off or generated from a series — can post to its own Discord ch
 Once a raid is **published**, its name becomes clickable in the grid and opens its dedicated detail page (breadcrumb: Guild > Raids > raid name) — a raid still in draft keeps a plain, unlinked name. The header shows the full date and time, the raid's zones, and a live role count (tank/heal/melee/ranged) tallied from the current assignments; a Planner-mode raid adds your own response (Accept/Tentative/Decline) right there. Below, the same composition grid as the Raids page sits next to either the roster's availability breakdown (Auto mode) or the signups breakdown (Planner mode) — both double as a drag source into the grid for officers, exactly like the roster pool. Officers additionally get **Publish** (while still a draft), **Ping to group up** (once published, see below), and an **Edit** shortcut, all from the same header.
 
 ![Raid detail page: header with RSVP buttons, composition grid, and the signups breakdown](/assets/manual/en/guild/raid-detail-overview.png)
+
+### Assignments
+
+The **Assignments** hub link, on a raid's detail page, opens who's filling each row of the guild's [raid attribution template](/manual/guild/raid-settings) for that specific raid — buffs, curses, tank/heal swaps, interrupts, whatever officers have set up. Rows are grouped by section and only show up if at least one currently seated character could fill them; a **Repeatable** row's instance count adjusts itself automatically (e.g. as many Innervate slots as there are druids currently seated). The **General** rows (guild-wide, not tied to any boss) always stay visible in their own column, regardless of which boss is selected.
+
+![Assignments page: rows filled in with seated characters](/assets/manual/en/guild/raid-attributions-overview.png)
+
+If the raid targets a zone with boss-scoped rows configured, a navigation strip on the left lists every boss, grouped by zone (usually just one, unless the raid is a split covering several) — pick one to fill in its own rows (interrupts, positions, whatever's specific to that fight) alongside General.
+
+Only officers can fill a slot — pick a character from the dropdown, restricted to whoever's seated in the raid and meets that slot's class/role/spec requirement, if any. Everyone else sees the same page read-only.
 
 ### Discord composition announcement
 

@@ -18,6 +18,8 @@ const wowBranch = (overrides?: Partial<Branch>): Branch => ({
   name: 'Classic Era',
   bnetNamespacePrefix: 'dynamic-classic1x',
   currentExpansionShortCode: 'Classic',
+  isActive: true,
+  syncAvailable: true,
   ...overrides,
 });
 
@@ -30,6 +32,7 @@ const guildBranch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
   rosterRoleIds: [],
   officerRoleIds: [],
   region: null,
+  signupMode: null,
   ...overrides,
 });
 
@@ -99,6 +102,20 @@ describe('GuildBranchesComponent', () => {
   describe('branchOptions', () => {
     it('labels each WoW branch with its expansion short code', () => {
       setup([], [wowBranch({ id: 3, name: 'Classic Era', currentExpansionShortCode: 'Classic' })]);
+      fixture.detectChanges();
+
+      expect(component.branchOptions()).toEqual([{ value: 3, label: 'Classic Era (Classic)', iconUrl: '/assets/images/expansion-icons/Classic.png' }]);
+    });
+
+    it('excludes a globally deactivated branch this guild has never activated', () => {
+      setup([], [wowBranch({ id: 3, isActive: false })]);
+      fixture.detectChanges();
+
+      expect(component.branchOptions()).toEqual([]);
+    });
+
+    it('still includes a globally deactivated branch this guild already has active — so it stays selectable/deactivatable', () => {
+      setup([guildBranch({ id: 7, branchId: 3, isActive: true })], [wowBranch({ id: 3, isActive: false })]);
       fixture.detectChanges();
 
       expect(component.branchOptions()).toEqual([{ value: 3, label: 'Classic Era (Classic)', iconUrl: '/assets/images/expansion-icons/Classic.png' }]);

@@ -34,10 +34,10 @@ const warrior: Character = makeChar(1, 1);
 const mage: Character = makeChar(2, 8);
 
 const specs: Spec[] = [
-  { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: null },
-  { id: 72, name: 'Fury', role: 'Dps', classId: 1, iconUrl: null },
+  { id: 71, name: 'Arms', role: 'MeleeDps', classId: 1, iconUrl: null },
+  { id: 72, name: 'Fury', role: 'MeleeDps', classId: 1, iconUrl: null },
   { id: 73, name: 'Protection', role: 'Tank', classId: 1, iconUrl: null },
-  { id: 62, name: 'Arcane', role: 'Dps', classId: 8, iconUrl: null },
+  { id: 62, name: 'Arcane', role: 'RangedDps', classId: 8, iconUrl: null },
 ];
 
 const makeSpec = (specId: number, isMain: boolean): CharacterSpec => ({

@@ -1,0 +1,18 @@
+:host {
+  display: contents; // the <img> participates directly in the parent's layout
+}
+
+.spell-icon-link {
+  // NOT display:contents: that collapses the anchor's own bounding box to zero-size, which makes
+  // Wowhead's tooltip script silently refuse to attach a hover tooltip to it (confirmed via an
+  // isolated repro). inline-flex keeps it exactly the size of the <img> it wraps.
+  display: inline-flex;
+}
+
+img {
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: block;
+  flex-shrink: 0;
+}

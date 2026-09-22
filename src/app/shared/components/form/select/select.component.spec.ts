@@ -153,6 +153,37 @@ describe('SelectComponent', () => {
     });
   });
 
+  // ── selectedColor ────────────────────────────────────────────────────────
+
+  describe('selectedColor', () => {
+    it('is null when no option matches the current value', () => {
+      expect(setup().selectedColor()).toBeNull();
+    });
+
+    it('is null when the matching option carries no color', () => {
+      const component = setup();
+      component.value.set('b');
+
+      expect(component.selectedColor()).toBeNull();
+    });
+
+    it("is the matching option's color", () => {
+      TestBed.configureTestingModule({ imports: [SelectComponent] })
+        .overrideComponent(SelectComponent, { set: { template: '', imports: [] } });
+
+      const fixture = TestBed.createComponent(SelectComponent<string>);
+      const withColor: SelectOption<string>[] = [
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta', color: '#ABD473' },
+      ];
+      fixture.componentRef.setInput('options', withColor);
+      fixture.detectChanges();
+      fixture.componentInstance.value.set('b');
+
+      expect(fixture.componentInstance.selectedColor()).toBe('#ABD473');
+    });
+  });
+
   // ── listboxValue ─────────────────────────────────────────────────────────
 
   describe('listboxValue', () => {

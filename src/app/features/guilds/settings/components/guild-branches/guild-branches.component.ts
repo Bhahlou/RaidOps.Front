@@ -33,19 +33,24 @@ export class GuildBranchesComponent implements OnInit {
   readonly guildBranches = this.#store.branches;
   readonly isLoading = this.#store.isLoading;
 
-  readonly branchOptions = computed<MultiSelectOption<number>[]>(() =>
-    this.wowBranches().map((b) => ({
-      value: b.id,
-      label: `${b.name} (${b.currentExpansionShortCode})`,
-      iconUrl: expansionIconUrl(b.currentExpansionShortCode),
-    })),
-  );
-
   readonly activeBranchIds = computed(() =>
     this.guildBranches()
       .filter((b) => b.isActive)
       .map((b) => b.branchId),
   );
+
+  // Deactivated WoW branches (e.g. a dead branch) are hidden from new activation, but a guild that
+  // already activated one keeps it selectable/visible here rather than losing it from the list.
+  readonly branchOptions = computed<MultiSelectOption<number>[]>(() => {
+    const activeIds = new Set(this.activeBranchIds());
+    return this.wowBranches()
+      .filter((b) => b.isActive || activeIds.has(b.id))
+      .map((b) => ({
+        value: b.id,
+        label: `${b.name} (${b.currentExpansionShortCode})`,
+        iconUrl: expansionIconUrl(b.currentExpansionShortCode),
+      }));
+  });
 
   readonly activeBranches = computed(() => this.guildBranches().filter((b) => b.isActive));
 

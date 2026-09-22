@@ -1,0 +1,9 @@
+:host {
+  display: contents; // the <img> participates directly in the parent's layout
+}
+
+img {
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}

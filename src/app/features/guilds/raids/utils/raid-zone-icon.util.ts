@@ -8,6 +8,9 @@ const RAID_ZONE_ICON_URLS: Record<string, string> = {
   Hyjal: '/assets/images/raid-icons/hs.jpg',
   BT: '/assets/images/raid-icons/bt.jpg',
   SWP: '/assets/images/raid-icons/swp.jpg',
+  // Not from the same wiki-icon batch as the rest (never found a matching one there) — a
+  // promotional Zul'jin artwork crop instead, same source/treatment as the boss icon fallback.
+  ZA: '/assets/images/raid-icons/za.jpg',
 };
 
 export function raidZoneIconUrl(shortCode: string | null | undefined): string | null {

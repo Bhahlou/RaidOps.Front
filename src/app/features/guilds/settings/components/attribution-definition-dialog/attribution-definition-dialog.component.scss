@@ -1,0 +1,228 @@
+.dialog-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+// No :host max-height/overflow here — the global `.cdk-dialog-container` rule already scrolls
+// the whole dialog when content overflows. Adding a second scroll region here produced two
+// nested scrollbars for tall content (many cells), which is worse than losing the "title/actions
+// stay pinned while content scrolls" nicety.
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-row-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-hint-chevron {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.text-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.icon-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.icon-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-picker-row-label {
+  flex: 0 0 90px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.cell-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cell-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.cell-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cell-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-kind-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.cell-card-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.name-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  // stretch (not flex-start): the "Nom" fieldset and the 3 multi-select fieldsets have
+  // different intrinsic heights (their <legend> boxes don't share the same line-height), so no
+  // amount of padding-matching makes them equal — stretching all 4 flex items to the row's
+  // tallest child (the multi-selects, ~48.6px) closes the gap structurally instead.
+  align-items: stretch;
+  gap: 8px;
+}
+
+.name-slot-label-card {
+  flex: 1 1 160px;
+  // Match app-select/app-multi-select's own fieldset (zero outer padding, 6px on the inner
+  // trigger) and legend color (--color-text-muted) so all 4 fields in this row read as one set.
+  --form-field-card-padding: 6px 14px;
+  --form-field-card-label-color: var(--color-text-muted);
+
+  // The two fieldsets' <legend> boxes don't share the same intrinsic height (form-field-card's
+  // label sets line-height:1, the select's doesn't), so no padding value makes their natural
+  // heights equal. `.name-slot-row`'s `align-items: stretch` gives this component's *host* the
+  // row's tallest height, but the <fieldset> inside is a plain block child that won't grow to
+  // fill it on its own — pierce encapsulation (scoped to this component's own template only,
+  // via the ancestor class) to stretch the fieldset itself; form-field-card's shared
+  // `.form-field-card-content { flex: 1; justify-content: center }` then centers the input in
+  // the resulting extra space.
+  ::ng-deep .form-field-card {
+    height: 100%;
+    box-sizing: border-box;
+  }
+}
+
+.restriction-select {
+  flex: 1 1 95px;
+
+  // Same reasoning as .name-slot-label-card above, for the select side: stretches this
+  // component's own fieldset to the host's (row-stretched) height instead of staying auto.
+  ::ng-deep .select-fieldset {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  // Equal total height still isn't equal top-alignment: a fieldset's border-top position is
+  // driven by its <legend> box height (the legend straddles the border), and
+  // .select-field-label has no explicit line-height (inherits the page default, taller) while
+  // .form-field-card-label sets line-height:1 — two different legend heights push the border
+  // line to two different offsets from the box top even when the total box height matches.
+  // Force the same line-height here so both legends occupy the same vertical space.
+  ::ng-deep .select-field-label {
+    line-height: 1;
+  }
+}
+
+.static-role-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.static-role-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  cursor: pointer;
+
+  &.active {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.add-cell-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}

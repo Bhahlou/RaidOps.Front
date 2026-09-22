@@ -8,12 +8,27 @@
 // gap in the border sized to the legend's content, no width measurement or background-matching
 // needed. This is the exact recipe already proven on the shared select's .select-fieldset.
 .form-field-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   margin: 0;
-  padding: 12px 14px;
+  // Overridable per call site (e.g. a compact inline field sitting next to app-select/app-multi-
+  // select, whose fieldset has zero outer padding and pads its inner trigger by 6px instead of
+  // this default 12px — same total height only if the caller matches that here).
+  padding: var(--form-field-card-padding, 12px 14px);
   min-width: 0;
   border-radius: 8px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-tertiary);
+  transition: border-color 0.12s ease;
+
+  // Only :focus-within (not :hover) — this card also wraps non-interactive content elsewhere
+  // (e.g. the branch settings card's static legend text), where a hover-triggered accent border
+  // would be a false "this is clickable" signal. Lighting up only once a real descendant control
+  // gets focus (tabbing/clicking into an input) has no such false positive.
+  &:focus-within {
+    border-color: var(--color-accent);
+  }
 }
 
 .form-field-card-label {
@@ -23,12 +38,16 @@
   font-weight: 500;
   line-height: 1;
   // --color-text-muted is a semi-transparent variant meant for de-emphasized text — too washed
-  // out here since this label needs to actually be read at a glance.
-  color: var(--color-text-secondary);
+  // out here since this label needs to actually be read at a glance. Overridable per call site
+  // (e.g. to match app-select/app-multi-select's own --color-text-muted legend when several sit
+  // in the same row).
+  color: var(--form-field-card-label-color, var(--color-text-secondary));
 }
 
 .form-field-card-content {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
 }

@@ -25,6 +25,7 @@ const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment
   availabilityStatus: DayAvailabilityStatus.Available,
   spec: { id: 1, name: 'Fury', iconUrl: null },
   availableSpecs: [{ id: 1, name: 'Fury', iconUrl: null }],
+  signupStatus: null,
   ...overrides,
 });
 
@@ -44,7 +45,13 @@ const event = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   assignments: [],
   ineligiblePlayerDiscordIds: [],
   mySignupStatus: null,
+  mySignupCharacterId: null,
+  mySignupSpecId: null,
   acceptedCharacterIdsByPlayerDiscordId: {},
+  dedicatedAnnouncementChannelId: null,
+  dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 
@@ -104,6 +111,34 @@ describe('assignable-characters.util', () => {
       const result = lockedCharacterEventIdsFor(event(), [otherA, otherB]);
 
       expect(result.get(5)).toEqual(new Set([2, 3]));
+    });
+
+    // ── Extension chain exemption ──────────────────────────────────────────
+
+    it('does not lock a character seated in an event that extends this one', () => {
+      const other = event({ id: 2, extendsRaidEventId: 1, assignments: [assignment({ characterId: 5 })] });
+
+      expect(lockedCharacterEventIdsFor(event({ id: 1 }), [other]).size).toBe(0);
+    });
+
+    it('does not lock a character seated in the event this one extends', () => {
+      const other = event({ id: 2, assignments: [assignment({ characterId: 5 })] });
+
+      expect(lockedCharacterEventIdsFor(event({ id: 1, extendsRaidEventId: 2 }), [other]).size).toBe(0);
+    });
+
+    it('does not lock a character seated in a sibling extending the same root', () => {
+      const other = event({ id: 2, extendsRaidEventId: 10, assignments: [assignment({ characterId: 5 })] });
+
+      expect(lockedCharacterEventIdsFor(event({ id: 1, extendsRaidEventId: 10 }), [other]).size).toBe(0);
+    });
+
+    it('still locks across unrelated events even when both happen to extend different chains', () => {
+      const other = event({ id: 2, extendsRaidEventId: 20, assignments: [assignment({ characterId: 5 })] });
+
+      const result = lockedCharacterEventIdsFor(event({ id: 1, extendsRaidEventId: 10 }), [other]);
+
+      expect(result.get(5)).toEqual(new Set([2]));
     });
   });
 
