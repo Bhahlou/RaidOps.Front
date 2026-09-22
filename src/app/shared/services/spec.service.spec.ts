@@ -6,7 +6,7 @@ import { SpecService } from './spec.service';
 import { Spec } from '../models/spec.model';
 
 const specs: Spec[] = [
-  { id: 71, name: 'Arms', role: 'Dps', classId: 1, iconUrl: null },
+  { id: 71, name: 'Arms', role: 'MeleeDps', classId: 1, iconUrl: null },
   { id: 73, name: 'Protection', role: 'Tank', classId: 1, iconUrl: 'https://cdn/prot.jpg' },
 ];
 

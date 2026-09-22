@@ -19,5 +19,9 @@
   <body>
     <app-root></app-root>
     <noscript>Please enable JavaScript to continue using this application.</noscript>
+    <!-- Powers the native Wowhead tooltip on any element carrying a `data-wowhead="spell=…"`
+         attribute (see SpellIconComponent) — no init call needed, it self-attaches via a
+         document-level hover listener, so it picks up icons added later by Angular too. -->
+    <script src="https://wow.zamimg.com/js/tooltips.js"></script>
   </body>
 </html>

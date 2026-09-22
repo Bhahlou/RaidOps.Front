@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
 import { CreateRaidEventDialogComponent, CreateRaidEventDialogData } from './create-raid-event-dialog.component';
@@ -48,10 +49,11 @@ describe('CreateRaidEventDialogComponent', () => {
   let zoneStore: { zones: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn> };
   let branchesStore: { branches: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn> };
   let guildStore: { settings: ReturnType<typeof signal>; loadSettings: ReturnType<typeof vi.fn> };
-  let raidsService: { createAnnouncementChannel: ReturnType<typeof vi.fn> };
+  let raidsService: { createAnnouncementChannel: ReturnType<typeof vi.fn>; getEventChoices: ReturnType<typeof vi.fn> };
   let guildSettingsService: { getNotificationChannels: ReturnType<typeof vi.fn>; getCategories: ReturnType<typeof vi.fn> };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialogRef: { close: ReturnType<typeof vi.fn> };
+  let transloco: { getActiveLang: ReturnType<typeof vi.fn>; activeLang: ReturnType<typeof signal>; translate: ReturnType<typeof vi.fn> };
 
   const data: CreateRaidEventDialogData = { guildId: 'g1', guildBranchId: 7 };
 
@@ -62,6 +64,7 @@ describe('CreateRaidEventDialogComponent', () => {
     guildStore = { settings: signal({ timezone: 'UTC', language: 'en' }), loadSettings: vi.fn() };
     raidsService = {
       createAnnouncementChannel: vi.fn().mockReturnValue(of({ body: { id: '555', name: 'kara-tue', missingPermissions: [], categoryName: null } })),
+      getEventChoices: vi.fn().mockReturnValue(of([])),
     };
     guildSettingsService = {
       getNotificationChannels: vi.fn().mockReturnValue(of([])),
@@ -69,6 +72,11 @@ describe('CreateRaidEventDialogComponent', () => {
     };
     snackbar = { success: vi.fn(), error: vi.fn() };
     dialogRef = { close: vi.fn() };
+    transloco = {
+      getActiveLang: vi.fn(() => 'en-US'),
+      activeLang: signal('en-US'),
+      translate: vi.fn((key: string) => key),
+    };
 
     TestBed.configureTestingModule({
       imports: [CreateRaidEventDialogComponent],
@@ -82,6 +90,7 @@ describe('CreateRaidEventDialogComponent', () => {
         { provide: SnackbarService, useValue: snackbar },
         { provide: DIALOG_DATA, useValue: data },
         { provide: DialogRef, useValue: dialogRef },
+        { provide: TranslocoService, useValue: transloco },
       ],
     }).overrideComponent(CreateRaidEventDialogComponent, { set: { template: '', imports: [] } });
 
@@ -108,6 +117,71 @@ describe('CreateRaidEventDialogComponent', () => {
       expect(guildStore.loadSettings).toHaveBeenCalledWith('g1');
       expect(guildSettingsService.getNotificationChannels).toHaveBeenCalledWith('g1');
       expect(guildSettingsService.getCategories).toHaveBeenCalledWith('g1');
+    });
+  });
+
+  // ── extendCandidates ─────────────────────────────────────────────────────
+
+  describe('extendCandidates', () => {
+    it('is empty and never fetches choices while no start date is set', () => {
+      const component = setup();
+      TestBed.tick();
+
+      expect(raidsService.getEventChoices).not.toHaveBeenCalled();
+      expect(component.extendCandidates()).toEqual([]);
+    });
+
+    it('fetches and formats choices around the lockout window once a start date is set', () => {
+      const component = setup();
+      raidsService.getEventChoices.mockReturnValue(
+        of([{ id: 5, name: 'Split 1', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]),
+      );
+
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      expect(raidsService.getEventChoices).toHaveBeenCalledWith('g1', 7, new Date('2026-08-05T21:00').toISOString());
+      expect(component.extendCandidates()).toEqual([{ value: 5, label: expect.stringContaining('Split 1') }]);
+    });
+
+    it('clears the candidates again if the start date is cleared', () => {
+      const component = setup();
+      raidsService.getEventChoices.mockReturnValue(
+        of([{ id: 5, name: 'Split 1', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]),
+      );
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+      expect(component.extendCandidates().length).toBe(1);
+
+      component.startsAtLocal.set('');
+      TestBed.tick();
+
+      expect(component.extendCandidates()).toEqual([]);
+    });
+  });
+
+  // ── stale extendsRaidEventId reset ───────────────────────────────────────
+
+  describe('extendsRaidEventId reset', () => {
+    it('leaves the selection untouched while it still matches a candidate', () => {
+      const component = setup();
+      raidsService.getEventChoices.mockReturnValue(of([{ id: 5, name: 'Split 1', startsAtLocal: '2026-08-05T21:00:00', extendsRaidEventId: null }]));
+      component.startsAtLocal.set('2026-08-05T21:00');
+      TestBed.tick();
+
+      component.extendsRaidEventId.set(5);
+      TestBed.tick();
+
+      expect(component.extendsRaidEventId()).toBe(5);
+    });
+
+    it('resets the selection to null once it no longer matches any candidate', () => {
+      const component = setup();
+      component.extendsRaidEventId.set(999);
+
+      TestBed.tick();
+
+      expect(component.extendsRaidEventId()).toBeNull();
     });
   });
 
@@ -265,6 +339,7 @@ describe('CreateRaidEventDialogComponent', () => {
         slotsPerGroup: 4,
         signupMode: 'DefaultPresent',
         raidZoneIds: [10],
+        extendsRaidEventId: null,
         signupModeOverride: null,
         dedicatedAnnouncementChannelId: null,
         dedicatedAnnouncementChannelIsBotOwned: false,

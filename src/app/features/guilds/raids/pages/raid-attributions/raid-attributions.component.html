@@ -1,0 +1,69 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" />
+
+  <div class="attributions-layout">
+    @if (bossGroups().length > 0) {
+      <nav class="boss-nav">
+        @for (group of bossGroups(); track group.raidZoneId) {
+          <div class="boss-nav-group">
+            <div class="boss-nav-group-header">
+              @if (zoneIconUrl(group.raidZoneShortCode); as iconUrl) {
+                <img class="boss-nav-group-header-icon" [src]="iconUrl" [alt]="group.raidZoneShortCode" />
+              }
+              <span>{{ zoneNameKey(group.raidZoneShortCode) | transloco }}</span>
+            </div>
+            @for (boss of group.bosses; track boss.id) {
+              <a class="boss-nav-item" [routerLink]="bossLink(boss.id)" routerLinkActive="boss-nav-item--active">
+                @if (bossIconUrl(boss.name); as iconUrl) {
+                  <img class="boss-nav-item-icon" [src]="iconUrl" [alt]="boss.name" />
+                }
+                <span>{{ bossNameKey(boss.name) | transloco }}</span>
+              </a>
+            }
+          </div>
+        }
+      </nav>
+    }
+
+    <div class="attributions-main">
+      @if (currentBoss(); as boss) {
+        <div class="raidplan-slot">
+          <span class="material-icons raidplan-slot-icon">map</span>
+          <span>{{ 'raidBuilder.attributions.raidplanComingSoon' | transloco }}</span>
+        </div>
+
+        <section class="attributions-scope">
+          <h2 class="attributions-scope-title">
+            @if (bossIconUrl(boss.name); as iconUrl) {
+              <img class="attributions-scope-title-icon" [src]="iconUrl" [alt]="boss.name" />
+            }
+            {{ bossNameKey(boss.name) | transloco }}
+          </h2>
+          <app-raid-attribution-scope
+            [data]="bossData()"
+            [isLoading]="isLoading()"
+            [specs]="specs()"
+            [classColorById]="classColorById()"
+            [isOfficer]="isOfficer()"
+            [horizontal]="true"
+            (slotChange)="onBossSlotChange($event)"
+          />
+        </section>
+      } @else if (bossGroups().length > 0) {
+        <app-empty-hint>{{ 'raidBuilder.attributions.selectABoss' | transloco }}</app-empty-hint>
+      }
+    </div>
+
+    <section class="attributions-scope attributions-general">
+      <h2 class="attributions-scope-title">{{ 'raidBuilder.attributions.general' | transloco }}</h2>
+      <app-raid-attribution-scope
+        [data]="generalData()"
+        [isLoading]="isLoading()"
+        [specs]="specs()"
+        [classColorById]="classColorById()"
+        [isOfficer]="isOfficer()"
+        (slotChange)="onGeneralSlotChange($event)"
+      />
+    </section>
+  </div>
+</div>

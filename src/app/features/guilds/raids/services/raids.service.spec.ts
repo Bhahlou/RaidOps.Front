@@ -137,6 +137,16 @@ describe('RaidsService', () => {
     });
   });
 
+  describe('getEventChoices', () => {
+    it('sends GET to .../events/choices with the reference date as a query param', () => {
+      service.getEventChoices('guild-1', 7, '2026-08-05T20:00:00.000Z').subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith(`${BASE}/events/choices`) && r.params.get('aroundStartsAtUtc') === '2026-08-05T20:00:00.000Z');
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
   describe('createEvent', () => {
     it('sends POST to .../events with the payload', () => {
       const payload: RaidEventPayload = { name: 'SSC/TK/Gruul', startsAtUtc: '2026-08-05T19:00:00Z', groupCount: 5, slotsPerGroup: 5, signupMode: SignupMode.DefaultPresent, raidZoneIds: [10] };

@@ -1,0 +1,129 @@
+// A single grid column sized to its content (`max-content`) but allowed to shrink down to the
+// host's real available width (the `minmax(0, ...)` half) — the host (`.attributions-general`)
+// sizes itself to fit-content up to its own cap, so most of the time this resolves to the
+// content's natural width with zero wrapping; only a row wide enough to bust that outer cap
+// actually wraps (via the icon+picker `.attribution-pair` grouping below), instead of either
+// silently overflowing past the cap or forcing every row to always stretch full-width regardless
+// of how little of it a given row actually needs.
+.attributions-content {
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+  gap: 8px;
+  max-width: 100%;
+
+  // Sections side by side instead of stacked, wrapping as needed — used for the boss column,
+  // which is wide enough to spread its (usually few) sections out horizontally instead of leaving
+  // most of the width empty; each section keeps its own natural width and internal vertical stack.
+  &--horizontal {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+  }
+}
+
+.attribution-section {
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-primary);
+  overflow: hidden;
+
+  &--unlabeled {
+    border: none;
+    background: none;
+    gap: 1px;
+  }
+}
+
+.attribution-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border-subtle);
+
+  app-spell-icon,
+  app-raid-marker-icon {
+    display: flex;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.attribution-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding: 3px 10px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}
+
+.attribution-section--unlabeled .attribution-row {
+  border-radius: 6px;
+  background: var(--color-bg-tertiary);
+
+  &:not(:last-child) {
+    border-bottom: none;
+  }
+}
+
+.attribution-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.attribution-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+}
+
+.attribution-instances {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+// Every picker in this scope shares one explicit width (`pickerWidth()`, bound on `app-select`
+// itself), so a plain wrapping flex row is enough to keep instance-rows lined up — no per-column
+// grid tracking needed once every cell in a given column position is already the same size.
+.attribution-instance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+// A wrap-unit — an icon and the picker(s) it labels stay on the same line together; the browser
+// only ever wraps *between* pairs, never inside one (no more an icon stranded alone with its own
+// picker pushed to the next line, which is what a flat cell-by-cell wrap produced in a narrow column).
+.attribution-pair {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.attribution-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

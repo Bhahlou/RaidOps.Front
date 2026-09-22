@@ -33,6 +33,8 @@ const raidEvent = (overrides?: Partial<RaidEvent>): RaidEvent => ({
   acceptedCharacterIdsByPlayerDiscordId: {},
   dedicatedAnnouncementChannelId: null,
   dedicatedAnnouncementChannelIsBotOwned: false,
+  extendsRaidEventId: null,
+  extendsRaidEventName: null,
   ...overrides,
 });
 
@@ -63,6 +65,7 @@ const assignment = (overrides?: Partial<RaidSlotAssignment>): RaidSlotAssignment
   availabilityStatus: DayAvailabilityStatus.Available,
   spec: { id: 1, name: 'Fury', iconUrl: null },
   availableSpecs: [{ id: 1, name: 'Fury', iconUrl: null }],
+  signupStatus: null,
   ...overrides,
 });
 

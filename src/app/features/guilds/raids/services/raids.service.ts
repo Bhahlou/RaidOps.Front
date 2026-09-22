@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { RaidZone } from '../models/raid-zone.model';
 import { RaidSeries, RaidSeriesPayload } from '../models/raid-series.model';
-import { RaidBoard, RaidEvent, RaidEventPayload } from '../models/raid-event.model';
+import { RaidBoard, RaidEvent, RaidEventChoice, RaidEventPayload } from '../models/raid-event.model';
 import { GuildBranchLockoutWeek } from '../models/guild-branch-lockout-week.model';
 import { RaidEventAssignedCharacter } from '../models/raid-event-assigned-character.model';
 import { RaidSignup } from '../models/raid-signup.model';
@@ -70,6 +70,18 @@ export class RaidsService {
   /** Fetches a single raid event (with assignments and resolved member availability) — backs the raid detail page. */
   getEvent(guildId: string, guildBranchId: number, eventId: number): Observable<RaidEvent> {
     return this.#http.get<RaidEvent>(`${this.#base(guildId, guildBranchId)}/events/${eventId}`);
+  }
+
+  /**
+   * Officer-only — lists the branch's raid events (draft and published) within the lockout window
+   * around `aroundStartsAtUtc`, for the create/edit dialogs' "extends the lockout of" picker.
+   * Independent of the board's currently loaded range or single-event mode, unlike sourcing
+   * candidates from `RaidBoardStore.events()`.
+   */
+  getEventChoices(guildId: string, guildBranchId: number, aroundStartsAtUtc: string): Observable<RaidEventChoice[]> {
+    return this.#http.get<RaidEventChoice[]>(`${this.#base(guildId, guildBranchId)}/events/choices`, {
+      params: { aroundStartsAtUtc },
+    });
   }
 
   createEvent(guildId: string, guildBranchId: number, payload: RaidEventPayload): Observable<void> {

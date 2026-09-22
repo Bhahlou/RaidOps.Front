@@ -13,7 +13,7 @@
     (click)="toggle()"
     [attr.aria-expanded]="isOpen()"
   >
-    <span class="select-value" [class.select-value--placeholder]="!selectedLabel()">
+    <span class="select-value" [class.select-value--placeholder]="!selectedLabel()" [style.color]="selectedLabel() ? selectedColor() : null">
       @if (selectedIconUrl(); as iconUrl) {
         <img class="select-value-icon" [ngSrc]="iconUrl" alt="" width="20" height="20" />
       }
@@ -28,13 +28,12 @@
   [cdkConnectedOverlayOrigin]="origin"
   [cdkConnectedOverlayOpen]="isOpen()"
   [cdkConnectedOverlayPositions]="dropdownPositions"
-  [cdkConnectedOverlayWidth]="triggerWidth()"
   [cdkConnectedOverlayHasBackdrop]="true"
   cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
   (backdropClick)="close()"
   (detach)="close()"
 >
-  <div class="select-panel" (keydown)="onPanelKeydown($event)">
+  <div class="select-panel" [style.min-width.px]="triggerWidth()" (keydown)="onPanelKeydown($event)">
     @if (filterable()) {
       <div class="select-filter">
         <span class="material-icons select-filter-icon">search</span>
@@ -64,7 +63,7 @@
             @if (opt.iconUrl) {
               <img class="select-option-icon" [ngSrc]="opt.iconUrl" alt="" width="20" height="20" />
             }
-            {{ opt.label }}
+            <span [style.color]="opt.label ? opt.color : null">{{ opt.label || placeholder() }}</span>
           </li>
         }
       } @empty {

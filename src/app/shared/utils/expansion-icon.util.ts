@@ -12,6 +12,7 @@ const EXPANSION_ICON_URLS: Record<string, string> = {
   SL: '/assets/images/expansion-icons/SL.png',
   DF: '/assets/images/expansion-icons/DF.png',
   TWW: '/assets/images/expansion-icons/TWW.png',
+  Forever: '/assets/images/expansion-icons/Forever.png',
 };
 
 export function expansionIconUrl(shortCode: string | null | undefined): string | null {

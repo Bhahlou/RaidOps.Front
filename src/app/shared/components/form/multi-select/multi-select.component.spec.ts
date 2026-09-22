@@ -117,6 +117,28 @@ describe('MultiSelectComponent', () => {
     });
   });
 
+  // ── selectedOptions ──────────────────────────────────────────────────────
+
+  describe('selectedOptions', () => {
+    it('is empty when nothing is selected', () => {
+      expect(setup().selectedOptions()).toEqual([]);
+    });
+
+    it('returns the full option objects currently selected, in options order', () => {
+      const component = setup();
+      component.value.set(['c', 'a']);
+
+      expect(component.selectedOptions()).toEqual([options[0], options[2]]);
+    });
+
+    it('ignores selected values that no longer match an option', () => {
+      const component = setup();
+      component.value.set(['a', 'stale-value']);
+
+      expect(component.selectedOptions()).toEqual([options[0]]);
+    });
+  });
+
   // ── isSelected ───────────────────────────────────────────────────────────
 
   describe('isSelected', () => {

@@ -1,0 +1,10 @@
+<h2 class="dialog-title">{{ 'guildSettings.attributions.sectionIcon.title' | transloco: { section: data.section } }}</h2>
+
+<div class="dialog-content">
+  <app-icon-source-picker [guildId]="data.guildId" [expansionId]="data.expansionId" [value]="icon()" (changed)="icon.set($event)" />
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="submitting()" (click)="submit()">{{ 'raidBuilder.actions.save' | transloco }}</app-button>
+</div>

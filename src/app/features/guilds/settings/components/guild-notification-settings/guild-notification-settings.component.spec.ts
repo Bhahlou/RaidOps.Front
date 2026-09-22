@@ -40,6 +40,7 @@ const branch = (overrides?: Partial<GuildBranch>): GuildBranch => ({
   rosterRoleIds: [],
   officerRoleIds: [],
   region: null,
+  signupMode: null,
   ...overrides,
 });
 
@@ -362,7 +363,7 @@ describe('GuildNotificationSettingsComponent', () => {
       setup(
         'g1', [], [],
         [branch({ id: 7, branchId: 1, branchName: 'Retail', isActive: true }), branch({ id: 8, branchName: 'Classic', isActive: false })],
-        [{ id: 1, name: 'Retail', bnetNamespacePrefix: 'retail', currentExpansionShortCode: 'TWW' }],
+        [{ id: 1, name: 'Retail', bnetNamespacePrefix: 'retail', currentExpansionShortCode: 'TWW', isActive: true, syncAvailable: true }],
       );
       fixture.detectChanges();
 
@@ -604,7 +605,7 @@ describe('GuildNotificationSettingsComponent', () => {
       setup('g1', [setting({ enabled: true, channelId: null })]);
       fixture.detectChanges();
 
-      await component.save();
+      await (component as any).save();
 
       expect(settingsService.updateNotificationSettings).not.toHaveBeenCalled();
     });
@@ -613,7 +614,7 @@ describe('GuildNotificationSettingsComponent', () => {
       setup('g1', [setting({ enabled: true, channelId: 'chan-1' })]);
       fixture.detectChanges();
 
-      await component.save();
+      await (component as any).save();
 
       // 5 families (Absences, Raid changes, Raid composition changes, Raid composition
       // announcement, Raid signup call), 12 event types total — only AbsenceAdded has a stored
@@ -647,7 +648,7 @@ describe('GuildNotificationSettingsComponent', () => {
       fixture.detectChanges();
       component.onScopeChange('7');
 
-      await component.save();
+      await (component as any).save();
 
       expect(settingsService.updateNotificationSettings).toHaveBeenCalledWith('g1', 7, expect.anything());
     });
@@ -657,7 +658,7 @@ describe('GuildNotificationSettingsComponent', () => {
       settingsService.updateNotificationSettings.mockReturnValue(throwError(() => new Error('failed')));
       fixture.detectChanges();
 
-      await component.save();
+      await (component as any).save();
 
       expect(snackbar.error).toHaveBeenCalledWith('errors.server');
       expect(component.submitting()).toBe(false);

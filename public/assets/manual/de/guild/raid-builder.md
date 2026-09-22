@@ -20,6 +20,10 @@ Die standardmäßig angezeigte Woche entspricht dem tatsächlichen wöchentliche
 
 ![Dialog „Raid-Event bearbeiten": Name, Zeitplan, Rastergröße und Raidzonen](/assets/manual/de/guild/raid-builder-edit-dialog.png)
 
+### Einen Raid über mehrere Abende verlängern
+
+Ein Raid kann als Verlängerung eines anderen markiert werden — das Ingame-Äquivalent zum Verlängern der Raid-Lockout-ID statt eine neue zu verbrauchen, z. B. um Black Temple über zwei aufeinanderfolgende Abende mit demselben Lock zu clearen. Das Feld **Verlängert das Lockout von** im Erstellungs- oder Bearbeitungsdialog schlägt die Raids des Spielzweigs innerhalb desselben wöchentlichen Reset-Fensters vor. Sobald die Verknüpfung besteht, können dieselben Charaktere beiden Raids zugewiesen werden, ohne dass die Zuweisung wegen eines Lockout-Konflikts blockiert wird; auf der Detailseite des Raids erscheint dann ein Abzeichen **Verlängerung von „Name"**.
+
 ### Anmeldemodus
 
 Standardmäßig läuft ein Raid im Modus **Automatisch**: Jedes Roster-Mitglied gilt als anwesend, sofern es keine Abwesenheit eingetragen hat, keine Anmeldung nötig (der Standard pro Spielzweig wird in den [Raid-Einstellungen](/manual/guild/raid-settings) festgelegt). Ein Raid kann stattdessen im Modus **Planer** laufen — entweder weil sein Spielzweig das als Standard hat, oder weil ein Officer beim Erstellen eines einmaligen Ausnahme-Raids „Anmeldemodus für diesen Raid verwenden" ankreuzt — dann melden sich Roster-Mitglieder selbst an (siehe die Detailseite des Raids weiter unten), statt sich auf ihre eingetragenen Abwesenheiten zu verlassen.
@@ -37,6 +41,16 @@ Ein Raid — einmalig oder aus einer Serie erzeugt — kann in seinen eigenen Di
 Sobald ein Raid **veröffentlicht** ist, wird sein Name im Raster anklickbar und öffnet seine eigene Detailseite (Breadcrumb: Gilde > Raids > Raid-Name) — ein noch im Entwurf befindlicher Raid behält einen einfachen, nicht verlinkten Namen. Der Header zeigt Datum und Uhrzeit vollständig, die Zonen des Raids und eine live aus den aktuellen Einteilungen berechnete Rollenzählung (Tank/Heal/Nahkampf/Fernkampf); ein Raid im Planer-Modus fügt dort deine eigene Antwort (Zusagen/Vielleicht/Absagen) hinzu. Darunter steht dasselbe Kompositionsraster wie auf der Raids-Seite neben entweder der Verfügbarkeitsübersicht des Rosters (Modus Automatisch) oder der Anmeldungsübersicht (Modus Planer) — beide dienen Officern zugleich als Ziehquelle ins Raster, genau wie der Roster-Pool. Officer bekommen zusätzlich **Veröffentlichen** (solange es ein Entwurf ist), **Gruppierung anpingen** (sobald veröffentlicht, siehe unten) und einen **Bearbeiten**-Shortcut, alles vom selben Header aus.
 
 ![Detailseite eines Raids: Header mit Antwort-Buttons, Kompositionsraster und Anmeldungsübersicht](/assets/manual/de/guild/raid-detail-overview.png)
+
+### Zuweisungen
+
+Der Link **Zuweisungen** auf der Detailseite eines Raids öffnet, wer welche Zeile der [Raid-Zuweisungsvorlage](/manual/guild/raid-settings) der Gilde für genau diesen Raid ausfüllt — Buffs, Flüche, Tank-/Heal-Wechsel, Interrupts, was auch immer Officer eingerichtet haben. Zeilen sind nach Abschnitt gruppiert und erscheinen nur, wenn sie mindestens ein aktuell im Raid sitzender Charakter ausfüllen könnte; die Instanzenzahl einer **wiederholbaren** Zeile passt sich automatisch an (z. B. so viele Anregen-Plätze wie Druiden im Raid sitzen). Die **Allgemein**-Zeilen (gildenweit, an keinen Boss gebunden) bleiben unabhängig vom ausgewählten Boss immer in ihrer eigenen Spalte sichtbar.
+
+![Zuweisungen-Seite: Zeilen mit anwesenden Charakteren ausgefüllt](/assets/manual/de/guild/raid-attributions-overview.png)
+
+Zielt der Raid auf eine Zone mit konfigurierten bossgebundenen Zeilen, listet eine Navigationsleiste links jeden Boss auf, gruppiert nach Zone (normalerweise nur eine, außer bei einem Split-Raid über mehrere Zonen) — einen auswählen, um dessen eigene Zeilen (Interrupts, Positionen, was auch immer für diesen Kampf spezifisch ist) neben Allgemein auszufüllen.
+
+Nur Officer können einen Platz ausfüllen — durch Auswahl eines Charakters aus dem Dropdown, beschränkt auf im Raid sitzende Charaktere, die die Klassen-/Rollen-/Spezialisierungsanforderung des Platzes erfüllen, sofern vorhanden. Alle anderen sehen dieselbe Seite nur lesend.
 
 ### Discord-Kompositions-Ankündigung
 
