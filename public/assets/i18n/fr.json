@@ -1344,6 +1344,7 @@
     "sync": {
       "title": "Synchroniser les personnages",
       "branchDesc": "Sélectionne la branche de jeu à synchroniser.",
+      "comingSoon": "Bientôt disponible",
       "authenticating": "Connexion à Battle.net…",
       "syncing": "Synchronisation en cours…",
       "error": "Une erreur est survenue. Réessaie.",

@@ -36,6 +36,8 @@ const wowBranch = (overrides: Partial<Branch> = {}): Branch => ({
   name: 'Classic Anniversary',
   bnetNamespacePrefix: 'classic1x',
   currentExpansionShortCode: 'TBC',
+  isActive: true,
+  syncAvailable: true,
   ...overrides,
 });
 

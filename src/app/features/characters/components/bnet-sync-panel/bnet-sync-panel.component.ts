@@ -72,7 +72,9 @@ export class BnetSyncPanelComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.#wowBranchesService.getAll().subscribe({
       next: (branches) => {
-        this.branches.set(branches);
+        // Dead/deactivated branches can still be resynced per-character elsewhere (character-card) —
+        // just not offered as a starting point for a fresh BNet link here.
+        this.branches.set(branches.filter((b) => b.isActive));
         this.isLoadingBranches.set(false);
       },
       error: () => {
@@ -87,6 +89,8 @@ export class BnetSyncPanelComponent implements OnInit, OnDestroy {
   }
 
   selectBranch(branch: Branch): void {
+    if (!branch.syncAvailable) return;
+
     this.#selectedBranchId = branch.id;
     this.step.set('authenticating');
 

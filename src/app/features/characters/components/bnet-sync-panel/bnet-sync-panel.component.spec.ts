@@ -9,8 +9,8 @@ import { Branch } from '../../../../shared/models/branch.model';
 import { BnetAccount } from '../../models/bnet-account.model';
 
 const mockBranches: Branch[] = [
-  { id: 1, name: 'Retail', bnetNamespacePrefix: 'profile-eu', currentExpansionShortCode: 'TWW' },
-  { id: 2, name: 'Classic Era', bnetNamespacePrefix: 'profile-classic-eu', currentExpansionShortCode: 'CLASSIC' },
+  { id: 1, name: 'Retail', bnetNamespacePrefix: 'profile-eu', currentExpansionShortCode: 'TWW', isActive: true, syncAvailable: true },
+  { id: 2, name: 'Classic Era', bnetNamespacePrefix: 'profile-classic-eu', currentExpansionShortCode: 'CLASSIC', isActive: true, syncAvailable: true },
 ];
 
 const makeAccount = (bnetId: string): BnetAccount => ({
@@ -88,6 +88,15 @@ describe('BnetSyncPanelComponent', () => {
       expect(component.step()).toBe('error');
       expect(component.isLoadingBranches()).toBe(false);
     });
+
+    it('filters out globally deactivated branches (e.g. a dead branch) — still resyncable per-character elsewhere', () => {
+      const deadBranch: Branch = { id: 3, name: 'Classic Era', bnetNamespacePrefix: 'dead', currentExpansionShortCode: 'CLASSIC', isActive: false, syncAvailable: true };
+      wowBranchesService.getAll.mockReturnValue(of([...mockBranches, deadBranch]));
+
+      component.ngOnInit();
+
+      expect(component.branches()).toEqual(mockBranches);
+    });
   });
 
   // ── reset ───────────────────────────────────────────────────────────────────
@@ -138,6 +147,15 @@ describe('BnetSyncPanelComponent', () => {
 
       const url = (globalThis.open as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
       expect(url).toContain('/bnet/link/initiate');
+    });
+
+    it('does nothing for a branch with no BNet sync available yet ("coming soon")', () => {
+      const comingSoon: Branch = { ...mockBranches[0], id: 5, name: 'Forever', syncAvailable: false };
+      component.ngOnInit();
+      component.selectBranch(comingSoon);
+
+      expect(component.step()).toBe('branches');
+      expect(globalThis.open).not.toHaveBeenCalled();
     });
   });
 

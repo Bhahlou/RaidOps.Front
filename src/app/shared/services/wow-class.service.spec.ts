@@ -33,9 +33,18 @@ describe('WowClassService', () => {
 
       const req = controller.expectOne((r) => r.url.endsWith('/wowclasses'));
       expect(req.request.method).toBe('GET');
+      expect(req.request.params.keys()).toEqual([]);
       req.flush(classes);
 
       expect(result).toEqual(classes);
+    });
+
+    it('sends availableForExpansionId as a query param when given', () => {
+      service.getAll(12).subscribe();
+
+      const req = controller.expectOne((r) => r.url.endsWith('/wowclasses'));
+      expect(req.request.params.get('availableForExpansionId')).toBe('12');
+      req.flush(classes);
     });
   });
 });
