@@ -14,9 +14,6 @@
 
     <div id="panel-raids" role="tabpanel" aria-labelledby="tab-raids" [hidden]="activeTab() !== 'raids'">
       <app-guild-raid-branches [guildId]="guildId" />
-      @if (attributionExpansionId(); as expansionId) {
-        <app-guild-attribution-settings [guildId]="guildId" [expansionId]="expansionId" />
-      }
     </div>
 
     <div

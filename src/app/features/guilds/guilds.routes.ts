@@ -47,6 +47,12 @@ export const guildRoutes: Routes = [
               import('./settings/pages/settings/guild-settings.component').then(m => m.GuildSettingsComponent),
           },
           {
+            path: 'raid-assignments',
+            data: { minAccessLevel: GuildAccessLevel.Officer },
+            loadComponent: () =>
+              import('./raid-assignments/pages/raid-assignments/guild-raid-assignments.component').then(m => m.GuildRaidAssignmentsComponent),
+          },
+          {
             path: 'audit-log',
             data: { minAccessLevel: GuildAccessLevel.Officer },
             loadComponent: () =>

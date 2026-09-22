@@ -425,6 +425,7 @@
       "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Paramètres",
+      "raidAssignments": "Attributions",
       "auditLog": "Journal d'audit",
       "switch": "Changer de guilde"
     }
@@ -535,6 +536,9 @@
     "attributions": {
       "title": "Modèle d'attributions de raid",
       "hint": "Lignes que la guilde doit toujours assigner pendant un raid (buffs, malédictions, tank/heal swaps, interrupts…). Les officiers remplissent chaque ligne avec de vrais personnages par raid, dans son onglet Attributions.",
+      "raidPlan": {
+        "title": "Plan de raid (raidplan)"
+      },
       "scope": {
         "general": "Général",
         "raidLabel": "Raid",
@@ -1115,7 +1119,6 @@
       "noneAssignable": "Aucune attribution n'est assignable avec la composition actuelle du raid.",
       "general": "Général",
       "selectABoss": "Choisissez un boss dans la liste pour voir son plan et ses attributions.",
-      "raidplanComingSoon": "Raidplan — bientôt disponible",
       "errors": {
         "CharacterNotSeatedInEvent": "Ce personnage n'est pas présent dans ce raid.",
         "AttributionCellNotFound": "Cet emplacement n'existe plus dans le modèle.",
@@ -1124,6 +1127,29 @@
         "InvalidInstanceIndex": "Cette instance n'existe plus sur cette ligne.",
         "BossNotTargetedByEvent": "Ce boss ne fait pas partie de ce raid.",
         "DefinitionBossMismatch": "Cette ligne n'appartient pas à ce boss."
+      }
+    },
+    "raidPlan": {
+      "noBoardYet": "Ce boss n'a pas encore de plan de raid.",
+      "createBoard": "Créer le plan",
+      "noPagesYet": "Aucune page pour l'instant — ajoutez-en une pour commencer.",
+      "addPage": "Ajouter une page",
+      "renamePage": "Renommer la page",
+      "deletePage": "Supprimer la page",
+      "deleteConfirmTitle": "Supprimer cette page ?",
+      "deleteConfirmMessage": "La page \"{{name}}\" et tout ce qu'elle contient seront définitivement supprimés.",
+      "pickBackground": "Choisir un fond",
+      "noBackground": "Aucun fond choisi",
+      "dialog": {
+        "createTitle": "Nouvelle page",
+        "editTitle": "Renommer la page",
+        "name": "Nom",
+        "namePlaceholder": "ex. Phase 1"
+      },
+      "backgroundPicker": {
+        "title": "Choisir un fond",
+        "empty": "Aucun fond disponible pour cette zone pour l'instant.",
+        "none": "Aucun"
       }
     },
     "tabs": {

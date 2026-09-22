@@ -26,6 +26,7 @@ import {
 } from '../attribution-definition-dialog/attribution-definition-dialog.component';
 import { SectionIconDialogComponent, SectionIconDialogData } from '../section-icon-dialog/section-icon-dialog.component';
 import { IconSourceState } from '../../../raids/components/icon-source-picker/icon-source-picker.component';
+import { RaidPlanSettingsComponent } from '../raid-plan-settings/raid-plan-settings.component';
 
 /** Sentinel `raidOptions` value for the "General" scope — every real raid zone has a positive seeded ID. */
 const GENERAL_SCOPE = -1;
@@ -43,6 +44,7 @@ const GENERAL_SCOPE = -1;
     SpellIconComponent,
     RaidMarkerIconComponent,
     AttributionRoleIconComponent,
+    RaidPlanSettingsComponent,
     TranslocoPipe,
   ],
   templateUrl: './guild-attribution-settings.component.html',
@@ -88,6 +90,9 @@ export class GuildAttributionSettingsComponent implements OnInit {
 
   /** The scope currently loaded/edited — the boss's ID, or `null` for "General". */
   readonly currentRaidBossId = computed<number | null>(() => (this.selectedRaidId() === GENERAL_SCOPE ? null : this.selectedBossId()));
+
+  /** The selected zone's short code — backs the raid-plan section below, which (unlike attributions) is never "General". */
+  readonly currentRaidZoneShortCode = computed<string | null>(() => this.raidZones().find((z) => z.id === this.selectedRaidId())?.shortCode ?? null);
 
   ngOnInit(): void {
     this.#definitionsService.getRaidZonesForGuild(this.guildId()).subscribe((zones) => this.raidZones.set(zones));

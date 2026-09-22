@@ -1,0 +1,24 @@
+<h2 class="dialog-title">
+  {{ (isEditMode ? 'raidBuilder.raidPlan.dialog.editTitle' : 'raidBuilder.raidPlan.dialog.createTitle') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <app-form-field-card [label]="'raidBuilder.raidPlan.dialog.name' | transloco">
+    <input
+      id="raid-plan-page-name"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      maxlength="64"
+      [attr.aria-label]="'raidBuilder.raidPlan.dialog.name' | transloco"
+      [placeholder]="'raidBuilder.raidPlan.dialog.namePlaceholder' | transloco"
+    />
+  </app-form-field-card>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'confirmDialog.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="submitting() || !name().trim()" (click)="submit()">{{ 'confirmDialog.confirm' | transloco }}</app-button>
+</div>

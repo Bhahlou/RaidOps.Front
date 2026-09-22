@@ -425,6 +425,7 @@
       "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Settings",
+      "raidAssignments": "Attributions",
       "auditLog": "Audit log",
       "switch": "Switch guild"
     }
@@ -535,6 +536,9 @@
     "attributions": {
       "title": "Raid attribution template",
       "hint": "Rows your guild always needs assigned during a raid (buffs, curses, tank/heal swaps, interrupts…). Officers fill each row in with real characters per raid event, on its Assignments tab.",
+      "raidPlan": {
+        "title": "Raid plan"
+      },
       "scope": {
         "general": "General",
         "raidLabel": "Raid",
@@ -1115,7 +1119,6 @@
       "noneAssignable": "No attribution is assignable with the raid's current composition.",
       "general": "General",
       "selectABoss": "Pick a boss from the list to see its plan and attributions.",
-      "raidplanComingSoon": "Raidplan — coming soon",
       "errors": {
         "CharacterNotSeatedInEvent": "That character isn't seated in this raid.",
         "AttributionCellNotFound": "This slot no longer exists on the template.",
@@ -1124,6 +1127,29 @@
         "InvalidInstanceIndex": "That instance no longer exists on this row.",
         "BossNotTargetedByEvent": "That boss isn't part of this raid.",
         "DefinitionBossMismatch": "This row doesn't belong to that boss."
+      }
+    },
+    "raidPlan": {
+      "noBoardYet": "This boss doesn't have a raid plan yet.",
+      "createBoard": "Create the plan",
+      "noPagesYet": "No pages yet — add one to get started.",
+      "addPage": "Add a page",
+      "renamePage": "Rename page",
+      "deletePage": "Delete page",
+      "deleteConfirmTitle": "Delete this page?",
+      "deleteConfirmMessage": "The page \"{{name}}\" and everything on it will be permanently deleted.",
+      "pickBackground": "Pick a background",
+      "noBackground": "No background picked",
+      "dialog": {
+        "createTitle": "New page",
+        "editTitle": "Rename page",
+        "name": "Name",
+        "namePlaceholder": "e.g. Phase 1"
+      },
+      "backgroundPicker": {
+        "title": "Pick a background",
+        "empty": "No background available for this zone yet.",
+        "none": "None"
       }
     },
     "tabs": {

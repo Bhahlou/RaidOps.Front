@@ -1,0 +1,37 @@
+// Aspect ratio is set inline from the background's declared value (or the 16:9 fallback) so
+// element positions saved as fractions of this box stay meaningful regardless of viewport width —
+// see raid-plan-backgrounds.enum.ts.
+.raid-plan-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.raid-plan-canvas-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.raid-plan-canvas-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.raid-plan-canvas-empty-icon {
+  font-size: 28px;
+  opacity: 0.5;
+}

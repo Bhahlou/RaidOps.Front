@@ -1,0 +1,9 @@
+<div class="guild-page">
+  <app-page-header [items]="breadcrumbs()" />
+
+  <div class="raid-assignments-content">
+    @if (attributionExpansionId(); as expansionId) {
+      <app-guild-attribution-settings [guildId]="guildId" [expansionId]="expansionId" />
+    }
+  </div>
+</div>

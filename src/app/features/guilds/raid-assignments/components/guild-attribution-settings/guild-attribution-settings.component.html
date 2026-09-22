@@ -88,3 +88,11 @@
     </div>
   }
 </app-form-field-card>
+
+@if (currentRaidBossId(); as raidBossId) {
+  @if (currentRaidZoneShortCode(); as raidZoneShortCode) {
+    <app-form-field-card [label]="'guildSettings.attributions.raidPlan.title' | transloco" class="raid-plan-settings-card">
+      <app-raid-plan-settings [guildId]="guildId()" [bossId]="raidBossId" [raidZoneShortCode]="raidZoneShortCode" />
+    </app-form-field-card>
+  }
+}

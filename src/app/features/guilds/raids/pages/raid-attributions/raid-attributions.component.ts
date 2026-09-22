@@ -16,6 +16,7 @@ import { RaidBoardStore } from '../../stores/raid-board.store';
 import { RaidEventAttributionsService } from '../../services/raid-event-attributions.service';
 import { RaidBoss } from '../../models/raid-boss.model';
 import { RaidAttributionScopeComponent, SlotChangeEvent } from '../../components/raid-attribution-scope/raid-attribution-scope.component';
+import { RaidPlanViewerComponent } from '../../components/raid-plan-viewer/raid-plan-viewer.component';
 import { raidBossIconUrl, raidBossNameKey, raidZoneNameKey } from '../../utils/raid-boss-name.util';
 import { raidZoneIconUrl } from '../../utils/raid-zone-icon.util';
 
@@ -33,7 +34,7 @@ interface BossGroup {
  */
 @Component({
   selector: 'app-raid-attributions',
-  imports: [RouterLink, RouterLinkActive, PageHeaderComponent, EmptyHintComponent, RaidAttributionScopeComponent, TranslocoPipe],
+  imports: [RouterLink, RouterLinkActive, PageHeaderComponent, EmptyHintComponent, RaidAttributionScopeComponent, RaidPlanViewerComponent, TranslocoPipe],
   templateUrl: './raid-attributions.component.html',
   styleUrl: './raid-attributions.component.scss',
 })

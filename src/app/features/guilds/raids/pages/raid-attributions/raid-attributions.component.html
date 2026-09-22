@@ -27,10 +27,7 @@
 
     <div class="attributions-main">
       @if (currentBoss(); as boss) {
-        <div class="raidplan-slot">
-          <span class="material-icons raidplan-slot-icon">map</span>
-          <span>{{ 'raidBuilder.attributions.raidplanComingSoon' | transloco }}</span>
-        </div>
+        <app-raid-plan-viewer [guildId]="guildId()" [bossId]="boss.id" />
 
         <section class="attributions-scope">
           <h2 class="attributions-scope-title">

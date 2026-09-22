@@ -1,0 +1,32 @@
+.raid-plan-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.raid-plan-viewer-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.raid-plan-page-tab {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px 6px 0 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+
+  &--active {
+    color: var(--color-accent);
+    background: var(--color-bg-elevated);
+    border-color: var(--color-accent);
+  }
+}

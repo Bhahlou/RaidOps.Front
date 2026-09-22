@@ -1,0 +1,39 @@
+<div class="raid-plan-settings">
+  @if (!isLoading() && !currentPlan()) {
+    <div class="raid-plan-settings-empty">
+      <span class="material-icons raid-plan-settings-empty-icon">map</span>
+      <span>{{ 'raidBuilder.raidPlan.noBoardYet' | transloco }}</span>
+      <app-button variant="stroked" icon="add" (click)="createBoard()">{{ 'raidBuilder.raidPlan.createBoard' | transloco }}</app-button>
+    </div>
+  } @else if (currentPlan()) {
+    <div class="raid-plan-settings-tabs">
+      @for (page of pages(); track page.id) {
+        <button type="button" class="raid-plan-page-tab" [class.raid-plan-page-tab--active]="page.id === selectedPage()?.id" (click)="selectPage(page)">
+          <span>{{ page.name }}</span>
+          <span class="raid-plan-page-tab-actions">
+            <app-icon-button
+              icon="edit"
+              [ariaLabel]="'raidBuilder.raidPlan.renamePage' | transloco"
+              (click)="openRenamePageDialog(page); $event.stopPropagation()"
+            />
+            <app-icon-button
+              icon="delete"
+              [ariaLabel]="'raidBuilder.raidPlan.deletePage' | transloco"
+              (click)="deletePage(page); $event.stopPropagation()"
+            />
+          </span>
+        </button>
+      }
+      <app-icon-button icon="add" [ariaLabel]="'raidBuilder.raidPlan.addPage' | transloco" (click)="openCreatePageDialog()" />
+    </div>
+
+    @if (pages().length === 0) {
+      <app-empty-hint>{{ 'raidBuilder.raidPlan.noPagesYet' | transloco }}</app-empty-hint>
+    } @else if (selectedPage(); as page) {
+      <div class="raid-plan-settings-canvas-header">
+        <app-button variant="stroked" icon="image" (click)="openBackgroundPicker()">{{ 'raidBuilder.raidPlan.pickBackground' | transloco }}</app-button>
+      </div>
+      <app-raid-plan-canvas [backgroundKey]="page.backgroundImageKey" />
+    }
+  }
+</div>

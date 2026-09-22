@@ -1,0 +1,24 @@
+<div class="raid-plan-viewer">
+  @if (!isLoading() && currentPlan() && pages().length > 0) {
+    @if (pages().length > 1) {
+      <div class="raid-plan-viewer-tabs">
+        @for (page of pages(); track page.id) {
+          <button
+            type="button"
+            class="raid-plan-page-tab"
+            [class.raid-plan-page-tab--active]="page.id === selectedPage()?.id"
+            (click)="selectPage(page)"
+          >
+            {{ page.name }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (selectedPage(); as page) {
+      <app-raid-plan-canvas [backgroundKey]="page.backgroundImageKey" />
+    }
+  } @else if (!isLoading()) {
+    <app-empty-hint>{{ 'raidBuilder.raidPlan.noBoardYet' | transloco }}</app-empty-hint>
+  }
+</div>

@@ -425,6 +425,7 @@
       "raidBuilder": "Raids",
       "loot": "Loot",
       "settings": "Einstellungen",
+      "raidAssignments": "Zuweisungen",
       "auditLog": "Audit-Log",
       "switch": "Gilde wechseln"
     }
@@ -535,6 +536,9 @@
     "attributions": {
       "title": "Raid-Zuweisungsvorlage",
       "hint": "Zeilen, die deine Gilde bei einem Raid immer zuweisen muss (Buffs, Flüche, Tank-/Heiler-Wechsel, Unterbrechungen…). Offiziere füllen jede Zeile pro Raid-Event mit echten Charakteren, auf dessen Zuweisungen-Tab.",
+      "raidPlan": {
+        "title": "Raidplan"
+      },
       "scope": {
         "general": "Allgemein",
         "raidLabel": "Raid",
@@ -1115,7 +1119,6 @@
       "noneAssignable": "Mit der aktuellen Raid-Zusammensetzung ist keine Zuweisung möglich.",
       "general": "Allgemein",
       "selectABoss": "Wähle einen Boss aus der Liste, um seinen Plan und seine Zuweisungen zu sehen.",
-      "raidplanComingSoon": "Raidplan — demnächst verfügbar",
       "errors": {
         "CharacterNotSeatedInEvent": "Dieser Charakter sitzt nicht in diesem Raid.",
         "AttributionCellNotFound": "Dieser Platz existiert nicht mehr in der Vorlage.",
@@ -1124,6 +1127,29 @@
         "InvalidInstanceIndex": "Diese Instanz existiert nicht mehr in dieser Zeile.",
         "BossNotTargetedByEvent": "Dieser Boss gehört nicht zu diesem Raid.",
         "DefinitionBossMismatch": "Diese Zeile gehört nicht zu diesem Boss."
+      }
+    },
+    "raidPlan": {
+      "noBoardYet": "Für diesen Boss gibt es noch keinen Raidplan.",
+      "createBoard": "Plan erstellen",
+      "noPagesYet": "Noch keine Seiten — füge eine hinzu, um zu starten.",
+      "addPage": "Seite hinzufügen",
+      "renamePage": "Seite umbenennen",
+      "deletePage": "Seite löschen",
+      "deleteConfirmTitle": "Diese Seite löschen?",
+      "deleteConfirmMessage": "Die Seite \"{{name}}\" und ihr gesamter Inhalt werden endgültig gelöscht.",
+      "pickBackground": "Hintergrund wählen",
+      "noBackground": "Kein Hintergrund gewählt",
+      "dialog": {
+        "createTitle": "Neue Seite",
+        "editTitle": "Seite umbenennen",
+        "name": "Name",
+        "namePlaceholder": "z. B. Phase 1"
+      },
+      "backgroundPicker": {
+        "title": "Hintergrund wählen",
+        "empty": "Für diese Zone ist noch kein Hintergrund verfügbar.",
+        "none": "Keiner"
       }
     },
     "tabs": {

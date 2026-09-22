@@ -1,0 +1,10 @@
+<div class="raid-plan-canvas" [style.aspect-ratio]="aspectRatio()">
+  @if (backgroundUrl(); as url) {
+    <img class="raid-plan-canvas-background" [src]="url" alt="" />
+  } @else {
+    <div class="raid-plan-canvas-empty">
+      <span class="material-icons raid-plan-canvas-empty-icon">image</span>
+      <span>{{ 'raidBuilder.raidPlan.noBackground' | transloco }}</span>
+    </div>
+  }
+</div>

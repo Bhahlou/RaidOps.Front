@@ -1,0 +1,23 @@
+<h2 class="dialog-title">{{ 'raidBuilder.raidPlan.backgroundPicker.title' | transloco }}</h2>
+
+<div class="dialog-content">
+  @if (options.length === 0) {
+    <app-empty-hint>{{ 'raidBuilder.raidPlan.backgroundPicker.empty' | transloco }}</app-empty-hint>
+  } @else {
+    <div class="background-picker-grid">
+      @for (option of options; track option.key) {
+        <button type="button" class="background-picker-tile" (click)="choose(option.key)">
+          @if (urlFor(option.key); as url) {
+            <img [src]="url" [alt]="option.label" />
+          }
+          <span>{{ option.label }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="choose(null)">{{ 'raidBuilder.raidPlan.backgroundPicker.none' | transloco }}</app-button>
+  <app-button variant="text" (click)="cancel()">{{ 'confirmDialog.cancel' | transloco }}</app-button>
+</div>

@@ -83,35 +83,14 @@
   flex-shrink: 0;
 }
 
-// Center column: the reserved raidplan slot on top (phase 3 — an image + draggable markers, not
-// built yet), the selected boss's own attribution tables below it. Empty (no boss picked yet) or
-// there simply are no bosses for this raid's zone(s).
+// Center column: the raid-plan board on top, the selected boss's own attribution tables below it.
+// Empty (no boss picked yet) or there simply are no bosses for this raid's zone(s).
 .attributions-main {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
-}
-
-// Placeholder for the phase-3 raidplan (background image + draggable position markers) — reserves
-// the space now so the boss content below doesn't visually claim it, without building the feature yet.
-.raidplan-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 220px;
-  border: 1px dashed var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-muted);
-  font-size: 0.8125rem;
-}
-
-.raidplan-slot-icon {
-  font-size: 28px;
-  opacity: 0.5;
 }
 
 // Shared by both the boss scope (in `.attributions-main`) and General (in `.attributions-general`)

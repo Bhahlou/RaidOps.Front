@@ -115,6 +115,14 @@
             </a>
             <a
               class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, 'raid-assignments']"
+              routerLinkActive="active-link"
+            >
+              <span class="material-icons item-icon">map</span>
+              <span class="sidenav-label">{{ 'sidenav.guild.raidAssignments' | transloco }}</span>
+            </a>
+            <a
+              class="sidenav-item"
               [routerLink]="['/guilds', guild.id, 'audit-log']"
               routerLinkActive="active-link"
             >
