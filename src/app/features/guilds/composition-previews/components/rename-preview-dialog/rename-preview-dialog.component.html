@@ -1,0 +1,25 @@
+<h2 class="dialog-title">
+  {{ (isDuplicate ? 'compositionPreviews.renameDialog.duplicateTitle' : 'compositionPreviews.renameDialog.renameTitle') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <app-form-field-card [label]="'compositionPreviews.renameDialog.name' | transloco">
+    <input
+      id="preview-name"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      maxlength="64"
+      [attr.aria-label]="'compositionPreviews.renameDialog.name' | transloco"
+    />
+  </app-form-field-card>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ (isDuplicate ? 'compositionPreviews.renameDialog.duplicateSubmit' : 'compositionPreviews.renameDialog.renameSubmit') | transloco }}
+  </app-button>
+</div>

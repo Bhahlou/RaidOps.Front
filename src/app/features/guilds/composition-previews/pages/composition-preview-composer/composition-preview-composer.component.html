@@ -1,0 +1,34 @@
+<app-page-header [items]="breadcrumbs()" />
+
+@if (isLoading() && !preview()) {
+  <p class="card-hint">{{ 'compositionPreviews.composer.loading' | transloco }}</p>
+} @else if (preview(); as p) {
+  <app-form-field-card>
+    <div class="composer-header">
+      <div class="composer-title">
+        <span class="composer-name">{{ p.name }}</span>
+        <app-icon-button icon="edit" (click)="renamePreview()" [title]="'compositionPreviews.list.rename' | transloco" />
+      </div>
+      <div class="composer-header-right">
+        <div class="composer-roles">
+          @for (role of roleOrder; track role) {
+            <span class="role-counter" [title]="'raidBuilder.roles.' + role | transloco">
+              <img class="role-counter-icon" [src]="roleIcon[role]" alt="" width="16" height="16" />
+              {{ roleCounts()[role] }}
+            </span>
+          }
+        </div>
+        <span class="composer-format">{{ 'compositionPreviews.groupsLabel' | transloco: { count: p.groupCount } }}</span>
+      </div>
+    </div>
+
+    <div class="composer-body" cdkDropListGroup>
+      <app-composition-preview-grid [guildId]="guildId()" [guildBranchId]="guildBranchId()" [preview]="p" />
+
+      <div class="composer-palette">
+        <p class="field-hint">{{ 'compositionPreviews.composer.palette' | transloco }}</p>
+        <app-class-spec-palette [expansionId]="expansionId()" />
+      </div>
+    </div>
+  </app-form-field-card>
+}

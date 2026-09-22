@@ -104,6 +104,18 @@ export const guildRoutes: Routes = [
                 loadComponent: () =>
                   import('./raids/pages/raid-attributions/raid-attributions.component').then(m => m.RaidAttributionsComponent),
               },
+              {
+                path: 'composition-previews',
+                data: { minAccessLevel: GuildAccessLevel.Officer },
+                loadComponent: () =>
+                  import('./composition-previews/pages/composition-previews-list/composition-previews-list.component').then(m => m.CompositionPreviewsListComponent),
+              },
+              {
+                path: 'composition-previews/:previewId',
+                data: { minAccessLevel: GuildAccessLevel.Officer },
+                loadComponent: () =>
+                  import('./composition-previews/pages/composition-preview-composer/composition-preview-composer.component').then(m => m.CompositionPreviewComposerComponent),
+              },
             ],
           },
         ],

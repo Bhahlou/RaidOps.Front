@@ -76,6 +76,9 @@
       },
       "raidSettings": {
         "title": "Paramètres - Raids"
+      },
+      "compositionPreviews": {
+        "title": "Aperçus de composition de raid"
       }
     }
   },
@@ -100,6 +103,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidCompositionPreview": {
+        "title": "Simuler une compo de raid avant même que les persos existent",
+        "description": "Les officiers peuvent désormais construire une grille théorique de groupes/emplacements, nommée (1 à 8 groupes de 5, selon le format visé), depuis une nouvelle page « Aperçus de composition » — glisse une spécialisation depuis la palette de classes vers un emplacement, et ajoute une note en texte libre par emplacement. Un compteur de rôles totalise tanks/heals/mêlée/distance au fil des placements. Utile juste après l'activation d'une nouvelle branche, avant que l'import Battle.net y soit disponible. Ni date, ni verrouillage, ni vrai personnage impliqué ; créez/renommez/dupliquez/supprimez-en autant que vous voulez."
+      },
       "raidAttributionsBossScope": {
         "title": "Attributions par boss, plus icônes de section",
         "description": "Les lignes d'attribution peuvent désormais être liées à un boss précis plutôt qu'à la Générale seule — choisis un raid puis un boss depuis l'éditeur de modèle, et seuls les raids ciblant effectivement la zone de ce boss afficheront la ligne. La page Attributions gagne une barre de navigation par boss pour remplir les lignes spécifiques (interrupts, placements) à côté des lignes Générales toujours visibles. Les sections peuvent aussi avoir leur propre icône, affichée une fois au-dessus de toutes les lignes qui la partagent."
@@ -324,6 +331,10 @@
         "title": "Annonce de groupage",
         "description": "Un bouton (ou une commande Discord) pour prévenir tous les joueurs assignés qu'il est temps de se grouper."
       },
+      "raidCompositionPreview": {
+        "title": "Aperçus de composition de raid",
+        "description": "Simule une grille théorique de groupes/emplacements — placeholders classe/spec et notes — avant même que les persos existent."
+      },
       "raidAssignments": {
         "title": "Assignations de raid",
         "description": "Qui doit faire quoi pendant le raid (dispel, soak, interrupt…)."
@@ -424,6 +435,7 @@
       "roster": "Roster",
       "raidBuilder": "Raids",
       "loot": "Loot",
+      "compositionPreviews": "Aperçus de compo",
       "settings": "Paramètres",
       "auditLog": "Journal d'audit",
       "switch": "Changer de guilde"
@@ -1250,6 +1262,52 @@
       "raidLockoutConflict": "Ce personnage est déjà verrouillé sur cette zone de raid dans un autre raid.",
       "raidEventAlreadyPublished": "Ce raid est déjà publié.",
       "gridShrinkWouldOrphanAssignments": "Désaffecte d'abord tous les persos en dehors de la nouvelle taille de grille."
+    }
+  },
+  "compositionPreviews": {
+    "list": {
+      "title": "Aperçus de composition de raid",
+      "hint": "Simule à quoi pourrait ressembler une compo de raid avant même que les persos existent — placeholders classe/spec, notes en texte libre.",
+      "create": "Nouvel aperçu",
+      "loading": "Chargement des aperçus…",
+      "empty": "Aucun aperçu pour l'instant.",
+      "rename": "Renommer",
+      "duplicate": "Dupliquer",
+      "delete": "Supprimer",
+      "duplicateName": "{{name}} (copie)",
+      "deleteConfirmTitle": "Supprimer l'aperçu",
+      "deleteConfirmMessage": "Supprimer « {{name}} » ? Cette action est irréversible.",
+      "deleteSuccess": "Aperçu supprimé."
+    },
+    "createDialog": {
+      "title": "Nouvel aperçu de composition de raid",
+      "name": "Nom",
+      "namePlaceholder": "ex. « Compo cible 40 joueurs »",
+      "groupCount": "Nombre de groupes",
+      "groupCountHint": "1 à 8 groupes de 5 — choisis ce qui correspond au format que tu prépares.",
+      "submit": "Créer"
+    },
+    "renameDialog": {
+      "renameTitle": "Renommer l'aperçu",
+      "duplicateTitle": "Dupliquer l'aperçu",
+      "name": "Nom",
+      "renameSubmit": "Renommer",
+      "duplicateSubmit": "Dupliquer"
+    },
+    "groupsLabel": "{{count}} groupes",
+    "composer": {
+      "loading": "Chargement de l'aperçu…",
+      "breadcrumb": "Aperçu",
+      "clearSlot": "Vider cet emplacement",
+      "palette": "Fais glisser une spécialisation vers un emplacement",
+      "notePlaceholder": "Qui est censé jouer ça ?",
+      "errors": {
+        "SpecClassMismatch": "Cette spécialisation n'appartient pas à la classe choisie.",
+        "InvalidGroupOrSlotNumber": "Numéro de groupe ou d'emplacement invalide pour cet aperçu.",
+        "InvalidGroupCount": "Le nombre de groupes doit être compris entre 1 et 8.",
+        "InvalidRequest": "Certains champs sont invalides.",
+        "RaidCompositionPreviewNotFound": "Cet aperçu n'existe plus."
+      }
     }
   },
   "home": {

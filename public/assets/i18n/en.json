@@ -76,6 +76,9 @@
       },
       "raidSettings": {
         "title": "Settings - Raids"
+      },
+      "compositionPreviews": {
+        "title": "Raid composition previews"
       }
     }
   },
@@ -100,6 +103,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidCompositionPreview": {
+        "title": "Simulate a raid composition before real characters exist",
+        "description": "Officers can now build a named, theoretical group/slot grid (1 to 8 groups of 5, whatever format you're planning for) from a new \"Composition previews\" page — drag a spec from the class palette onto a slot, and add a free-text note per slot. A role counter tallies tanks/healers/melee/ranged as you place specs. Useful right after activating a new branch, ahead of Battle.net import being available for it. No date, lockout, or real character involved; create/rename/duplicate/delete as many as you like."
+      },
       "raidAttributionsBossScope": {
         "title": "Per-boss attribution rows, plus section icons",
         "description": "Attribution rows can now be scoped to a specific boss instead of just General — pick a raid, then a boss, from the template editor, and only raid events actually targeting that boss's zone will show the row. The Assignments page grows a boss navigation sidebar so officers can fill boss-specific rows (interrupts, positions) right alongside the always-visible General ones. Sections can also carry their own icon, shown once above every row that shares them."
@@ -324,6 +331,10 @@
         "title": "Grouping ping",
         "description": "A button (or Discord command) to tell every assigned player it's time to group up."
       },
+      "raidCompositionPreview": {
+        "title": "Raid composition previews",
+        "description": "Simulate a theoretical group/slot grid — class/spec placeholders and notes — before real characters exist."
+      },
       "raidAssignments": {
         "title": "Raid assignments",
         "description": "Who does what during the raid (dispel, soak, interrupt…)."
@@ -424,6 +435,7 @@
       "roster": "Roster",
       "raidBuilder": "Raids",
       "loot": "Loot",
+      "compositionPreviews": "Comp previews",
       "settings": "Settings",
       "auditLog": "Audit log",
       "switch": "Switch guild"
@@ -1250,6 +1262,52 @@
       "raidLockoutConflict": "This character is already locked to this raid zone in another event.",
       "raidEventAlreadyPublished": "This raid event is already published.",
       "gridShrinkWouldOrphanAssignments": "Unassign every character outside the new grid size first."
+    }
+  },
+  "compositionPreviews": {
+    "list": {
+      "title": "Raid composition previews",
+      "hint": "Simulate what a raid comp could look like before real characters exist — class/spec placeholders, free-text notes.",
+      "create": "New preview",
+      "loading": "Loading previews…",
+      "empty": "No previews yet.",
+      "rename": "Rename",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "duplicateName": "{{name}} (copy)",
+      "deleteConfirmTitle": "Delete preview",
+      "deleteConfirmMessage": "Delete \"{{name}}\"? This can't be undone.",
+      "deleteSuccess": "Preview deleted."
+    },
+    "createDialog": {
+      "title": "New raid composition preview",
+      "name": "Name",
+      "namePlaceholder": "e.g. \"40-man target comp\"",
+      "groupCount": "Number of groups",
+      "groupCountHint": "1 to 8 groups of 5 — pick whatever fits the format you're planning for.",
+      "submit": "Create"
+    },
+    "renameDialog": {
+      "renameTitle": "Rename preview",
+      "duplicateTitle": "Duplicate preview",
+      "name": "Name",
+      "renameSubmit": "Rename",
+      "duplicateSubmit": "Duplicate"
+    },
+    "groupsLabel": "{{count}} groups",
+    "composer": {
+      "loading": "Loading preview…",
+      "breadcrumb": "Preview",
+      "clearSlot": "Clear this slot",
+      "palette": "Drag a spec onto a slot",
+      "notePlaceholder": "Who's expected to play this?",
+      "errors": {
+        "SpecClassMismatch": "This spec doesn't belong to the chosen class.",
+        "InvalidGroupOrSlotNumber": "Invalid group or slot number for this preview.",
+        "InvalidGroupCount": "Group count must be between 1 and 8.",
+        "InvalidRequest": "Some fields are invalid.",
+        "RaidCompositionPreviewNotFound": "This preview no longer exists."
+      }
     }
   },
   "home": {

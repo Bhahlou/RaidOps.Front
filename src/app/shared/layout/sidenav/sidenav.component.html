@@ -103,8 +103,20 @@
             }
           }
 
-          @if (guild.isAdmin) {
+          @if (guild.isAdmin || defaultBranchId(guild, AccessLevel.Officer)) {
             <div class="section-separator"></div>
+          }
+          @if (defaultBranchId(guild, AccessLevel.Officer); as officerBranchId) {
+            <a
+              class="sidenav-item"
+              [routerLink]="['/guilds', guild.id, officerBranchId, 'composition-previews']"
+              routerLinkActive="active-link"
+            >
+              <span class="material-icons item-icon">construction</span>
+              <span class="sidenav-label">{{ 'sidenav.guild.compositionPreviews' | transloco }}</span>
+            </a>
+          }
+          @if (guild.isAdmin) {
             <a
               class="sidenav-item"
               [routerLink]="['/guilds', guild.id, 'settings']"

@@ -126,6 +126,12 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
         requiredAccessLevel: GuildAccessLevel.Officer,
         contentPath: (lang) => `assets/manual/${lang}/guild/notifications.md`,
       },
+      {
+        id: 'composition-previews',
+        labelKey: 'manual.article.compositionPreviews.title',
+        requiredAccessLevel: GuildAccessLevel.Officer,
+        contentPath: (lang) => `assets/manual/${lang}/guild/composition-previews.md`,
+      },
     ],
   },
 ];

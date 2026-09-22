@@ -16,6 +16,7 @@ const EXPANSION_IDS_BY_SHORT_CODE: Record<string, number> = {
   SL: 9,
   DF: 10,
   TWW: 11,
+  Forever: 12,
 };
 
 /** Numeric expansion ID for a branch's short code, or `null` for an unrecognized one. */

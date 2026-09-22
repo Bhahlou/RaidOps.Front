@@ -1,0 +1,34 @@
+<app-page-header [items]="breadcrumbs()" />
+
+<app-form-field-card>
+  <div class="preview-list-header">
+    <div>
+      <p class="field-label">{{ 'compositionPreviews.list.title' | transloco }}</p>
+      <p class="card-hint">{{ 'compositionPreviews.list.hint' | transloco }}</p>
+    </div>
+    <app-button variant="primary" (click)="openCreateDialog()">{{ 'compositionPreviews.list.create' | transloco }}</app-button>
+  </div>
+
+  @if (isLoading()) {
+    <p class="card-hint">{{ 'compositionPreviews.list.loading' | transloco }}</p>
+  } @else if (previews().length === 0) {
+    <p class="card-hint">{{ 'compositionPreviews.list.empty' | transloco }}</p>
+  } @else {
+    <div class="preview-list">
+      @for (preview of previews(); track preview.id) {
+        <div class="preview-row">
+          <a class="preview-row-link" [routerLink]="['/guilds', guildId(), guildBranchId(), 'composition-previews', preview.id]">
+            <span class="preview-row-name">{{ preview.name }}</span>
+            <span class="preview-row-format">{{ 'compositionPreviews.groupsLabel' | transloco: { count: preview.groupCount } }}</span>
+          </a>
+
+          <span class="preview-row-actions">
+            <app-icon-button icon="edit" (click)="renamePreview(preview)" [title]="'compositionPreviews.list.rename' | transloco" />
+            <app-icon-button icon="content_copy" (click)="duplicatePreview(preview)" [title]="'compositionPreviews.list.duplicate' | transloco" />
+            <app-icon-button icon="delete" (click)="deletePreview(preview)" [title]="'compositionPreviews.list.delete' | transloco" />
+          </span>
+        </div>
+      }
+    </div>
+  }
+</app-form-field-card>

@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+// Grid, not flex-wrap — see raid-event-grid.component.scss for why (a lone trailing group keeps
+// the same column width as the others instead of stretching to fill its row).
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.preview-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.preview-group-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.preview-group-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

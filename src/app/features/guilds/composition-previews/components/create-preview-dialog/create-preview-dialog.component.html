@@ -1,0 +1,38 @@
+<h2 class="dialog-title">{{ 'compositionPreviews.createDialog.title' | transloco }}</h2>
+
+<div class="dialog-content">
+  <app-form-field-card [label]="'compositionPreviews.createDialog.name' | transloco">
+    <input
+      id="new-preview-name"
+      type="text"
+      class="text-input"
+      autocomplete="off"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      maxlength="64"
+      [attr.aria-label]="'compositionPreviews.createDialog.name' | transloco"
+      [placeholder]="'compositionPreviews.createDialog.namePlaceholder' | transloco"
+    />
+  </app-form-field-card>
+
+  <app-form-field-card [label]="'compositionPreviews.createDialog.groupCount' | transloco">
+    <input
+      id="new-preview-group-count"
+      type="number"
+      min="1"
+      max="8"
+      class="number-input"
+      [value]="groupCount()"
+      (change)="groupCount.set(+$any($event.target).value)"
+      [attr.aria-label]="'compositionPreviews.createDialog.groupCount' | transloco"
+    />
+  </app-form-field-card>
+  <p class="field-hint">{{ 'compositionPreviews.createDialog.groupCountHint' | transloco }}</p>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'raidBuilder.actions.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'compositionPreviews.createDialog.submit' | transloco }}
+  </app-button>
+</div>
