@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.1...raidops-front-v2.0.2) (2026-09-22)
+
+
+### 🐛 Bug Fixes
+
+* ngsw navigation hijacks api requests ([#95](https://github.com/Bhahlou/RaidOps.Front/issues/95)) ([c71d834](https://github.com/Bhahlou/RaidOps.Front/commit/c71d83495fe668e6d748e5907b615d3460a4d914))
+
 ## [2.0.1](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.0...raidops-front-v2.0.1) (2026-09-22)
 
 
