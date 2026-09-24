@@ -43,7 +43,7 @@
   @if (section().trim()) {
     <div class="field-group">
       <span class="field-label">{{ 'guildSettings.attributions.dialog.sectionIcon' | transloco }}</span>
-      <app-icon-source-picker [guildId]="data.guildId" [expansionId]="data.expansionId" [value]="sectionIcon()" (changed)="setSectionIcon($event)" />
+      <app-icon-source-picker [guildId]="data.guildId" [guildBranchId]="data.guildBranchId" [value]="sectionIcon()" (changed)="setSectionIcon($event)" />
     </div>
   }
 
@@ -107,7 +107,7 @@
 
               <div class="icon-picker-row">
                 <span class="icon-picker-row-label">{{ 'guildSettings.attributions.dialog.spell' | transloco }}</span>
-                <app-spell-picker [guildId]="data.guildId" [expansionId]="data.expansionId" (selected)="onSpellSelected(cell.key, $event)" />
+                <app-spell-picker [guildId]="data.guildId" [guildBranchId]="data.guildBranchId" (selected)="onSpellSelected(cell.key, $event)" />
               </div>
             </div>
           } @else {

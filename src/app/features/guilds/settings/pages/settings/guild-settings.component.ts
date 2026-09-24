@@ -1,15 +1,18 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { GuildSettingsFormComponent } from '../../components/guild-settings-form/guild-settings-form.component';
 import { GuildNotificationSettingsComponent } from '../../components/guild-notification-settings/guild-notification-settings.component';
 import { GuildBranchesComponent } from '../../components/guild-branches/guild-branches.component';
 import { GuildRosterBranchesComponent } from '../../components/guild-roster-branches/guild-roster-branches.component';
-import { GuildRaidBranchesComponent } from '../../components/guild-raid-branches/guild-raid-branches.component';
+import { GuildBranchRaidSettingsCardComponent } from '../../components/guild-branch-raid-settings-card/guild-branch-raid-settings-card.component';
 import { GuildAttributionSettingsComponent } from '../../components/guild-attribution-settings/guild-attribution-settings.component';
+import { SelectComponent, SelectOption } from '../../../../../shared/components/form/select/select.component';
 import { PageHeaderComponent } from '../../../../../shared/components/layout/page-header/page-header.component';
 import { TabDefinition, TabsComponent } from '../../../../../shared/components/layout/tabs/tabs.component';
 import { WowBrancheService } from '../../../../../shared/services/wow-branche.service';
+import { expansionIconUrl } from '../../../../../shared/utils/expansion-icon.util';
 import { expansionIdFromShortCode } from '../../../../../shared/utils/expansion-id.util';
 import { GuildBranchesStore } from '../../../stores/guild-branches.store';
 import { injectGuildContext } from '../../../inject-guild-context';
@@ -25,10 +28,12 @@ const TAB_IDS = new Set<SettingsTabId>(['general', 'roster', 'raids', 'notificat
     GuildNotificationSettingsComponent,
     GuildBranchesComponent,
     GuildRosterBranchesComponent,
-    GuildRaidBranchesComponent,
+    GuildBranchRaidSettingsCardComponent,
     GuildAttributionSettingsComponent,
     PageHeaderComponent,
+    SelectComponent,
     TabsComponent,
+    TranslocoPipe,
   ],
   templateUrl: './guild-settings.component.html',
   styleUrl: './guild-settings.component.scss',
@@ -44,17 +49,35 @@ export class GuildSettingsComponent {
 
   readonly #wowBranches = toSignal(this.#wowBrancheService.getAll(), { initialValue: [] });
 
-  /**
-   * The expansion the attribution template's spell picker searches against — the first active
-   * branch's currently-active expansion. Good enough while spell data is TBC-only; once multiple
-   * expansions are seeded, a guild running several branches at once would need to pick which one
-   * to search, but that's not a real scenario yet.
-   */
-  readonly attributionExpansionId = computed<number | null>(() => {
-    const activeBranch = this.#branchesStore.branches().find((b) => b.isActive);
-    const branchShortCode = this.#wowBranches().find((wb) => wb.id === activeBranch?.branchId)?.currentExpansionShortCode;
+  /** Active guild branches — the Raids tab (signup mode, attribution template) works on one at a time. */
+  readonly activeBranches = computed(() => this.#branchesStore.branches().filter((b) => b.isActive));
+
+  readonly #selectedBranchKey = signal<string | null>(null);
+
+  /** The branch being edited — the user's pick, or the first active branch until they choose one (or if their pick was since deactivated). */
+  readonly selectedBranch = computed(() => {
+    const branches = this.activeBranches();
+    const key = this.#selectedBranchKey();
+    return branches.find((b) => String(b.id) === key) ?? branches[0] ?? null;
+  });
+
+  readonly branchOptions = computed<SelectOption<string>[]>(() =>
+    this.activeBranches().map((b) => ({
+      value: String(b.id),
+      label: b.branchName,
+      iconUrl: expansionIconUrl(this.#wowBranches().find((wb) => wb.id === b.branchId)?.currentExpansionShortCode),
+    })),
+  );
+
+  /** The selected branch's currently-active expansion — filters the class picker in the template editor. */
+  readonly selectedBranchExpansionId = computed<number | null>(() => {
+    const branchShortCode = this.#wowBranches().find((wb) => wb.id === this.selectedBranch()?.branchId)?.currentExpansionShortCode;
     return expansionIdFromShortCode(branchShortCode);
   });
+
+  onBranchChange(key: string | null): void {
+    this.#selectedBranchKey.set(key);
+  }
 
   constructor() {
     this.#branchesStore.load(this.guildId);

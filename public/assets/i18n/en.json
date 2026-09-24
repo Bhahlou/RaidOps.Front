@@ -6,6 +6,13 @@
     "help": "Help",
     "toggleNav": "Toggle navigation menu"
   },
+  "admin": {
+    "spellSync": {
+      "trigger": "Sync spells",
+      "success": "Spell sync completed",
+      "error": "Spell sync failed"
+    }
+  },
   "confirmDialog": {
     "confirm": "Confirm",
     "cancel": "Cancel"
@@ -543,6 +550,9 @@
       "raidSettings": {
         "saveSuccess": "Branch raid mode saved."
       }
+    },
+    "branchPicker": {
+      "label": "Game branch"
     },
     "attributions": {
       "title": "Raid attribution template",
@@ -1123,7 +1133,7 @@
     },
     "attributions": {
       "loading": "Loading assignments…",
-      "empty": "Your guild hasn't set up any raid-attribution template yet — add rows in Guild Settings → Raids.",
+      "empty": "Your guild hasn't set up a raid-attribution template for this branch yet — add rows in Guild Settings → Raids.",
       "noneAssignable": "No attribution is assignable with the raid's current composition.",
       "general": "General",
       "selectABoss": "Pick a boss from the list to see its plan and attributions.",

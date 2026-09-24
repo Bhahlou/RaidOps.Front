@@ -9,7 +9,7 @@ import { IconSourcePickerComponent, IconSourceState } from '../../../raids/compo
 
 export interface SectionIconDialogData {
   guildId: string;
-  expansionId: number;
+  guildBranchId: number;
   /** Scope of the section being edited — the boss's ID, or `null` for a "General" section. */
   raidBossId: number | null;
   section: string;
@@ -36,7 +36,7 @@ export class SectionIconDialogComponent {
     this.submitting.set(true);
 
     this.#definitionsService
-      .setSectionIcon(this.data.guildId, { raidBossId: this.data.raidBossId, section: this.data.section, ...this.icon() })
+      .setSectionIcon(this.data.guildId, this.data.guildBranchId, { raidBossId: this.data.raidBossId, section: this.data.section, ...this.icon() })
       .subscribe({
         next: () => {
           this.#snackbar.success('guildSettings.attributions.sectionIcon.saveSuccess');

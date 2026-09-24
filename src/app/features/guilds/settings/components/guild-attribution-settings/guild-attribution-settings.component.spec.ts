@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -62,11 +62,12 @@ describe('GuildAttributionSettingsComponent', () => {
   let definitionsService: {
     deleteDefinition: ReturnType<typeof vi.fn>;
     reorderDefinitions: ReturnType<typeof vi.fn>;
-    getRaidZonesForGuild: ReturnType<typeof vi.fn>;
+    getRaidZones: ReturnType<typeof vi.fn>;
     getBossesForZone: ReturnType<typeof vi.fn>;
   };
   let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
+  let fixture: ComponentFixture<GuildAttributionSettingsComponent>;
 
   const setup = (definitions: GuildAttributionDefinition[] = [], zones: RaidZone[] = []) => {
     definitionsSignal = signal(definitions);
@@ -74,7 +75,7 @@ describe('GuildAttributionSettingsComponent', () => {
     definitionsService = {
       deleteDefinition: vi.fn().mockReturnValue(of(undefined)),
       reorderDefinitions: vi.fn().mockReturnValue(of(undefined)),
-      getRaidZonesForGuild: vi.fn().mockReturnValue(of(zones)),
+      getRaidZones: vi.fn().mockReturnValue(of(zones)),
       getBossesForZone: vi.fn().mockReturnValue(of([])),
     };
     snackbar = { success: vi.fn(), error: vi.fn() };
@@ -91,8 +92,9 @@ describe('GuildAttributionSettingsComponent', () => {
       ],
     }).overrideComponent(GuildAttributionSettingsComponent, { set: { template: '', imports: [] } });
 
-    const fixture = TestBed.createComponent(GuildAttributionSettingsComponent);
+    fixture = TestBed.createComponent(GuildAttributionSettingsComponent);
     fixture.componentRef.setInput('guildId', 'guild-1');
+    fixture.componentRef.setInput('guildBranchId', 3);
     fixture.componentRef.setInput('expansionId', 2);
     fixture.detectChanges();
     return fixture.componentInstance;
@@ -102,17 +104,17 @@ describe('GuildAttributionSettingsComponent', () => {
     expect(setup()).toBeTruthy();
   });
 
-  // ── ngOnInit ─────────────────────────────────────────────────────────────
+  // ── initial load ─────────────────────────────────────────────────────────────
 
-  describe('ngOnInit', () => {
-    it('loads the guild-wide raid zones', () => {
+  describe('initial load', () => {
+    it('loads the branch raid zones', () => {
       setup();
-      expect(definitionsService.getRaidZonesForGuild).toHaveBeenCalledWith('guild-1');
+      expect(definitionsService.getRaidZones).toHaveBeenCalledWith('guild-1', 3);
     });
 
     it('loads the definitions store for the General scope (null)', () => {
       setup();
-      expect(store.load).toHaveBeenCalledWith('guild-1', null);
+      expect(store.load).toHaveBeenCalledWith('guild-1', 3, null);
     });
 
     it('populates raidZones() from the response', () => {
@@ -120,6 +122,46 @@ describe('GuildAttributionSettingsComponent', () => {
       const component = setup([], zones);
 
       expect(component.raidZones()).toEqual(zones);
+    });
+  });
+
+  // ── branch switch ───────────────────────────────────────────────────────────
+
+  describe('when the guildBranchId input changes', () => {
+    it('resets to the General scope and reloads the raid zones and definitions for the new branch', () => {
+      const component = setup([], [raidZone({ id: 4 })]);
+      definitionsService.getBossesForZone.mockReturnValue(of([raidBoss({ id: 14 })]));
+      component.onRaidChange(4);
+      expect(component.selectedRaidId()).toBe(4);
+      expect(component.bosses()).toHaveLength(1);
+      const otherBranchZones = [raidZone({ id: 9, shortCode: 'TK' })];
+      definitionsService.getRaidZones.mockReturnValue(of(otherBranchZones));
+      definitionsService.getRaidZones.mockClear();
+      store.load.mockClear();
+
+      fixture.componentRef.setInput('guildBranchId', 8);
+      fixture.detectChanges();
+
+      expect(definitionsService.getRaidZones).toHaveBeenCalledOnce();
+      expect(definitionsService.getRaidZones).toHaveBeenCalledWith('guild-1', 8);
+      expect(component.raidZones()).toEqual(otherBranchZones);
+      expect(component.selectedRaidId()).toBe(-1);
+      expect(component.selectedBossId()).toBeNull();
+      expect(component.bosses()).toEqual([]);
+      expect(store.load).toHaveBeenCalledOnce();
+      expect(store.load).toHaveBeenCalledWith('guild-1', 8, null);
+    });
+
+    it('does not reload anything when an unrelated input (expansionId) changes', () => {
+      setup();
+      definitionsService.getRaidZones.mockClear();
+      store.load.mockClear();
+
+      fixture.componentRef.setInput('expansionId', 5);
+      fixture.detectChanges();
+
+      expect(definitionsService.getRaidZones).not.toHaveBeenCalled();
+      expect(store.load).not.toHaveBeenCalled();
     });
   });
 
@@ -198,7 +240,7 @@ describe('GuildAttributionSettingsComponent', () => {
 
       expect(component.selectedRaidId()).toBe(-1);
       expect(component.selectedBossId()).toBeNull();
-      expect(store.load).toHaveBeenCalledWith('guild-1', null);
+      expect(store.load).toHaveBeenCalledWith('guild-1', 3, null);
     });
 
     it('treats a null raidId the same as General', () => {
@@ -218,7 +260,7 @@ describe('GuildAttributionSettingsComponent', () => {
       expect(definitionsService.getBossesForZone).toHaveBeenCalledWith('guild-1', 4);
       expect(component.bosses().map((b) => b.id)).toEqual([14, 15]);
       expect(component.selectedBossId()).toBe(14);
-      expect(store.load).toHaveBeenCalledWith('guild-1', 14);
+      expect(store.load).toHaveBeenCalledWith('guild-1', 3, 14);
       expect(component.loadingBosses()).toBe(false);
     });
 
@@ -245,7 +287,7 @@ describe('GuildAttributionSettingsComponent', () => {
       component.onBossChange(14);
 
       expect(component.selectedBossId()).toBe(14);
-      expect(store.load).toHaveBeenCalledWith('guild-1', 14);
+      expect(store.load).toHaveBeenCalledWith('guild-1', 3, 14);
     });
 
     it('does not load a scope when clearing to null', () => {
@@ -321,8 +363,20 @@ describe('GuildAttributionSettingsComponent', () => {
 
       expect(dialog.open).toHaveBeenCalledWith(
         AttributionDefinitionDialogComponent,
-        expect.objectContaining({ data: expect.objectContaining({ guildId: 'guild-1', expansionId: 2, definition: null, cloneFrom: null, existingSections: ['Curses'] }) }),
+        expect.objectContaining({ data: expect.objectContaining({ guildId: 'guild-1', guildBranchId: 3, expansionId: 2, definition: null, cloneFrom: null, existingSections: ['Curses'] }) }),
       );
+    });
+
+    it('passes the distinct existingSections trimmed and sorted alphabetically', () => {
+      const component = setup([
+        definition({ id: 1, section: 'Personals' }),
+        definition({ id: 2, section: ' Curses ' }),
+        definition({ id: 3, section: 'Personals' }),
+      ]);
+
+      component.openCreateDialog();
+
+      expect(dialog.open).toHaveBeenCalledWith(AttributionDefinitionDialogComponent, expect.objectContaining({ data: expect.objectContaining({ existingSections: ['Curses', 'Personals'] }) }));
     });
 
     it('excludes a definition with no section (null) from existingSections', () => {
@@ -429,7 +483,7 @@ describe('GuildAttributionSettingsComponent', () => {
         expect.objectContaining({
           data: expect.objectContaining({
             guildId: 'guild-1',
-            expansionId: 2,
+            guildBranchId: 3,
             raidBossId: 14,
             section: 'Interrupts',
             icon: { iconSource: AttributionIconSource.RaidMarker, spellId: null, spellIconUrl: null, raidMarker: RaidMarkerIcon.Skull, staticRole: null },
@@ -478,7 +532,7 @@ describe('GuildAttributionSettingsComponent', () => {
 
       component.deleteDefinition(definition({ id: 7 }));
 
-      expect(definitionsService.deleteDefinition).toHaveBeenCalledWith('guild-1', 7);
+      expect(definitionsService.deleteDefinition).toHaveBeenCalledWith('guild-1', 3, 7);
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.attributions.deleteSuccess');
       expect(store.reload).toHaveBeenCalled();
     });
@@ -512,7 +566,7 @@ describe('GuildAttributionSettingsComponent', () => {
 
       component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<GuildAttributionDefinition[]>);
 
-      expect(definitionsService.reorderDefinitions).toHaveBeenCalledWith('guild-1', [2, 3, 1]);
+      expect(definitionsService.reorderDefinitions).toHaveBeenCalledWith('guild-1', 3, [2, 3, 1]);
       expect(store.reload).toHaveBeenCalled();
     });
 

@@ -22,7 +22,7 @@ describe('SectionIconDialogComponent', () => {
 
     const fullData: SectionIconDialogData = {
       guildId: 'guild-1',
-      expansionId: 2,
+      guildBranchId: 7,
       raidBossId: null,
       section: 'Personals',
       icon: BLANK_ICON_SOURCE,
@@ -53,12 +53,12 @@ describe('SectionIconDialogComponent', () => {
   });
 
   describe('submit', () => {
-    it('sends the guildId, boss scope, section and current icon state, then closes with true on success', () => {
+    it('sends the guildId, branch, boss scope, section and current icon state, then closes with true on success', () => {
       const component = setup({ guildId: 'guild-1', raidBossId: 14, section: 'Interrupts' });
 
       component.submit();
 
-      expect(definitionsService.setSectionIcon).toHaveBeenCalledWith('guild-1', { raidBossId: 14, section: 'Interrupts', ...BLANK_ICON_SOURCE });
+      expect(definitionsService.setSectionIcon).toHaveBeenCalledWith('guild-1', 7, { raidBossId: 14, section: 'Interrupts', ...BLANK_ICON_SOURCE });
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.attributions.sectionIcon.saveSuccess');
       expect(dialogRef.close).toHaveBeenCalledWith(true);
     });

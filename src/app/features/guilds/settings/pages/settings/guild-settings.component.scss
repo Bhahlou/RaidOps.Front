@@ -4,3 +4,13 @@
   height: 100%;
   overflow: auto;
 }
+
+.branch-select {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.empty-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

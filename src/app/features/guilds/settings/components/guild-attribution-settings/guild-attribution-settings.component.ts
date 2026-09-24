@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkDrag, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -30,7 +30,7 @@ import { IconSourceState } from '../../../raids/components/icon-source-picker/ic
 /** Sentinel `raidOptions` value for the "General" scope — every real raid zone has a positive seeded ID. */
 const GENERAL_SCOPE = -1;
 
-/** Guild-wide raid-attribution template editor — one evolving, reorderable list of rows the guild curates as its raid content changes. */
+/** Raid-attribution template editor for one guild branch — one evolving, reorderable list of rows the branch curates as its raid content changes. */
 @Component({
   selector: 'app-guild-attribution-settings',
   imports: [
@@ -48,9 +48,11 @@ const GENERAL_SCOPE = -1;
   templateUrl: './guild-attribution-settings.component.html',
   styleUrl: './guild-attribution-settings.component.scss',
 })
-export class GuildAttributionSettingsComponent implements OnInit {
+export class GuildAttributionSettingsComponent {
   readonly guildId = input.required<string>();
-  /** The expansion the spell picker searches against — currently the guild's single active expansion. */
+  /** The guild branch whose template is edited — every row, spell search and raid zone is scoped to it. */
+  readonly guildBranchId = input.required<number>();
+  /** The branch's expansion, used to filter the class picker (the spell picker resolves it server-side from the branch). */
   readonly expansionId = input.required<number>();
 
   readonly IconSource = AttributionIconSource;
@@ -89,8 +91,21 @@ export class GuildAttributionSettingsComponent implements OnInit {
   /** The scope currently loaded/edited — the boss's ID, or `null` for "General". */
   readonly currentRaidBossId = computed<number | null>(() => (this.selectedRaidId() === GENERAL_SCOPE ? null : this.selectedBossId()));
 
-  ngOnInit(): void {
-    this.#definitionsService.getRaidZonesForGuild(this.guildId()).subscribe((zones) => this.raidZones.set(zones));
+  constructor() {
+    effect(() => {
+      const guildId = this.guildId();
+      const guildBranchId = this.guildBranchId();
+      untracked(() => this.#resetForBranch(guildId, guildBranchId));
+    });
+  }
+
+  /** (Re)starts the editor on a branch: back to the "General" scope, with that branch's own raid zones. */
+  #resetForBranch(guildId: string, guildBranchId: number): void {
+    this.selectedRaidId.set(GENERAL_SCOPE);
+    this.selectedBossId.set(null);
+    this.bosses.set([]);
+    this.raidZones.set([]);
+    this.#definitionsService.getRaidZones(guildId, guildBranchId).subscribe((zones) => this.raidZones.set(zones));
     this.#loadScope();
   }
 
@@ -119,7 +134,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
   }
 
   #loadScope(): void {
-    this.#store.load(this.guildId(), this.currentRaidBossId());
+    this.#store.load(this.guildId(), this.guildBranchId(), this.currentRaidBossId());
   }
 
   /** `null`/empty section renders under this fallback heading. */
@@ -184,6 +199,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
         maxHeight: '85vh',
         data: {
           guildId: this.guildId(),
+          guildBranchId: this.guildBranchId(),
           expansionId: this.expansionId(),
           definition,
           cloneFrom,
@@ -207,7 +223,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
         maxWidth: '95vw',
         data: {
           guildId: this.guildId(),
-          expansionId: this.expansionId(),
+          guildBranchId: this.guildBranchId(),
           raidBossId: this.currentRaidBossId(),
           section,
           icon: found.icon,
@@ -233,7 +249,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
       })
       .closed.subscribe((confirmed) => {
         if (!confirmed) return;
-        this.#definitionsService.deleteDefinition(this.guildId(), definition.id).subscribe({
+        this.#definitionsService.deleteDefinition(this.guildId(), this.guildBranchId(), definition.id).subscribe({
           next: () => {
             this.#snackbar.success('guildSettings.attributions.deleteSuccess');
             this.#store.reload();
@@ -249,7 +265,7 @@ export class GuildAttributionSettingsComponent implements OnInit {
     const reordered = [...this.definitions()];
     moveItemInArray(reordered, event.previousIndex, event.currentIndex);
 
-    this.#definitionsService.reorderDefinitions(this.guildId(), reordered.map((d) => d.id)).subscribe({
+    this.#definitionsService.reorderDefinitions(this.guildId(), this.guildBranchId(), reordered.map((d) => d.id)).subscribe({
       next: () => this.#store.reload(),
       error: () => this.#snackbar.error('errors.server'),
     });

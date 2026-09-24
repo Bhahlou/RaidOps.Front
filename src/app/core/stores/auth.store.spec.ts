@@ -264,6 +264,53 @@ describe('AuthStore', () => {
     });
   });
 
+  // ── isAdmin ───────────────────────────────────────────────────────────────
+
+  describe('isAdmin', () => {
+    const ADMIN_ID = '511624657162731533';
+
+    it('is false when there is no user', () => {
+      const store = setup();
+
+      expect(store.isAdmin()).toBe(false);
+    });
+
+    it('is false for a user whose Discord id is not in the admin list', () => {
+      const store = setup();
+      store.loadUser().subscribe();
+
+      expect(store.isAdmin()).toBe(false);
+    });
+
+    it('is true for a user whose Discord id is in the admin list', () => {
+      getMe.mockReturnValue(of({ ...mockUser, discordId: ADMIN_ID }));
+      const store = setup();
+
+      store.loadUser().subscribe();
+
+      expect(store.isAdmin()).toBe(true);
+    });
+
+    it('is false for a user with an empty Discord id', () => {
+      getMe.mockReturnValue(of({ ...mockUser, discordId: '' }));
+      const store = setup();
+
+      store.loadUser().subscribe();
+
+      expect(store.isAdmin()).toBe(false);
+    });
+
+    it('turns false again after logout', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...mockUser, discordId: ADMIN_ID }));
+      const store = setup();
+      expect(store.isAdmin()).toBe(true);
+
+      store.logout().subscribe();
+
+      expect(store.isAdmin()).toBe(false);
+    });
+  });
+
   // ── dismissNotification ───────────────────────────────────────────────────
 
   describe('dismissNotification', () => {
