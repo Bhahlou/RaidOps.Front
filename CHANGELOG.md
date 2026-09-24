@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.2...raidops-front-v2.1.0) (2026-09-24)
+
+
+### 🚀 Features
+
+* Add raid composition preview tool for theoretical raid planning ([#98](https://github.com/Bhahlou/RaidOps.Front/issues/98)) ([58719d3](https://github.com/Bhahlou/RaidOps.Front/commit/58719d34cf1d7c407f3214d8530b1f1eb4e6776c))
+* Scope raid attribution templates to a guild branch with a single branch picker and add an owner-only spell sync trigger ([#100](https://github.com/Bhahlou/RaidOps.Front/issues/100)) ([6a258fd](https://github.com/Bhahlou/RaidOps.Front/commit/6a258fd1bf55e2b0068e6708b5ab51e69720c9ad))
+
 ## [2.0.2](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.1...raidops-front-v2.0.2) (2026-09-22)
 
 
