@@ -29,7 +29,7 @@ describe('SpellPickerComponent', () => {
 
     const fixture = TestBed.createComponent(SpellPickerComponent);
     fixture.componentRef.setInput('guildId', 'guild-1');
-    fixture.componentRef.setInput('expansionId', 2);
+    fixture.componentRef.setInput('guildBranchId', 7);
     fixture.detectChanges();
     return fixture.componentInstance;
   };
@@ -93,7 +93,7 @@ describe('SpellPickerComponent', () => {
 
       vi.advanceTimersByTime(250);
 
-      expect(searchSpells).toHaveBeenCalledWith('guild-1', 2, 'frappe', 'fr');
+      expect(searchSpells).toHaveBeenCalledWith('guild-1', 7, 'frappe', 'fr');
     });
 
     it('cancels a pending debounce when the query changes again', () => {
@@ -110,7 +110,7 @@ describe('SpellPickerComponent', () => {
       vi.advanceTimersByTime(150);
 
       expect(searchSpells).toHaveBeenCalledTimes(1);
-      expect(searchSpells).toHaveBeenCalledWith('guild-1', 2, 'frappe', 'fr');
+      expect(searchSpells).toHaveBeenCalledWith('guild-1', 7, 'frappe', 'fr');
     });
 
     it('deduplicates results sharing the same name and icon, keeping the first', () => {

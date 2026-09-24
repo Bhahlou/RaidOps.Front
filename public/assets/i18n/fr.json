@@ -6,6 +6,13 @@
     "help": "Aide",
     "toggleNav": "Ouvrir/fermer le menu"
   },
+  "admin": {
+    "spellSync": {
+      "trigger": "Synchroniser les sorts",
+      "success": "Synchronisation des sorts terminée",
+      "error": "Échec de la synchronisation des sorts"
+    }
+  },
   "confirmDialog": {
     "confirm": "Confirmer",
     "cancel": "Annuler"
@@ -543,6 +550,9 @@
       "raidSettings": {
         "saveSuccess": "Mode de raid de la branche enregistré."
       }
+    },
+    "branchPicker": {
+      "label": "Branche de jeu"
     },
     "attributions": {
       "title": "Modèle d'attributions de raid",
@@ -1123,7 +1133,7 @@
     },
     "attributions": {
       "loading": "Chargement des attributions…",
-      "empty": "Votre guilde n'a pas encore de modèle d'attributions — ajoutez des lignes dans Paramètres de la guilde → Raids.",
+      "empty": "Votre guilde n'a pas encore de modèle d'attributions pour cette branche — ajoutez des lignes dans Paramètres de la guilde → Raids.",
       "noneAssignable": "Aucune attribution n'est assignable avec la composition actuelle du raid.",
       "general": "Général",
       "selectABoss": "Choisissez un boss dans la liste pour voir son plan et ses attributions.",

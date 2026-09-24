@@ -6,6 +6,13 @@
     "help": "Hilfe",
     "toggleNav": "Navigationsmenü öffnen/schließen"
   },
+  "admin": {
+    "spellSync": {
+      "trigger": "Zauber synchronisieren",
+      "success": "Zauber-Synchronisierung abgeschlossen",
+      "error": "Zauber-Synchronisierung fehlgeschlagen"
+    }
+  },
   "confirmDialog": {
     "confirm": "Bestätigen",
     "cancel": "Abbrechen"
@@ -543,6 +550,9 @@
       "raidSettings": {
         "saveSuccess": "Raid-Modus des Spielzweigs gespeichert."
       }
+    },
+    "branchPicker": {
+      "label": "Spielzweig"
     },
     "attributions": {
       "title": "Raid-Zuweisungsvorlage",
@@ -1123,7 +1133,7 @@
     },
     "attributions": {
       "loading": "Zuweisungen werden geladen…",
-      "empty": "Deine Gilde hat noch keine Zuweisungsvorlage — füge Zeilen unter Gildeneinstellungen → Raids hinzu.",
+      "empty": "Deine Gilde hat für diesen Spielzweig noch keine Zuweisungsvorlage — füge Zeilen unter Gildeneinstellungen → Raids hinzu.",
       "noneAssignable": "Mit der aktuellen Raid-Zusammensetzung ist keine Zuweisung möglich.",
       "general": "Allgemein",
       "selectABoss": "Wähle einen Boss aus der Liste, um seinen Plan und seine Zuweisungen zu sehen.",

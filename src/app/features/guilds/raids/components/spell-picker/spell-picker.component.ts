@@ -18,7 +18,8 @@ import { Spell } from '../../models/spell.model';
 })
 export class SpellPickerComponent {
   readonly guildId = input.required<string>();
-  readonly expansionId = input.required<number>();
+  /** The guild branch whose expansion is searched — the server derives the expansion (and each spell's name/icon on it) from the branch. */
+  readonly guildBranchId = input.required<number>();
   readonly selected = output<Spell>();
 
   private readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInput');
@@ -57,7 +58,7 @@ export class SpellPickerComponent {
 
   #search(term: string): void {
     this.searching.set(true);
-    this.#attributionDefinitionsService.searchSpells(this.guildId(), this.expansionId(), term, this.#transloco.getActiveLang()).subscribe({
+    this.#attributionDefinitionsService.searchSpells(this.guildId(), this.guildBranchId(), term, this.#transloco.getActiveLang()).subscribe({
       next: (spells) => {
         this.results.set(dedupeByNameAndIcon(spells));
         this.searching.set(false);

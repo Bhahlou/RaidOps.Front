@@ -12,58 +12,66 @@ import { RaidBoss } from '../models/raid-boss.model';
 import { RaidZone } from '../models/raid-zone.model';
 import { Spell } from '../models/spell.model';
 
-/** Thin HTTP wrapper over `api/v1/guilds/{guildId}/attribution-definitions` and the spell search endpoint — guild-wide, no branch scope. */
+/**
+ * Thin HTTP wrapper over `api/v1/guilds/{guildId}/branches/{guildBranchId}/attribution-definitions` and
+ * the spell search endpoint — every template is scoped to one guild branch (a guild running several
+ * branches keeps one template per branch, since spells/classes/raids all depend on the branch's expansion).
+ */
 @Service()
 export class AttributionDefinitionsService {
   readonly #http = inject(HttpClient);
   readonly #api = environment.apiUrl;
 
-  #base(guildId: string): string {
+  #guildBase(guildId: string): string {
     return `${this.#api}/guilds/${guildId}`;
   }
 
-  /** Returns the guild's raid-attribution template for one scope ("General", or one specific boss), ordered for display. */
-  getDefinitions(guildId: string, raidBossId: number | null): Observable<GuildAttributionDefinition[]> {
-    return this.#http.get<GuildAttributionDefinition[]>(`${this.#base(guildId)}/attribution-definitions`, {
+  #branchBase(guildId: string, guildBranchId: number): string {
+    return `${this.#guildBase(guildId)}/branches/${guildBranchId}`;
+  }
+
+  /** Returns the branch's raid-attribution template for one scope ("General", or one specific boss), ordered for display. */
+  getDefinitions(guildId: string, guildBranchId: number, raidBossId: number | null): Observable<GuildAttributionDefinition[]> {
+    return this.#http.get<GuildAttributionDefinition[]>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions`, {
       params: raidBossId != null ? { raidBossId } : {},
     });
   }
 
-  createDefinition(guildId: string, payload: CreateGuildAttributionDefinitionPayload): Observable<void> {
-    return this.#http.post<void>(`${this.#base(guildId)}/attribution-definitions`, payload);
+  createDefinition(guildId: string, guildBranchId: number, payload: CreateGuildAttributionDefinitionPayload): Observable<void> {
+    return this.#http.post<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions`, payload);
   }
 
-  /** Returns the union of raid zones available across every active branch of the guild — backs the template editor's "raid" scope picker. */
-  getRaidZonesForGuild(guildId: string): Observable<RaidZone[]> {
-    return this.#http.get<RaidZone[]>(`${this.#base(guildId)}/raid-zones`);
+  /** Returns the raid zones of the branch's expansion — backs the template editor's "raid" scope picker. */
+  getRaidZones(guildId: string, guildBranchId: number): Observable<RaidZone[]> {
+    return this.#http.get<RaidZone[]>(`${this.#branchBase(guildId, guildBranchId)}/raids/zones`);
   }
 
   /** Returns every boss of one raid zone — backs the template editor's boss picker once a raid is chosen. */
   getBossesForZone(guildId: string, raidZoneId: number): Observable<RaidBoss[]> {
-    return this.#http.get<RaidBoss[]>(`${this.#base(guildId)}/raid-zones/${raidZoneId}/bosses`);
+    return this.#http.get<RaidBoss[]>(`${this.#guildBase(guildId)}/raid-zones/${raidZoneId}/bosses`);
   }
 
-  updateDefinition(guildId: string, definitionId: number, payload: GuildAttributionDefinitionPayload): Observable<void> {
-    return this.#http.patch<void>(`${this.#base(guildId)}/attribution-definitions/${definitionId}`, payload);
+  updateDefinition(guildId: string, guildBranchId: number, definitionId: number, payload: GuildAttributionDefinitionPayload): Observable<void> {
+    return this.#http.patch<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions/${definitionId}`, payload);
   }
 
-  deleteDefinition(guildId: string, definitionId: number): Observable<void> {
-    return this.#http.delete<void>(`${this.#base(guildId)}/attribution-definitions/${definitionId}`);
+  deleteDefinition(guildId: string, guildBranchId: number, definitionId: number): Observable<void> {
+    return this.#http.delete<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions/${definitionId}`);
   }
 
-  reorderDefinitions(guildId: string, orderedIds: number[]): Observable<void> {
-    return this.#http.post<void>(`${this.#base(guildId)}/attribution-definitions/reorder`, { orderedIds });
+  reorderDefinitions(guildId: string, guildBranchId: number, orderedIds: number[]): Observable<void> {
+    return this.#http.post<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions/reorder`, { orderedIds });
   }
 
   /** Sets the section-header icon shown above every row sharing one (scope, section) tuple. */
-  setSectionIcon(guildId: string, payload: SetAttributionSectionIconPayload): Observable<void> {
-    return this.#http.post<void>(`${this.#base(guildId)}/attribution-definitions/sections/icon`, payload);
+  setSectionIcon(guildId: string, guildBranchId: number, payload: SetAttributionSectionIconPayload): Observable<void> {
+    return this.#http.post<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions/sections/icon`, payload);
   }
 
-  /** Searches the seeded spell reference table by localized name substring. */
-  searchSpells(guildId: string, expansionId: number, searchTerm: string, locale: string): Observable<Spell[]> {
-    return this.#http.get<Spell[]>(`${this.#base(guildId)}/spells/search`, {
-      params: { expansionId, searchTerm, locale },
+  /** Searches the spells of the branch's expansion by localized name substring — the server derives the expansion from the branch. */
+  searchSpells(guildId: string, guildBranchId: number, searchTerm: string, locale: string): Observable<Spell[]> {
+    return this.#http.get<Spell[]>(`${this.#branchBase(guildId, guildBranchId)}/spells/search`, {
+      params: { searchTerm, locale },
     });
   }
 }
