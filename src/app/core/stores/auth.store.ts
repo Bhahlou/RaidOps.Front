@@ -9,6 +9,10 @@ import { User } from '../models/user.model';
 
 const STORAGE_KEY = 'raidops_user';
 
+// Front-side visibility only (hides/shows the admin menu item) — the backend independently
+// re-checks the same Discord ID against Admin:OwnerDiscordIds before actually running anything.
+const ADMIN_DISCORD_IDS: ReadonlySet<string> = new Set(['511624657162731533']);
+
 @Service()
 export class AuthStore {
   readonly #authService = inject(AuthService);
@@ -21,6 +25,7 @@ export class AuthStore {
 
   readonly isAuthenticated = computed(() => this.#user() !== null);
   readonly notifications = computed(() => this.#user()?.notifications ?? []);
+  readonly isAdmin = computed(() => ADMIN_DISCORD_IDS.has(this.#user()?.discordId ?? ''));
 
   #refresh$: Observable<void> | null = null;
 

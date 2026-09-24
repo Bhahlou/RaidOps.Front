@@ -1,0 +1,54 @@
+<div
+  class="preview-slot"
+  [class.preview-slot--empty]="!slot() && !editingNote()"
+  cdkDropList
+  [cdkDropListData]="slot()"
+  (cdkDropListDropped)="onDropped($event)"
+>
+  @if (editingNote()) {
+    @if (slot()?.specIconUrl) {
+      <img class="preview-slot-icon" [ngSrc]="slot()!.specIconUrl!" alt="" width="20" height="20" />
+    } @else if (slot()?.wowClassId) {
+      <app-wow-class-icon [classId]="slot()!.wowClassId!" [size]="20" />
+    }
+    <input
+      #noteInput
+      type="text"
+      class="preview-slot-note-input"
+      [value]="draftNote()"
+      (input)="draftNote.set($any($event.target).value)"
+      (blur)="commitNote()"
+      (keydown.enter)="commitNote()"
+      (keydown.escape)="cancelEditingNote()"
+      maxlength="200"
+      [attr.aria-label]="'compositionPreviews.composer.notePlaceholder' | transloco"
+      [placeholder]="'compositionPreviews.composer.notePlaceholder' | transloco"
+    />
+  } @else {
+    <button type="button" class="preview-slot-click-area" (click)="startEditingNote()">
+      @if (slot(); as s) {
+        @if (s.specIconUrl) {
+          <img class="preview-slot-icon" [ngSrc]="s.specIconUrl" [alt]="s.specName ?? ''" width="20" height="20" />
+        } @else if (s.wowClassId) {
+          <app-wow-class-icon [classId]="s.wowClassId" [size]="20" />
+        }
+        @if (s.note) {
+          <span class="preview-slot-note" [style.color]="s.wowClassColor">{{ s.note }}</span>
+        }
+      } @else {
+        <span class="preview-slot-label">{{ groupNumber() }}.{{ slotNumber() }}</span>
+      }
+    </button>
+  }
+
+  @if (slot()?.wowClassId && !editingNote()) {
+    <button
+      type="button"
+      class="preview-slot-clear"
+      (click)="clear.emit(); $event.stopPropagation()"
+      [attr.aria-label]="'compositionPreviews.composer.clearSlot' | transloco"
+    >
+      <span class="material-icons">close</span>
+    </button>
+  }
+</div>

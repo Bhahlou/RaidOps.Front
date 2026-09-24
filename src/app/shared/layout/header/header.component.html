@@ -56,6 +56,12 @@
   <ng-template #userMenu>
     <div class="menu-panel" cdkMenu>
       @if (isAuthenticated()) {
+        @if (isAdmin()) {
+          <button type="button" class="menu-item" cdkMenuItem (click)="onSyncSpellsClick()">
+            <span class="material-icons">sync</span>
+            {{ 'admin.spellSync.trigger' | transloco }}
+          </button>
+        }
         <button type="button" class="menu-item" cdkMenuItem (click)="onLogoutClick()">
           <span class="material-icons">logout</span>
           {{ 'header.logout' | transloco }}

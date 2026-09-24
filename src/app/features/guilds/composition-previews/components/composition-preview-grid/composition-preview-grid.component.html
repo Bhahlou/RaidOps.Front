@@ -1,0 +1,19 @@
+<div class="preview-grid">
+  @for (group of groupNumbers(); track group) {
+    <div class="preview-group">
+      <span class="preview-group-label">{{ 'raidBuilder.grid.group' | transloco: { n: group } }}</span>
+      <div class="preview-group-slots">
+        @for (slot of slotNumbers(); track slot) {
+          <app-composition-preview-slot
+            [groupNumber]="group"
+            [slotNumber]="slot"
+            [slot]="slotFor(group, slot)"
+            (dropped)="onDropped($event, group, slot)"
+            (clear)="onClear(group, slot)"
+            (noteChanged)="onNoteChanged($event, group, slot)"
+          />
+        }
+      </div>
+    </div>
+  }
+</div>

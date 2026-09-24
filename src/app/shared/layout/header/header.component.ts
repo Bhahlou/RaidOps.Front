@@ -5,10 +5,12 @@ import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { catchError, of } from 'rxjs';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
+import { AdminStore } from '../../../core/stores/admin.store';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { AuthService } from '../../../core/services/auth.service';
 import { EnvBrandingService } from '../../../core/services/env-branding.service';
 import { SidenavService } from '../../../core/services/sidenav.service';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 import { ChangelogStore } from '../../../features/changelog/stores/changelog.store';
 import { DiscordIconComponent } from '../../components/icons/discord-icon/discord-icon.component';
 import { LangSelectorComponent } from '../../components/header/lang-selector/lang-selector.component';
@@ -38,14 +40,17 @@ import { IconButtonComponent } from '../../components/buttons/icon-button/icon-b
 export class HeaderComponent {
   readonly #authStore = inject(AuthStore);
   readonly #authService = inject(AuthService);
+  readonly #adminStore = inject(AdminStore);
   readonly #router = inject(Router);
   readonly #changelogStore = inject(ChangelogStore);
+  readonly #snackbar = inject(SnackbarService);
 
   readonly envBranding = inject(EnvBrandingService);
   readonly sidenavService = inject(SidenavService);
   readonly iconType = DiscordIconType.User;
 
   readonly isAuthenticated = this.#authStore.isAuthenticated;
+  readonly isAdmin = this.#authStore.isAdmin;
   readonly user = this.#authStore.user;
   readonly unseenChangelogCount = this.#changelogStore.unseenCount;
 
@@ -65,6 +70,13 @@ export class HeaderComponent {
   onLogoutClick(): void {
     this.#authStore.logout().subscribe({
       next: () => this.#router.navigate(['/home']),
+    });
+  }
+
+  onSyncSpellsClick(): void {
+    this.#adminStore.syncSpells().subscribe({
+      next: () => this.#snackbar.success('admin.spellSync.success'),
+      error: () => this.#snackbar.error('admin.spellSync.error'),
     });
   }
 }

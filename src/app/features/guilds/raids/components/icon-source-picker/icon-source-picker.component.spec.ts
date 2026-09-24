@@ -14,7 +14,7 @@ describe('IconSourcePickerComponent', () => {
 
     const fixture = TestBed.createComponent(IconSourcePickerComponent);
     fixture.componentRef.setInput('guildId', 'guild-1');
-    fixture.componentRef.setInput('expansionId', 2);
+    fixture.componentRef.setInput('guildBranchId', 7);
     fixture.componentRef.setInput('value', value);
     fixture.detectChanges();
     return fixture.componentInstance;

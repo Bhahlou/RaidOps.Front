@@ -6,6 +6,13 @@
     "help": "Hilfe",
     "toggleNav": "Navigationsmenü öffnen/schließen"
   },
+  "admin": {
+    "spellSync": {
+      "trigger": "Zauber synchronisieren",
+      "success": "Zauber-Synchronisierung abgeschlossen",
+      "error": "Zauber-Synchronisierung fehlgeschlagen"
+    }
+  },
   "confirmDialog": {
     "confirm": "Bestätigen",
     "cancel": "Abbrechen"
@@ -76,6 +83,9 @@
       },
       "raidSettings": {
         "title": "Einstellungen - Raids"
+      },
+      "compositionPreviews": {
+        "title": "Raid-Kompositionsvorschauen"
       }
     }
   },
@@ -100,6 +110,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidCompositionPreview": {
+        "title": "Eine Raid-Zusammensetzung simulieren, bevor echte Charaktere existieren",
+        "description": "Offiziere können jetzt ein benanntes, theoretisches Gruppen-/Slot-Raster (1 bis 8 Gruppen zu je 5, passend zum geplanten Format) über eine neue Seite „Kompositionsvorschauen“ aufbauen — eine Spezialisierung aus der Klassenpalette auf einen Slot ziehen und pro Slot eine Freitext-Notiz hinzufügen. Ein Rollenzähler summiert Tanks/Heiler/Nahkampf/Fernkampf beim Platzieren. Nützlich direkt nach der Aktivierung eines neuen Branches, solange der Battle.net-Import dafür noch nicht verfügbar ist. Kein Datum, keine Lockout und kein echter Charakter beteiligt; beliebig viele erstellen/umbenennen/duplizieren/löschen."
+      },
       "raidAttributionsBossScope": {
         "title": "Bossgebundene Zuweisungszeilen, plus Abschnitts-Icons",
         "description": "Zuweisungszeilen können jetzt statt nur Allgemein einem bestimmten Boss zugeordnet werden — im Vorlagen-Editor einen Raid, dann einen Boss wählen; die Zeile erscheint dann nur bei Raid-Events, die tatsächlich die Zone dieses Bosses anvisieren. Die Zuweisungen-Seite bekommt eine Boss-Navigationsleiste, damit Officer bossspezifische Zeilen (Interrupts, Positionen) neben den immer sichtbaren Allgemein-Zeilen ausfüllen können. Abschnitte können außerdem ein eigenes Icon tragen, das einmal über allen Zeilen dieses Abschnitts angezeigt wird."
@@ -324,6 +338,10 @@
         "title": "Gruppierungs-Ping",
         "description": "Ein Button (oder Discord-Befehl), um alle zugewiesenen Spieler zu informieren, dass es Zeit ist, sich zu gruppieren."
       },
+      "raidCompositionPreview": {
+        "title": "Raid-Kompositionsvorschauen",
+        "description": "Simuliere ein theoretisches Gruppen-/Slot-Raster — Klassen-/Spezialisierungs-Platzhalter und Notizen — bevor echte Charaktere existieren."
+      },
       "raidAssignments": {
         "title": "Raid-Zuweisungen",
         "description": "Wer macht was während des Raids (Dispel, Soak, Interrupt…)."
@@ -424,6 +442,7 @@
       "roster": "Roster",
       "raidBuilder": "Raids",
       "loot": "Loot",
+      "compositionPreviews": "Comp-Vorschauen",
       "settings": "Einstellungen",
       "auditLog": "Audit-Log",
       "switch": "Gilde wechseln"
@@ -531,6 +550,9 @@
       "raidSettings": {
         "saveSuccess": "Raid-Modus des Spielzweigs gespeichert."
       }
+    },
+    "branchPicker": {
+      "label": "Spielzweig"
     },
     "attributions": {
       "title": "Raid-Zuweisungsvorlage",
@@ -1111,7 +1133,7 @@
     },
     "attributions": {
       "loading": "Zuweisungen werden geladen…",
-      "empty": "Deine Gilde hat noch keine Zuweisungsvorlage — füge Zeilen unter Gildeneinstellungen → Raids hinzu.",
+      "empty": "Deine Gilde hat für diesen Spielzweig noch keine Zuweisungsvorlage — füge Zeilen unter Gildeneinstellungen → Raids hinzu.",
       "noneAssignable": "Mit der aktuellen Raid-Zusammensetzung ist keine Zuweisung möglich.",
       "general": "Allgemein",
       "selectABoss": "Wähle einen Boss aus der Liste, um seinen Plan und seine Zuweisungen zu sehen.",
@@ -1250,6 +1272,52 @@
       "raidLockoutConflict": "Dieser Charakter ist in einem anderen Raid bereits an diese Raid-Zone gebunden.",
       "raidEventAlreadyPublished": "Dieser Raid ist bereits veröffentlicht.",
       "gridShrinkWouldOrphanAssignments": "Zuerst alle Charaktere außerhalb der neuen Rastergröße entfernen."
+    }
+  },
+  "compositionPreviews": {
+    "list": {
+      "title": "Raid-Kompositionsvorschauen",
+      "hint": "Simuliere, wie eine Raid-Zusammensetzung aussehen könnte, bevor überhaupt Charaktere existieren — Klassen-/Spezialisierungs-Platzhalter, Notizen im Freitext.",
+      "create": "Neue Vorschau",
+      "loading": "Vorschauen werden geladen…",
+      "empty": "Noch keine Vorschauen.",
+      "rename": "Umbenennen",
+      "duplicate": "Duplizieren",
+      "delete": "Löschen",
+      "duplicateName": "{{name}} (Kopie)",
+      "deleteConfirmTitle": "Vorschau löschen",
+      "deleteConfirmMessage": "„{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+      "deleteSuccess": "Vorschau gelöscht."
+    },
+    "createDialog": {
+      "title": "Neue Raid-Kompositionsvorschau",
+      "name": "Name",
+      "namePlaceholder": "z. B. „40er Zielkomposition“",
+      "groupCount": "Anzahl Gruppen",
+      "groupCountHint": "1 bis 8 Gruppen zu je 5 — wähle, was zu dem Format passt, das du planst.",
+      "submit": "Erstellen"
+    },
+    "renameDialog": {
+      "renameTitle": "Vorschau umbenennen",
+      "duplicateTitle": "Vorschau duplizieren",
+      "name": "Name",
+      "renameSubmit": "Umbenennen",
+      "duplicateSubmit": "Duplizieren"
+    },
+    "groupsLabel": "{{count}} Gruppen",
+    "composer": {
+      "loading": "Vorschau wird geladen…",
+      "breadcrumb": "Vorschau",
+      "clearSlot": "Diesen Slot leeren",
+      "palette": "Eine Spezialisierung auf einen Slot ziehen",
+      "notePlaceholder": "Wer soll das voraussichtlich spielen?",
+      "errors": {
+        "SpecClassMismatch": "Diese Spezialisierung gehört nicht zur gewählten Klasse.",
+        "InvalidGroupOrSlotNumber": "Ungültige Gruppen- oder Slotnummer für diese Vorschau.",
+        "InvalidGroupCount": "Die Gruppenanzahl muss zwischen 1 und 8 liegen.",
+        "InvalidRequest": "Einige Felder sind ungültig.",
+        "RaidCompositionPreviewNotFound": "Diese Vorschau existiert nicht mehr."
+      }
     }
   },
   "home": {

@@ -35,6 +35,7 @@ import { Spell } from '../../../raids/models/spell.model';
 
 export interface AttributionDefinitionDialogData {
   guildId: string;
+  guildBranchId: number;
   expansionId: number;
   /** The row to edit, or `null` to create a new one. */
   definition: GuildAttributionDefinition | null;
@@ -323,8 +324,8 @@ export class AttributionDefinitionDialogComponent {
     this.submitting.set(true);
 
     const request = this.data.definition
-      ? this.#definitionsService.updateDefinition(this.data.guildId, this.data.definition.id, payload)
-      : this.#definitionsService.createDefinition(this.data.guildId, { ...payload, raidBossId: this.data.raidBossId } satisfies CreateGuildAttributionDefinitionPayload);
+      ? this.#definitionsService.updateDefinition(this.data.guildId, this.data.guildBranchId, this.data.definition.id, payload)
+      : this.#definitionsService.createDefinition(this.data.guildId, this.data.guildBranchId, { ...payload, raidBossId: this.data.raidBossId } satisfies CreateGuildAttributionDefinitionPayload);
 
     request.subscribe({
       next: () => this.#saveSectionIconThenClose(),
@@ -349,7 +350,7 @@ export class AttributionDefinitionDialogComponent {
     }
 
     this.#definitionsService
-      .setSectionIcon(this.data.guildId, { raidBossId: this.data.raidBossId, section, ...this.sectionIcon() } satisfies SetAttributionSectionIconPayload)
+      .setSectionIcon(this.data.guildId, this.data.guildBranchId, { raidBossId: this.data.raidBossId, section, ...this.sectionIcon() } satisfies SetAttributionSectionIconPayload)
       .subscribe({
         next: () => {
           this.#snackbar.success('guildSettings.attributions.saveSuccess');

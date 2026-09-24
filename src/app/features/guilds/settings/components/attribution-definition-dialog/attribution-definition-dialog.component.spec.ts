@@ -93,6 +93,7 @@ describe('AttributionDefinitionDialogComponent', () => {
 
     const fullData: AttributionDefinitionDialogData = {
       guildId: 'guild-1',
+      guildBranchId: 3,
       expansionId: 2,
       definition: null,
       cloneFrom: null,
@@ -561,6 +562,7 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       expect(definitionsService.createDefinition).toHaveBeenCalledWith(
         'guild-1',
+        3,
         expect.objectContaining({ label: 'Innervate', section: 'Personals', isRepeatable: true, cells: expect.any(Array) }),
       );
       expect(definitionsService.updateDefinition).not.toHaveBeenCalled();
@@ -572,7 +574,7 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       component.submit();
 
-      expect(definitionsService.updateDefinition).toHaveBeenCalledWith('guild-1', 7, expect.any(Object));
+      expect(definitionsService.updateDefinition).toHaveBeenCalledWith('guild-1', 3, 7, expect.any(Object));
     });
 
     it('trims the label/section and nulls a blank section', () => {
@@ -583,7 +585,7 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       component.submit();
 
-      expect(definitionsService.createDefinition).toHaveBeenCalledWith('guild-1', expect.objectContaining({ label: 'Innervate', section: null }));
+      expect(definitionsService.createDefinition).toHaveBeenCalledWith('guild-1', 3, expect.objectContaining({ label: 'Innervate', section: null }));
     });
 
     it('shows a success snackbar and closes the dialog with true on success', () => {
@@ -647,7 +649,7 @@ describe('AttributionDefinitionDialogComponent', () => {
 
       component.submit();
 
-      expect(definitionsService.setSectionIcon).toHaveBeenCalledWith('guild-1', { raidBossId: 14, section: 'Interrupts', ...icon });
+      expect(definitionsService.setSectionIcon).toHaveBeenCalledWith('guild-1', 3, { raidBossId: 14, section: 'Interrupts', ...icon });
       expect(snackbar.success).toHaveBeenCalledWith('guildSettings.attributions.saveSuccess');
       expect(dialogRef.close).toHaveBeenCalledWith(true);
     });

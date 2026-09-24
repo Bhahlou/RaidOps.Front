@@ -49,6 +49,7 @@ export const ROADMAP_SECTIONS: RoadmapSection[] = [
       done('raidBuilder'),
       done('raidCompositionAnnouncement'),
       done('raidGrouping'),
+      done('raidCompositionPreview'),
       item('raidAssignments'),
       item('raidHistory'),
       item('guildDashboard'),

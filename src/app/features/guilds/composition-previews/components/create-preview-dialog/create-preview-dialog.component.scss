@@ -1,0 +1,11 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-hint {
+  margin: -4px 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}

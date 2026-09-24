@@ -13,9 +13,23 @@
     </div>
 
     <div id="panel-raids" role="tabpanel" aria-labelledby="tab-raids" [hidden]="activeTab() !== 'raids'">
-      <app-guild-raid-branches [guildId]="guildId" />
-      @if (attributionExpansionId(); as expansionId) {
-        <app-guild-attribution-settings [guildId]="guildId" [expansionId]="expansionId" />
+      @if (selectedBranch(); as branch) {
+        @if (activeBranches().length > 1) {
+          <app-select
+            class="branch-select"
+            inputId="raids-branch"
+            [label]="'guildSettings.branchPicker.label' | transloco"
+            [options]="branchOptions()"
+            [value]="'' + branch.id"
+            (valueChange)="onBranchChange($event)"
+          />
+        }
+        <app-guild-branch-raid-settings-card [guildId]="guildId" [branch]="branch" />
+        @if (selectedBranchExpansionId(); as expansionId) {
+          <app-guild-attribution-settings [guildId]="guildId" [guildBranchId]="branch.id" [expansionId]="expansionId" />
+        }
+      } @else {
+        <p class="empty-hint">{{ 'guildSettings.branches.noActiveBranches' | transloco }}</p>
       }
     </div>
 
