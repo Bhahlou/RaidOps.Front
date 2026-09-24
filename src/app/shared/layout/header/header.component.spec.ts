@@ -4,29 +4,39 @@ import { signal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
+import { AdminStore } from '../../../core/stores/admin.store';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { AuthService } from '../../../core/services/auth.service';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 import { DiscordIconType } from '../../models/discord-icon-type.enum';
 
 describe('HeaderComponent', () => {
   let signup: ReturnType<typeof vi.fn>;
   let logout: ReturnType<typeof vi.fn>;
   let loadUser: ReturnType<typeof vi.fn>;
+  let syncSpells: ReturnType<typeof vi.fn>;
   let navigate: ReturnType<typeof vi.fn>;
   let isAuthenticated: ReturnType<typeof signal<boolean>>;
+  let isAdmin: ReturnType<typeof signal<boolean>>;
+  let snackbar: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   const setup = (authenticated = false, url = '/home') => {
     signup = vi.fn();
     logout = vi.fn().mockReturnValue(of(undefined));
     loadUser = vi.fn().mockReturnValue(of(null));
+    syncSpells = vi.fn().mockReturnValue(of(undefined));
     navigate = vi.fn().mockResolvedValue(true);
     isAuthenticated = signal(authenticated);
+    isAdmin = signal(false);
+    snackbar = { success: vi.fn(), error: vi.fn() };
 
     TestBed.configureTestingModule({
       imports: [HeaderComponent],
       providers: [
-        { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly(), user: signal(null), logout, loadUser } },
+        { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly(), isAdmin: isAdmin.asReadonly(), user: signal(null), logout, loadUser } },
         { provide: AuthService, useValue: { signup } },
+        { provide: AdminStore, useValue: { syncSpells } },
+        { provide: SnackbarService, useValue: snackbar },
         { provide: Router, useValue: { navigate, url } },
       ],
     })
@@ -80,8 +90,10 @@ describe('HeaderComponent', () => {
       TestBed.configureTestingModule({
         imports: [HeaderComponent],
         providers: [
-          { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly(), user: signal(null), logout: vi.fn(), loadUser } },
+          { provide: AuthStore, useValue: { isAuthenticated: isAuthenticated.asReadonly(), isAdmin: signal(false).asReadonly(), user: signal(null), logout: vi.fn(), loadUser } },
           { provide: AuthService, useValue: { signup: vi.fn() } },
+          { provide: AdminStore, useValue: { syncSpells: vi.fn().mockReturnValue(of(undefined)) } },
+          { provide: SnackbarService, useValue: { success: vi.fn(), error: vi.fn() } },
           { provide: Router, useValue: { navigate: vi.fn(), url: '/home' } },
         ],
       })
@@ -93,6 +105,38 @@ describe('HeaderComponent', () => {
       }).not.toThrow();
 
       expect(loadUser).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('isAdmin', () => {
+    it('is wired from AuthStore', () => {
+      const component = setup(true);
+      expect(component.isAdmin()).toBe(false);
+
+      isAdmin.set(true);
+      expect(component.isAdmin()).toBe(true);
+    });
+  });
+
+  describe('onSyncSpellsClick', () => {
+    it('calls AdminStore.syncSpells and shows the success snackbar', () => {
+      const component = setup(true);
+
+      component.onSyncSpellsClick();
+
+      expect(syncSpells).toHaveBeenCalledOnce();
+      expect(snackbar.success).toHaveBeenCalledWith('admin.spellSync.success');
+      expect(snackbar.error).not.toHaveBeenCalled();
+    });
+
+    it('shows the error snackbar when the sync fails', () => {
+      const component = setup(true);
+      syncSpells.mockReturnValue(throwError(() => new Error('403')));
+
+      component.onSyncSpellsClick();
+
+      expect(snackbar.error).toHaveBeenCalledWith('admin.spellSync.error');
+      expect(snackbar.success).not.toHaveBeenCalled();
     });
   });
 

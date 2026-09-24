@@ -46,18 +46,53 @@ describe('GuildBranchRaidSettingsCardComponent', () => {
     return component;
   };
 
-  // ── ngOnInit ──────────────────────────────────────────────────────────────
+  // ── signupMode (derived from the branch input) ────────────────────────────
 
-  describe('ngOnInit', () => {
-    it('pre-fills signupMode from the branch input', () => {
+  describe('signupMode', () => {
+    it('is derived from the branch input', () => {
       setup(branch({ signupMode: SignupMode.Signup }));
       fixture.detectChanges();
 
       expect(component.signupMode()).toBe(SignupMode.Signup);
     });
 
-    it('defaults signupMode to DefaultPresent when the branch has none configured yet', () => {
+    it('defaults to DefaultPresent when the branch has none configured yet', () => {
       setup(branch({ signupMode: null }));
+      fixture.detectChanges();
+
+      expect(component.signupMode()).toBe(SignupMode.DefaultPresent);
+    });
+
+    it('defaults to DefaultPresent when the branch signupMode is undefined', () => {
+      setup(branch({ signupMode: undefined as unknown as null }));
+      fixture.detectChanges();
+
+      expect(component.signupMode()).toBe(SignupMode.DefaultPresent);
+    });
+
+    it('re-derives when the branch input is replaced by another branch', () => {
+      setup(branch({ id: 7, signupMode: SignupMode.Signup }));
+      fixture.detectChanges();
+      expect(component.signupMode()).toBe(SignupMode.Signup);
+
+      fixture.componentRef.setInput('branch', branch({ id: 8, signupMode: null }));
+      fixture.detectChanges();
+
+      expect(component.signupMode()).toBe(SignupMode.DefaultPresent);
+
+      fixture.componentRef.setInput('branch', branch({ id: 9, signupMode: SignupMode.Signup }));
+      fixture.detectChanges();
+
+      expect(component.signupMode()).toBe(SignupMode.Signup);
+    });
+
+    it('drops a locally picked mode when the branch input changes', async () => {
+      setup(branch({ id: 7, signupMode: SignupMode.DefaultPresent }));
+      fixture.detectChanges();
+      await component.onSignupModeChange(SignupMode.Signup);
+      expect(component.signupMode()).toBe(SignupMode.Signup);
+
+      fixture.componentRef.setInput('branch', branch({ id: 8, signupMode: SignupMode.DefaultPresent }));
       fixture.detectChanges();
 
       expect(component.signupMode()).toBe(SignupMode.DefaultPresent);
