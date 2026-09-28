@@ -5,7 +5,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { SpellIconComponent } from './spell-icon.component';
 
 describe('SpellIconComponent', () => {
-  const setup = (iconUrl: string, label?: string, size?: number, spellId?: number | null, activeLang = 'en') => {
+  const setup = (iconUrl: string, label?: string, size?: number, spellId?: number | null, activeLang = 'en', expansionId?: number | null) => {
     TestBed.configureTestingModule({
       imports: [SpellIconComponent],
       providers: [{ provide: TranslocoService, useValue: { activeLang: signal(activeLang) } }],
@@ -15,6 +15,7 @@ describe('SpellIconComponent', () => {
     if (label !== undefined) fixture.componentRef.setInput('label', label);
     if (size !== undefined) fixture.componentRef.setInput('size', size);
     if (spellId !== undefined) fixture.componentRef.setInput('spellId', spellId);
+    if (expansionId !== undefined) fixture.componentRef.setInput('expansionId', expansionId);
     fixture.detectChanges();
     return fixture;
   };
@@ -85,6 +86,25 @@ describe('SpellIconComponent', () => {
       const fixture = setup('https://cdn/icon.jpg', 'Innervate', undefined, 29166, 'fr');
       const link: HTMLAnchorElement = fixture.nativeElement.querySelector('a');
       expect(link.getAttribute('data-wowhead')).toBe('domain=fr.tbc');
+    });
+  });
+
+  // ── expansionId ──────────────────────────────────────────────────────────
+
+  describe('expansionId', () => {
+    it('picks the expansion\'s Wowhead sub-site for both the URL and the tooltip domain', () => {
+      const fixture = setup('https://cdn/icon.jpg', undefined, undefined, 16176, 'en', 12);
+
+      expect(fixture.componentInstance.wowheadUrl()).toBe('https://www.wowhead.com/forever/spell=16176');
+      expect(fixture.componentInstance.wowheadDomain()).toBe('forever');
+    });
+
+    it('localizes the expansion sub-site domain', () => {
+      expect(setup('https://cdn/icon.jpg', undefined, undefined, 16176, 'fr', 12).componentInstance.wowheadDomain()).toBe('fr.forever');
+    });
+
+    it('falls back to TBC when expansionId is not given at all', () => {
+      expect(setup('https://cdn/icon.jpg', undefined, undefined, 16176, 'en').componentInstance.wowheadDomain()).toBe('tbc');
     });
   });
 

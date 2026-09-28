@@ -398,6 +398,15 @@ body::after {
   overflow-y: auto;
 }
 
+// Wowhead's tooltip (script in index.html) is appended straight to <body>, so a spell icon hovered
+// inside a CDK overlay (dialog, menu — e.g. the spell picker's results) would otherwise show its
+// tooltip underneath that overlay. Keep it above the overlay container (z-index 1000). This only works
+// because overlays are rendered without the Popover API / top layer — see OVERLAY_DEFAULT_CONFIG in app.config.ts.
+.wowhead-tooltip,
+#wowhead-tooltip {
+  z-index: 100000 !important;
+}
+
 // Structural classes for CDK dialog content — Material's mat-dialog-title/-content/-actions
 // have no CDK equivalent, so these are hand-rolled and shared by every CDK-based dialog.
 .dialog-title {

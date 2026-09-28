@@ -24,7 +24,7 @@
       }
       @for (spell of results(); track spell.id) {
         <li class="spell-picker-row">
-          <app-spell-icon [iconUrl]="spell.iconUrl" [label]="spell.name" [spellId]="spell.id" [size]="20" />
+          <app-spell-icon [iconUrl]="spell.iconUrl" [label]="spell.name" [spellId]="spell.id" [expansionId]="expansionId()" [size]="20" />
           <button type="button" class="spell-picker-option" (click)="select(spell)">{{ spell.name }}</button>
         </li>
       }

@@ -25,6 +25,10 @@ import { CompositionSpecDragItem } from '../../models/composition-spec-drag-item
 export class ClassSpecPaletteComponent {
   /** Filters the class list to what's playable on this branch's current expansion, or `null` to show everything (expansion not resolved yet). */
   readonly expansionId = input<number | null>(null);
+  /** How many placed slots use each class — shown next to the class name. */
+  readonly classCounts = input<ReadonlyMap<number, number>>(new Map());
+  /** How many placed slots use each spec — shown under the spec icon. */
+  readonly specCounts = input<ReadonlyMap<number, number>>(new Map());
 
   readonly #wowClassService = inject(WowClassService);
   readonly #characterStore = inject(CharacterStore);
@@ -54,6 +58,14 @@ export class ClassSpecPaletteComponent {
 
   specsFor(classId: number): Spec[] {
     return this.#specs().filter((s) => s.classId === classId);
+  }
+
+  classCount(classId: number): number {
+    return this.classCounts().get(classId) ?? 0;
+  }
+
+  specCount(specId: number): number {
+    return this.specCounts().get(specId) ?? 0;
   }
 
   dragItem(wowClass: WowClass, spec: Spec): CompositionSpecDragItem {

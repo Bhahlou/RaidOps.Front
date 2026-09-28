@@ -29,9 +29,6 @@
 }
 
 .composer-header-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
   flex-shrink: 0;
 }
 
@@ -70,10 +67,40 @@
   gap: 16px;
 }
 
+// Tinted, dashed panel — reads as a distinct drop-source surface (drag a spec out of it) rather
+// than blending into the surrounding card, which shares the grid's own plain background.
 .composer-palette {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 8px;
-  border-top: 1px solid var(--color-border-subtle);
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  border: 1px dashed var(--color-border);
+}
+
+// No space-between: the role tally is a summary of the same thing the cards below count (who's
+// placed), so it belongs right next to the drag hint, not flung to the opposite edge of the panel.
+.composer-palette-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+
+// Was previously unstyled (relying on the browser's default <p> margin) — harmless standing alone,
+// but that margin threw off vertical centering once the drag icon joined it in a flex row.
+.field-hint {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.palette-drag-icon {
+  margin-right: 2px;
+  font-size: 16px;
+  vertical-align: text-bottom;
+  color: var(--color-text-muted);
 }

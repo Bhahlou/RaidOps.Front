@@ -44,8 +44,7 @@ export class IconSourcePickerComponent {
   readonly IconSource = AttributionIconSource;
   readonly staticRoleOrder = SPEC_ROLE_ORDER;
 
-  readonly guildId = input.required<string>();
-  readonly guildBranchId = input.required<number>();
+  readonly expansionId = input.required<number>();
   readonly value = input.required<IconSourceState>();
 
   readonly changed = output<IconSourceState>();

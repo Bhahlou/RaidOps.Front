@@ -1,7 +1,10 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
+import { SpellIconComponent } from '../../../../../shared/components/icons/spell-icon/spell-icon.component';
+import { RaidBuffDefinition } from '../../../../../shared/models/raid-buff-definition.model';
+import { raidBuffLabel } from '../../../../../shared/utils/raid-buff.util';
 import { RaidCompositionPreviewsStore } from '../../stores/raid-composition-previews.store';
 import { RaidCompositionPreview, RaidCompositionPreviewSlot } from '../../models/raid-composition-preview.model';
 import { CompositionSpecDragItem } from '../../models/composition-spec-drag-item.model';
@@ -16,7 +19,7 @@ import { CompositionPreviewSlotComponent } from '../composition-preview-slot/com
  */
 @Component({
   selector: 'app-composition-preview-grid',
-  imports: [CompositionPreviewSlotComponent, TranslocoPipe],
+  imports: [CompositionPreviewSlotComponent, SpellIconComponent, TranslocoPipe],
   templateUrl: './composition-preview-grid.component.html',
   styleUrl: './composition-preview-grid.component.scss',
 })
@@ -24,12 +27,27 @@ export class CompositionPreviewGridComponent {
   readonly guildId = input.required<string>();
   readonly guildBranchId = input.required<number>();
   readonly preview = input.required<RaidCompositionPreview>();
+  /** Per group number, the group buffs its members provide — shown as icons under the group. */
+  readonly groupBuffs = input<ReadonlyMap<number, RaidBuffDefinition[]>>(new Map());
+  /** The expansion the buff spells belong to — picks the Wowhead sub-site of their tooltips. */
+  readonly expansionId = input<number | null>(null);
 
   readonly #store = inject(RaidCompositionPreviewsStore);
   readonly #snackbar = inject(SnackbarService);
+  readonly #transloco = inject(TranslocoService);
 
   readonly groupNumbers = computed(() => range(1, this.preview().groupCount));
   readonly slotNumbers = computed(() => range(1, this.preview().slotsPerGroup));
+
+  /** A group's provided buffs, or an empty list — the card is only rendered when there is at least one. */
+  groupBuffsFor(groupNumber: number): RaidBuffDefinition[] {
+    return this.groupBuffs().get(groupNumber) ?? [];
+  }
+
+  /** Effect label plus spell name, for the icon's accessible name — the Wowhead tooltip carries the detail. */
+  buffLabel(definition: RaidBuffDefinition): string {
+    return raidBuffLabel(definition, this.#transloco.getActiveLang());
+  }
 
   slotFor(groupNumber: number, slotNumber: number): RaidCompositionPreviewSlot | null {
     return this.preview().slots.find((s) => s.groupNumber === groupNumber && s.slotNumber === slotNumber) ?? null;

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
 import { CompositionPreviewGridComponent } from './composition-preview-grid.component';
@@ -7,6 +8,26 @@ import { RaidCompositionPreviewsStore } from '../../stores/raid-composition-prev
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { RaidCompositionPreview, RaidCompositionPreviewSlot } from '../../models/raid-composition-preview.model';
 import { CompositionSpecDragItem } from '../../models/composition-spec-drag-item.model';
+import { RaidBuffDefinition } from '../../../../../shared/models/raid-buff-definition.model';
+import { RaidBuffKind } from '../../../../../shared/models/raid-buff-kind.enum';
+import { RaidBuffScope } from '../../../../../shared/models/raid-buff-scope.enum';
+
+const buffDefinition = (overrides?: Partial<RaidBuffDefinition>): RaidBuffDefinition => ({
+  id: 1,
+  expansionId: 12,
+  spellId: 25289,
+  scope: RaidBuffScope.Group,
+  kind: RaidBuffKind.Buff,
+  labelEn: '+140 attack power',
+  labelFr: '+140 puissance d\'attaque',
+  labelDe: '+140 Angriffskraft',
+  exclusiveGroupKey: null,
+  capacityPoolKey: null,
+  sortOrder: 0,
+  sources: [],
+  spell: { nameEn: 'Battle Shout', nameFr: 'Cri de guerre', nameDe: 'Schlachtruf', iconUrl: 'https://cdn/battle-shout.jpg' },
+  ...overrides,
+});
 
 const slot = (overrides?: Partial<RaidCompositionPreviewSlot>): RaidCompositionPreviewSlot => ({
   groupNumber: 1,
@@ -44,7 +65,7 @@ describe('CompositionPreviewGridComponent', () => {
   let store: { updateSlot: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
   let snackbar: { error: ReturnType<typeof vi.fn> };
 
-  const setup = (previewValue: RaidCompositionPreview) => {
+  const setup = (previewValue: RaidCompositionPreview, groupBuffs?: ReadonlyMap<number, RaidBuffDefinition[]>) => {
     store = { updateSlot: vi.fn().mockReturnValue(of(undefined)), reload: vi.fn() };
     snackbar = { error: vi.fn() };
 
@@ -53,6 +74,7 @@ describe('CompositionPreviewGridComponent', () => {
       providers: [
         { provide: RaidCompositionPreviewsStore, useValue: store },
         { provide: SnackbarService, useValue: snackbar },
+        { provide: TranslocoService, useValue: { getActiveLang: () => 'fr' } },
       ],
     }).overrideComponent(CompositionPreviewGridComponent, { set: { template: '', imports: [] } });
 
@@ -60,6 +82,7 @@ describe('CompositionPreviewGridComponent', () => {
     fixture.componentRef.setInput('guildId', 'g1');
     fixture.componentRef.setInput('guildBranchId', 7);
     fixture.componentRef.setInput('preview', previewValue);
+    if (groupBuffs) fixture.componentRef.setInput('groupBuffs', groupBuffs);
     component = fixture.componentInstance;
     fixture.detectChanges();
     return component;
@@ -197,6 +220,31 @@ describe('CompositionPreviewGridComponent', () => {
       component.onNoteChanged('New note', 1, 1);
 
       expect(snackbar.error).toHaveBeenCalledWith('compositionPreviews.composer.errors.RaidCompositionPreviewNotFound');
+    });
+  });
+
+  // ── groupBuffsFor / buffLabel ────────────────────────────────────────────
+
+  describe('groupBuffsFor', () => {
+    it('returns the buffs of the given group number', () => {
+      const buff = buffDefinition();
+      setup(preview(), new Map([[1, [buff]]]));
+
+      expect(component.groupBuffsFor(1)).toEqual([buff]);
+    });
+
+    it('returns an empty array for a group with no buffs', () => {
+      setup(preview(), new Map([[1, [buffDefinition()]]]));
+
+      expect(component.groupBuffsFor(2)).toEqual([]);
+    });
+  });
+
+  describe('buffLabel', () => {
+    it('resolves the label in the active language', () => {
+      setup(preview());
+
+      expect(component.buffLabel(buffDefinition())).toBe('+140 puissance d\'attaque');
     });
   });
 });

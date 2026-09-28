@@ -116,6 +116,38 @@ describe('ClassSpecPaletteComponent', () => {
     });
   });
 
+  // ── classCount / specCount ───────────────────────────────────────────────
+
+  describe('classCount', () => {
+    it('returns the count for the given class', () => {
+      setup();
+      fixture.componentRef.setInput('classCounts', new Map([[1, 6]]));
+
+      expect(component.classCount(1)).toBe(6);
+    });
+
+    it('returns 0 for a class with no entry', () => {
+      setup();
+
+      expect(component.classCount(1)).toBe(0);
+    });
+  });
+
+  describe('specCount', () => {
+    it('returns the count for the given spec', () => {
+      setup();
+      fixture.componentRef.setInput('specCounts', new Map([[71, 3]]));
+
+      expect(component.specCount(71)).toBe(3);
+    });
+
+    it('returns 0 for a spec with no entry', () => {
+      setup();
+
+      expect(component.specCount(71)).toBe(0);
+    });
+  });
+
   // ── dragItem ─────────────────────────────────────────────────────────────
 
   describe('dragItem', () => {

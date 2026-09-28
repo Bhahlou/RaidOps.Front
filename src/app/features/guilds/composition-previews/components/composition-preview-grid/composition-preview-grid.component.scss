@@ -31,3 +31,15 @@
   flex-direction: column;
   gap: 2px;
 }
+
+// Group buffs: icons only, and the card itself only exists when the group provides at least one.
+.group-buffs-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-subtle);
+}

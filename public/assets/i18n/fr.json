@@ -11,6 +11,80 @@
       "trigger": "Synchroniser les sorts",
       "success": "Synchronisation des sorts terminée",
       "error": "Échec de la synchronisation des sorts"
+    },
+    "raidBuffs": {
+      "menu": "Buffs de raid",
+      "title": "Buffs et debuffs de raid",
+      "intro": "Les buffs et debuffs qu'une composition de raid peut apporter, par extension. Les changements s'appliquent immédiatement ; utilise l'export/import pour aligner un autre environnement.",
+      "expansion": "Extension",
+      "add": "Ajouter",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "export": "Copier le JSON",
+      "import": "Importer un JSON",
+      "importSummary": "Dernier import : {{ created }} créée(s), {{ updated }} mise(s) à jour, {{ deleted }} supprimée(s).",
+      "exportCopied": "JSON copié dans le presse-papier",
+      "exportFailed": "Impossible de copier dans le presse-papier",
+      "importDialog": {
+        "title": "Importer des définitions",
+        "hint": "Colle le JSON copié depuis l'export d'un autre environnement. Il est écrit dans l'extension indiquée par le fichier.",
+        "placeholder": "{ \"expansionId\": 12, \"definitions\": [ … ] }",
+        "preview": "{{ count }} définitions pour {{ expansion }}.",
+        "pruneMissing": "Supprimer aussi les définitions de l'extension absentes de ce JSON",
+        "pruneWarning": "Toutes les définitions de cette extension qui ne figurent pas dans le JSON collé seront supprimées.",
+        "submit": "Importer",
+        "errors": {
+          "tooLarge": "Ce texte est trop volumineux pour être un export de buffs de raid.",
+          "invalidJson": "Ce n'est pas du JSON valide.",
+          "invalidShape": "Ce JSON n'est pas un export de buffs de raid valide (valeurs inconnues, champs manquants ou caractères non autorisés)."
+        }
+      },
+      "importSuccess": "Définitions importées",
+      "saveSuccess": "Définition enregistrée",
+      "deleteSuccess": "Définition supprimée",
+      "deleteConfirmTitle": "Supprimer cette définition ?",
+      "deleteConfirmMessage": "« {{ name }} » ne sera plus vérifié dans les compositions de raid.",
+      "empty": "Aucune définition pour cette extension pour l'instant.",
+      "exclusiveGroupKey": "Groupe exclusif — ces effets ne se cumulent pas",
+      "capacityPoolKey": "Pool de capacité — chaque fournisseur n'en couvre qu'un",
+      "scope": {
+        "Raid": "Raid",
+        "Group": "Groupe",
+        "Individual": "Individuel"
+      },
+      "kind": {
+        "Buff": "Buff",
+        "Debuff": "Debuff"
+      },
+      "section": {
+        "Raid": { "Buff": "Buffs de raid", "Debuff": "Debuffs de raid" },
+        "Group": { "Buff": "Buffs de groupe", "Debuff": "Debuffs de groupe" },
+        "Individual": { "Buff": "Buffs individuels", "Debuff": "Debuffs individuels" }
+      },
+      "dialog": {
+        "createTitle": "Ajouter un buff ou un debuff",
+        "editTitle": "Modifier un buff ou un debuff",
+        "spell": "Sort",
+        "noSpell": "Aucun sort choisi",
+        "scope": "Portée",
+        "kind": "Type",
+        "labelEn": "Libellé (anglais)",
+        "labelFr": "Libellé (français)",
+        "labelDe": "Libellé (allemand)",
+        "exclusiveGroupKey": "Groupe exclusif",
+        "capacityPoolKey": "Pool de capacité",
+        "sortOrder": "Ordre",
+        "keysHint": "Les définitions d'un même groupe exclusif sont des alternatives pour un seul effet ; celles d'un même pool de capacité sont couvertes une par fournisseur, dans l'ordre. Les clés n'utilisent que des minuscules, des chiffres et des tirets. Laisse vide si aucun ne s'applique.",
+        "sources": "Qui l'apporte",
+        "sourcesHint": "Une seule de ces classes ou specs suffit.",
+        "class": "Classe",
+        "spec": "Spécialisation",
+        "anySpec": "Toutes les specs",
+        "addSource": "Ajouter une classe ou une spec",
+        "removeSource": "Retirer",
+        "cancel": "Annuler",
+        "save": "Enregistrer"
+      }
     }
   },
   "confirmDialog": {
@@ -110,6 +184,10 @@
     },
     "viewGuide": "Voir le guide →",
     "entries": {
+      "raidBuffs": {
+        "title": "Buffs et debuffs de raid dans les aperçus de composition",
+        "description": "Les aperçus de composition affichent désormais un panneau récapitulant les buffs de raid, debuffs de raid et buffs individuels qu'apporte la composition, à partir d'une liste tenue à jour par extension — un effet manquant reste visible mais grisé (icône et infobulle Wowhead toujours actives), les alternatives non cumulables partagent une seule ligne, et les effets à capacité limitée comme les bénédictions affichent un compteur « n/m ». Une carte sous chaque groupe liste les buffs de groupe qu'il apporte. La palette de classes est passée au-dessus de la grille et affiche désormais des compteurs de placement par classe et par spécialisation."
+      },
       "raidCompositionPreview": {
         "title": "Simuler une compo de raid avant même que les persos existent",
         "description": "Les officiers peuvent désormais construire une grille théorique de groupes/emplacements, nommée (1 à 8 groupes de 5, selon le format visé), depuis une nouvelle page « Aperçus de composition » — glisse une spécialisation depuis la palette de classes vers un emplacement, et ajoute une note en texte libre par emplacement. Un compteur de rôles totalise tanks/heals/mêlée/distance au fil des placements. Utile juste après l'activation d'une nouvelle branche, avant que l'import Battle.net y soit disponible. Ni date, ni verrouillage, ni vrai personnage impliqué ; créez/renommez/dupliquez/supprimez-en autant que vous voulez."
@@ -341,6 +419,10 @@
       "raidCompositionPreview": {
         "title": "Aperçus de composition de raid",
         "description": "Simule une grille théorique de groupes/emplacements — placeholders classe/spec et notes — avant même que les persos existent."
+      },
+      "raidBuffs": {
+        "title": "Buffs et debuffs de raid",
+        "description": "Couverture des buffs/debuffs tenue à jour par extension, affichée sur les aperçus de composition, avec une liste de ce qu'il manque encore à la compo."
       },
       "raidAssignments": {
         "title": "Assignations de raid",
@@ -1305,6 +1387,15 @@
       "duplicateSubmit": "Dupliquer"
     },
     "groupsLabel": "{{count}} groupes",
+    "buffs": {
+      "buffs": "Buffs de raid",
+      "debuffs": "Debuffs de raid",
+      "individual": "Buffs individuels",
+      "poolHint": "Chaque membre de la composition ne peut être compté que pour un seul de ces effets.",
+      "pools": {
+        "paladin-blessings": "Bénédictions"
+      }
+    },
     "composer": {
       "loading": "Chargement de l'aperçu…",
       "breadcrumb": "Aperçu",

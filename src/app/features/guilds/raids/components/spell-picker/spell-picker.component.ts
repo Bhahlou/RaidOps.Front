@@ -2,7 +2,7 @@ import { Component, ElementRef, inject, input, output, signal, viewChild } from 
 import { CdkMenu, CdkMenuTrigger } from '@angular/cdk/menu';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SpellIconComponent } from '../../../../../shared/components/icons/spell-icon/spell-icon.component';
-import { AttributionDefinitionsService } from '../../services/attribution-definitions.service';
+import { SpellService } from '../../services/spell.service';
 import { Spell } from '../../models/spell.model';
 
 /**
@@ -17,14 +17,13 @@ import { Spell } from '../../models/spell.model';
   styleUrl: './spell-picker.component.scss',
 })
 export class SpellPickerComponent {
-  readonly guildId = input.required<string>();
-  /** The guild branch whose expansion is searched — the server derives the expansion (and each spell's name/icon on it) from the branch. */
-  readonly guildBranchId = input.required<number>();
+  /** The expansion whose spells are searched — each result carries its name and icon on that expansion. */
+  readonly expansionId = input.required<number>();
   readonly selected = output<Spell>();
 
   private readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
-  readonly #attributionDefinitionsService = inject(AttributionDefinitionsService);
+  readonly #spellService = inject(SpellService);
   readonly #transloco = inject(TranslocoService);
 
   readonly query = signal('');
@@ -58,7 +57,7 @@ export class SpellPickerComponent {
 
   #search(term: string): void {
     this.searching.set(true);
-    this.#attributionDefinitionsService.searchSpells(this.guildId(), this.guildBranchId(), term, this.#transloco.getActiveLang()).subscribe({
+    this.#spellService.search(this.expansionId(), term, this.#transloco.getActiveLang()).subscribe({
       next: (spells) => {
         this.results.set(dedupeByNameAndIcon(spells));
         this.searching.set(false);

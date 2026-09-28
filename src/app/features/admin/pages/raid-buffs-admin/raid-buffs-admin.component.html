@@ -1,0 +1,84 @@
+<div class="admin-page">
+  <app-page-header [items]="breadcrumb" />
+
+  <p class="intro">{{ 'admin.raidBuffs.intro' | transloco }}</p>
+
+  <div class="toolbar">
+    <app-select
+      class="expansion-select"
+      [label]="'admin.raidBuffs.expansion' | transloco"
+      [options]="expansionOptions"
+      [value]="expansionId()"
+      (valueChange)="selectExpansion($event)"
+    />
+
+    <div class="toolbar-actions">
+      <app-button variant="primary" icon="add" (click)="add()">{{ 'admin.raidBuffs.add' | transloco }}</app-button>
+      <app-button variant="stroked" icon="content_copy" (click)="copyExport()">{{ 'admin.raidBuffs.export' | transloco }}</app-button>
+      <app-button variant="stroked" icon="upload" (click)="openImport()">{{ 'admin.raidBuffs.import' | transloco }}</app-button>
+    </div>
+  </div>
+
+  @if (lastSummary(); as summary) {
+    <p class="import-summary">
+      {{ 'admin.raidBuffs.importSummary' | transloco: { created: summary.created, updated: summary.updated, deleted: summary.deleted } }}
+    </p>
+  }
+
+  @if (sections().length === 0 && !isLoading()) {
+    <app-empty-hint>{{ 'admin.raidBuffs.empty' | transloco }}</app-empty-hint>
+  }
+
+  @for (section of sections(); track section.key) {
+    <section class="definition-section">
+      <h2 class="section-title">{{ 'admin.raidBuffs.section.' + section.scope + '.' + section.kind | transloco }}</h2>
+
+      <ul class="definition-list">
+        @for (definition of section.definitions; track definition.id) {
+          <li class="definition-row">
+            <span class="spell-cell">
+              @if (definition.spell?.iconUrl; as iconUrl) {
+                <app-spell-icon [iconUrl]="iconUrl" [label]="spellName(definition)" [spellId]="definition.spellId" [expansionId]="expansionId()" [size]="32" />
+              } @else {
+                <span class="icon-placeholder material-icons" aria-hidden="true">help_outline</span>
+              }
+            </span>
+
+            <div class="definition-main">
+              <span class="definition-label">{{ label(definition) }}</span>
+              <span class="definition-spell">{{ spellName(definition) }} · #{{ definition.spellId }}</span>
+            </div>
+
+            <ul class="source-icons">
+              @for (source of definition.sources; track $index) {
+                @if (sourceIcon(source); as icon) {
+                  <li class="source-icon">
+                    @if (icon.url) {
+                      <img [src]="icon.url" [alt]="icon.label" [title]="icon.label" width="28" height="28" />
+                    } @else {
+                      <span class="source-icon-fallback" [title]="icon.label">?</span>
+                    }
+                  </li>
+                }
+              }
+            </ul>
+
+            <div class="definition-keys">
+              @if (definition.exclusiveGroupKey) {
+                <span class="chip chip--key" [title]="'admin.raidBuffs.exclusiveGroupKey' | transloco">≠ {{ definition.exclusiveGroupKey }}</span>
+              }
+              @if (definition.capacityPoolKey) {
+                <span class="chip chip--key" [title]="'admin.raidBuffs.capacityPoolKey' | transloco">◧ {{ definition.capacityPoolKey }}</span>
+              }
+            </div>
+
+            <div class="definition-actions">
+              <app-icon-button icon="edit" (click)="edit(definition)" [title]="'admin.raidBuffs.edit' | transloco" />
+              <app-icon-button icon="delete" (click)="remove(definition)" [title]="'admin.raidBuffs.delete' | transloco" />
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

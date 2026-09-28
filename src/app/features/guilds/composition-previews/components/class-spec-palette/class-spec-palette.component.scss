@@ -2,16 +2,23 @@
   display: block;
 }
 
+// Flex, not a fixed-column grid: a grid would force every card to the same width, so Druid's 4th
+// spec (every other class has 3) would either overflow or force an internal wrap — a lone icon
+// stranded on its own second line. Flex instead sizes each card to its own content and only wraps
+// whole cards onto the next line once a row is full, so Druid's card is simply a bit wider.
 .palette {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 8px;
 }
 
 .palette-card {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 6px;
+  min-width: 140px;
   padding: 8px;
   border-radius: 6px;
   background: var(--color-bg-tertiary);
@@ -24,6 +31,15 @@
   gap: 6px;
 }
 
+// Plain muted number, not a pill — a bordered badge here would compete with the per-spec badges
+// below for attention; the class total is a lighter-weight, secondary figure.
+.palette-card-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 .palette-card-name {
   font-size: 0.8rem;
   font-weight: 600;
@@ -32,6 +48,33 @@
 .palette-card-specs {
   display: flex;
   gap: 6px;
+}
+
+// Wraps just the icon so the count can overlay its corner as a badge instead of taking its own
+// line — a dozen "0" lines under unused specs was the biggest source of clutter in this palette.
+.palette-spec-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+// Only rendered when count > 0 (see template) — an empty badge on every unused spec defeats the point.
+.palette-spec-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-bg-primary);
+  background: var(--color-accent);
+  pointer-events: none; // never steals the hover/drag from the icon underneath
 }
 
 .palette-spec {

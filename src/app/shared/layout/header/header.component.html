@@ -57,6 +57,10 @@
     <div class="menu-panel" cdkMenu>
       @if (isAuthenticated()) {
         @if (isAdmin()) {
+          <a class="menu-item" cdkMenuItem routerLink="/admin/raid-buffs">
+            <span class="material-icons">shield</span>
+            {{ 'admin.raidBuffs.menu' | transloco }}
+          </a>
           <button type="button" class="menu-item" cdkMenuItem (click)="onSyncSpellsClick()">
             <span class="material-icons">sync</span>
             {{ 'admin.spellSync.trigger' | transloco }}

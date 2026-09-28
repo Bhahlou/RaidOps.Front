@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
@@ -6,15 +6,20 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { PageHeaderComponent, BreadcrumbItem } from '../../../../../shared/components/layout/page-header/page-header.component';
 import { IconButtonComponent } from '../../../../../shared/components/buttons/icon-button/icon-button.component';
 import { FormFieldCardComponent } from '../../../../../shared/components/form/form-field-card/form-field-card.component';
+import { BranchTabsComponent } from '../../../components/branch-tabs/branch-tabs.component';
 import { injectGuildContext, injectGuildBranchContext } from '../../../inject-guild-context';
+import { RaidBuffsStore } from '../../../../../core/stores/raid-buffs.store';
 import { GuildBranchesStore } from '../../../stores/guild-branches.store';
 import { WowBrancheService } from '../../../../../shared/services/wow-branche.service';
 import { Branch } from '../../../../../shared/models/branch.model';
 import { expansionIdFromShortCode } from '../../../../../shared/utils/expansion-id.util';
 import { RaidCompositionPreviewsStore } from '../../stores/raid-composition-previews.store';
 import { countPreviewRoles } from '../../utils/composition-role.util';
+import { countPlacements } from '../../utils/composition-placement-count.util';
+import { evaluateRaidBuffCoverage } from '../../utils/raid-buff-coverage.util';
 import { RAID_ROLE_ICON, RAID_ROLE_ORDER } from '../../../raids/utils/raid-role.util';
 import { CompositionPreviewGridComponent } from '../../components/composition-preview-grid/composition-preview-grid.component';
+import { RaidBuffsPanelComponent } from '../../components/raid-buffs-panel/raid-buffs-panel.component';
 import { ClassSpecPaletteComponent } from '../../components/class-spec-palette/class-spec-palette.component';
 import { RenamePreviewDialogComponent, RenamePreviewDialogData } from '../../components/rename-preview-dialog/rename-preview-dialog.component';
 
@@ -23,11 +28,13 @@ import { RenamePreviewDialogComponent, RenamePreviewDialogData } from '../../com
   selector: 'app-composition-preview-composer',
   imports: [
     PageHeaderComponent,
+    BranchTabsComponent,
     IconButtonComponent,
     FormFieldCardComponent,
     CdkDropListGroup,
     CompositionPreviewGridComponent,
     ClassSpecPaletteComponent,
+    RaidBuffsPanelComponent,
     TranslocoPipe,
   ],
   templateUrl: './composition-preview-composer.component.html',
@@ -39,6 +46,7 @@ export class CompositionPreviewComposerComponent {
   readonly #route = inject(ActivatedRoute);
   readonly #store = inject(RaidCompositionPreviewsStore);
   readonly #branchesStore = inject(GuildBranchesStore);
+  readonly #raidBuffsStore = inject(RaidBuffsStore);
   readonly #wowBrancheService = inject(WowBrancheService);
   readonly #dialog = inject(Dialog);
 
@@ -52,6 +60,14 @@ export class CompositionPreviewComposerComponent {
   readonly roleIcon = RAID_ROLE_ICON;
 
   readonly roleCounts = computed(() => countPreviewRoles(this.preview()?.slots ?? []));
+
+  /** How many placed slots use each class/spec — feeds the palette's counters. */
+  readonly placementCounts = computed(() => countPlacements(this.preview()?.slots ?? []));
+
+  /** What the composition brings, checked against the curated buff/debuff list of the branch's expansion. */
+  readonly buffCoverage = computed(() =>
+    evaluateRaidBuffCoverage(this.#raidBuffsStore.definitions(), this.preview()?.slots ?? [], this.preview()?.groupCount ?? 0),
+  );
 
   readonly #wowBranches = signal<Branch[]>([]);
 
@@ -77,6 +93,12 @@ export class CompositionPreviewComposerComponent {
     this.#store.loadPreview(this.guildId(), this.guildBranchId(), this.previewId);
     this.#branchesStore.load(this.guildId());
     this.#wowBrancheService.getAll().subscribe((branches) => this.#wowBranches.set(branches));
+
+    // The buff list follows the branch's expansion, which resolves asynchronously after the branches load.
+    effect(() => {
+      const expansionId = this.expansionId();
+      if (expansionId !== null) untracked(() => this.#raidBuffsStore.load(expansionId));
+    });
   }
 
   renamePreview(): void {
