@@ -142,6 +142,14 @@ describe('RaidBuffImportDialogComponent', () => {
   // ── submit ───────────────────────────────────────────────────────────────
 
   describe('submit', () => {
+    it('does nothing when nothing has been pasted yet (parsed is null)', () => {
+      const component = setup();
+
+      component.submit();
+
+      expect(adminStore.importRaidBuffs).not.toHaveBeenCalled();
+    });
+
     it('does nothing when the text has not parsed successfully', () => {
       const component = setup();
       component.onTextInput('not json');
