@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.1.0...raidops-front-v2.2.0) (2026-09-28)
+
+
+### 🚀 Features
+
+* Show curated raid buff/debuff coverage on composition previews and add the owner-only raid buffs admin screen ([#102](https://github.com/Bhahlou/RaidOps.Front/issues/102)) ([8d5de8e](https://github.com/Bhahlou/RaidOps.Front/commit/8d5de8e7f4cbde9113f5bce6585cf2e09131718a))
+
 ## [2.1.0](https://github.com/Bhahlou/RaidOps.Front/compare/raidops-front-v2.0.2...raidops-front-v2.1.0) (2026-09-24)
 
 
