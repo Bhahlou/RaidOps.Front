@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 
 import { CompositionPreviewComposerComponent } from './composition-preview-composer.component';
 import { RaidCompositionPreviewsStore } from '../../stores/raid-composition-previews.store';
+import { RaidBuffsStore } from '../../../../../core/stores/raid-buffs.store';
 import { GuildBranchesStore } from '../../../stores/guild-branches.store';
 import { WowBrancheService } from '../../../../../shared/services/wow-branche.service';
 import { AuthStore } from '../../../../../core/stores/auth.store';
@@ -14,7 +15,27 @@ import { User } from '../../../../../core/models/user.model';
 import { GuildBranch } from '../../../models/guild-branch.model';
 import { Branch } from '../../../../../shared/models/branch.model';
 import { RaidCompositionPreview, RaidCompositionPreviewSlot } from '../../models/raid-composition-preview.model';
+import { RaidBuffDefinition } from '../../../../../shared/models/raid-buff-definition.model';
+import { RaidBuffKind } from '../../../../../shared/models/raid-buff-kind.enum';
+import { RaidBuffScope } from '../../../../../shared/models/raid-buff-scope.enum';
 import { RenamePreviewDialogComponent } from '../../components/rename-preview-dialog/rename-preview-dialog.component';
+
+const buffDefinition = (overrides?: Partial<RaidBuffDefinition>): RaidBuffDefinition => ({
+  id: 1,
+  expansionId: 2,
+  spellId: 10293,
+  scope: RaidBuffScope.Group,
+  kind: RaidBuffKind.Buff,
+  labelEn: '+735 armor',
+  labelFr: '+735 armure',
+  labelDe: '+735 Rüstung',
+  exclusiveGroupKey: null,
+  capacityPoolKey: null,
+  sortOrder: 0,
+  sources: [{ classId: 1, specId: 73 }],
+  spell: { nameEn: 'Devotion Aura', nameFr: 'Aura de dévotion', nameDe: 'Aura der Hingabe', iconUrl: 'https://cdn/devotion.jpg' },
+  ...overrides,
+});
 
 const slot = (overrides?: Partial<RaidCompositionPreviewSlot>): RaidCompositionPreviewSlot => ({
   groupNumber: 1,
@@ -80,8 +101,17 @@ describe('CompositionPreviewComposerComponent', () => {
   let branchesStore: { branches: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn> };
   let wowBrancheService: { getAll: ReturnType<typeof vi.fn> };
   let dialog: { open: ReturnType<typeof vi.fn> };
+  let raidBuffsStore: { definitions: ReturnType<typeof signal>; isLoading: ReturnType<typeof signal>; load: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
 
-  const setup = (opts?: { preview?: RaidCompositionPreview | null; branches?: GuildBranch[]; wowBranches?: Branch[]; guildId?: string; branchId?: number; previewId?: number }) => {
+  const setup = (opts?: {
+    preview?: RaidCompositionPreview | null;
+    branches?: GuildBranch[];
+    wowBranches?: Branch[];
+    guildId?: string;
+    branchId?: number;
+    previewId?: number;
+    raidBuffDefinitions?: RaidBuffDefinition[];
+  }) => {
     store = {
       preview: signal(opts?.preview === undefined ? preview() : opts.preview),
       isLoading: signal(false),
@@ -91,6 +121,7 @@ describe('CompositionPreviewComposerComponent', () => {
     branchesStore = { branches: signal(opts?.branches ?? [guildBranch()]), load: vi.fn() };
     wowBrancheService = { getAll: vi.fn().mockReturnValue(of(opts?.wowBranches ?? [branch()])) };
     dialog = { open: vi.fn().mockReturnValue({ closed: of(false) }) };
+    raidBuffsStore = { definitions: signal(opts?.raidBuffDefinitions ?? []), isLoading: signal(false), load: vi.fn(), reload: vi.fn() };
 
     const guildId = opts?.guildId ?? 'g1';
     const branchIdParam = opts?.branchId ?? 7;
@@ -114,13 +145,17 @@ describe('CompositionPreviewComposerComponent', () => {
         },
         { provide: AuthStore, useValue: { user: signal(fakeUser()) } },
         { provide: RaidCompositionPreviewsStore, useValue: store },
+        { provide: RaidBuffsStore, useValue: raidBuffsStore },
         { provide: GuildBranchesStore, useValue: branchesStore },
         { provide: WowBrancheService, useValue: wowBrancheService },
         { provide: Dialog, useValue: dialog },
       ],
     }).overrideComponent(CompositionPreviewComposerComponent, { set: { template: '', imports: [] } });
 
-    return TestBed.createComponent(CompositionPreviewComposerComponent).componentInstance;
+    const component = TestBed.createComponent(CompositionPreviewComposerComponent).componentInstance;
+    // Flushes the constructor's effect (loads the raid buffs store once the expansion resolves).
+    TestBed.flushEffects();
+    return component;
   };
 
   it('should create', () => {
@@ -160,6 +195,60 @@ describe('CompositionPreviewComposerComponent', () => {
     it('is null when the short code has no known expansion id', () => {
       const component = setup({ branches: [guildBranch({ id: 7, branchId: 3 })], wowBranches: [branch({ id: 3, currentExpansionShortCode: 'Unknown' })] });
       expect(component.expansionId()).toBeNull();
+    });
+  });
+
+  // ── raid buffs store loading ─────────────────────────────────────────────
+
+  describe('raid buffs loading', () => {
+    it('loads the raid buffs store once the expansion resolves', () => {
+      setup({ branches: [guildBranch({ id: 7, branchId: 3 })], wowBranches: [branch({ id: 3, currentExpansionShortCode: 'TBC' })] });
+
+      expect(raidBuffsStore.load).toHaveBeenCalledWith(2);
+    });
+
+    it('does not load the raid buffs store while the expansion is unresolved', () => {
+      setup({ branches: [] });
+
+      expect(raidBuffsStore.load).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── buffCoverage ─────────────────────────────────────────────────────────
+
+  describe('buffCoverage', () => {
+    it('evaluates coverage from the raid buffs store definitions and the current preview', () => {
+      const component = setup({
+        preview: preview({ groupCount: 1, slots: [slot({ groupNumber: 1, wowClassId: 1, specId: 73 })] }),
+        raidBuffDefinitions: [buffDefinition({ sources: [{ classId: 1, specId: 73 }] })],
+      });
+
+      const groupBuffs = component.buffCoverage().groups.get(1);
+      expect(groupBuffs).toEqual([buffDefinition({ sources: [{ classId: 1, specId: 73 }] })]);
+    });
+
+    it('is empty when there is no preview yet', () => {
+      const component = setup({ preview: null, raidBuffDefinitions: [buffDefinition()] });
+
+      expect(component.buffCoverage().groups.size).toBe(0);
+      expect(component.buffCoverage().buffs).toEqual([]);
+    });
+  });
+
+  // ── placementCounts ──────────────────────────────────────────────────────
+
+  describe('placementCounts', () => {
+    it('tallies classes and specs from the current preview slots', () => {
+      const component = setup({ preview: preview({ slots: [slot({ wowClassId: 1, specId: 73 })] }) });
+
+      expect(component.placementCounts().classCounts.get(1)).toBe(1);
+      expect(component.placementCounts().specCounts.get(73)).toBe(1);
+    });
+
+    it('is empty when there is no preview yet', () => {
+      const component = setup({ preview: null });
+
+      expect(component.placementCounts().classCounts.size).toBe(0);
     });
   });
 

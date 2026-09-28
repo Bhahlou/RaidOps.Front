@@ -1,0 +1,125 @@
+:host {
+  display: block;
+}
+
+// Lighter, solid-bordered panel — informational rather than interactive (unlike the dashed,
+// same-toned palette above the grid), it just needs to read as its own zone, not a drop surface.
+.buffs-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.buffs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.buffs-section-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.buff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  // Nested (inside a pool) is already inset by the pool's own left accent/padding — adding this
+  // gutter again on top of it would push pool members needlessly further right.
+  &--nested {
+    gap: 4px;
+    padding-left: 0;
+  }
+}
+
+.buff-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+// Reserves the room of the section's widest entry (24px icons, 3px gaps), icons left-aligned, so a lone
+// icon and a row of three put their labels at the same x.
+.buff-icons {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 3px;
+  min-width: calc(var(--icon-slots, 1) * 24px + (var(--icon-slots, 1) - 1) * 3px);
+}
+
+.buff-icon {
+  display: flex;
+  transition: opacity 120ms ease, filter 120ms ease;
+
+  // Missing but still hoverable: the tooltip is how you find out what the composition would need.
+  &--missing {
+    opacity: 0.4;
+    filter: grayscale(1);
+  }
+}
+
+.buff-label {
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.buff-entry--missing .buff-label {
+  color: var(--color-text-muted);
+}
+
+// A left accent bar rather than a filled/bordered card: a pool is a sub-group of the same list, not
+// a separate widget — a full card made it look like an unrelated element interrupting the list.
+.buff-pool {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0 2px 10px;
+  border-left: 2px solid var(--color-border);
+}
+
+.buff-pool-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.buff-pool-name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+// One shade darker than the panel's own background so it reads as an inset chip, not a flat patch.
+.buff-pool-count {
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+}
+
+.buff-pool--empty .buff-pool-count {
+  color: var(--color-text-muted);
+}

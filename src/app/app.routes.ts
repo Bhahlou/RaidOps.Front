@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { PageLayoutComponent } from './shared/layout/page/page-layout.component';
 
@@ -61,6 +62,12 @@ export const routes: Routes = [
             path: 'gear-planner',
             loadComponent: () =>
               import('./features/gear-planner/gear-planner.component').then(m => m.GearPlannerComponent),
+          },
+          {
+            path: 'admin/raid-buffs',
+            canActivate: [adminGuard],
+            loadComponent: () =>
+              import('./features/admin/pages/raid-buffs-admin/raid-buffs-admin.component').then(m => m.RaidBuffsAdminComponent),
           },
           {
             path: 'settings',

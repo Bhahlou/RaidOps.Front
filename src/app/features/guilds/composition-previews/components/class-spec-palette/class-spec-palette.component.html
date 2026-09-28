@@ -4,12 +4,18 @@
       <div class="palette-card-header">
         <app-wow-class-icon [classId]="cls.id" [size]="16" />
         <span class="palette-card-name" [style.color]="'#' + cls.color">{{ className(cls.id) }}</span>
+        <span class="palette-card-count">{{ classCount(cls.id) }}</span>
       </div>
       <div class="palette-card-specs">
         @for (spec of specsFor(cls.id); track spec.id) {
-          <div class="palette-spec" cdkDrag [cdkDragData]="dragItem(cls, spec)" [title]="'specs.' + spec.id | transloco">
-            @if (spec.iconUrl) {
-              <img class="palette-spec-icon" [ngSrc]="spec.iconUrl" [alt]="'specs.' + spec.id | transloco" width="28" height="28" />
+          <div class="palette-spec-wrapper">
+            <div class="palette-spec" cdkDrag [cdkDragData]="dragItem(cls, spec)" [title]="'specs.' + spec.id | transloco">
+              @if (spec.iconUrl) {
+                <img class="palette-spec-icon" [ngSrc]="spec.iconUrl" [alt]="'specs.' + spec.id | transloco" width="28" height="28" />
+              }
+            </div>
+            @if (specCount(spec.id) > 0) {
+              <span class="palette-spec-badge">{{ specCount(spec.id) }}</span>
             }
           </div>
         }

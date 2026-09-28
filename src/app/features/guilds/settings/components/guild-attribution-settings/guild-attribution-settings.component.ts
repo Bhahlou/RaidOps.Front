@@ -224,6 +224,7 @@ export class GuildAttributionSettingsComponent {
         data: {
           guildId: this.guildId(),
           guildBranchId: this.guildBranchId(),
+          expansionId: this.expansionId(),
           raidBossId: this.currentRaidBossId(),
           section,
           icon: found.icon,

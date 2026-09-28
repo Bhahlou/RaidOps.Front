@@ -1,0 +1,187 @@
+:host {
+  display: block;
+}
+
+// Fixed column tracks shared by every row, so spell icons, effect text, source icons and keys line up
+// vertically from one row to the next whatever their content.
+$row-columns: 32px minmax(0, 1fr) 96px 200px 72px;
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.expansion-select {
+  width: 220px;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.import-summary {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.definition-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.definition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.definition-row {
+  display: grid;
+  grid-template-columns: $row-columns;
+  align-items: center;
+  column-gap: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--color-bg-tertiary);
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}
+
+.spell-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.icon-placeholder {
+  font-size: 28px;
+  color: var(--color-text-muted);
+}
+
+.definition-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.definition-label {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.definition-spell {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.source-icons,
+.definition-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+
+  img {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+.source-icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+}
+
+.chip {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.chip--key {
+  color: var(--color-text-muted);
+  border-style: dashed;
+}
+
+.definition-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+// Below this width the fixed tracks no longer fit: rows fall back to a wrapping layout.
+@media (max-width: 860px) {
+  .definition-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .definition-main {
+    flex: 1 1 180px;
+  }
+
+  .expansion-select {
+    width: 100%;
+  }
+}

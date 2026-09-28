@@ -6,6 +6,7 @@ import { PageHeaderComponent } from '../../../../../shared/components/layout/pag
 import { ButtonComponent } from '../../../../../shared/components/buttons/button/button.component';
 import { IconButtonComponent } from '../../../../../shared/components/buttons/icon-button/icon-button.component';
 import { FormFieldCardComponent } from '../../../../../shared/components/form/form-field-card/form-field-card.component';
+import { BranchTabsComponent } from '../../../components/branch-tabs/branch-tabs.component';
 import { ConfirmDialogComponent } from '../../../../../shared/components/dialogs/confirm-dialog/confirm-dialog.component';
 import { SnackbarService } from '../../../../../core/services/snackbar.service';
 import { injectGuildContext, injectGuildBranchContext } from '../../../inject-guild-context';
@@ -17,7 +18,7 @@ import { RenamePreviewDialogComponent, RenamePreviewDialogData } from '../../com
 /** List of a guild branch's raid composition previews — create/rename/duplicate/delete, click a row to open its composer. */
 @Component({
   selector: 'app-composition-previews-list',
-  imports: [RouterLink, TranslocoPipe, PageHeaderComponent, ButtonComponent, IconButtonComponent, FormFieldCardComponent],
+  imports: [RouterLink, TranslocoPipe, PageHeaderComponent, BranchTabsComponent, ButtonComponent, IconButtonComponent, FormFieldCardComponent],
   templateUrl: './composition-previews-list.component.html',
   styleUrl: './composition-previews-list.component.scss',
 })

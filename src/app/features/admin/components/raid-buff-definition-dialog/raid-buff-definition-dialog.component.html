@@ -1,0 +1,102 @@
+<h2 class="dialog-title">
+  {{ (isEditMode ? 'admin.raidBuffs.dialog.editTitle' : 'admin.raidBuffs.dialog.createTitle') | transloco }}
+</h2>
+
+<div class="dialog-content">
+  <div class="field-group">
+    <span class="field-label">{{ 'admin.raidBuffs.dialog.spell' | transloco }}</span>
+    <div class="spell-row">
+      @if (spell(); as selectedSpell) {
+        @if (selectedSpell.iconUrl) {
+          <app-spell-icon [iconUrl]="selectedSpell.iconUrl" [label]="selectedSpell.name" [spellId]="selectedSpell.id" [expansionId]="data.expansionId" [size]="28" />
+        }
+        <span class="spell-name">{{ selectedSpell.name }}</span>
+        <span class="spell-id">#{{ selectedSpell.id }}</span>
+      } @else {
+        <span class="field-hint">{{ 'admin.raidBuffs.dialog.noSpell' | transloco }}</span>
+      }
+      <app-spell-picker [expansionId]="data.expansionId" (selected)="onSpellSelected($event)" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <app-select
+      class="field-row-item"
+      [label]="'admin.raidBuffs.dialog.scope' | transloco"
+      [options]="scopeOptions()"
+      [value]="scope()"
+      (valueChange)="scope.set($event ?? scope())"
+    />
+    <app-select
+      class="field-row-item"
+      [label]="'admin.raidBuffs.dialog.kind' | transloco"
+      [options]="kindOptions()"
+      [value]="kind()"
+      (valueChange)="kind.set($event ?? kind())"
+    />
+  </div>
+
+  <div class="field-row">
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.labelEn' | transloco" class="field-row-item">
+      <input type="text" class="text-input" autocomplete="off" maxlength="128" [value]="labelEn()" (input)="labelEn.set($any($event.target).value)" [attr.aria-label]="'admin.raidBuffs.dialog.labelEn' | transloco" />
+    </app-form-field-card>
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.labelFr' | transloco" class="field-row-item">
+      <input type="text" class="text-input" autocomplete="off" maxlength="128" [value]="labelFr()" (input)="labelFr.set($any($event.target).value)" [attr.aria-label]="'admin.raidBuffs.dialog.labelFr' | transloco" />
+    </app-form-field-card>
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.labelDe' | transloco" class="field-row-item">
+      <input type="text" class="text-input" autocomplete="off" maxlength="128" [value]="labelDe()" (input)="labelDe.set($any($event.target).value)" [attr.aria-label]="'admin.raidBuffs.dialog.labelDe' | transloco" />
+    </app-form-field-card>
+  </div>
+
+  <div class="field-row">
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.exclusiveGroupKey' | transloco" class="field-row-item">
+      <input type="text" class="text-input" autocomplete="off" maxlength="64" [value]="exclusiveGroupKey()" (input)="exclusiveGroupKey.set($any($event.target).value)" [attr.aria-label]="'admin.raidBuffs.dialog.exclusiveGroupKey' | transloco" />
+    </app-form-field-card>
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.capacityPoolKey' | transloco" class="field-row-item">
+      <input type="text" class="text-input" autocomplete="off" maxlength="64" [value]="capacityPoolKey()" (input)="capacityPoolKey.set($any($event.target).value)" [attr.aria-label]="'admin.raidBuffs.dialog.capacityPoolKey' | transloco" />
+    </app-form-field-card>
+    <app-form-field-card [label]="'admin.raidBuffs.dialog.sortOrder' | transloco" class="field-row-item sort-order">
+      <input type="number" class="text-input" [value]="sortOrder()" (input)="sortOrder.set($any($event.target).valueAsNumber || 0)" [attr.aria-label]="'admin.raidBuffs.dialog.sortOrder' | transloco" />
+    </app-form-field-card>
+  </div>
+  <span class="field-hint">{{ 'admin.raidBuffs.dialog.keysHint' | transloco }}</span>
+
+  <div class="field-group">
+    <span class="field-label">{{ 'admin.raidBuffs.dialog.sources' | transloco }}</span>
+    <span class="field-hint">{{ 'admin.raidBuffs.dialog.sourcesHint' | transloco }}</span>
+
+    <div class="source-list">
+      @for (row of sources(); track row.key) {
+        <div class="source-row">
+          <app-select
+            class="source-select"
+            [label]="'admin.raidBuffs.dialog.class' | transloco"
+            [options]="classOptions()"
+            [value]="row.classId"
+            (valueChange)="setSourceClass(row.key, $event)"
+          />
+          <app-select
+            class="source-select"
+            [label]="'admin.raidBuffs.dialog.spec' | transloco"
+            [options]="specOptionsFor(row)"
+            [value]="row.classId === null ? null : row.specId"
+            [disabled]="row.classId === null"
+            (valueChange)="setSourceSpec(row.key, $event)"
+          />
+          <app-icon-button icon="delete" (click)="removeSource(row.key)" [title]="'admin.raidBuffs.dialog.removeSource' | transloco" />
+        </div>
+      }
+    </div>
+
+    <div>
+      <app-button variant="text" icon="add" (click)="addSource()">{{ 'admin.raidBuffs.dialog.addSource' | transloco }}</app-button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'admin.raidBuffs.dialog.cancel' | transloco }}</app-button>
+  <app-button variant="primary" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'admin.raidBuffs.dialog.save' | transloco }}
+  </app-button>
+</div>

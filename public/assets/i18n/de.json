@@ -11,6 +11,80 @@
       "trigger": "Zauber synchronisieren",
       "success": "Zauber-Synchronisierung abgeschlossen",
       "error": "Zauber-Synchronisierung fehlgeschlagen"
+    },
+    "raidBuffs": {
+      "menu": "Raid-Buffs",
+      "title": "Raid-Buffs und -Debuffs",
+      "intro": "Die ausgewählten Buffs und Debuffs, die eine Raid-Zusammenstellung mitbringen kann, je Erweiterung. Änderungen gelten sofort; mit Export/Import gleichst du eine andere Umgebung an.",
+      "expansion": "Erweiterung",
+      "add": "Hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "export": "JSON kopieren",
+      "import": "JSON importieren",
+      "importSummary": "Letzter Import: {{ created }} erstellt, {{ updated }} aktualisiert, {{ deleted }} gelöscht.",
+      "exportCopied": "JSON in die Zwischenablage kopiert",
+      "exportFailed": "Kopieren in die Zwischenablage nicht möglich",
+      "importDialog": {
+        "title": "Definitionen importieren",
+        "hint": "Füge das JSON aus dem Export einer anderen Umgebung ein. Es wird in die in der Datei genannte Erweiterung geschrieben.",
+        "placeholder": "{ \"expansionId\": 12, \"definitions\": [ … ] }",
+        "preview": "{{ count }} Definitionen für {{ expansion }}.",
+        "pruneMissing": "Auch Definitionen der Erweiterung löschen, die nicht in diesem JSON stehen",
+        "pruneWarning": "Alle Definitionen dieser Erweiterung, die nicht im eingefügten JSON stehen, werden gelöscht.",
+        "submit": "Importieren",
+        "errors": {
+          "tooLarge": "Dieser Text ist zu groß für einen Export von Raid-Buffs.",
+          "invalidJson": "Das ist kein gültiges JSON.",
+          "invalidShape": "Dieses JSON ist kein gültiger Export von Raid-Buffs (unbekannte Werte, fehlende Felder oder nicht erlaubte Zeichen)."
+        }
+      },
+      "importSuccess": "Definitionen importiert",
+      "saveSuccess": "Definition gespeichert",
+      "deleteSuccess": "Definition gelöscht",
+      "deleteConfirmTitle": "Diese Definition löschen?",
+      "deleteConfirmMessage": "„{{ name }}“ wird bei Raid-Zusammenstellungen nicht mehr geprüft.",
+      "empty": "Für diese Erweiterung gibt es noch keine Definition.",
+      "exclusiveGroupKey": "Exklusive Gruppe — diese Effekte addieren sich nicht",
+      "capacityPoolKey": "Kapazitätspool — jeder Anbieter deckt nur einen davon ab",
+      "scope": {
+        "Raid": "Raid",
+        "Group": "Gruppe",
+        "Individual": "Einzeln"
+      },
+      "kind": {
+        "Buff": "Buff",
+        "Debuff": "Debuff"
+      },
+      "section": {
+        "Raid": { "Buff": "Raid-Buffs", "Debuff": "Raid-Debuffs" },
+        "Group": { "Buff": "Gruppen-Buffs", "Debuff": "Gruppen-Debuffs" },
+        "Individual": { "Buff": "Einzel-Buffs", "Debuff": "Einzel-Debuffs" }
+      },
+      "dialog": {
+        "createTitle": "Buff oder Debuff hinzufügen",
+        "editTitle": "Buff oder Debuff bearbeiten",
+        "spell": "Zauber",
+        "noSpell": "Kein Zauber gewählt",
+        "scope": "Reichweite",
+        "kind": "Art",
+        "labelEn": "Bezeichnung (Englisch)",
+        "labelFr": "Bezeichnung (Französisch)",
+        "labelDe": "Bezeichnung (Deutsch)",
+        "exclusiveGroupKey": "Exklusive Gruppe",
+        "capacityPoolKey": "Kapazitätspool",
+        "sortOrder": "Reihenfolge",
+        "keysHint": "Definitionen einer exklusiven Gruppe sind Alternativen für einen einzigen Effekt; Definitionen eines Kapazitätspools werden pro Anbieter der Reihe nach abgedeckt. Schlüssel bestehen nur aus Kleinbuchstaben, Ziffern und Bindestrichen. Leer lassen, wenn nichts davon zutrifft.",
+        "sources": "Wer liefert es",
+        "sourcesHint": "Eine dieser Klassen oder Spezialisierungen genügt.",
+        "class": "Klasse",
+        "spec": "Spezialisierung",
+        "anySpec": "Jede Spezialisierung",
+        "addSource": "Klasse oder Spezialisierung hinzufügen",
+        "removeSource": "Entfernen",
+        "cancel": "Abbrechen",
+        "save": "Speichern"
+      }
     }
   },
   "confirmDialog": {
@@ -110,6 +184,10 @@
     },
     "viewGuide": "Anleitung ansehen →",
     "entries": {
+      "raidBuffs": {
+        "title": "Gepflegte Raid-Buffs & -Debuffs in Kompositionsvorschauen",
+        "description": "Kompositionsvorschauen zeigen jetzt ein Panel, das die Raid-Buffs, Raid-Debuffs und Einzel-Buffs einer Zusammenstellung zusammenfasst, geprüft gegen eine je Erweiterung gepflegte Liste — fehlende Effekte bleiben sichtbar, aber ausgegraut (Symbol und Wowhead-Tooltip funktionieren weiterhin), nicht stapelbare Alternativen teilen sich eine Zeile, und Effekte mit begrenzter Kapazität wie Segen zeigen einen „n/m“-Zähler. Eine Karte unter jeder Gruppe listet die von ihr gelieferten Gruppen-Buffs. Die Klassenpalette ist über das Raster gewandert und zeigt jetzt Platzierungszähler je Klasse und Spezialisierung."
+      },
       "raidCompositionPreview": {
         "title": "Eine Raid-Zusammensetzung simulieren, bevor echte Charaktere existieren",
         "description": "Offiziere können jetzt ein benanntes, theoretisches Gruppen-/Slot-Raster (1 bis 8 Gruppen zu je 5, passend zum geplanten Format) über eine neue Seite „Kompositionsvorschauen“ aufbauen — eine Spezialisierung aus der Klassenpalette auf einen Slot ziehen und pro Slot eine Freitext-Notiz hinzufügen. Ein Rollenzähler summiert Tanks/Heiler/Nahkampf/Fernkampf beim Platzieren. Nützlich direkt nach der Aktivierung eines neuen Branches, solange der Battle.net-Import dafür noch nicht verfügbar ist. Kein Datum, keine Lockout und kein echter Charakter beteiligt; beliebig viele erstellen/umbenennen/duplizieren/löschen."
@@ -341,6 +419,10 @@
       "raidCompositionPreview": {
         "title": "Raid-Kompositionsvorschauen",
         "description": "Simuliere ein theoretisches Gruppen-/Slot-Raster — Klassen-/Spezialisierungs-Platzhalter und Notizen — bevor echte Charaktere existieren."
+      },
+      "raidBuffs": {
+        "title": "Raid-Buffs & -Debuffs",
+        "description": "Je Erweiterung gepflegte Buff-/Debuff-Abdeckung, angezeigt auf Kompositionsvorschauen, mit einer Übersicht, was einer Zusammenstellung noch fehlt."
       },
       "raidAssignments": {
         "title": "Raid-Zuweisungen",
@@ -1305,6 +1387,15 @@
       "duplicateSubmit": "Duplizieren"
     },
     "groupsLabel": "{{count}} Gruppen",
+    "buffs": {
+      "buffs": "Raid-Buffs",
+      "debuffs": "Raid-Debuffs",
+      "individual": "Einzel-Buffs",
+      "poolHint": "Jedes Mitglied der Zusammenstellung kann nur für einen dieser Effekte gezählt werden.",
+      "pools": {
+        "paladin-blessings": "Segen"
+      }
+    },
     "composer": {
       "loading": "Vorschau wird geladen…",
       "breadcrumb": "Vorschau",

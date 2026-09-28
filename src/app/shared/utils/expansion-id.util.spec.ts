@@ -1,4 +1,4 @@
-import { expansionIdFromShortCode } from './expansion-id.util';
+import { allExpansions, expansionIdFromShortCode } from './expansion-id.util';
 
 describe('expansionIdFromShortCode', () => {
   it.each([
@@ -24,5 +24,20 @@ describe('expansionIdFromShortCode', () => {
 
   it('returns null for undefined', () => {
     expect(expansionIdFromShortCode(undefined)).toBeNull();
+  });
+});
+
+describe('allExpansions', () => {
+  it('returns every expansion, matching expansionIdFromShortCode', () => {
+    const expansions = allExpansions();
+
+    expect(expansions).toHaveLength(12);
+    for (const { id, shortCode } of expansions) {
+      expect(expansionIdFromShortCode(shortCode)).toBe(id);
+    }
+  });
+
+  it('includes Forever', () => {
+    expect(allExpansions()).toContainEqual({ id: 12, shortCode: 'Forever' });
   });
 });

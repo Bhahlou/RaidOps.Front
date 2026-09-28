@@ -1,0 +1,50 @@
+<ng-template #entryTemplate let-entry>
+  <li class="buff-entry" [class.buff-entry--missing]="!entry.covered">
+    <span class="buff-icons">
+      @for (icon of entry.icons; track icon.definition.id) {
+        <span class="buff-icon" [class.buff-icon--missing]="!icon.provided">
+          <app-spell-icon
+            [iconUrl]="icon.definition.spell?.iconUrl ?? ''"
+            [label]="spellName(icon.definition)"
+            [spellId]="icon.definition.spellId"
+            [expansionId]="expansionId()"
+            [size]="24"
+          />
+        </span>
+      }
+    </span>
+    <span class="buff-label">{{ label(entry.definition) }}</span>
+  </li>
+</ng-template>
+
+@if (sections().length > 0) {
+  <div class="buffs-panel">
+    @for (section of sections(); track section.key) {
+      <section class="buffs-section" [style.--icon-slots]="section.iconSlots">
+        <h3 class="buffs-section-title">{{ 'compositionPreviews.buffs.' + section.key | transloco }}</h3>
+
+        <ul class="buff-list">
+          @for (item of section.items; track $index) {
+            @if (item.kind === 'entry') {
+              <ng-container *ngTemplateOutlet="entryTemplate; context: { $implicit: item.entry }" />
+            } @else {
+              <li class="buff-pool" [class.buff-pool--empty]="item.pool.covered === 0">
+                <div class="buff-pool-header">
+                  <span class="buff-pool-name">{{ poolLabel(item.pool.key) }}</span>
+                  <span class="buff-pool-count" [title]="'compositionPreviews.buffs.poolHint' | transloco">
+                    {{ item.pool.covered }}/{{ item.pool.total }}
+                  </span>
+                </div>
+                <ul class="buff-list buff-list--nested">
+                  @for (entry of item.pool.entries; track entry.key) {
+                    <ng-container *ngTemplateOutlet="entryTemplate; context: { $implicit: entry }" />
+                  }
+                </ul>
+              </li>
+            }
+          }
+        </ul>
+      </section>
+    }
+  </div>
+}

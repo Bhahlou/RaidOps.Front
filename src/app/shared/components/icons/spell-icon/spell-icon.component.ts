@@ -1,14 +1,14 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
+import { wowheadSpellUrl, wowheadTooltipDomain } from '../../../utils/wowhead.util';
 
 /**
  * Renders a spell icon from a `Spell.iconUrl` (or any other RaidOps-hosted icon URL) — the seeded
  * reference table already resolves the URL server-side, this component just displays it.
  * Accepts an optional `label` for accessibility and an optional `size` in pixels (default: 24).
  * When `spellId` is set, the icon links to the spell's Wowhead page and shows a native Wowhead
- * tooltip on hover (see `index.html`'s `wow.zamimg.com/js/tooltips.js` include), scoped to TBC
- * data and to the app's active language (`{lang}.tbc.wowhead.com`, confirmed via testing against
- * the live script to serve fully localized tooltip content; plain `tbc` for English).
+ * tooltip on hover (see `index.html`'s `wow.zamimg.com/js/tooltips.js` include), in the app's active language.
+ * The Wowhead sub-site follows `expansionId` (e.g. `forever`, `fr.forever`); without one it falls back to TBC.
  *
  * This has to be a real `<a href>` — confirmed by testing against the live script (an isolated
  * page with `data-wowhead` on a bare `<img>` produced no tooltip at all; the same attribute on an
@@ -30,14 +30,13 @@ export class SpellIconComponent {
   /** Side length in pixels. The icon is always square. */
   readonly size = input(24);
   readonly spellId = input<number | null>(null);
+  /** The expansion the spell belongs to — picks the Wowhead sub-site (tooltip data and link). Falls back to TBC when unset. */
+  readonly expansionId = input<number | null>(null);
 
   readonly wowheadUrl = computed(() => {
     const id = this.spellId();
-    return id ? `https://www.wowhead.com/spell=${id}` : null;
+    return id ? wowheadSpellUrl(this.expansionId(), id) : null;
   });
 
-  readonly wowheadDomain = computed(() => {
-    const lang = this.#transloco.activeLang();
-    return lang === 'en' ? 'tbc' : `${lang}.tbc`;
-  });
+  readonly wowheadDomain = computed(() => wowheadTooltipDomain(this.expansionId(), this.#transloco.activeLang()));
 }

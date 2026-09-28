@@ -14,6 +14,22 @@
           />
         }
       </div>
+
+      @if (groupBuffsFor(group); as buffs) {
+        @if (buffs.length > 0) {
+          <div class="group-buffs-card">
+            @for (buff of buffs; track buff.id) {
+              <app-spell-icon
+                [iconUrl]="buff.spell?.iconUrl ?? ''"
+                [label]="buffLabel(buff)"
+                [spellId]="buff.spellId"
+                [expansionId]="expansionId()"
+                [size]="22"
+              />
+            }
+          </div>
+        }
+      }
     </div>
   }
 </div>

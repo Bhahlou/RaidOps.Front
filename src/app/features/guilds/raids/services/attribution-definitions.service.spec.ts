@@ -128,15 +128,4 @@ describe('AttributionDefinitionsService', () => {
       req.flush(null);
     });
   });
-
-  describe('searchSpells', () => {
-    it('sends GET to .../spells/search with the search params', () => {
-      service.searchSpells('guild-1', 7, 'frappe', 'fr').subscribe();
-      const req = controller.expectOne(
-        (r) => r.url.endsWith(`${BRANCH}/spells/search`) && !r.params.has('expansionId') && r.params.get('searchTerm') === 'frappe' && r.params.get('locale') === 'fr',
-      );
-      expect(req.request.method).toBe('GET');
-      req.flush([]);
-    });
-  });
 });

@@ -10,6 +10,8 @@ import { IconSourcePickerComponent, IconSourceState } from '../../../raids/compo
 export interface SectionIconDialogData {
   guildId: string;
   guildBranchId: number;
+  /** The branch's expansion — the spell picker searches spells on it. */
+  expansionId: number;
   /** Scope of the section being edited — the boss's ID, or `null` for a "General" section. */
   raidBossId: number | null;
   section: string;

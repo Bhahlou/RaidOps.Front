@@ -49,7 +49,7 @@ describe('BranchTabsComponent', () => {
 
   const setup = (
     branches: UserGuildBranch[],
-    leaf: 'dashboard' | 'roster' | 'loot' = 'roster',
+    leaf: 'dashboard' | 'roster' | 'loot' | 'raids' | 'composition-previews' = 'roster',
     wowBranches: Branch[] = [wowBranch()],
   ) => {
     const user = { discordId: '1', name: 'Viewer', avatarHash: null, guilds: [guild(branches)], notifications: [] };
@@ -114,6 +114,18 @@ describe('BranchTabsComponent', () => {
       );
 
       expect(c.branches().map((b) => b.id)).toEqual([1, 2]);
+    });
+
+    it('requires Officer for the composition-previews leaf', () => {
+      const c = setup(
+        [
+          branch({ id: 1, accessLevel: GuildAccessLevel.Officer }),
+          branch({ id: 2, accessLevel: GuildAccessLevel.Roster }),
+        ],
+        'composition-previews',
+      );
+
+      expect(c.branches().map((b) => b.id)).toEqual([1]);
     });
   });
 

@@ -10,12 +10,11 @@ import {
 } from '../models/guild-attribution-definition.model';
 import { RaidBoss } from '../models/raid-boss.model';
 import { RaidZone } from '../models/raid-zone.model';
-import { Spell } from '../models/spell.model';
 
 /**
- * Thin HTTP wrapper over `api/v1/guilds/{guildId}/branches/{guildBranchId}/attribution-definitions` and
- * the spell search endpoint — every template is scoped to one guild branch (a guild running several
- * branches keeps one template per branch, since spells/classes/raids all depend on the branch's expansion).
+ * Thin HTTP wrapper over `api/v1/guilds/{guildId}/branches/{guildBranchId}/attribution-definitions` —
+ * every template is scoped to one guild branch (a guild running several branches keeps one template
+ * per branch, since spells/classes/raids all depend on the branch's expansion).
  */
 @Service()
 export class AttributionDefinitionsService {
@@ -66,12 +65,5 @@ export class AttributionDefinitionsService {
   /** Sets the section-header icon shown above every row sharing one (scope, section) tuple. */
   setSectionIcon(guildId: string, guildBranchId: number, payload: SetAttributionSectionIconPayload): Observable<void> {
     return this.#http.post<void>(`${this.#branchBase(guildId, guildBranchId)}/attribution-definitions/sections/icon`, payload);
-  }
-
-  /** Searches the spells of the branch's expansion by localized name substring — the server derives the expansion from the branch. */
-  searchSpells(guildId: string, guildBranchId: number, searchTerm: string, locale: string): Observable<Spell[]> {
-    return this.#http.get<Spell[]>(`${this.#branchBase(guildId, guildBranchId)}/spells/search`, {
-      params: { searchTerm, locale },
-    });
   }
 }

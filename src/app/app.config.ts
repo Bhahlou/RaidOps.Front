@@ -12,6 +12,7 @@ import localeFr from '@angular/common/locales/fr';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
 import { provideTransloco, provideTranslocoLoader, TranslocoService } from '@jsverse/transloco';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { provideServiceWorker } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 
@@ -33,6 +34,11 @@ registerLocaleData(localeEn, 'en');
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    // CDK overlays default to the browser's top layer (Popover API), which sits above everything —
+    // including the Wowhead tooltip (appended to <body> by a third-party script), so a spell icon
+    // hovered inside a dialog or menu showed its tooltip underneath it. Classic stacking (the overlay
+    // container, z-index 1000) lets the tooltip be raised above overlays with a plain z-index.
+    { provide: OVERLAY_DEFAULT_CONFIG, useValue: { usePopover: false } },
     provideRouter(routes, withRouterConfig({ paramsInheritanceStrategy: 'always' })),
     provideHttpClient(withInterceptors([snackbarInterceptor, loadingInterceptor, authInterceptor])),
     provideTransloco({

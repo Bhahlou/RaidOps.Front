@@ -24,3 +24,8 @@ export function expansionIdFromShortCode(shortCode: string | undefined): number 
   if (!shortCode) return null;
   return EXPANSION_IDS_BY_SHORT_CODE[shortCode] ?? null;
 }
+
+/** Every known expansion as `{ id, shortCode }`, in release order — for pickers that offer all of them. */
+export function allExpansions(): { id: number; shortCode: string }[] {
+  return Object.entries(EXPANSION_IDS_BY_SHORT_CODE).map(([shortCode, id]) => ({ id, shortCode }));
+}

@@ -11,6 +11,80 @@
       "trigger": "Sync spells",
       "success": "Spell sync completed",
       "error": "Spell sync failed"
+    },
+    "raidBuffs": {
+      "menu": "Raid buffs",
+      "title": "Raid buffs & debuffs",
+      "intro": "The curated buffs and debuffs a raid composition can bring, per expansion. Changes apply immediately; use export/import to align another environment.",
+      "expansion": "Expansion",
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "export": "Copy JSON",
+      "import": "Import JSON",
+      "importSummary": "Last import: {{ created }} created, {{ updated }} updated, {{ deleted }} deleted.",
+      "exportCopied": "JSON copied to the clipboard",
+      "exportFailed": "Couldn't copy to the clipboard",
+      "importDialog": {
+        "title": "Import definitions",
+        "hint": "Paste the JSON copied from another environment's export. It is written to the expansion named in the file.",
+        "placeholder": "{ \"expansionId\": 12, \"definitions\": [ … ] }",
+        "preview": "{{ count }} definitions for {{ expansion }}.",
+        "pruneMissing": "Also delete the expansion's definitions that are not in this JSON",
+        "pruneWarning": "Every definition of that expansion missing from the pasted JSON will be deleted.",
+        "submit": "Import",
+        "errors": {
+          "tooLarge": "This text is too large to be a raid buffs export.",
+          "invalidJson": "This is not valid JSON.",
+          "invalidShape": "This JSON is not a valid raid buffs export (unknown values, missing fields or unsupported characters)."
+        }
+      },
+      "importSuccess": "Definitions imported",
+      "saveSuccess": "Definition saved",
+      "deleteSuccess": "Definition deleted",
+      "deleteConfirmTitle": "Delete this definition?",
+      "deleteConfirmMessage": "\"{{ name }}\" will no longer be checked against raid compositions.",
+      "empty": "No definition for this expansion yet.",
+      "exclusiveGroupKey": "Exclusive group — these effects do not stack",
+      "capacityPoolKey": "Capacity pool — each provider covers only one of them",
+      "scope": {
+        "Raid": "Raid",
+        "Group": "Group",
+        "Individual": "Individual"
+      },
+      "kind": {
+        "Buff": "Buff",
+        "Debuff": "Debuff"
+      },
+      "section": {
+        "Raid": { "Buff": "Raid buffs", "Debuff": "Raid debuffs" },
+        "Group": { "Buff": "Group buffs", "Debuff": "Group debuffs" },
+        "Individual": { "Buff": "Individual buffs", "Debuff": "Individual debuffs" }
+      },
+      "dialog": {
+        "createTitle": "Add a buff or debuff",
+        "editTitle": "Edit a buff or debuff",
+        "spell": "Spell",
+        "noSpell": "No spell chosen",
+        "scope": "Scope",
+        "kind": "Kind",
+        "labelEn": "Label (English)",
+        "labelFr": "Label (French)",
+        "labelDe": "Label (German)",
+        "exclusiveGroupKey": "Exclusive group",
+        "capacityPoolKey": "Capacity pool",
+        "sortOrder": "Order",
+        "keysHint": "Definitions sharing an exclusive group are alternatives for one effect; definitions sharing a capacity pool are covered one per provider, in order. Keys use lowercase letters, digits and hyphens only. Leave empty if neither applies.",
+        "sources": "Who provides it",
+        "sourcesHint": "Any one of these classes or specs is enough.",
+        "class": "Class",
+        "spec": "Spec",
+        "anySpec": "Any spec",
+        "addSource": "Add a class or spec",
+        "removeSource": "Remove",
+        "cancel": "Cancel",
+        "save": "Save"
+      }
     }
   },
   "confirmDialog": {
@@ -110,6 +184,10 @@
     },
     "viewGuide": "View guide →",
     "entries": {
+      "raidBuffs": {
+        "title": "Curated raid buffs & debuffs in composition previews",
+        "description": "Composition previews now show a panel summing up the raid buffs, raid debuffs and individual buffs a composition brings, checked against a curated list maintained per expansion — missing effects stay visible but greyed out (icon and Wowhead tooltip still work), non-stacking alternatives share one row, and capacity-limited effects like blessings show an \"n/m\" counter. A card under each group lists the group buffs it provides. The class palette moved above the grid and gained per-class and per-spec placement counters."
+      },
       "raidCompositionPreview": {
         "title": "Simulate a raid composition before real characters exist",
         "description": "Officers can now build a named, theoretical group/slot grid (1 to 8 groups of 5, whatever format you're planning for) from a new \"Composition previews\" page — drag a spec from the class palette onto a slot, and add a free-text note per slot. A role counter tallies tanks/healers/melee/ranged as you place specs. Useful right after activating a new branch, ahead of Battle.net import being available for it. No date, lockout, or real character involved; create/rename/duplicate/delete as many as you like."
@@ -341,6 +419,10 @@
       "raidCompositionPreview": {
         "title": "Raid composition previews",
         "description": "Simulate a theoretical group/slot grid — class/spec placeholders and notes — before real characters exist."
+      },
+      "raidBuffs": {
+        "title": "Raid buffs & debuffs",
+        "description": "Curated per-expansion buff/debuff coverage shown on composition previews, with a checklist of what a composition still lacks."
       },
       "raidAssignments": {
         "title": "Raid assignments",
@@ -1305,6 +1387,15 @@
       "duplicateSubmit": "Duplicate"
     },
     "groupsLabel": "{{count}} groups",
+    "buffs": {
+      "buffs": "Raid buffs",
+      "debuffs": "Raid debuffs",
+      "individual": "Individual buffs",
+      "poolHint": "Each member of the composition can only be counted for one of these effects.",
+      "pools": {
+        "paladin-blessings": "Blessings"
+      }
+    },
     "composer": {
       "loading": "Loading preview…",
       "breadcrumb": "Preview",

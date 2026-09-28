@@ -1,0 +1,47 @@
+<h2 class="dialog-title">{{ 'admin.raidBuffs.importDialog.title' | transloco }}</h2>
+
+<div class="dialog-content">
+  <p class="hint">{{ 'admin.raidBuffs.importDialog.hint' | transloco }}</p>
+
+  <textarea
+    class="text-input json-input"
+    spellcheck="false"
+    autocomplete="off"
+    rows="12"
+    [attr.maxlength]="maxChars"
+    [value]="text()"
+    (input)="onTextInput($any($event.target).value)"
+    [placeholder]="'admin.raidBuffs.importDialog.placeholder' | transloco"
+    [attr.aria-label]="'admin.raidBuffs.importDialog.title' | transloco"
+  ></textarea>
+
+  @if (parsed(); as result) {
+    @if (result.ok && preview(); as summary) {
+      <p class="status status--ok">
+        {{ 'admin.raidBuffs.importDialog.preview' | transloco: { count: summary.count, expansion: summary.expansion } }}
+      </p>
+    } @else if (!result.ok) {
+      <p class="status status--error" role="alert">{{ 'admin.raidBuffs.importDialog.errors.' + result.error | transloco }}</p>
+    }
+  }
+
+  @if (serverError(); as detail) {
+    <p class="status status--error" role="alert">{{ detail }}</p>
+  }
+
+  <div class="prune-option">
+    <app-checkbox [checked]="pruneMissing()" (checkedChange)="pruneMissing.set($event)">
+      {{ 'admin.raidBuffs.importDialog.pruneMissing' | transloco }}
+    </app-checkbox>
+    @if (pruneMissing()) {
+      <p class="status status--warning">{{ 'admin.raidBuffs.importDialog.pruneWarning' | transloco }}</p>
+    }
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <app-button variant="text" (click)="cancel()">{{ 'admin.raidBuffs.dialog.cancel' | transloco }}</app-button>
+  <app-button [variant]="pruneMissing() ? 'danger' : 'primary'" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'admin.raidBuffs.importDialog.submit' | transloco }}
+  </app-button>
+</div>

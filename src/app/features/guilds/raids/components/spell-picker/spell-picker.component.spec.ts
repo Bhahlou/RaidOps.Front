@@ -3,7 +3,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
 
 import { SpellPickerComponent } from './spell-picker.component';
-import { AttributionDefinitionsService } from '../../services/attribution-definitions.service';
+import { SpellService } from '../../services/spell.service';
 import { Spell } from '../../models/spell.model';
 
 const spell = (overrides?: Partial<Spell>): Spell => ({
@@ -22,14 +22,13 @@ describe('SpellPickerComponent', () => {
     TestBed.configureTestingModule({
       imports: [SpellPickerComponent],
       providers: [
-        { provide: AttributionDefinitionsService, useValue: { searchSpells } },
+        { provide: SpellService, useValue: { search: searchSpells } },
         { provide: TranslocoService, useValue: { getActiveLang: () => 'fr', translate: (key: string) => key } },
       ],
     }).overrideComponent(SpellPickerComponent, { set: { template: '', imports: [] } });
 
     const fixture = TestBed.createComponent(SpellPickerComponent);
-    fixture.componentRef.setInput('guildId', 'guild-1');
-    fixture.componentRef.setInput('guildBranchId', 7);
+    fixture.componentRef.setInput('expansionId', 12);
     fixture.detectChanges();
     return fixture.componentInstance;
   };
@@ -93,7 +92,7 @@ describe('SpellPickerComponent', () => {
 
       vi.advanceTimersByTime(250);
 
-      expect(searchSpells).toHaveBeenCalledWith('guild-1', 7, 'frappe', 'fr');
+      expect(searchSpells).toHaveBeenCalledWith(12, 'frappe', 'fr');
     });
 
     it('cancels a pending debounce when the query changes again', () => {
@@ -110,7 +109,7 @@ describe('SpellPickerComponent', () => {
       vi.advanceTimersByTime(150);
 
       expect(searchSpells).toHaveBeenCalledTimes(1);
-      expect(searchSpells).toHaveBeenCalledWith('guild-1', 7, 'frappe', 'fr');
+      expect(searchSpells).toHaveBeenCalledWith(12, 'frappe', 'fr');
     });
 
     it('deduplicates results sharing the same name and icon, keeping the first', () => {
